@@ -43,6 +43,8 @@ public class BlockEvents implements Listener {
 			
 			if(block.getType() != Material.AIR) {
 			
+				Bukkit.broadcastMessage(block.getType().toString());
+				
 			final BlockState state = block.getState();
 			
 			int delay = 80 + (int)(Math.random()*140);
