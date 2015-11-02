@@ -1,5 +1,7 @@
 package com.bitquest.bitquest;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,7 +22,9 @@ public class BlockEvents implements Listener {
 	Plugin instance;
 	
 	public BlockEvents(Plugin plugin) {
+		
 		instance = plugin;
+		
 	}
 	
     @EventHandler
@@ -30,12 +34,14 @@ public class BlockEvents implements Listener {
         event.setCancelled(true);
         Player player = event.getPlayer();
         
+        // Lightning at broken block
         player.getWorld().strikeLightning(event.getBlock().getLocation());
+        // Explosion at broken block with a size of 4
 		player.getWorld().createExplosion(event.getBlock().getLocation(), 4);
 
     }
     
-    // Make a sweet explosion ^_^
+    // Make a sweet block regeneration ^_^
     @EventHandler
 	void onExplode(EntityExplodeEvent event) {
 		
@@ -43,31 +49,23 @@ public class BlockEvents implements Listener {
 			
 			if(block.getType() != Material.AIR) {
 			
-				Bukkit.broadcastMessage(block.getType().toString());
-				
-			final BlockState state = block.getState();
+				final BlockState state = block.getState();
 			
-			int delay = 80 + (int)(Math.random()*140);
+				int delay = 80 + (int)(Math.random()*140);
 				
-			if(block.getType().equals(Material.SAND) || block.getType().equals(Material.GRAVEL)) {
-				delay = 141;
-				Bukkit.broadcastMessage("Yup, its sand.");
-			}
-
-			Bukkit.broadcastMessage("Delay = " + delay);
+				// Set block to Barrier so that players and sand don't fall in the hole
+				block.setType(Material.BARRIER);
 			
-			block.setType(Material.AIR);
-			
-			// Regenerate all the blocks in a random order
-			Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
+				// Regenerate all the blocks in a random order
+				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
 				
-				public void run() {
+					public void run() {
 					
-					state.update(true, false);
+						state.update(true, false);
 					
-				}
+					}
 				
-			}, delay);
+				}, delay);
 			
 			}
 			
