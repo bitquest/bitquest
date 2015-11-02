@@ -1,5 +1,4 @@
 group 'bitquest'
-version '1.1'
 
 apply plugin: 'java'
 
