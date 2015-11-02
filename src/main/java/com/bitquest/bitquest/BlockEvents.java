@@ -51,8 +51,11 @@ public class BlockEvents implements Listener {
 				
 			if(block.getType().equals(Material.SAND) || block.getType().equals(Material.GRAVEL)) {
 				delay = 141;
+				Bukkit.broadcastMessage("Yup, its sand.");
 			}
 
+			Bukkit.broadcastMessage("Delay = " + delay);
+			
 			block.setType(Material.AIR);
 			
 			// Regenerate all the blocks in a random order
