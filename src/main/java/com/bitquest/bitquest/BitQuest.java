@@ -13,12 +13,14 @@ import java.util.logging.Logger;
 
 
 public class BitQuest extends JavaPlugin {
+	
     public Logger log = Bukkit.getLogger();
     @Override
     public void onEnable() {
         log.info("BitQuest starting...");
         // registers listener classes
-        getServer().getPluginManager().registerEvents(new BlockEvents(),this);
+        getServer().getPluginManager().registerEvents(new BlockEvents(this),this);
+		
     }
 
 }
