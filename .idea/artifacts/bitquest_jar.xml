@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="bitquest:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/bitquest_jar</output-path>
+    <root id="archive" name="bitquest.jar">
+      <element id="module-output" name="bitquest" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/libs/spigot-api-1.8.8-R0.1-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="file-copy" path="$PROJECT_DIR$/libs/spigot-api-1.8.8-R0.1-SNAPSHOT.jar" />
+    </root>
+  </artifact>
+</component>
