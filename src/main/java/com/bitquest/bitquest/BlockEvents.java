@@ -51,10 +51,20 @@ public class BlockEvents implements Listener {
 			
 				final BlockState state = block.getState();
 			
-				int delay = 80 + (int)(Math.random()*140);
+				int delay;
 				
-				// Set block to Barrier so that players and sand don't fall in the hole
-				block.setType(Material.BARRIER);
+				if(block.getType().equals(Material.SAND) || block.getType().equals(Material.GRAVEL)) {
+					
+					delay = 141;
+					
+				} else {
+					
+					delay = 80 + (int)(Math.random()*140);
+					
+				}
+				
+				// Set block to air so that no blocks drop
+				block.setType(Material.AIR);
 			
 				// Regenerate all the blocks in a random order
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
