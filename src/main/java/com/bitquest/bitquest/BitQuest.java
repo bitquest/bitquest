@@ -17,7 +17,7 @@ public class BitQuest extends JavaPlugin {
     // let's get constants from the environment
     public final static String BITQUEST_ENV=System.getenv("BITQUEST_ENV");
     public final static Jedis REDIS=new Jedis("localhost",6379);
-    public final static Logger LOG=Bukkit.getLogger();
+    public final static BitLogger LOG=new BitLogger();
     @Override
     public void onEnable() {
         LOG.info("BitQuest starting...");

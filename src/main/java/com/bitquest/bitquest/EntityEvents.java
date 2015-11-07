@@ -18,6 +18,7 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException {
-
+        BitPlayer user=new BitPlayer(event.getPlayer());
+        BitQuest.LOG.info("");
     }
 }
