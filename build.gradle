@@ -17,7 +17,7 @@ dependencies {
 }
 jar {
     from {
-        ["plugin.yml"]
+        ["plugin.yml","config.yml"]
     }
     baseName = 'bitquest'
 }

@@ -19,6 +19,12 @@ public class BitQuest extends JavaPlugin {
         log.info("BitQuest starting...");
         // registers listener classes
         getServer().getPluginManager().registerEvents(new BlockEvents(),this);
+        // loads config file. If it doesn't exist, creates it.
+        // get plugin config
+        getDataFolder().mkdir();
+        if(!new java.io.File(getDataFolder(), "config.yml").exists()) {
+            saveDefaultConfig();
+        }
     }
 
 }
