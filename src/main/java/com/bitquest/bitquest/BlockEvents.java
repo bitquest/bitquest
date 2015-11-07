@@ -2,6 +2,7 @@ package com.bitquest.bitquest;
 
 import java.util.HashMap;
 
+import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -10,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.Plugin;
 
@@ -29,18 +31,14 @@ public class BlockEvents implements Listener {
 	
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
-    	
-        // strikes a lightning when player breaks block. Why? testing purposes. This annoying code will be obviously eliminated
-        event.setCancelled(true);
-        Player player = event.getPlayer();
-        
-        // Lightning at broken block
-        player.getWorld().strikeLightning(event.getBlock().getLocation());
-        // Explosion at broken block with a size of 4
-		player.getWorld().createExplosion(event.getBlock().getLocation(), 4);
-
+		JsonObject areas=new JsonObject();
+		String areasJSON=BitQuest.REDIS.lrange("areas",0,-1);
+		// TODO: parse the areas object
     }
-    
+	@EventHandler
+	void onBlockPlace(BlockPlaceEvent e) {
+
+	}
     // Make a sweet block regeneration ^_^
     @EventHandler
 	void onExplode(EntityExplodeEvent event) {

@@ -3,6 +3,10 @@ BitQuest is an initiative to make a Bitcoin-denominated Minecraft server with MM
 
 Everybody is welcome to contribute. :D
 
+Requirements
+============
+
+* REDIS
 
 How to Build Bitquest
 =====================
