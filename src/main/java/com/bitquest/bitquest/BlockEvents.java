@@ -19,11 +19,11 @@ import org.bukkit.plugin.Plugin;
  */
 public class BlockEvents implements Listener {
 	
-	Plugin instance;
+	Plugin bitQuest;
 	
 	public BlockEvents(Plugin plugin) {
 		
-		instance = plugin;
+		bitQuest = plugin;
 		
 	}
 	
@@ -67,7 +67,7 @@ public class BlockEvents implements Listener {
 				block.setType(Material.AIR);
 			
 				// Regenerate all the blocks in a random order
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(instance, new Runnable() {
+				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
 				
 					public void run() {
 					

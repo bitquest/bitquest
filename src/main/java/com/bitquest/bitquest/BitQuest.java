@@ -26,7 +26,6 @@ public class BitQuest extends JavaPlugin {
         if(!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
-
     }
 
 }
