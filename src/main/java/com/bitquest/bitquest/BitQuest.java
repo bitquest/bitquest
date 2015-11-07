@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 
 
 public class BitQuest extends JavaPlugin {
+	
     public Logger log = Bukkit.getLogger();
     @Override
     public void onEnable() {
@@ -25,6 +26,7 @@ public class BitQuest extends JavaPlugin {
         if(!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
+
     }
 
 }
