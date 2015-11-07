@@ -19,7 +19,7 @@ public class BitQuest extends JavaPlugin {
     public void onEnable() {
         log.info("BitQuest starting...");
         // registers listener classes
-        getServer().getPluginManager().registerEvents(new BlockEvents(),this);
+        getServer().getPluginManager().registerEvents(new BlockEvents(this),this);
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
         getDataFolder().mkdir();
