@@ -14,12 +14,9 @@ import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
-
 /**
  * Created by explodi on 11/1/15.
  */
-
-
 
 public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
@@ -61,21 +58,26 @@ public class BitQuest extends JavaPlugin {
         }
         return null;
     }
+    
+    final int minLandSize = 1;
+    final int maxLandSize = 512;
+    final int minNameSize = 3;
+    final int maxNameSize = 16;
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addarea")) { // If the player typed /basic then do the following...
+            if (cmd.getName().equalsIgnoreCase("addarea")) { // If the player typed /addarea then do the following...
                 // doSomething
                 if(args[0]!=null && args[1]!=null) {
                     // first, check that arg[1] (size) is an integer
                     try {
                         int size=Integer.parseInt(args[1]);
-                        if(size>0&&size<512) {
+                        if(size>=minLandSize&&size<=maxLandSize) {
                             // ensure that arg[0] is alphanumeric and 2 characters minimum, 16 max
-                            if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>1 && args[0].length()<17) {
+                            if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
                                 // write the new area to REDIS
                                 JsonObject areaJSON=new JsonObject();
 
@@ -85,16 +87,18 @@ public class BitQuest extends JavaPlugin {
                                 areaJSON.addProperty("x",player.getLocation().getX());
                                 areaJSON.addProperty("z",player.getLocation().getZ());
                                 REDIS.lpush("areas",areaJSON.toString());
-                                player.sendMessage(ChatColor.GREEN+"Area '"+args[0]+"' created.");
+                                player.sendMessage(ChatColor.GREEN+"Area '"+args[0]+"' was created.");
                                 return true;
                             } else {
+                            	sender.sendMessage(ChatColor.RED+"Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
                                 return false;
                             }
                         } else {
-                            // TODO: Explain the maximum and minimum value of the land size
+                        	sender.sendMessage(ChatColor.RED+"Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                             return false;
                         }
                     } catch(Exception e) {
+                    	sender.sendMessage(ChatColor.RED+"Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                         return false;
                     }
                 } else {
