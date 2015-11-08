@@ -7,6 +7,7 @@ Requirements
 ============
 
 * REDIS
+* Gradle
 
 How to Build Bitquest
 =====================

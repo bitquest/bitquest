@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
@@ -16,7 +17,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.plugin.Plugin;
 
 /**
- * Created by cristian on 11/1/15.
+ * Created by explodi on 11/1/15.
  * Edited by Xeyler on 11/2/15
  */
 public class BlockEvents implements Listener {
@@ -32,7 +33,7 @@ public class BlockEvents implements Listener {
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
 		JsonObject areas=new JsonObject();
-		String areasJSON=BitQuest.REDIS.lrange("areas",0,-1);
+		List<String> areasJSON=BitQuest.REDIS.lrange("areas",0,-1);
 		// TODO: parse the areas object
     }
 	@EventHandler
