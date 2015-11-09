@@ -52,13 +52,13 @@ public class BlockEvents implements Listener {
 			
 				int delay;
 				
-				if(block.getType().equals(Material.SAND) || block.getType().equals(Material.GRAVEL)) {
+				if(block.getType().hasGravity()) {
 					
 					delay = 141;
 					
 				} else {
 					
-					delay = 80 + (int)(Math.random()*140);
+					delay = 80 + (int)(Math.random()*60);
 					
 				}
 				

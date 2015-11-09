@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -28,6 +29,8 @@ public class User {
                 return true;
             }
         } catch(final Exception e) {
+        	// Log the error.
+        	Bukkit.getLogger().warning("Error saving "+player.getName()+"'s data: "+e.getLocalizedMessage());
             return false;
         }
     }

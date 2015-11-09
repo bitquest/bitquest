@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -14,12 +15,9 @@ import redis.clients.jedis.Jedis;
 
 import java.util.List;
 
-
 /**
  * Created by explodi on 11/1/15.
  */
-
-
 
 public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
@@ -46,6 +44,14 @@ public class BitQuest extends JavaPlugin {
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
+    public void success(Player recipient, String msg) {
+    	recipient.sendMessage(ChatColor.GREEN+msg);
+		recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
+    }
+    public void error(Player recipient, String msg) {
+    	recipient.sendMessage(ChatColor.RED+msg);
+    	recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
+    }
 
     public JsonObject areaForLocation(Location location) {
         List<String> areas=REDIS.lrange("areas",0,-1);
@@ -61,21 +67,26 @@ public class BitQuest extends JavaPlugin {
         }
         return null;
     }
+    
+    final int minLandSize = 1;
+    final int maxLandSize = 512;
+    final int minNameSize = 3;
+    final int maxNameSize = 16;
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addarea")) {
-                log("add area command");
+            if (cmd.getName().equalsIgnoreCase("addarea")) { // If the player typed /addarea then do the following...
+
                 if(args[0]!=null && args[1]!=null) {
                     // first, check that arg[1] (size) is an integer
                     try {
                         int size=Integer.parseInt(args[1]);
-                        if(size>0&&size<512) {
+                        if(size>=minLandSize&&size<=maxLandSize) {
                             // ensure that arg[0] is alphanumeric and 2 characters minimum, 16 max
-                            if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>1 && args[0].length()<17) {
+                            if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
                                 // write the new area to REDIS
                                 JsonObject areaJSON=new JsonObject();
                                 areaJSON.addProperty("size",size);
@@ -84,29 +95,28 @@ public class BitQuest extends JavaPlugin {
                                 areaJSON.addProperty("x",player.getLocation().getX());
                                 areaJSON.addProperty("z",player.getLocation().getZ());
                                 REDIS.lpush("areas",areaJSON.toString());
-                                player.sendMessage(ChatColor.GREEN+"Area '"+args[0]+"' created.");
+                                success(player, "Area '"+args[0]+"' was created.");
                                 return true;
                             } else {
-                                sender.sendMessage(ChatColor.RED+"invalid name. must be alphanumeric (only letters and numbers)");
+                            	error(player, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
                                 return false;
                             }
                         } else {
-                            // TODO: Explain the maximum and minimum value of the land size
-                            sender.sendMessage(ChatColor.RED+"invalid size number");
+                        	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                             return false;
                         }
                     } catch(Exception e) {
-                        sender.sendMessage(ChatColor.RED+"size must be a number");
+                    	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                         return false;
                     }
                 } else {
-                    sender.sendMessage(ChatColor.RED+"Please specify area name and size");
+                    error(player, "Please specify area name and size!");
                     return false;
                 }
             } //If this has happened the function will return true.
             // If this hasn't happened the value of false will be returned.
         } else {
-            sender.sendMessage(ChatColor.RED+"This command is for players only");
+            sender.sendMessage("This command is for players only!");
         }
 
         return false;
