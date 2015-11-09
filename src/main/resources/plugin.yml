@@ -6,4 +6,16 @@ description: The Minecraft server that runs on Bitcoin
 commands:
   addarea:
     description: "Adds area to the server"
-    usage: /addarea
+    usage: /addarea <size> <name>
+  delarea:
+    description: "Deletes area from the server (Where currently standing)"
+    usage: /delarea
+  publicarea:
+    description: "Makes area public; If already public reverts it to private"
+    usage: /publicarea
+  ban:
+    description: "Adds player to the ban list"
+    usage: /ban <nickname>
+  unban:
+    description: "Removes player from the ban list"
+    usage: /unban <nickname>

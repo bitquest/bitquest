@@ -14,6 +14,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import redis.clients.jedis.Jedis;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Created by explodi on 11/1/15.
@@ -25,7 +26,9 @@ public class BitQuest extends JavaPlugin {
     public final static String redisHost=System.getenv("REDIS_1_PORT_6379_TCP_ADDR")!=null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer redisPort=System.getenv("REDIS_1_PORT_6379_TCP_PORT")!=null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS=new Jedis(redisHost,redisPort);
-
+    public static int distance(Location location1,Location location2) {
+        return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
+    }
     @Override
     public void onEnable() {
         log("BitQuest starting...");
@@ -68,19 +71,32 @@ public class BitQuest extends JavaPlugin {
         }
         return null;
     }
-    
+    public boolean createNewArea(Location location, Player owner, String name, int size) {
+        // write the new area to REDIS
+        JsonObject areaJSON=new JsonObject();
+        areaJSON.addProperty("size",size);
+        areaJSON.addProperty("owner",owner.getUniqueId().toString());
+        areaJSON.addProperty("name",name);
+        areaJSON.addProperty("x",location.getX());
+        areaJSON.addProperty("z",location.getZ());
+        REDIS.lpush("areas",areaJSON.toString());
+    }
+
+
+
     final int minLandSize = 1;
     final int maxLandSize = 512;
     final int minNameSize = 3;
     final int maxNameSize = 16;
+
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addarea")) { // If the player typed /addarea then do the following...
-
+            if (cmd.getName().equalsIgnoreCase("addarea")) {
                 if(args[0]!=null && args[1]!=null) {
                     // first, check that arg[1] (size) is an integer
                     try {
@@ -90,15 +106,11 @@ public class BitQuest extends JavaPlugin {
 
                             // ensure that name is alphanumeric and is within character limits
                             if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
-                                // write the new area to REDIS
-                                JsonObject areaJSON=new JsonObject();
-                                areaJSON.addProperty("size",size);
-                                areaJSON.addProperty("owner",player.getUniqueId().toString());
-                                areaJSON.addProperty("name",name);
-                                areaJSON.addProperty("x",player.getLocation().getX());
-                                areaJSON.addProperty("z",player.getLocation().getZ());
-                                REDIS.lpush("areas",areaJSON.toString());
-                                success(player, "Area '"+args[0]+"' was created.");
+                                if(createNewArea(player.getLocation(),player,name,size)) {
+                                    success(player, "Area '"+args[0]+"' was created.");
+                                } else {
+                                    error(player,"Error creating area");
+                                }
                                 return true;
                             } else {
                             	error(player, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
