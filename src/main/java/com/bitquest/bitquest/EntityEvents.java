@@ -32,7 +32,7 @@ public class EntityEvents implements Listener {
         if (world.getName().endsWith("_nether") == false && world.getName().endsWith("_the_end") == false) {
             JsonObject newarea = bitQuest.areaForLocation(event.getTo());
             JsonObject oldarea = bitQuest.areaForLocation(event.getFrom());
-            if (oldarea != newarea) {
+            if ((oldarea==null && newarea!=null)||(oldarea!=null&&newarea==null)) {
                 if (newarea == null) {
                     event.getPlayer().sendMessage(ChatColor.YELLOW + "[ the wilderness ]");
                 } else {

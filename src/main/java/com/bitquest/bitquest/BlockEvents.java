@@ -22,9 +22,9 @@ import org.bukkit.plugin.Plugin;
  */
 public class BlockEvents implements Listener {
 	
-	Plugin bitQuest;
+	BitQuest bitQuest;
 	
-	public BlockEvents(Plugin plugin) {
+	public BlockEvents(BitQuest plugin) {
 		
 		bitQuest = plugin;
 		
@@ -32,9 +32,11 @@ public class BlockEvents implements Listener {
 	
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
-		JsonObject areas=new JsonObject();
-		List<String> areasJSON=BitQuest.REDIS.lrange("areas",0,-1);
-		// TODO: parse the areas object
+		JsonObject area=bitQuest.areaForLocation(event.getBlock().getLocation());
+		if(area!=null) {
+            // TODO: check if user is owner of that plot, otherwise cancel the event
+			bitQuest.log(area.toString());
+		}
     }
 	@EventHandler
 	void onBlockPlace(BlockPlaceEvent e) {

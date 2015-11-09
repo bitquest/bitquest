@@ -61,9 +61,10 @@ public class BitQuest extends JavaPlugin {
             int x=area.get("x").getAsInt();
             int z=area.get("z").getAsInt();
             int size=area.get("size").getAsInt();
-            if(location.getX()>(x-size) && location.getX()<(x+size)&&location.getZ()>(z-size)&&location.getZ()>(z+size)) {
+            if(location.getX()>(x-size) && location.getX()<(x+size)&&location.getZ()>(z-size)&&location.getZ()<(z+size)) {
                 return area;
             }
+
         }
         return null;
     }
@@ -85,13 +86,15 @@ public class BitQuest extends JavaPlugin {
                     try {
                         int size=Integer.parseInt(args[1]);
                         if(size>=minLandSize&&size<=maxLandSize) {
-                            // ensure that arg[0] is alphanumeric and 2 characters minimum, 16 max
-                            if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
+                            String name=args[0].toLowerCase();
+
+                            // ensure that name is alphanumeric and is within character limits
+                            if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
                                 // write the new area to REDIS
                                 JsonObject areaJSON=new JsonObject();
                                 areaJSON.addProperty("size",size);
                                 areaJSON.addProperty("owner",player.getUniqueId().toString());
-                                areaJSON.addProperty("name",args[0]);
+                                areaJSON.addProperty("name",name);
                                 areaJSON.addProperty("x",player.getLocation().getX());
                                 areaJSON.addProperty("z",player.getLocation().getZ());
                                 REDIS.lpush("areas",areaJSON.toString());

@@ -9,7 +9,6 @@ group 'bitquest'
 apply plugin: 'java'
 
 
-sourceCompatibility = 1.5
 
 repositories {
     mavenCentral()
