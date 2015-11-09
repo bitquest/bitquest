@@ -96,7 +96,7 @@ public class BitQuest extends JavaPlugin {
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            sender.sendMessage("Args: " + args);
+            sender.sendMessage("Args: " + args.toString());
             if (cmd.getName().equalsIgnoreCase("addarea")) {
                 if(args.length > 1) {
                     // first, check that arg[0] (size) is an integer
@@ -126,7 +126,7 @@ public class BitQuest extends JavaPlugin {
                             return false;
                         }
                     } catch(Exception e) {
-                    	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                    	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!" + e.getLocalizedMessage());
                         return false;
                     }
                 } else {
