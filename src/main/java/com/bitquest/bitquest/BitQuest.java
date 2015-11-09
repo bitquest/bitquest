@@ -80,6 +80,8 @@ public class BitQuest extends JavaPlugin {
         areaJSON.addProperty("x",location.getX());
         areaJSON.addProperty("z",location.getZ());
         REDIS.lpush("areas",areaJSON.toString());
+        // TODO: Check if redis actually appended the area to list and return the success of the operation
+        return true;
     }
 
 

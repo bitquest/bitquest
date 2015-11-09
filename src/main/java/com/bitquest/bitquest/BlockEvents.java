@@ -58,7 +58,7 @@ public class BlockEvents implements Listener {
                     return;
                 }
                 // checks that new area is far enough from other areas
-                if (BitQuest.distance(e.getBlock().getLocation(), new Location(area.get("x").getAsDouble(), 0, area.get("z").getAsDouble())) < area.get("size").getAsInt()) {
+                if (BitQuest.distance(e.getBlock().getLocation(), new Location(e.getPlayer().getWorld(),area.get("x").getAsDouble(), 0, area.get("z").getAsDouble())) < area.get("size").getAsInt()) {
                     bitQuest.error(e.getPlayer(), "This area is too close from " + area.get("name").getAsString());
                 }
             }
