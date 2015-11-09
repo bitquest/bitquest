@@ -15,15 +15,15 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="redis.clients:jedis:2.7.3" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.4" level="project" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/spigot-api-1.8.8-R0.1-SNAPSHOT.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/spigot-api-1.8.8-R0.1-SNAPSHOT-shaded.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="library" name="com.google.code.gson:gson:2.4" level="project" />
   </component>
 </module>

@@ -15,6 +15,6 @@
 	<classpathentry kind="lib" path="lib/commons-pool2-2.3.jar"/>
 	<classpathentry kind="lib" path="lib/gson-2.4.jar"/>
 	<classpathentry kind="lib" path="lib/jedis-2.7.3.jar"/>
-	<classpathentry kind="lib" path="lib/spigot-api-1.8.8-R0.1-SNAPSHOT.jar"/>
+	<classpathentry kind="lib" path="lib/spigot-api-1.8.8-R0.1-SNAPSHOT-shaded.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

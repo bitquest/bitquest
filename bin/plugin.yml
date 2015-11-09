@@ -5,9 +5,5 @@ main: com.bitquest.bitquest.BitQuest
 description: The Minecraft server that runs on Bitcoin
 commands:
   addarea:
-<<<<<<< HEAD
     description: "Adds area to the server"
     usage: /addarea
-=======
-    usage: /addarea <name> <size>
->>>>>>> 07572e050aeb96a1cf3b461438fc807ee98e6153
