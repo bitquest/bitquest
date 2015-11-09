@@ -96,7 +96,6 @@ public class BitQuest extends JavaPlugin {
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            sender.sendMessage("Args: " + args.toString());
             if (cmd.getName().equalsIgnoreCase("addarea")) {
                 if(args.length > 1) {
                     // first, check that arg[0] (size) is an integer
@@ -110,7 +109,7 @@ public class BitQuest extends JavaPlugin {
             				String name = builder.toString().trim();
 
                             // ensure that name is alphanumeric and is within character limits
-                            if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
+                            if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && name.length()>=minNameSize && name.length()<=maxNameSize) {
                                 if(createNewArea(player.getLocation(),player,name,size)) {
                                     success(player, "Area '"+name+"' was created.");
                                 } else {
