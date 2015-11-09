@@ -6,6 +6,7 @@ import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -42,6 +43,14 @@ public class BitQuest extends JavaPlugin {
     }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
+    }
+    public void success(Player recipient, String msg) {
+    	recipient.sendMessage(ChatColor.GREEN+msg);
+		recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
+    }
+    public void error(Player recipient, String msg) {
+    	recipient.sendMessage(ChatColor.RED+msg);
+    	recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
 
     public JsonObject areaForLocation(Location location) {
@@ -87,28 +96,28 @@ public class BitQuest extends JavaPlugin {
                                 areaJSON.addProperty("x",player.getLocation().getX());
                                 areaJSON.addProperty("z",player.getLocation().getZ());
                                 REDIS.lpush("areas",areaJSON.toString());
-                                player.sendMessage(ChatColor.GREEN+"Area '"+args[0]+"' was created.");
+                                success(sender, "Area '"+args[0]+"' was created.");
                                 return true;
                             } else {
-                            	sender.sendMessage(ChatColor.RED+"Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
+                            	error(sender, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
                                 return false;
                             }
                         } else {
-                        	sender.sendMessage(ChatColor.RED+"Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                        	error(sender, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                             return false;
                         }
                     } catch(Exception e) {
-                    	sender.sendMessage(ChatColor.RED+"Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                    	error(sender, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                         return false;
                     }
                 } else {
-                    sender.sendMessage(ChatColor.RED+"Please specify area name and size");
+                    error(sender, "Please specify area name and size!");
                     return false;
                 }
             } //If this has happened the function will return true.
             // If this hasn't happened the value of false will be returned.
         } else {
-            sender.sendMessage(ChatColor.RED+"This command is for players only");
+            sender.sendMessage("This command is for players only!");
         }
 
         return false;

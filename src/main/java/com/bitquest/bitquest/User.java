@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
