@@ -96,6 +96,7 @@ public class BitQuest extends JavaPlugin {
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
+            sender.sendMessage("Args: " + args);
             if (cmd.getName().equalsIgnoreCase("addarea")) {
                 if(args.length > 1) {
                     // first, check that arg[1] (size) is an integer
