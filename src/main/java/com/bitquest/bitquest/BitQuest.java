@@ -99,16 +99,20 @@ public class BitQuest extends JavaPlugin {
             sender.sendMessage("Args: " + args);
             if (cmd.getName().equalsIgnoreCase("addarea")) {
                 if(args.length > 1) {
-                    // first, check that arg[1] (size) is an integer
+                    // first, check that arg[0] (size) is an integer
                     try {
-                        int size=Integer.parseInt(args[1]);
+                        int size=Integer.parseInt(args[0]);
                         if(size>=minLandSize&&size<=maxLandSize) {
-                            String name=args[0].toLowerCase();
+                        	StringBuilder builder = new StringBuilder();
+            				for(int i = 1; i < args.length; i++) {
+            					builder.append(args[i]).append(" ");
+            				}
+            				String name = builder.toString().trim();
 
                             // ensure that name is alphanumeric and is within character limits
                             if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>=minNameSize && args[0].length()<=maxNameSize) {
                                 if(createNewArea(player.getLocation(),player,name,size)) {
-                                    success(player, "Area '"+args[0]+"' was created.");
+                                    success(player, "Area '"+name+"' was created.");
                                 } else {
                                     error(player,"Error creating area");
                                 }
