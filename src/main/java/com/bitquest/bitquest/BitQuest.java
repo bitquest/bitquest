@@ -67,8 +67,8 @@ public class BitQuest extends JavaPlugin {
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addarea")) { // If the player typed /basic then do the following...
-                // doSomething
+            if (cmd.getName().equalsIgnoreCase("addarea")) {
+                log("add area command");
                 if(args[0]!=null && args[1]!=null) {
                     // first, check that arg[1] (size) is an integer
                     try {
@@ -78,7 +78,6 @@ public class BitQuest extends JavaPlugin {
                             if(args[0].matches("^.*[^a-zA-Z0-9 ].*$") && args[0].length()>1 && args[0].length()<17) {
                                 // write the new area to REDIS
                                 JsonObject areaJSON=new JsonObject();
-
                                 areaJSON.addProperty("size",size);
                                 areaJSON.addProperty("owner",player.getUniqueId().toString());
                                 areaJSON.addProperty("name",args[0]);
@@ -88,13 +87,16 @@ public class BitQuest extends JavaPlugin {
                                 player.sendMessage(ChatColor.GREEN+"Area '"+args[0]+"' created.");
                                 return true;
                             } else {
+                                sender.sendMessage(ChatColor.RED+"invalid name. must be alphanumeric (only letters and numbers)");
                                 return false;
                             }
                         } else {
                             // TODO: Explain the maximum and minimum value of the land size
+                            sender.sendMessage(ChatColor.RED+"invalid size number");
                             return false;
                         }
                     } catch(Exception e) {
+                        sender.sendMessage(ChatColor.RED+"size must be a number");
                         return false;
                     }
                 } else {
