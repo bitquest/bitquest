@@ -1,8 +1,7 @@
 package com.bitquest.bitquest;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import java.util.List;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -11,10 +10,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import redis.clients.jedis.Jedis;
 
-import java.util.List;
-import java.util.UUID;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import redis.clients.jedis.Jedis;
 
 /**
  * Created by explodi on 11/1/15.
@@ -84,13 +85,10 @@ public class BitQuest extends JavaPlugin {
         return true;
     }
 
-
-
     final int minLandSize = 1;
     final int maxLandSize = 512;
     final int minNameSize = 3;
     final int maxNameSize = 16;
-
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
@@ -99,7 +97,7 @@ public class BitQuest extends JavaPlugin {
             Player player=(Player) sender;
             // command to create abu new area
             if (cmd.getName().equalsIgnoreCase("addarea")) {
-                if(args[0]!=null && args[1]!=null) {
+                if(args.length > 1) {
                     // first, check that arg[1] (size) is an integer
                     try {
                         int size=Integer.parseInt(args[1]);
