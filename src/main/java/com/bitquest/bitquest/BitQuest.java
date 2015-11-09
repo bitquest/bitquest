@@ -96,22 +96,22 @@ public class BitQuest extends JavaPlugin {
                                 areaJSON.addProperty("x",player.getLocation().getX());
                                 areaJSON.addProperty("z",player.getLocation().getZ());
                                 REDIS.lpush("areas",areaJSON.toString());
-                                success(sender, "Area '"+args[0]+"' was created.");
+                                success(player, "Area '"+args[0]+"' was created.");
                                 return true;
                             } else {
-                            	error(sender, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
+                            	error(player, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
                                 return false;
                             }
                         } else {
-                        	error(sender, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                        	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                             return false;
                         }
                     } catch(Exception e) {
-                    	error(sender, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                    	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
                         return false;
                     }
                 } else {
-                    error(sender, "Please specify area name and size!");
+                    error(player, "Please specify area name and size!");
                     return false;
                 }
             } //If this has happened the function will return true.
