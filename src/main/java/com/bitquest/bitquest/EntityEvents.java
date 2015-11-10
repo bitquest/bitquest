@@ -33,7 +33,7 @@ public class EntityEvents implements Listener {
         	// welcomes new player(maybe add a tutorial?)
         	Firework work = (Firework) event.getPlayer().getWorld().spawnEntity(event.getPlayer().getLocation(), EntityType.FIREWORK);
         	FireworkMeta workMeta = work.getFireworkMeta();
-        	FireworkEffect effect = FireworkEffect.builder().flicker(true).withColor(Color.YELLOW).withFade(Color.WHITE).with(Type.BALL).trail(true).build();
+        	FireworkEffect effect = FireworkEffect.builder().flicker(true).withColor(Color.YELLOW).withFade(Color.WHITE).with(Type.BALL_LARGE).trail(true).build();
         	workMeta.addEffect(effect);
         	workMeta.setPower(0);
         	work.setFireworkMeta(workMeta);
