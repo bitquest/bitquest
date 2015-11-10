@@ -32,7 +32,7 @@ public class BitQuest extends JavaPlugin {
         return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
     }
     public static int rand(int min, int max) {
-        return min + ((int)Math.random()) * ((max - min) + 1);
+        return min + (int)(Math.random() * ((max - min) + 1));
     }
 
     @Override

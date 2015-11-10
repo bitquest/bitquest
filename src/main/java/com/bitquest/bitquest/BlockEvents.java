@@ -84,7 +84,7 @@ public class BlockEvents implements Listener {
 					
 				} else {
 					
-					delay = 80 + (int)(Math.random()*60);
+					delay = bitQuest.rand(80, 140);
 					
 				}
 				
