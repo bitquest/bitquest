@@ -44,6 +44,9 @@ public class EntityEvents implements Listener {
         	work.setFireworkMeta(workMeta);
     	}
     	event.getPlayer().sendMessage(welcome.toString());
+    	for(String test : bitQuest.getConfig().getStringList("welcomeMessage")) {
+    		event.getPlayer().sendMessage("output: " + test);
+    	}
     }
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
