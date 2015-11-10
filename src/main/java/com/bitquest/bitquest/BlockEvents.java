@@ -1,6 +1,5 @@
 package com.bitquest.bitquest;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -11,13 +10,11 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.plugin.Plugin;
 
 /**
  * Created by explodi on 11/1/15.
@@ -78,7 +75,7 @@ public class BlockEvents implements Listener {
 			if(block.getType() != Material.AIR) {
 			
 				final BlockState state = block.getState();
-			
+				
 				int delay;
 				
 				if(block.getType().hasGravity()) {
@@ -98,7 +95,7 @@ public class BlockEvents implements Listener {
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
 				
 					public void run() {
-					
+
 						state.update(true, false);
 					
 					}
