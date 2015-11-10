@@ -35,7 +35,7 @@ public class EntityEvents implements Listener {
         	FireworkMeta workMeta = work.getFireworkMeta();
         	FireworkEffect effect = FireworkEffect.builder().flicker(true).withColor(Color.YELLOW).withFade(Color.WHITE).with(Type.BALL).trail(true).build();
         	workMeta.addEffect(effect);
-        	workMeta.setPower(10);
+        	workMeta.setPower(0);
         	work.setFireworkMeta(workMeta);
 
     	}
