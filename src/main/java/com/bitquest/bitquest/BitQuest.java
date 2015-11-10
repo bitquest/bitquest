@@ -27,9 +27,14 @@ public class BitQuest extends JavaPlugin {
     public final static String redisHost=System.getenv("REDIS_1_PORT_6379_TCP_ADDR")!=null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer redisPort=System.getenv("REDIS_1_PORT_6379_TCP_PORT")!=null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS=new Jedis(redisHost,redisPort);
+    // utilities: distance and rand
     public static int distance(Location location1,Location location2) {
         return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
     }
+    public static int rand(int min, int max) {
+        return min + ((int)Math.random()) * ((max - min) + 1);
+    }
+
     @Override
     public void onEnable() {
         log("BitQuest starting...");
