@@ -8,6 +8,7 @@ import org.bukkit.World;
 import org.bukkit.FireworkEffect.Type;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Firework;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -34,21 +35,9 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         User user=new User(event.getPlayer());
-    	if(!event.getPlayer().hasPlayedBefore()) {
-        	// welcomes new player(maybe add a tutorial?)
-        	Firework work = (Firework) event.getPlayer().getWorld().spawnEntity(event.getPlayer().getLocation(), EntityType.FIREWORK);
-        	FireworkMeta workMeta = work.getFireworkMeta();
-        	FireworkEffect effect = FireworkEffect.builder().flicker(true).withColor(Color.YELLOW).withFade(Color.YELLOW).with(Type.BALL_LARGE).trail(true).build();
-        	workMeta.addEffect(effect);
-        	workMeta.setPower(0);
-        	work.setFireworkMeta(workMeta);
-    	}
     	event.getPlayer().sendMessage(welcome.toString());
-    	for(String test : bitQuest.getConfig().getStringList("welcomeMessage")) {
-    		event.getPlayer().sendMessage("output: " + test);
-    	}
     }
-    @EventHandler
+	@EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         // announce new area
         World world = event.getPlayer().getWorld();
