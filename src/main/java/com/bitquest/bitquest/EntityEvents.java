@@ -2,11 +2,17 @@ package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
 import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.World;
+import org.bukkit.FireworkEffect.Type;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Firework;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.plugin.Plugin;
 
 import java.io.IOException;
@@ -22,6 +28,17 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
+    	if(!event.getPlayer().hasPlayedBefore()) {
+
+        	// welcomes new player(maybe add a tutorial?)
+        	Firework work = (Firework) event.getPlayer().getWorld().spawnEntity(event.getPlayer().getLocation(), EntityType.FIREWORK);
+        	FireworkMeta workMeta = work.getFireworkMeta();
+        	FireworkEffect effect = FireworkEffect.builder().flicker(true).withColor(Color.YELLOW).withFade(Color.WHITE).with(Type.BALL).trail(true).build();
+        	workMeta.addEffect(effect);
+        	workMeta.setPower(10);
+        	work.setFireworkMeta(workMeta);
+
+    	}
         User user=new User(event.getPlayer());
 
     }
