@@ -63,7 +63,7 @@ public class EntityEvents implements Listener {
 
         if (entity instanceof Monster && e.isCancelled() == false) {
             // Disable mob spawners. Keep mob farmers away
-            if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
+            if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
                 e.setCancelled(true);
                 return;
             }
@@ -75,6 +75,7 @@ public class EntityEvents implements Listener {
             // Ghasts somehow work in a totally different wat of Monsters
             // MAYBE TODO: Make ghasts more difficult and rewarding
             if (entity instanceof Ghast) {
+            	// TODO: Remove this SpawnReason check, it is redundant
                 if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
                     e.setCancelled(true);
                     return;
@@ -87,14 +88,16 @@ public class EntityEvents implements Listener {
 
             // monsters
             if (entity instanceof Monster) {
+            	// TODO: Remove this SpawnReason check, it is redundant
                 if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
                     e.setCancelled(true);
                     return;
                 }
+                // TODO: Remove this event cancellation check, it is redundant
                 if (e.isCancelled() == false) {
 
                     if (world.getName().endsWith("_nether") == true) {
-                        level=BitQuest.rand(1,128);
+                        level = BitQuest.rand(1,128);
                     } else if (world.getName().endsWith("_end") == true) {
                         level = BitQuest.rand(1,32);
                     } else {
@@ -104,7 +107,7 @@ public class EntityEvents implements Listener {
                     entity.setMaxHealth(level * 4);
                     entity.setHealth(level * 4);
                     entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                    entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name(), level));
+                    entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name().toLowerCase().replace("_", " "), level));
                 }
 
                 // add potion effects
@@ -152,6 +155,7 @@ public class EntityEvents implements Listener {
                     useRandomEquipment(entity, level);
                 }
                 // blazes spawn everywhere on the spawn
+                // TODO: Remove this SpawnReason check, it is redundant
                 if (entityType == EntityType.PIG_ZOMBIE && e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
                     e.getLocation().getWorld().spawnEntity(location, EntityType.BLAZE);
                 }
@@ -165,7 +169,6 @@ public class EntityEvents implements Listener {
                 if (e.getEntity() instanceof Monster) {
                     if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL)
                         return;
-
 
                         Location spawn = e.getLocation();
                         int num = BitQuest.rand(0, 15);
@@ -200,23 +203,18 @@ public class EntityEvents implements Listener {
                             case 7:
                                 entityType = EntityType.CAVE_SPIDER;
                                 break;
-
                             case 8:
                                 entityType = EntityType.ZOMBIE;
                                 break;
-
                             case 9:
                                 entityType = EntityType.SKELETON;
                                 break;
-
                             case 10:
                                 entityType = EntityType.CREEPER;
                                 break;
                             case 11:
-
                                 entityType = EntityType.ENDERMAN;
                                 break;
-
                             case 12:
                                 entityType = EntityType.GUARDIAN;
                                 break;
@@ -237,7 +235,8 @@ public class EntityEvents implements Listener {
         }
     }
     public void useRandomEquipment(LivingEntity entity, int level) {
-        // has sword
+    	
+        // give sword
         if (BitQuest.rand(0, 32) < level) {
             ItemStack sword=new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
@@ -253,9 +252,8 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setItemInHand(sword);
         }
 
-        // has helmet
+        // give helmet
         if (BitQuest.rand(0, 32) < level) {
-            // helmet
             ItemStack helmet=new ItemStack(Material.LEATHER_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.IRON_HELMET);
@@ -267,8 +265,8 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setHelmet(helmet);
         }
 
+        // give chestplate
         if (BitQuest.rand(0, 32) < level) {
-            // chestplate
             ItemStack chest=new ItemStack(Material.LEATHER_CHESTPLATE);
             if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
             if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.IRON_CHESTPLATE);
@@ -281,8 +279,8 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setChestplate(chest);
         }
 
+        // give leggings
         if (BitQuest.rand(0, 128) < level) {
-            // leggings
             ItemStack leggings=new ItemStack(Material.LEATHER_LEGGINGS);
             if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
             if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.IRON_LEGGINGS);
@@ -295,8 +293,8 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setLeggings(leggings);
         }
 
+        // give boots
         if (BitQuest.rand(0, 128) < level) {
-            // boots
             ItemStack boots=new ItemStack(Material.LEATHER_BOOTS);
             if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.CHAINMAIL_BOOTS);
             if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.IRON_BOOTS);
@@ -308,6 +306,8 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setBoots(boots);
         }
     }
+    
+    // enchant an item
     public static void randomEnchantItem(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         Enchantment enchantment=null;
