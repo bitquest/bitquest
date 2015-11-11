@@ -60,10 +60,63 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster && e.isCancelled() == false) {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-                Location location = e.getLocation();
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
+                int num = BitQuest.rand(0, 14);
 
+                // change the mob type to a random type
+                switch (num) {
+                	case 0:
+                    	if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
+                    		entityType = EntityType.GHAST;
+                    	} else {
+                    		entityType = EntityType.SPIDER;
+                    	}
+                    	break;
+                    case 1:
+                    	entityType = EntityType.WITCH;
+                    	break;
+                    case 2:
+                    	entityType = EntityType.PIG_ZOMBIE;
+                    	break;
+                    case 3:
+                    	entityType = EntityType.MAGMA_CUBE;
+                    	break;
+                    case 4:
+                    	entityType = EntityType.BLAZE;
+                    	break;
+                    case 5:
+                    	entityType = EntityType.SILVERFISH;
+                    	break;
+                    case 6:
+                    	entityType = EntityType.CAVE_SPIDER;
+                    	break;
+                    case 7:
+                    	entityType = EntityType.ZOMBIE;
+                    	break;
+                    case 8:
+                    	entityType = EntityType.SKELETON;
+                    	break;
+                    case 9:
+                    	entityType = EntityType.CREEPER;
+                    	break;
+                    case 10:
+                    	entityType = EntityType.ENDERMAN;
+                    	break;
+                    case 11:
+                    	entityType = EntityType.GUARDIAN;
+                    	break;
+                    case 12:
+                    	entityType = EntityType.ENDERMITE;
+                    	break;
+                    case 13:
+                    	entityType = EntityType.GIANT;
+                    	break;
+                    default:
+                    	entityType = EntityType.SPIDER;
+                    	break;
+                }
+                
                 int level = 1;
 
                 // give a random lvl depending on world
@@ -119,66 +172,6 @@ public class EntityEvents implements Listener {
                 	}
                 }
                 
-                // blazes spawn everywhere on the spawn
-                if (entityType == EntityType.PIG_ZOMBIE) {
-                	//world.spawnEntity(location, EntityType.BLAZE);
-                }
-
-                int num = BitQuest.rand(0, 14);
-
-                    switch (num) {
-                    	case 0:
-                        	if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
-                        		entityType = EntityType.GHAST;
-                        	} else {
-                        		entityType = EntityType.SPIDER;
-                        	}
-                        	break;
-                        case 1:
-                        	entityType = EntityType.WITCH;
-                        	break;
-                        case 2:
-                        	entityType = EntityType.PIG_ZOMBIE;
-                        	break;
-                        case 3:
-                        	entityType = EntityType.MAGMA_CUBE;
-                        	break;
-                        case 4:
-                        	entityType = EntityType.BLAZE;
-                        	break;
-                        case 5:
-                        	entityType = EntityType.SILVERFISH;
-                        	break;
-                        case 6:
-                        	entityType = EntityType.CAVE_SPIDER;
-                        	break;
-                        case 7:
-                        	entityType = EntityType.ZOMBIE;
-                        	break;
-                        case 8:
-                        	entityType = EntityType.SKELETON;
-                        	break;
-                        case 9:
-                        	entityType = EntityType.CREEPER;
-                        	break;
-                        case 10:
-                        	entityType = EntityType.ENDERMAN;
-                        	break;
-                        case 11:
-                        	entityType = EntityType.GUARDIAN;
-                        	break;
-                        case 12:
-                        	entityType = EntityType.ENDERMITE;
-                        	break;
-                        case 13:
-                        	entityType = EntityType.GIANT;
-                        	break;
-                        default:
-                        	entityType = EntityType.SPIDER;
-                        	break;
-                    }
-                    //world.spawnEntity(location, entityType);
-
                 }
             // if spawn cause wasn't natural
             } else {
