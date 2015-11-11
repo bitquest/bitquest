@@ -66,23 +66,13 @@ public class EntityEvents implements Listener {
 
                 int level = 1;
 
-                // Ghasts somehow work in a totally different wat of Monsters
-                // MAYBE TODO: Make ghasts more difficult and rewarding
-                if (entity instanceof Ghast) {
-            	
-                	level = BitQuest.rand(32,64);
-                	entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                	entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name(), level));
-
-                }
-
                 // give a random lvl depending on world
                 if (world.getName().endsWith("_nether") == true) {
                 	level = BitQuest.rand(1,128);
                 } else if (world.getName().endsWith("_end") == true) {
-                	level = BitQuest.rand(1,32);
+                	level = BitQuest.rand(1,64);
                 } else {
-                	level = BitQuest.rand(1,8);
+                	level = BitQuest.rand(1,16);
                 }
 
                 entity.setMaxHealth(level * 4);
@@ -98,21 +88,21 @@ public class EntityEvents implements Listener {
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-
-                // if it is a zombie, give it speed
-                if (entityType == EntityType.ZOMBIE) {
-                	entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1), true);
+             
+                // give random equipment
+                if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton ) {
+                	useRandomEquipment(entity, level);
                 }
+                
                 // some creepers are charged
-                if (entityType == EntityType.CREEPER && BitQuest.rand(0, 100) < level) {
+                if (entity instanceof Creeper && BitQuest.rand(0, 100) < level) {
                 	((Creeper) entity).setPowered(true);
                 }
+              
                 // pigzombies are always angry
                 if (entity instanceof PigZombie) {
                 	PigZombie pigZombie = (PigZombie) entity;
                 	pigZombie.setAnger(Integer.MAX_VALUE);
-                	ItemStack sword = new ItemStack(Material.GOLD_SWORD);
-                	entity.getEquipment().setItemInHand(sword);
                 }
 
                 // some skeletons are black
@@ -120,7 +110,6 @@ public class EntityEvents implements Listener {
                 	Skeleton skeleton = (Skeleton) entity;
                 	if (BitQuest.rand(0, 256) < level) {
                 		skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
-                		useRandomEquipment(skeleton, level);
                 	} else {
                 		ItemStack bow = new ItemStack(Material.BOW);
                 		if (BitQuest.rand(0, 64) < level) {
@@ -129,17 +118,13 @@ public class EntityEvents implements Listener {
                 		entity.getEquipment().setItemInHand(bow);
                 	}
                 }
-                // give random equipment
-                if (entityType == EntityType.ZOMBIE || entityType == EntityType.PIG_ZOMBIE) {
-                	useRandomEquipment(entity, level);
-                }
-                // TODO: This code is never called because the SpawnCause is CUSTOM, so our code stops the blaze from existing
+                
                 // blazes spawn everywhere on the spawn
                 if (entityType == EntityType.PIG_ZOMBIE) {
-                	world.spawnEntity(location, EntityType.BLAZE);
+                	//world.spawnEntity(location, EntityType.BLAZE);
                 }
 
-                int num = BitQuest.rand(0, 15);
+                int num = BitQuest.rand(0, 14);
 
                     switch (num) {
                     	case 0:
@@ -165,37 +150,34 @@ public class EntityEvents implements Listener {
                         	entityType = EntityType.SILVERFISH;
                         	break;
                         case 6:
-                        	entityType = EntityType.SILVERFISH;
-                        	break;
-                        case 7:
                         	entityType = EntityType.CAVE_SPIDER;
                         	break;
-                        case 8:
+                        case 7:
                         	entityType = EntityType.ZOMBIE;
                         	break;
-                        case 9:
+                        case 8:
                         	entityType = EntityType.SKELETON;
                         	break;
-                        case 10:
+                        case 9:
                         	entityType = EntityType.CREEPER;
                         	break;
-                        case 11:
+                        case 10:
                         	entityType = EntityType.ENDERMAN;
                         	break;
-                        case 12:
+                        case 11:
                         	entityType = EntityType.GUARDIAN;
                         	break;
-                        case 13:
+                        case 12:
                         	entityType = EntityType.ENDERMITE;
                         	break;
-                        case 14:
+                        case 13:
                         	entityType = EntityType.GIANT;
                         	break;
                         default:
                         	entityType = EntityType.SPIDER;
                         	break;
                     }
-                    world.spawnEntity(location, entityType);
+                    //world.spawnEntity(location, entityType);
 
                 }
             // if spawn cause wasn't natural
