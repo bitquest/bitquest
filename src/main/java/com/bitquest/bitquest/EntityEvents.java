@@ -60,7 +60,7 @@ public class EntityEvents implements Listener {
 	public void onAttack(EntityDamageByEntityEvent event) {
 		if(event.getDamager() instanceof Player) {
 			int maxHealth = (int) ((LivingEntity)event.getEntity()).getMaxHealth()*2;
-			int health = (int) ((LivingEntity)event.getEntity()).getHealth()*2;
+			int health = (int) (((LivingEntity)event.getEntity()).getHealth()-event.getDamage())*2;
 			String name = event.getEntity().getName().toLowerCase().replace("_", " ");
 			event.getDamager().sendMessage(ChatColor.BOLD + name + " - " + health + "/" + maxHealth);
 		}
