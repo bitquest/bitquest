@@ -115,12 +115,14 @@ public class EntityEvents implements Listener {
                     	entityType = EntityType.SPIDER;
                     	break;
                 }
+                Bukkit.broadcastMessage("Spawning a " + entityType.name().toLowerCase());
                 world.spawnEntity(entity.getLocation(), entityType);
                 
             // if spawn cause wasn't natural
             } else if (e.getSpawnReason() == SpawnReason.CUSTOM) {
             	World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
+            	Bukkit.broadcastMessage("Request for a " + entityType.name() + " recieved.");
 
                 int level = 1;
 
