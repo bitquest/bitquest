@@ -54,6 +54,10 @@ public class EntityEvents implements Listener {
             }
         }
     }
+	
+	// TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it would be better to
+	//          find a way to instead set the EntityType of the event. Is there any way to do that?
+	// TODO: Magma Cubes don't get levels or custom names for some reason...
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
         LivingEntity entity = e.getEntity();
@@ -116,13 +120,14 @@ public class EntityEvents implements Listener {
                     	entityType = EntityType.SPIDER;
                     	break;
                 }
+                // we spawn another entity with the custom type
+                // the entity should have a CUSTOM SpawnReason, so it is handled below
                 world.spawnEntity(entity.getLocation(), entityType);
                 
-            // if spawn cause wasn't natural
+            // if spawn cause was a plugin
             } else if (e.getSpawnReason() == SpawnReason.CUSTOM) {
             	World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
-            	Bukkit.broadcastMessage("Request for a " + entityType.name() + " recieved.");
 
                 int level = 1;
 
@@ -179,6 +184,7 @@ public class EntityEvents implements Listener {
                 	}
                 }
 
+            // if spawn cause was something else
             } else {	
                 e.setCancelled(true);
                 return;
