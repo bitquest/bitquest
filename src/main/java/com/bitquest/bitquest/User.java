@@ -31,6 +31,8 @@ public class User {
         } catch(final Exception e) {
         	// Log the error.
         	Bukkit.getLogger().warning("Error saving "+player.getName()+"'s data: "+e.getLocalizedMessage());
+        	Bukkit.getLogger().warning("Below are the details of the error:");
+        	e.printStackTrace();
             return false;
         }
     }

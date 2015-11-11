@@ -67,6 +67,7 @@ public class EntityEvents implements Listener {
                 // change the mob type to a random type
                 switch (num) {
                 	case 0:
+                		// if the world is nether/end, spawn a ghast. else, spawn a spider.
                     	if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
                     		entityType = EntityType.GHAST;
                     	} else {
@@ -172,13 +173,13 @@ public class EntityEvents implements Listener {
                 	}
                 }
                 
-                }
             // if spawn cause wasn't natural
             } else {
                 e.setCancelled(true);
                 return;
-            }
+            } 
         }
+    }
     
     public void useRandomEquipment(LivingEntity entity, int level) {
     	
