@@ -7,6 +7,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -60,10 +61,10 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster && e.isCancelled() == false) {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-                World world = e.getLocation().getWorld();
+            	World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
-                int num = BitQuest.rand(0, 14);
-
+                
+                int num = BitQuest.rand(0, 13);
                 // change the mob type to a random type
                 switch (num) {
                 	case 0:
@@ -110,14 +111,17 @@ public class EntityEvents implements Listener {
                     case 12:
                     	entityType = EntityType.ENDERMITE;
                     	break;
-                    case 13:
-                    	entityType = EntityType.GIANT;
-                    	break;
                     default:
                     	entityType = EntityType.SPIDER;
                     	break;
                 }
+                world.spawnEntity(entity.getLocation(), entityType);
                 
+            // if spawn cause wasn't natural
+            } else if (e.getSpawnReason() == SpawnReason.CUSTOM) {
+            	World world = e.getLocation().getWorld();
+                EntityType entityType = entity.getType();
+
                 int level = 1;
 
                 // give a random lvl depending on world
@@ -172,9 +176,8 @@ public class EntityEvents implements Listener {
                 		entity.getEquipment().setItemInHand(bow);
                 	}
                 }
-                
-            // if spawn cause wasn't natural
-            } else {
+
+            } else {	
                 e.setCancelled(true);
                 return;
             } 

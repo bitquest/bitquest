@@ -15,7 +15,7 @@ commands:
     usage: /publicarea
   ban:
     description: "Adds player to the ban list"
-    usage: /ban <nickname>
+    usage: /ban <player>
   unban:
     description: "Removes player from the ban list"
-    usage: /unban <nickname>
+    usage: /unban <player>
