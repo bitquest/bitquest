@@ -9,6 +9,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -58,8 +59,17 @@ public class EntityEvents implements Listener {
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event) {
 		if(event.getDamager() instanceof Player) {
-			event.getDamager().sendMessage(event.getEntityType().name().toLowerCase().replace("_", " ") + " took " + event.getDamage() + " damage!");
+			int maxHealth = (int) ((LivingEntity)event.getEntity()).getMaxHealth()*2;
+			int health = (int) ((LivingEntity)event.getEntity()).getHealth()*2;
+			String name = event.getEntity().getName().toLowerCase().replace("_", " ");
+			event.getDamager().sendMessage(ChatColor.BOLD + name + " - " + health + "/" + maxHealth);
 		}
+	}
+	@EventHandler
+	public void onDeath(PlayerDeathEvent event) {
+		event.setKeepInventory(true);
+		event.setKeepLevel(true);
+		event.setDeathMessage(null);
 	}
 	// TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it would be better to
 	//          find a way to instead set the EntityType of the event. Is there any way to do that?
