@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
@@ -54,7 +55,12 @@ public class EntityEvents implements Listener {
             }
         }
     }
-	
+	@EventHandler
+	public void onAttack(EntityDamageByEntityEvent event) {
+		if(event.getDamager() instanceof Player) {
+			event.getDamager().sendMessage(event.getEntityType().name().toLowerCase().replace("_", " ") + " took " + event.getDamage() + " damage!");
+		}
+	}
 	// TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it would be better to
 	//          find a way to instead set the EntityType of the event. Is there any way to do that?
 	// TODO: Magma Cubes don't get levels or custom names for some reason...
