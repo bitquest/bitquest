@@ -2,7 +2,6 @@ package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
 import org.bukkit.*;
-import org.bukkit.FireworkEffect.Type;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -11,7 +10,6 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
@@ -57,58 +55,40 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
-        Location location = e.getLocation();
         LivingEntity entity = e.getEntity();
-        World world = e.getLocation().getWorld();
 
         if (entity instanceof Monster && e.isCancelled() == false) {
             // Disable mob spawners. Keep mob farmers away
-            if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL) {
-                e.setCancelled(true);
-                return;
-            }
+            if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+                Location location = e.getLocation();
+                World world = e.getLocation().getWorld();
+                EntityType entityType = entity.getType();
 
-            int level=1;
+                int level = 1;
 
-            EntityType entityType = entity.getType();
+                // Ghasts somehow work in a totally different wat of Monsters
+                // MAYBE TODO: Make ghasts more difficult and rewarding
+                if (entity instanceof Ghast) {
+            	
+                	level = BitQuest.rand(32,64);
+                	entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
+                	entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name(), level));
 
-            // Ghasts somehow work in a totally different wat of Monsters
-            // MAYBE TODO: Make ghasts more difficult and rewarding
-            if (entity instanceof Ghast) {
-            	// TODO: Remove this SpawnReason check, it is redundant
-                if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
-                    e.setCancelled(true);
-                    return;
                 }
-                level = BitQuest.rand(32,64);
+
+                // give a random lvl depending on world
+                if (world.getName().endsWith("_nether") == true) {
+                	level = BitQuest.rand(1,128);
+                } else if (world.getName().endsWith("_end") == true) {
+                	level = BitQuest.rand(1,32);
+                } else {
+                	level = BitQuest.rand(1,8);
+                }
+
+                entity.setMaxHealth(level * 4);
+                entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name(), level));
-
-            }
-
-            // monsters
-            if (entity instanceof Monster) {
-            	// TODO: Remove this SpawnReason check, it is redundant
-                if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER) {
-                    e.setCancelled(true);
-                    return;
-                }
-                // TODO: Remove this event cancellation check, it is redundant
-                if (e.isCancelled() == false) {
-
-                    if (world.getName().endsWith("_nether") == true) {
-                        level = BitQuest.rand(1,128);
-                    } else if (world.getName().endsWith("_end") == true) {
-                        level = BitQuest.rand(1,32);
-                    } else {
-                        level = BitQuest.rand(1,8);
-                    }
-
-                    entity.setMaxHealth(level * 4);
-                    entity.setHealth(level * 4);
-                    entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                    entity.setCustomName(String.format("%s lvl %d", e.getEntityType().name().toLowerCase().replace("_", " "), level));
-                }
+                entity.setCustomName(String.format("%s lvl %d", entityType.name().toLowerCase().replace("_", " "), level));
 
                 // add potion effects
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
@@ -119,121 +99,112 @@ public class EntityEvents implements Listener {
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
 
+                // if it is a zombie, give it speed
                 if (entityType == EntityType.ZOMBIE) {
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1), true);
+                	entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 1), true);
                 }
                 // some creepers are charged
                 if (entityType == EntityType.CREEPER && BitQuest.rand(0, 100) < level) {
-                    ((Creeper) entity).setPowered(true);
+                	((Creeper) entity).setPowered(true);
                 }
                 // pigzombies are always angry
                 if (entity instanceof PigZombie) {
-                    PigZombie pigZombie = (PigZombie) entity;
-                    pigZombie.setAnger(Integer.MAX_VALUE);
-                    ItemStack sword = new ItemStack(Material.GOLD_SWORD);
-                    entity.getEquipment().setItemInHand(sword);
-                    useRandomEquipment(entity, level);
+                	PigZombie pigZombie = (PigZombie) entity;
+                	pigZombie.setAnger(Integer.MAX_VALUE);
+                	ItemStack sword = new ItemStack(Material.GOLD_SWORD);
+                	entity.getEquipment().setItemInHand(sword);
                 }
 
                 // some skeletons are black
                 if (entity instanceof Skeleton) {
-                    Skeleton skeleton = (Skeleton) entity;
-                    if (BitQuest.rand(0, 256) < level) {
-                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
-                        ItemStack sword = new ItemStack(Material.IRON_SWORD);
-                        useRandomEquipment(skeleton, level);
-                    } else {
-                        ItemStack bow = new ItemStack(Material.BOW);
-                        if (BitQuest.rand(0, 64) < level) {
-                            randomEnchantItem(bow);
-                        }
-                        entity.getEquipment().setItemInHand(bow);
-                    }
+                	Skeleton skeleton = (Skeleton) entity;
+                	if (BitQuest.rand(0, 256) < level) {
+                		skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
+                		useRandomEquipment(skeleton, level);
+                	} else {
+                		ItemStack bow = new ItemStack(Material.BOW);
+                		if (BitQuest.rand(0, 64) < level) {
+                			randomEnchantItem(bow);
+                		}
+                		entity.getEquipment().setItemInHand(bow);
+                	}
                 }
                 // give random equipment
-                if (entityType == EntityType.ZOMBIE || e.getEntityType() == EntityType.PIG_ZOMBIE) {
-                    useRandomEquipment(entity, level);
+                if (entityType == EntityType.ZOMBIE || entityType == EntityType.PIG_ZOMBIE) {
+                	useRandomEquipment(entity, level);
                 }
+                // TODO: This code is never called because the SpawnCause is CUSTOM, so our code stops the blaze from existing
                 // blazes spawn everywhere on the spawn
-                // TODO: Remove this SpawnReason check, it is redundant
-                if (entityType == EntityType.PIG_ZOMBIE && e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
-                    e.getLocation().getWorld().spawnEntity(location, EntityType.BLAZE);
+                if (entityType == EntityType.PIG_ZOMBIE) {
+                	world.spawnEntity(location, EntityType.BLAZE);
                 }
 
-                if(e.getEntity() instanceof Giant) {
-                    if(e.getEntity().hasMetadata("boss")==false) {
-                        e.setCancelled(true);
+                int num = BitQuest.rand(0, 15);
+
+                    switch (num) {
+                    	case 0:
+                        	if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
+                        		entityType = EntityType.GHAST;
+                        	} else {
+                        		entityType = EntityType.SPIDER;
+                        	}
+                        	break;
+                        case 1:
+                        	entityType = EntityType.WITCH;
+                        	break;
+                        case 2:
+                        	entityType = EntityType.PIG_ZOMBIE;
+                        	break;
+                        case 3:
+                        	entityType = EntityType.MAGMA_CUBE;
+                        	break;
+                        case 4:
+                        	entityType = EntityType.BLAZE;
+                        	break;
+                        case 5:
+                        	entityType = EntityType.SILVERFISH;
+                        	break;
+                        case 6:
+                        	entityType = EntityType.SILVERFISH;
+                        	break;
+                        case 7:
+                        	entityType = EntityType.CAVE_SPIDER;
+                        	break;
+                        case 8:
+                        	entityType = EntityType.ZOMBIE;
+                        	break;
+                        case 9:
+                        	entityType = EntityType.SKELETON;
+                        	break;
+                        case 10:
+                        	entityType = EntityType.CREEPER;
+                        	break;
+                        case 11:
+                        	entityType = EntityType.ENDERMAN;
+                        	break;
+                        case 12:
+                        	entityType = EntityType.GUARDIAN;
+                        	break;
+                        case 13:
+                        	entityType = EntityType.ENDERMITE;
+                        	break;
+                        case 14:
+                        	entityType = EntityType.GIANT;
+                        	break;
+                        default:
+                        	entityType = EntityType.SPIDER;
+                        	break;
                     }
-                }
-                // spawn random mobs
-                if (e.getEntity() instanceof Monster) {
-                    if (e.getSpawnReason() != CreatureSpawnEvent.SpawnReason.NATURAL)
-                        return;
-
-                        Location spawn = e.getLocation();
-                        int num = BitQuest.rand(0, 15);
-                        world = spawn.getWorld();
-
-                        switch (num) {
-                            case 0:
-                                if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
-                                    entityType = EntityType.GHAST;
-                                } else {
-                                    entityType = EntityType.SPIDER;
-                                }
-                                break;
-                            case 1:
-                                entityType = EntityType.WITCH;
-                                break;
-                            case 2:
-                                entityType = EntityType.PIG_ZOMBIE;
-                                break;
-                            case 3:
-                                entityType = EntityType.MAGMA_CUBE;
-                                break;
-                            case 4:
-                                entityType = EntityType.BLAZE;
-                                break;
-                            case 5:
-                                entityType = EntityType.SILVERFISH;
-                                break;
-                            case 6:
-                                entityType = EntityType.SILVERFISH;
-                                break;
-                            case 7:
-                                entityType = EntityType.CAVE_SPIDER;
-                                break;
-                            case 8:
-                                entityType = EntityType.ZOMBIE;
-                                break;
-                            case 9:
-                                entityType = EntityType.SKELETON;
-                                break;
-                            case 10:
-                                entityType = EntityType.CREEPER;
-                                break;
-                            case 11:
-                                entityType = EntityType.ENDERMAN;
-                                break;
-                            case 12:
-                                entityType = EntityType.GUARDIAN;
-                                break;
-                            case 13:
-                                entityType = EntityType.ENDERMITE;
-                                break;
-                            case 14:
-                                entityType = EntityType.GIANT;
-                                break;
-                            default:
-                                entityType = EntityType.SPIDER;
-                                break;
-                        }
-                        e.getLocation().getWorld().spawnEntity(spawn, entityType);
+                    world.spawnEntity(location, entityType);
 
                 }
+            // if spawn cause wasn't natural
+            } else {
+                e.setCancelled(true);
+                return;
             }
         }
-    }
+    
     public void useRandomEquipment(LivingEntity entity, int level) {
     	
         // give sword
@@ -262,6 +233,7 @@ public class EntityEvents implements Listener {
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
+            
             entity.getEquipment().setHelmet(helmet);
         }
 
@@ -303,6 +275,7 @@ public class EntityEvents implements Listener {
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
+            
             entity.getEquipment().setBoots(boots);
         }
     }
