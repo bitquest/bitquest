@@ -61,6 +61,7 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster && e.isCancelled() == false) {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            	e.setCancelled(true);
             	World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
                 
@@ -115,7 +116,6 @@ public class EntityEvents implements Listener {
                     	entityType = EntityType.SPIDER;
                     	break;
                 }
-                Bukkit.broadcastMessage("Spawning a " + entityType.name().toLowerCase());
                 world.spawnEntity(entity.getLocation(), entityType);
                 
             // if spawn cause wasn't natural
