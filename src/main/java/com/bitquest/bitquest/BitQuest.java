@@ -77,6 +77,19 @@ public class BitQuest extends JavaPlugin {
         }
         return null;
     }
+    public boolean allowBuild(Location location, Player player) {
+        // returns true if player has permission to build in location
+        // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
+        if(areaForLocation(location)!=null) {
+            if(areaForLocation(location).get("owner").getAsString().equals(player.getUniqueId().toString())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return true;
+        }
+    }
     public boolean createNewArea(Location location, Player owner, String name, int size) {
         // write the new area to REDIS
         JsonObject areaJSON=new JsonObject();

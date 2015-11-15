@@ -16,6 +16,9 @@ public class User {
         this.player=player;
         loadUserData();
     }
+    public void addExperience(int exp) {
+        BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
+    }
     private boolean loadUserData() {
         try {
             if (BitQuest.REDIS.get(player.getUniqueId().toString()) != null) {
