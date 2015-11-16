@@ -14,12 +14,16 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+
+import java.io.IOException;
+import java.text.ParseException;
 
 /**
  * Created by explodi on 11/7/15.
@@ -42,6 +46,14 @@ public class EntityEvents implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         User user=new User(event.getPlayer());
     	event.getPlayer().sendMessage(welcome.toString());
+    }
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        User user=new User(event.getPlayer());
+        if(user.getAddress()==null) {
+            user.generateBitcoinAddress();
+        }
+
     }
 	@EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
@@ -80,8 +92,9 @@ public class EntityEvents implements Listener {
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
         LivingEntity entity = e.getEntity();
-
-        if (entity instanceof Monster && e.isCancelled() == false) {
+        if(bitQuest.areaForLocation(e.getLocation())!=null) {
+            e.setCancelled(true);
+        } else if (entity instanceof Monster) {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
             	e.setCancelled(true);

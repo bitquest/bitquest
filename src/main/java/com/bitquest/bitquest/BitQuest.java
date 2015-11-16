@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -98,6 +99,7 @@ public class BitQuest extends JavaPlugin {
         areaJSON.addProperty("name",name);
         areaJSON.addProperty("x",location.getX());
         areaJSON.addProperty("z",location.getZ());
+        areaJSON.addProperty("uuid", UUID.randomUUID().toString());
         REDIS.lpush("areas",areaJSON.toString());
         // TODO: Check if redis actually appended the area to list and return the success of the operation
         return true;
@@ -114,7 +116,7 @@ public class BitQuest extends JavaPlugin {
         if(sender instanceof Player) {
             Player player=(Player) sender;
             // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addarea")) {
+            if (cmd.getName().equalsIgnoreCase("addtown")) {
                 if(args.length > 1) {
                     // first, check that arg[0] (size) is an integer
                     try {
@@ -152,8 +154,9 @@ public class BitQuest extends JavaPlugin {
                 }
             } //If this has happened the function will return true.
             // If this hasn't happened the value of false will be returned.
-        } else {
-            sender.sendMessage("This command is for players only!");
+            if(cmd.getName().equalsIgnoreCase("deltown")) {
+                sender.sendMessage(REDIS.lrem("areas",1,areaForLocation(((Player) sender).getLocation()).toString()).toString());
+            }
         }
 
         return false;
