@@ -4,10 +4,10 @@ author: The BitQuest Open Source Project
 main: com.bitquest.bitquest.BitQuest
 description: The Minecraft server that runs on Bitcoin
 commands:
-  addarea:
+  addtown:
     description: "Creates a new town in the standing location"
     usage: /addtown <size> <name>
-  delarea:
+  deltown:
     description: "Deletes area from the server (Where currently standing)"
     usage: /deltown
   publicarea:

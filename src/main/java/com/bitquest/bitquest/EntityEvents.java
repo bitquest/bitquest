@@ -61,6 +61,19 @@ public class EntityEvents implements Listener {
         World world = event.getPlayer().getWorld();
         if (world.getName().endsWith("_nether") == false && world.getName().endsWith("_the_end") == false) {
             JsonObject newarea = bitQuest.areaForLocation(event.getTo());
+            if(newarea!=null) {
+                if((event.getPlayer().hasMetadata("area")==true && newarea.get("uuid").getAsString().equals(event.getPlayer().getMetadata("area").get(0).asString())==false)||event.getPlayer().hasMetadata("area")==false) {
+                    event.getPlayer().setMetadata("area",new FixedMetadataValue(bitQuest,newarea.get("uuid").getAsString()));
+
+                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + newarea.get("name").getAsString() + " ]");
+                }
+            } else {
+                if(event.getPlayer().hasMetadata("area")==true) {
+                    event.getPlayer().removeMetadata("area",bitQuest);
+                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ the wilderness ]");
+                }
+            }
+
             JsonObject oldarea = bitQuest.areaForLocation(event.getFrom());
             if ((oldarea==null && newarea!=null)||(oldarea!=null&&newarea==null)) {
                 if (newarea == null) {

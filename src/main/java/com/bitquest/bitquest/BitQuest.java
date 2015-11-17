@@ -155,7 +155,13 @@ public class BitQuest extends JavaPlugin {
             } //If this has happened the function will return true.
             // If this hasn't happened the value of false will be returned.
             if(cmd.getName().equalsIgnoreCase("deltown")) {
-                sender.sendMessage(REDIS.lrem("areas",1,areaForLocation(((Player) sender).getLocation()).toString()).toString());
+                JsonObject area=areaForLocation(((Player) sender).getLocation());
+                if(area!=null) {
+                    sender.sendMessage(REDIS.lrem("areas",1,area.toString()).toString());
+                } else {
+                    sender.sendMessage("0");
+                }
+                return true;
             }
         }
 
