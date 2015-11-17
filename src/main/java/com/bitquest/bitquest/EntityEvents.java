@@ -40,15 +40,15 @@ public class EntityEvents implements Listener {
         for(String line : bitQuest.getConfig().getStringList("welcomeMessage")) {
         	for (ChatColor color : ChatColor.values()) {
         		line.replaceAll("<"+color.name()+">", color.toString());
-        		// add links
-        		final Pattern pattern = Pattern.compile("<link>(.+?)</link>");
-        		final Matcher matcher = pattern.matcher(line);
-        		matcher.find();
-        		String link = matcher.group(1);
-        		// Right here we need to replace the link variable with a minecraft-compatible link
-        		line.replaceAll("<link>" + link + "<link>", link);
-        		
         	}
+        	// add links
+    		final Pattern pattern = Pattern.compile("<link>(.+?)</link>");
+    		final Matcher matcher = pattern.matcher(line);
+    		matcher.find();
+    		String link = matcher.group(1);
+    		// Right here we need to replace the link variable with a minecraft-compatible link
+    		line.replaceAll("<link>" + link + "<link>", link);
+    		
         	rawwelcome.append(line);
     	}
     }
