@@ -24,65 +24,75 @@ import redis.clients.jedis.Jedis;
 
 public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
+    // Links to the administration account via Environment Variables
+    public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
     // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
-    public final static String redisHost=System.getenv("REDIS_1_PORT_6379_TCP_ADDR")!=null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
-    public final static Integer redisPort=System.getenv("REDIS_1_PORT_6379_TCP_PORT")!=null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
-    public final static Jedis REDIS=new Jedis(redisHost,redisPort);
+    public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
+    public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
+    public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
+
     // utilities: distance and rand
-    public static int distance(Location location1,Location location2) {
+    public static int distance(Location location1, Location location2) {
         return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
     }
+
     public static int rand(int min, int max) {
-        return min + (int)(Math.random() * ((max - min) + 1));
+        return min + (int) (Math.random() * ((max - min) + 1));
     }
 
     @Override
     public void onEnable() {
         log("BitQuest starting...");
-        log("REDIS is redis://"+redisHost+":"+redisPort);
+        if (ADMIN_UUID == null) {
+            log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
+        }
         // registers listener classes
-        getServer().getPluginManager().registerEvents(new BlockEvents(this),this);
-        getServer().getPluginManager().registerEvents(new EntityEvents(this),this);
+        getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
+        getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
 
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
         getDataFolder().mkdir();
-        if(!new java.io.File(getDataFolder(), "config.yml").exists()) {
+        if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
     }
+
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
+
     public void success(Player recipient, String msg) {
-    	recipient.sendMessage(ChatColor.GREEN+msg);
-		recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
+        recipient.sendMessage(ChatColor.GREEN + msg);
+        recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
     }
+
     public void error(Player recipient, String msg) {
-    	recipient.sendMessage(ChatColor.RED+msg);
-    	recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
+        recipient.sendMessage(ChatColor.RED + msg);
+        recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
 
     public JsonObject areaForLocation(Location location) {
-        List<String> areas=REDIS.lrange("areas",0,-1);
-        for(String areaJSON : areas) {
+        List<String> areas = REDIS.lrange("areas", 0, -1);
+        for (String areaJSON : areas) {
             Gson gson = new Gson();
-            JsonObject area=new JsonParser().parse(areaJSON).getAsJsonObject();
-            int x=area.get("x").getAsInt();
-            int z=area.get("z").getAsInt();
-            int size=area.get("size").getAsInt();
-            if(location.getX()>(x-size) && location.getX()<(x+size)&&location.getZ()>(z-size)&&location.getZ()<(z+size)) {
+            JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
+            int x = area.get("x").getAsInt();
+            int z = area.get("z").getAsInt();
+            int size = area.get("size").getAsInt();
+            if (location.getX() > (x - size) && location.getX() < (x + size) && location.getZ() > (z - size) && location.getZ() < (z + size)) {
                 return area;
             }
 
         }
         return null;
     }
+
     public boolean allowBuild(Location location, Player player) {
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
-        if(areaForLocation(location)!=null) {
-            if(areaForLocation(location).get("owner").getAsString().equals(player.getUniqueId().toString())) {
+        if (areaForLocation(location) != null) {
+            if (areaForLocation(location).get("owner").getAsString().equals(player.getUniqueId().toString())) {
                 return true;
             } else {
                 return false;
@@ -91,16 +101,17 @@ public class BitQuest extends JavaPlugin {
             return true;
         }
     }
+
     public boolean createNewArea(Location location, Player owner, String name, int size) {
         // write the new area to REDIS
-        JsonObject areaJSON=new JsonObject();
-        areaJSON.addProperty("size",size);
-        areaJSON.addProperty("owner",owner.getUniqueId().toString());
-        areaJSON.addProperty("name",name);
-        areaJSON.addProperty("x",location.getX());
-        areaJSON.addProperty("z",location.getZ());
+        JsonObject areaJSON = new JsonObject();
+        areaJSON.addProperty("size", size);
+        areaJSON.addProperty("owner", owner.getUniqueId().toString());
+        areaJSON.addProperty("name", name);
+        areaJSON.addProperty("x", location.getX());
+        areaJSON.addProperty("z", location.getZ());
         areaJSON.addProperty("uuid", UUID.randomUUID().toString());
-        REDIS.lpush("areas",areaJSON.toString());
+        REDIS.lpush("areas", areaJSON.toString());
         // TODO: Check if redis actually appended the area to list and return the success of the operation
         return true;
     }
@@ -113,59 +124,64 @@ public class BitQuest extends JavaPlugin {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
-        if(sender instanceof Player) {
-            Player player=(Player) sender;
-            // command to create abu new area
-            if (cmd.getName().equalsIgnoreCase("addtown")) {
-                if(args.length > 1) {
-                    // first, check that arg[0] (size) is an integer
-                    try {
-                        int size=Integer.parseInt(args[0]);
-                        if(size>=minLandSize&&size<=maxLandSize) {
-                        	StringBuilder builder = new StringBuilder();
-            				for(int i = 1; i < args.length; i++) {
-            					builder.append(args[i]).append(" ");
-            				}
-            				String name = builder.toString().trim();
+        if (sender instanceof Player) {
+            Player player = (Player) sender;
+            if (player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
 
-                            // ensure that name is alphanumeric and is within character limits
-                            if(!name.matches("^.*[^a-zA-Z0-9 ].*$") && name.length()>=minNameSize && name.length()<=maxNameSize) {
-                                if(createNewArea(player.getLocation(),player,name,size)) {
-                                    success(player, "Area '"+name+"' was created.");
-                                } else {
-                                    error(player,"Error creating area");
+                // command to create abu new area
+                if (cmd.getName().equalsIgnoreCase("addtown")) {
+                    if (args.length > 1) {
+                        // first, check that arg[0] (size) is an integer
+                        try {
+                            int size = Integer.parseInt(args[0]);
+                            if (size >= minLandSize && size <= maxLandSize) {
+                                StringBuilder builder = new StringBuilder();
+                                for (int i = 1; i < args.length; i++) {
+                                    builder.append(args[i]).append(" ");
                                 }
-                                return true;
+                                String name = builder.toString().trim();
+
+                                // ensure that name is alphanumeric and is within character limits
+                                if (!name.matches("^.*[^a-zA-Z0-9 ].*$") && name.length() >= minNameSize && name.length() <= maxNameSize) {
+                                    if (createNewArea(player.getLocation(), player, name, size)) {
+                                        success(player, "Area '" + name + "' was created.");
+                                    } else {
+                                        error(player, "Error creating area");
+                                    }
+                                    return true;
+                                } else {
+                                    error(player, "Invalid land name! Must be " + minNameSize + "-" + maxNameSize + " characters!");
+                                    return false;
+                                }
                             } else {
-                            	error(player, "Invalid land name! Must be "+minNameSize+"-"+maxNameSize+" characters!");
+                                error(player, "Invalid land size! Must be " + minLandSize + "-" + maxLandSize + "!");
                                 return false;
                             }
-                        } else {
-                        	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!");
+                        } catch (Exception e) {
+                            error(player, "Invalid land size! Must be " + minLandSize + "-" + maxLandSize + "!" + e.getLocalizedMessage());
                             return false;
                         }
-                    } catch(Exception e) {
-                    	error(player, "Invalid land size! Must be "+minLandSize+"-"+maxLandSize+"!" + e.getLocalizedMessage());
+                    } else {
+                        error(player, "Please specify area name and size!");
                         return false;
                     }
-                } else {
-                    error(player, "Please specify area name and size!");
-                    return false;
+                } //If this has happened the function will return true.
+                // If this hasn't happened the value of false will be returned.
+                if (cmd.getName().equalsIgnoreCase("deltown")) {
+                    JsonObject area = areaForLocation(((Player) sender).getLocation());
+                    if (area != null) {
+                        sender.sendMessage(REDIS.lrem("areas", 1, area.toString()).toString());
+                    } else {
+                        sender.sendMessage("0");
+                    }
+                    return true;
                 }
-            } //If this has happened the function will return true.
-            // If this hasn't happened the value of false will be returned.
-            if(cmd.getName().equalsIgnoreCase("deltown")) {
-                JsonObject area=areaForLocation(((Player) sender).getLocation());
-                if(area!=null) {
-                    sender.sendMessage(REDIS.lrem("areas",1,area.toString()).toString());
-                } else {
-                    sender.sendMessage("0");
-                }
-                return true;
             }
-        }
 
-        return false;
+            return false;
+        }
+        sender.sendMessage(ChatColor.RED+"Permission denied.");
+        return true;
     }
 }
 
