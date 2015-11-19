@@ -1,6 +1,7 @@
 superuser: null
-welcomeMessage:
-   <bold><yellow>Welcome to BitQuest, the server that runs on Bitcoin! ^_^<reset>
-
-   <green>Your bank balance is: <walletAmount>
-   <green>To cash out or add funds, log into: <blue><underline><link>xapo.com</link>
+# commented until <walletAmount> gets a class getter
+#welcomeMessage:
+#   <bold><yellow>Welcome to BitQuest, the server that runs on Bitcoin! ^_^<reset>
+#
+#   <green>Your bank balance is: <walletAmount>
+#   <green>To cash out or add funds, log into: <blue><underline><link>xapo.com</link>

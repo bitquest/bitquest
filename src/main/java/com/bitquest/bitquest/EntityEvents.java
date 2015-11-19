@@ -24,13 +24,15 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by explodi on 11/7/15.
  */
 public class EntityEvents implements Listener {
     BitQuest bitQuest;
-    StringBuilder welcome = new StringBuilder();
+    StringBuilder rawwelcome = new StringBuilder();
 
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -39,13 +41,23 @@ public class EntityEvents implements Listener {
         	for (ChatColor color : ChatColor.values()) {
         		line.replaceAll("<"+color.name()+">", color.toString());
         	}
-        	welcome.append(line);
+        	// add links
+    		final Pattern pattern = Pattern.compile("<link>(.+?)</link>");
+    		final Matcher matcher = pattern.matcher(line);
+    		matcher.find();
+    		String link = matcher.group(1);
+    		// Right here we need to replace the link variable with a minecraft-compatible link
+    		line.replaceAll("<link>" + link + "<link>", link);
+    		
+        	rawwelcome.append(line);
     	}
     }
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) {
         User user=new User(event.getPlayer());
-    	event.getPlayer().sendMessage(welcome.toString());
+        String welcome = rawwelcome.toString();
+        welcome.replace("<name>", event.getPlayer().getName());
+    	event.getPlayer().sendMessage(welcome);
     }
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -250,7 +262,6 @@ public class EntityEvents implements Listener {
 
             // damager is player
             if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-                Player damagerplayer = (Player) ((EntityDamageByEntityEvent) event).getDamager();
                 Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
                 damagerlevel = player.getLevel();
 
@@ -288,7 +299,6 @@ public class EntityEvents implements Listener {
                 // damaged is monster
                 if (event.getEntity() instanceof Monster) {
                     Monster monster = (Monster) event.getEntity();
-                    int monsterlevel = new Double(monster.getMaxHealth() / 4).intValue();
                     damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
 
                     if (monster.hasMetadata("level")) {
@@ -321,10 +331,6 @@ public class EntityEvents implements Listener {
                     damager = shooter;
                     damagerlevel = shooter.getLevel();
 
-                    // player vs player
-                    if (event.getEntity() instanceof Player) {
-                        Player player = (Player) event.getEntity();
-                    }
                     // shoot villagers
                     if (event.getEntity() instanceof Villager) {
                         event.setCancelled(true);
@@ -336,7 +342,6 @@ public class EntityEvents implements Listener {
                     if (event.getEntity() instanceof Monster) {
                         Monster monster = (Monster) event.getEntity();
                         damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
-                        int factor = 1;
 
                         if (monster.hasMetadata("damage")) {
                             int damage = monster.getMetadata("damage").get(0).asInt();
@@ -373,8 +378,6 @@ public class EntityEvents implements Listener {
             }
 
             // begins to recalculate damage
-            int critical = 0;
-
             double attack = 0;
             double defense = 0;
             boolean miss=false;
