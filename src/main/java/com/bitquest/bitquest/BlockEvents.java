@@ -32,16 +32,16 @@ public class BlockEvents implements Listener {
 	
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
-		JsonObject area=bitQuest.areaForLocation(event.getBlock().getLocation());
-		if(area!=null) {
-            // TODO: check if user is owner of that plot, otherwise cancel the event
-			bitQuest.log(area.toString());
-		}
+    	if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+    		// TODO: Perhaps add the area's name?
+    		bitQuest.error(event.getPlayer(), "You may not break blocks here!");
+            event.setCancelled(true);
+        }
     }
 	@EventHandler
-	void onBlockPlace(BlockPlaceEvent e) {
+	void onBlockPlace(BlockPlaceEvent event) {
         // If block is bed, attempt to claim area for player
-        if (e.getBlock().getType() == Material.BED_BLOCK) {
+        if (event.getBlock().getType() == Material.BED_BLOCK) {
             List<String> areas = bitQuest.REDIS.lrange("areas", 0, -1);
 
             for (String areaJSON : areas) {
@@ -49,22 +49,31 @@ public class BlockEvents implements Listener {
                 JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
                 // Check if player already owns a plot
                 // In the future this might change as we allow players to get more than one plot.
-                if (area.get("owner").getAsString().equals(e.getPlayer().getUniqueId().toString())) {
-                    bitQuest.error(e.getPlayer(), "You already own a home plot");
-                    e.setCancelled(true);
+                if (area.get("owner").getAsString().equals(event.getPlayer().getUniqueId().toString())) {
+                    bitQuest.error(event.getPlayer(), "You already own a home plot");
+                    event.setCancelled(true);
                     return;
                 }
                 // checks that new area is far enough from other areas
-                if (BitQuest.distance(e.getBlock().getLocation(), new Location(e.getPlayer().getWorld(),area.get("x").getAsDouble(), 0, area.get("z").getAsDouble())) < area.get("size").getAsInt()) {
-                    bitQuest.error(e.getPlayer(), "This area is too close from " + area.get("name").getAsString());
+                if (BitQuest.distance(event.getBlock().getLocation(), new Location(event.getPlayer().getWorld(),area.get("x").getAsDouble(), 0, area.get("z").getAsDouble())) < area.get("size").getAsInt()) {
+                    bitQuest.error(event.getPlayer(), "This area is too close to " + area.get("name").getAsString());
                 }
             }
-            if (bitQuest.createNewArea(e.getBlock().getLocation(), e.getPlayer(), e.getPlayer().getDisplayName() + "'s home", 32)) {
-                bitQuest.success(e.getPlayer(), "Congratulations! this is your new home!");
+            if (bitQuest.createNewArea(event.getBlock().getLocation(), event.getPlayer(), event.getPlayer().getDisplayName() + "'s home", 32)) {
+                bitQuest.success(event.getPlayer(), "Congratulations! this is your new home!");
             } else {
-                bitQuest.error(e.getPlayer(), "Plot claim error");
+                bitQuest.error(event.getPlayer(), "Plot claim error");
             }
+        } else {
+
+        	if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+        		// TODO: Perhaps add the area's name?
+        		bitQuest.error(event.getPlayer(), "You may not place blocks here!");
+                event.setCancelled(true);
+            }
+    		
         }
+        
 	}
     // Make a sweet block regeneration ^_^
     @EventHandler

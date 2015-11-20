@@ -34,6 +34,7 @@ public class BitQuest extends JavaPlugin {
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
+        // TODO: Perhaps use this instead? return (int) location1.distance(location2);
     }
 
     public static int rand(int min, int max) {
