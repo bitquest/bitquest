@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
@@ -33,8 +34,7 @@ public class BitQuest extends JavaPlugin {
 
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
-        return new Double(Math.sqrt(Math.pow((location2.getX() - location1.getX()), 2) + Math.pow((location2.getZ() - location2.getZ()), 2))).intValue();
-        // TODO: Perhaps use this instead? return (int) location1.distance(location2);
+        return (int) location1.distance(location2);
     }
 
     public static int rand(int min, int max) {
@@ -166,8 +166,8 @@ public class BitQuest extends JavaPlugin {
                         error(player, "Please specify area name and size!");
                         return false;
                     }
-                } //If this has happened the function will return true.
-                // If this hasn't happened the value of false will be returned.
+                } 
+                // deltown command for deleting the town you're currently in
                 if (cmd.getName().equalsIgnoreCase("deltown")) {
                     JsonObject area = areaForLocation(((Player) sender).getLocation());
                     if (area != null) {
@@ -176,6 +176,16 @@ public class BitQuest extends JavaPlugin {
                         sender.sendMessage("0");
                     }
                     return true;
+                }
+                if (cmd.getName().equalsIgnoreCase("spectate") && args.length == 1) {
+                	
+                	if(Bukkit.getPlayer(args[0]) != null) {
+                		((Player) sender).setGameMode(GameMode.SPECTATOR);
+                    	((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
+                    	success(((Player) sender), "You're now spectating " + args[0] + ".");
+                	} else {
+                		error(((Player) sender), "Player " + args[0] + " isn't online.");
+                	}
                 }
             }
 
