@@ -19,3 +19,6 @@ commands:
   unban:
     description: "Removes player from the ban list"
     usage: /unban <player>
+  spectate:
+    description: "Allows moderators to spectate players' actions"
+    usage: /spectate <player>
