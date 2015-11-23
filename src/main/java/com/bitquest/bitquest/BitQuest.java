@@ -186,12 +186,14 @@ public class BitQuest extends JavaPlugin {
                 	} else {
                 		error(((Player) sender), "Player " + args[0] + " isn't online.");
                 	}
+                	return true;
                 }
             }
 
-            return false;
+            error((Player) sender, "You don't have permission to do that!");
+            return true;
         }
-        sender.sendMessage(ChatColor.RED+"Permission denied.");
+        sender.sendMessage(ChatColor.RED+"This command is for players only!");
         return true;
     }
 }

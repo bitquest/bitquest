@@ -32,7 +32,12 @@ public class BlockEvents implements Listener {
 	
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
-    	if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+    	// If block is bedrock, cancel the event
+    	if(event.getBlock().getType().equals(Material.BEDROCK)) {
+    		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
+    		event.setCancelled(true);
+    	// If player is in a no-build zone, cancel the event
+    	} else if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
     		// TODO: Perhaps add the area's name?
     		bitQuest.error(event.getPlayer(), "You may not break blocks here!");
             event.setCancelled(true);
@@ -40,6 +45,11 @@ public class BlockEvents implements Listener {
     }
 	@EventHandler
 	void onBlockPlace(BlockPlaceEvent event) {
+		// If block is bedrock, cancel the event
+		if(event.getBlock().getType().equals(Material.BEDROCK)) {
+			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
+    		event.setCancelled(true);
+		}
         // If block is bed, attempt to claim area for player
         if (event.getBlock().getType() == Material.BED_BLOCK) {
             List<String> areas = bitQuest.REDIS.lrange("areas", 0, -1);
