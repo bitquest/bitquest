@@ -8,11 +8,13 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
@@ -96,6 +98,19 @@ public class EntityEvents implements Listener {
             }
         }
     }
+	@EventHandler
+	public void onClick(PlayerInteractEvent event) {
+		if(event.getItem().getType() == Material.COMPASS) {
+			if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+				// TODO: tp player home
+				bitQuest.success(event.getPlayer(), "You left-clicked a compass!");
+			}
+			if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+				// TODO: open the tps inventory
+				bitQuest.success(event.getPlayer(), "You right-clicked a compass!");
+			}
+		}
+	}
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event) {
 		if(event.getDamager() instanceof Player) {
