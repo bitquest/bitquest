@@ -266,7 +266,7 @@ public class EntityEvents implements Listener {
                 damagerlevel = player.getLevel();
 
                 if (event.getEntity() instanceof ItemFrame) {
-                    if (bitQuest.allowBuild(event.getEntity().getLocation(), player) == false) {
+                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
                         event.setCancelled(true);
                     }
                 }
@@ -281,7 +281,7 @@ public class EntityEvents implements Listener {
                         }
                     }
                 } else if (event.getEntity() instanceof Animals) {
-                    if (bitQuest.allowBuild(event.getEntity().getLocation(), player) == false) {
+                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
                         event.setCancelled(true);
                     }
 

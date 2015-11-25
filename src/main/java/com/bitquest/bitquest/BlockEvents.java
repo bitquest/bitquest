@@ -37,9 +37,15 @@ public class BlockEvents implements Listener {
     		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
-    	} else if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
-    		// TODO: Perhaps add the area's name?
-    		bitQuest.error(event.getPlayer(), "You may not break blocks here!");
+    	} else if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+    		JsonObject area = bitQuest.areaForLocation(event.getBlock().getLocation());
+    		// Check if the area has a name so the player doesn't receive "null"
+    		// in theory, all properties should have names, but just incase...
+    		if(area.get("name") != null) {
+    			bitQuest.error(event.getPlayer(), "You may not break blocks in " + area.get("name").getAsString() + "!");
+    		} else {
+    			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
+    		}
             event.setCancelled(true);
         }
     }
@@ -76,9 +82,13 @@ public class BlockEvents implements Listener {
             }
         } else {
 
-        	if (bitQuest.allowBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
-        		// TODO: Perhaps add the area's name?
-        		bitQuest.error(event.getPlayer(), "You may not place blocks here!");
+        	if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+        		JsonObject area = bitQuest.areaForLocation(event.getBlock().getLocation());
+        		if(area.get("name") != null) {
+        			bitQuest.error(event.getPlayer(), "You may not break blocks in " + area.get("name").getAsString() + "!");
+        		} else {
+        			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
+        		}
                 event.setCancelled(true);
             }
     		
