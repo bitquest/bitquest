@@ -58,9 +58,9 @@ public class BlockEvents implements Listener {
 		if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
 			JsonObject area = bitQuest.areaForLocation(event.getBlock().getLocation());
 			if(area.get("name") != null) {
-				bitQuest.error(event.getPlayer(), "You may not place blocks in " + area.get("name").getAsString() + "!");
+				bitQuest.error(event.getPlayer(), "You may not break blocks in " + area.get("name").getAsString() + "!");
 			} else {
-				bitQuest.error(event.getPlayer(), "You may not place blocks here!");
+				bitQuest.error(event.getPlayer(), "You may not break blocks here!");
 			}
 			event.setCancelled(true);
 		} else if (event.getBlock().getType() == Material.STANDING_BANNER) {
@@ -84,19 +84,19 @@ public class BlockEvents implements Listener {
 				if (sign != null) {
 					String tag = sign.getLine(0).toLowerCase();
 					if (tag.length() > 12) {
-						bitQuest.error(event.getPlayer(), "Clan names are limited to a maximum of 12 characters.");
+						event.getPlayer().sendMessage("Clan names are limited to a maximum of 12 characters.");
 					} else if (tag.length() > 0) {
 						// TODO: Find out if the clan name already exists and check player is invited
 						// TODO: Add a clan property to area key
 						// TODO: Add a clan property to user data
 					} else {
-						bitQuest.error(event.getPlayer(), "Please write the name of the clan on the first line of the sign.");
+						event.getPlayer().sendMessage("Please write the name of the clan on the first line of the sign.");
 					}
 
 
 				}
 			} else {
-				bitQuest.error(event.getPlayer(), "You can only place banners in your home land.");
+				event.getPlayer().sendMessage("You can only place banners in your home land.");
 				event.setCancelled(true);
 			}
 		} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
@@ -121,9 +121,9 @@ public class BlockEvents implements Listener {
                 }
             }
             if (bitQuest.createNewArea(event.getBlock().getLocation(), event.getPlayer(), event.getPlayer().getDisplayName() + "'s home", 32)) {
-                bitQuest.success(event.getPlayer(), "Congratulations! This is your new home!");
+                bitQuest.success(event.getPlayer(), "Congratulations! this is your new home!");
             } else {
-                bitQuest.error(event.getPlayer(), "There was an error registering your home...");
+                bitQuest.error(event.getPlayer(), "Plot claim error");
             }
         }
 
