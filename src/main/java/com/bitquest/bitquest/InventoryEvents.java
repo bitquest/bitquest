@@ -42,7 +42,7 @@ public class InventoryEvents implements Listener {
                 int x = 0;
                 int z = 0;
                 // TODO: Go to the actual destination selected on the inventory, not 0,0
-
+                
                 player.sendMessage(ChatColor.GREEN + "Teleporting to " + clicked.getItemMeta().getDisplayName() + "...");
                 System.out.println("[teleport] " + player.getName() + " teleported to " + x + "," + z);
                 player.closeInventory();
