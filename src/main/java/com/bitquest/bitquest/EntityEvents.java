@@ -215,7 +215,7 @@ public class EntityEvents implements Listener {
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name()), level));
+                entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
                 // add potion effects
                 if(BitQuest.rand(0,128) < level) entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
