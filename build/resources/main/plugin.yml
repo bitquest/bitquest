@@ -1,0 +1,24 @@
+name: BitQuest
+version: 1.1
+author: The BitQuest Open Source Project
+main: com.bitquest.bitquest.BitQuest
+description: The Minecraft server that runs on Bitcoin
+commands:
+  addtown:
+    description: "Creates a new town in the standing location"
+    usage: /addtown <size> <name>
+  deltown:
+    description: "Deletes area from the server (Where currently standing)"
+    usage: /deltown
+  publicarea:
+    description: "Makes area public; If already public reverts it to private"
+    usage: /publicarea
+  ban:
+    description: "Adds player to the ban list"
+    usage: /ban <player>
+  unban:
+    description: "Removes player from the ban list"
+    usage: /unban <player>
+  spectate:
+    description: "Allows moderators to spectate players' actions"
+    usage: /spectate <player>

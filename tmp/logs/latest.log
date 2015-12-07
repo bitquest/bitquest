@@ -1,0 +1,311 @@
+[17:09:03] [Server thread/INFO]: Starting minecraft server version 1.8.8
+[17:09:03] [Server thread/INFO]: Loading properties
+[17:09:03] [Server thread/INFO]: Default game type: SURVIVAL
+[17:09:03] [Server thread/INFO]: This server is running CraftBukkit version git-Spigot-5f38d38-18fbb24 (MC: 1.8.8) (Implementing API version 1.8.8-R0.1-SNAPSHOT)
+[17:09:03] [Server thread/INFO]: Server Ping Player Sample Count: 12
+[17:09:03] [Server thread/INFO]: Using 4 threads for Netty based IO
+[17:09:03] [Server thread/INFO]: Debug logging is disabled
+[17:09:03] [Server thread/INFO]: Generating keypair
+[17:09:03] [Server thread/INFO]: Starting Minecraft server on *:25565
+[17:09:03] [Server thread/INFO]: Using epoll channel type
+[17:09:03] [Server thread/INFO]: Set PluginClassLoader as parallel capable
+[17:09:03] [Server thread/INFO]: [BitQuest] Loading BitQuest v1.1
+[17:09:03] [Server thread/INFO]: **** Beginning UUID conversion, this may take A LONG time ****
+[17:09:03] [Server thread/INFO]: Preparing level "world"
+[17:09:03] [Server thread/INFO]: -------- World Settings For [world] --------
+[17:09:03] [Server thread/INFO]: Mob Spawn Range: 4
+[17:09:03] [Server thread/INFO]: Anti X-Ray: true
+[17:09:03] [Server thread/INFO]: 	Engine Mode: 1
+[17:09:03] [Server thread/INFO]: 	Hidden Blocks: [14, 15, 16, 21, 48, 49, 54, 56, 73, 74, 82, 129, 130]
+[17:09:03] [Server thread/INFO]: 	Replace Blocks: [1, 5]
+[17:09:03] [Server thread/INFO]: Nerfing mobs spawned from spawners: false
+[17:09:03] [Server thread/INFO]: Cactus Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Cane Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Melon Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Mushroom Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Pumpkin Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Sapling Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Wheat Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: NetherWart Growth Modifier: 100%
+[17:09:03] [Server thread/INFO]: Entity Activation Range: An 32 / Mo 32 / Mi 16
+[17:09:03] [Server thread/INFO]: Entity Tracking Range: Pl 48 / An 48 / Mo 48 / Mi 32 / Other 64
+[17:09:03] [Server thread/INFO]: Hopper Transfer: 8 Hopper Check: 8 Hopper Amount: 1
+[17:09:03] [Server thread/INFO]: Random Lighting Updates: false
+[17:09:03] [Server thread/INFO]: Structure Info Saving: true
+[17:09:03] [Server thread/INFO]: Sending up to 10 chunks per packet
+[17:09:03] [Server thread/INFO]: Max Entity Collisions: 8
+[17:09:03] [Server thread/INFO]: Custom Map Seeds:  Village: 10387312 Feature: 14357617
+[17:09:03] [Server thread/INFO]: Max TNT Explosions: 100
+[17:09:03] [Server thread/INFO]: Tile Max Tick Time: 50ms Entity max Tick Time: 50ms
+[17:09:03] [Server thread/INFO]: Item Despawn Rate: 6000
+[17:09:03] [Server thread/INFO]: Item Merge Radius: 2.5
+[17:09:03] [Server thread/INFO]: Arrow Despawn Rate: 1200
+[17:09:03] [Server thread/INFO]: Allow Zombie Pigmen to spawn from portal blocks: true
+[17:09:03] [Server thread/INFO]: View Distance: 10
+[17:09:03] [Server thread/INFO]: Zombie Aggressive Towards Villager: true
+[17:09:03] [Server thread/INFO]: Chunks to Grow per Tick: 650
+[17:09:03] [Server thread/INFO]: Clear tick list: false
+[17:09:03] [Server thread/INFO]: Experience Merge Radius: 3.0
+[17:09:04] [Server thread/INFO]: -------- World Settings For [world_nether] --------
+[17:09:04] [Server thread/INFO]: Mob Spawn Range: 4
+[17:09:04] [Server thread/INFO]: Anti X-Ray: true
+[17:09:04] [Server thread/INFO]: 	Engine Mode: 1
+[17:09:04] [Server thread/INFO]: 	Hidden Blocks: [14, 15, 16, 21, 48, 49, 54, 56, 73, 74, 82, 129, 130]
+[17:09:04] [Server thread/INFO]: 	Replace Blocks: [1, 5]
+[17:09:04] [Server thread/INFO]: Nerfing mobs spawned from spawners: false
+[17:09:04] [Server thread/INFO]: Cactus Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Cane Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Melon Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Mushroom Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Pumpkin Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Sapling Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Wheat Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: NetherWart Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Entity Activation Range: An 32 / Mo 32 / Mi 16
+[17:09:04] [Server thread/INFO]: Entity Tracking Range: Pl 48 / An 48 / Mo 48 / Mi 32 / Other 64
+[17:09:04] [Server thread/INFO]: Hopper Transfer: 8 Hopper Check: 8 Hopper Amount: 1
+[17:09:04] [Server thread/INFO]: Random Lighting Updates: false
+[17:09:04] [Server thread/INFO]: Structure Info Saving: true
+[17:09:04] [Server thread/INFO]: Sending up to 10 chunks per packet
+[17:09:04] [Server thread/INFO]: Max Entity Collisions: 8
+[17:09:04] [Server thread/INFO]: Custom Map Seeds:  Village: 10387312 Feature: 14357617
+[17:09:04] [Server thread/INFO]: Max TNT Explosions: 100
+[17:09:04] [Server thread/INFO]: Tile Max Tick Time: 50ms Entity max Tick Time: 50ms
+[17:09:04] [Server thread/INFO]: Item Despawn Rate: 6000
+[17:09:04] [Server thread/INFO]: Item Merge Radius: 2.5
+[17:09:04] [Server thread/INFO]: Arrow Despawn Rate: 1200
+[17:09:04] [Server thread/INFO]: Allow Zombie Pigmen to spawn from portal blocks: true
+[17:09:04] [Server thread/INFO]: View Distance: 10
+[17:09:04] [Server thread/INFO]: Zombie Aggressive Towards Villager: true
+[17:09:04] [Server thread/INFO]: Chunks to Grow per Tick: 650
+[17:09:04] [Server thread/INFO]: Clear tick list: false
+[17:09:04] [Server thread/INFO]: Experience Merge Radius: 3.0
+[17:09:04] [Server thread/INFO]: -------- World Settings For [world_the_end] --------
+[17:09:04] [Server thread/INFO]: Mob Spawn Range: 4
+[17:09:04] [Server thread/INFO]: Anti X-Ray: true
+[17:09:04] [Server thread/INFO]: 	Engine Mode: 1
+[17:09:04] [Server thread/INFO]: 	Hidden Blocks: [14, 15, 16, 21, 48, 49, 54, 56, 73, 74, 82, 129, 130]
+[17:09:04] [Server thread/INFO]: 	Replace Blocks: [1, 5]
+[17:09:04] [Server thread/INFO]: Nerfing mobs spawned from spawners: false
+[17:09:04] [Server thread/INFO]: Cactus Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Cane Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Melon Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Mushroom Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Pumpkin Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Sapling Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Wheat Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: NetherWart Growth Modifier: 100%
+[17:09:04] [Server thread/INFO]: Entity Activation Range: An 32 / Mo 32 / Mi 16
+[17:09:04] [Server thread/INFO]: Entity Tracking Range: Pl 48 / An 48 / Mo 48 / Mi 32 / Other 64
+[17:09:04] [Server thread/INFO]: Hopper Transfer: 8 Hopper Check: 8 Hopper Amount: 1
+[17:09:04] [Server thread/INFO]: Random Lighting Updates: false
+[17:09:04] [Server thread/INFO]: Structure Info Saving: true
+[17:09:04] [Server thread/INFO]: Sending up to 10 chunks per packet
+[17:09:04] [Server thread/INFO]: Max Entity Collisions: 8
+[17:09:04] [Server thread/INFO]: Custom Map Seeds:  Village: 10387312 Feature: 14357617
+[17:09:04] [Server thread/INFO]: Max TNT Explosions: 100
+[17:09:04] [Server thread/INFO]: Tile Max Tick Time: 50ms Entity max Tick Time: 50ms
+[17:09:04] [Server thread/INFO]: Item Despawn Rate: 6000
+[17:09:04] [Server thread/INFO]: Item Merge Radius: 2.5
+[17:09:04] [Server thread/INFO]: Arrow Despawn Rate: 1200
+[17:09:04] [Server thread/INFO]: Allow Zombie Pigmen to spawn from portal blocks: true
+[17:09:04] [Server thread/INFO]: View Distance: 10
+[17:09:04] [Server thread/INFO]: Zombie Aggressive Towards Villager: true
+[17:09:04] [Server thread/INFO]: Chunks to Grow per Tick: 650
+[17:09:04] [Server thread/INFO]: Clear tick list: false
+[17:09:04] [Server thread/INFO]: Experience Merge Radius: 3.0
+[17:09:04] [Server thread/INFO]: Preparing start region for level 0 (Seed: 8933851771922416906)
+[17:09:05] [Server thread/INFO]: Preparing spawn area: 54%
+[17:09:05] [Server thread/INFO]: Preparing start region for level 1 (Seed: 8933851771922416906)
+[17:09:06] [Server thread/INFO]: Preparing start region for level 2 (Seed: 8933851771922416906)
+[17:09:06] [Server thread/INFO]: [BitQuest] Enabling BitQuest v1.1
+[17:09:06] [Server thread/INFO]: BitQuest starting...
+[17:09:06] [Server thread/INFO]: Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.
+[17:09:06] [Server thread/INFO]: Server permissions file permissions.yml is empty, ignoring it
+[17:09:06] [Server thread/INFO]: Done (2.332s)! For help, type "help" or "?"
+[17:09:41] [User Authenticator #1/INFO]: UUID of player explodi is ae89b9c1-2d1d-4d0b-957d-1e5acd114e6e
+[17:09:41] [Server thread/INFO]: {"exp":0}
+[17:09:41] [Server thread/INFO]: {"exp":0}
+[17:09:41] [Server thread/INFO]: explodi[/127.0.0.1:55864] logged in with entity id 329 at ([world]-294.5, 73.0, 216.5)
+[17:10:00] [Server thread/ERROR]: Could not pass event PlayerInteractEvent to BitQuest v1.1
+org.bukkit.event.EventException
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:310) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.RegisteredListener.callEvent(RegisteredListener.java:62) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.fireEvent(SimplePluginManager.java:502) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.callEvent(SimplePluginManager.java:487) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:228) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:195) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerInteractManager.a(PlayerInteractManager.java:107) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:623) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:40) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:10) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.EntityEvents.onClick(EntityEvents.java:103) ~[?:?]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_66]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_66]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_66]
+	at java.lang.reflect.Method.invoke(Method.java:497) ~[?:1.8.0_66]
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:306) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 18 more
+[17:10:01] [Server thread/ERROR]: Could not pass event PlayerInteractEvent to BitQuest v1.1
+org.bukkit.event.EventException
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:310) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.RegisteredListener.callEvent(RegisteredListener.java:62) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.fireEvent(SimplePluginManager.java:502) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.callEvent(SimplePluginManager.java:487) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:228) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:195) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerInteractManager.a(PlayerInteractManager.java:107) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:623) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:40) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:10) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.EntityEvents.onClick(EntityEvents.java:103) ~[?:?]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_66]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_66]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_66]
+	at java.lang.reflect.Method.invoke(Method.java:497) ~[?:1.8.0_66]
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:306) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 18 more
+[17:10:01] [Server thread/ERROR]: Could not pass event PlayerInteractEvent to BitQuest v1.1
+org.bukkit.event.EventException
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:310) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.RegisteredListener.callEvent(RegisteredListener.java:62) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.fireEvent(SimplePluginManager.java:502) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.plugin.SimplePluginManager.callEvent(SimplePluginManager.java:487) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:228) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.event.CraftEventFactory.callPlayerInteractEvent(CraftEventFactory.java:195) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerInteractManager.a(PlayerInteractManager.java:107) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:623) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:40) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInBlockDig.a(SourceFile:10) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.EntityEvents.onClick(EntityEvents.java:103) ~[?:?]
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method) ~[?:1.8.0_66]
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62) ~[?:1.8.0_66]
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43) ~[?:1.8.0_66]
+	at java.lang.reflect.Method.invoke(Method.java:497) ~[?:1.8.0_66]
+	at org.bukkit.plugin.java.JavaPluginLoader$1.execute(JavaPluginLoader.java:306) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 18 more
+[17:11:07] [Server thread/INFO]: explodi issued server command: /addtown satoshi town
+[17:11:07] [Server thread/ERROR]: null
+org.bukkit.command.CommandException: Unhandled exception executing command 'addtown' in plugin BitQuest v1.1
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:46) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.command.SimpleCommandMap.dispatch(SimpleCommandMap.java:141) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.CraftServer.dispatchCommand(CraftServer.java:641) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.handleCommand(PlayerConnection.java:1162) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:997) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:45) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:1) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.BitQuest.onCommand(BitQuest.java:130) ~[?:?]
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:44) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 15 more
+[17:11:41] [Server thread/INFO]: explodi issued server command: /addtown satoshi town
+[17:11:41] [Server thread/ERROR]: null
+org.bukkit.command.CommandException: Unhandled exception executing command 'addtown' in plugin BitQuest v1.1
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:46) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.command.SimpleCommandMap.dispatch(SimpleCommandMap.java:141) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.CraftServer.dispatchCommand(CraftServer.java:641) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.handleCommand(PlayerConnection.java:1162) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:997) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:45) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:1) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.BitQuest.onCommand(BitQuest.java:130) ~[?:?]
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:44) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 15 more
+[17:11:51] [Server thread/INFO]: explodi issued server command: /addtown 10 satoshi town
+[17:11:51] [Server thread/ERROR]: null
+org.bukkit.command.CommandException: Unhandled exception executing command 'addtown' in plugin BitQuest v1.1
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:46) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.command.SimpleCommandMap.dispatch(SimpleCommandMap.java:141) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.CraftServer.dispatchCommand(CraftServer.java:641) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.handleCommand(PlayerConnection.java:1162) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:997) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:45) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:1) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.BitQuest.onCommand(BitQuest.java:130) ~[?:?]
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:44) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 15 more
+[17:11:59] [Server thread/INFO]: explodi issued server command: /addtown 10 satoshi town
+[17:11:59] [Server thread/ERROR]: null
+org.bukkit.command.CommandException: Unhandled exception executing command 'addtown' in plugin BitQuest v1.1
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:46) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.command.SimpleCommandMap.dispatch(SimpleCommandMap.java:141) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at org.bukkit.craftbukkit.v1_8_R3.CraftServer.dispatchCommand(CraftServer.java:641) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.handleCommand(PlayerConnection.java:1162) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnection.a(PlayerConnection.java:997) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:45) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PacketPlayInChat.a(PacketPlayInChat.java:1) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.PlayerConnectionUtils$1.run(SourceFile:13) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.util.concurrent.Executors$RunnableAdapter.call(Executors.java:511) [?:1.8.0_66]
+	at java.util.concurrent.FutureTask.run(FutureTask.java:266) [?:1.8.0_66]
+	at net.minecraft.server.v1_8_R3.SystemUtils.a(SourceFile:44) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.B(MinecraftServer.java:715) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.DedicatedServer.B(DedicatedServer.java:374) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.A(MinecraftServer.java:654) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at net.minecraft.server.v1_8_R3.MinecraftServer.run(MinecraftServer.java:557) [spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	at java.lang.Thread.run(Thread.java:745) [?:1.8.0_66]
+Caused by: java.lang.NullPointerException
+	at com.bitquest.bitquest.BitQuest.onCommand(BitQuest.java:130) ~[?:?]
+	at org.bukkit.command.PluginCommand.execute(PluginCommand.java:44) ~[spigot-1.8.8-R0.1-SNAPSHOT.jar:git-Spigot-5f38d38-18fbb24]
+	... 15 more
+[17:13:25] [Server thread/INFO]: explodi lost connection: Internal Exception: java.io.IOException: Error while read(...): Connection reset by peer
+[17:13:25] [Server thread/INFO]: explodi left the game.
+[17:14:40] [Thread-4/INFO]: Stopping server
