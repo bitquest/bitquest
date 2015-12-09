@@ -120,9 +120,7 @@ public class BitQuest extends JavaPlugin {
     }
 
     public boolean isModerator(Player player) {
-        if(player.getUniqueId().toString().equals(ADMIN_UUID)) {
-            return true;
-        } else {
+
             Set<String> moderators=REDIS.smembers("moderators");
 
             for(String uuid : moderators) {
@@ -132,7 +130,7 @@ public class BitQuest extends JavaPlugin {
                 }
             }
             return false;
-        }
+
     }
 
     final int minLandSize = 1;
