@@ -60,6 +60,10 @@ public class EntityEvents implements Listener {
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
     	event.getPlayer().sendMessage(welcome);
+        // Updates name-to-UUID database
+        bitQuest.REDIS.set("uuid"+event.getPlayer().getName(),event.getPlayer().getUniqueId().toString());
+        // Updates UUID-to-name database
+        bitQuest.REDIS.set("name"+event.getPlayer().getUniqueId().toString(),event.getPlayer().getName());
     }
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -100,16 +104,19 @@ public class EntityEvents implements Listener {
     }
 	@EventHandler
 	public void onClick(PlayerInteractEvent event) {
-		if(event.getItem().getType() == Material.COMPASS) {
-			if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-				// TODO: tp player home
-				bitQuest.success(event.getPlayer(), "You left-clicked a compass!");
-			}
-			if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-				// TODO: open the tps inventory
-				bitQuest.success(event.getPlayer(), "You right-clicked a compass!");
-			}
-		}
+        if(event.getItem()!=null) {
+            if(event.getItem().getType() == Material.COMPASS) {
+                if(event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    // TODO: tp player home
+                    bitQuest.success(event.getPlayer(), "You left-clicked a compass!");
+                }
+                if(event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                    // TODO: open the tps inventory
+                    bitQuest.success(event.getPlayer(), "You right-clicked a compass!");
+                }
+            }
+        }
+
 	}
 	@EventHandler
 	public void onAttack(EntityDamageByEntityEvent event) {

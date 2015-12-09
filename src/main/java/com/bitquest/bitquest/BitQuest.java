@@ -29,7 +29,7 @@ public class BitQuest extends JavaPlugin {
     // Links to the administration account via Environment Variables
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
     // If env MOD_OPS exists, server automatically ops moderators
-    public final static boolean MOD_OPS = System.getenv("MOD_OPS") != null ? true : null;
+    public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
     // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
@@ -125,9 +125,9 @@ public class BitQuest extends JavaPlugin {
         } else {
             Set<String> moderators=REDIS.smembers("moderators");
 
-            for(String modJSON : moderators) {
-                JsonObject moderator=new JsonParser().parse(modJSON).getAsJsonObject();
-                if(player.getUniqueId().toString().equals(moderator.get("uuid").getAsString())) {
+            for(String uuid : moderators) {
+
+                if(player.getUniqueId().toString().equals(uuid)) {
                     return true;
                 }
             }
@@ -150,17 +150,27 @@ public class BitQuest extends JavaPlugin {
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
                     if(args[0].equals("add")) {
-                        for(String playerJSON : allplayers) {
-                            JsonObject player=new JsonParser().parse(playerJSON).getAsJsonObject();
-                            if(player.get("name").getAsString().equalsIgnoreCase(args[1])) {
-                                REDIS.sadd("moderators",playerJSON);
-                                return true;
-                            }
+                        if(REDIS.get("uuid"+args[1])!=null) {
+                            UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
+                            REDIS.sadd("moderators",uuid.toString());
+                            return true;
+                        } else {
+                            sender.sendMessage(ChatColor.RED+"Cannot find player "+args[1]);
+                            return true;
                         }
                     } else if(args[0].equals("del")) {
-
+                        if(REDIS.get("uuid"+args[1])!=null) {
+                            UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
+                            REDIS.srem("moderators",uuid.toString());
+                            return true;
+                        }
+                        return false;
                     } else if(args[0].equals("list")) {
-
+                        Set<String> moderators=REDIS.smembers("moderators");
+                        for(String uuid:moderators) {
+                            sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
+                        }
+                        return true;
                     }
                 }
                 // COMMAND: ADDTOWN
