@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -27,6 +28,8 @@ public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
+    // If env MOD_OPS exists, server automatically ops moderators
+    public final static boolean MOD_OPS = System.getenv("MOD_OPS") != null ? true : null;
     // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
@@ -76,7 +79,6 @@ public class BitQuest extends JavaPlugin {
     public JsonObject areaForLocation(Location location) {
         List<String> areas = REDIS.lrange("areas", 0, -1);
         for (String areaJSON : areas) {
-            Gson gson = new Gson();
             JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
             int x = area.get("x").getAsInt();
             int z = area.get("z").getAsInt();
@@ -117,6 +119,22 @@ public class BitQuest extends JavaPlugin {
         return true;
     }
 
+    public boolean isModerator(Player player) {
+        if(player.getUniqueId().toString().equals(ADMIN_UUID)) {
+            return true;
+        } else {
+            Set<String> moderators=REDIS.smembers("moderators");
+
+            for(String modJSON : moderators) {
+                JsonObject moderator=new JsonParser().parse(modJSON).getAsJsonObject();
+                if(player.getUniqueId().toString().equals(moderator.get("uuid").getAsString())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+    }
+
     final int minLandSize = 1;
     final int maxLandSize = 512;
     final int minNameSize = 3;
@@ -128,8 +146,26 @@ public class BitQuest extends JavaPlugin {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             if (player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+                // COMMAND: MOD
+                if (cmd.getName().equalsIgnoreCase("mod")) {
+                    Set<String> allplayers=REDIS.smembers("players");
+                    if(args[0].equals("add")) {
+                        for(String playerJSON : allplayers) {
+                            JsonObject player=new JsonParser().parse(playerJSON).getAsJsonObject();
+                            if(player.get("name").getAsString().equalsIgnoreCase(args[1])) {
+                                REDIS.sadd("moderators",playerJSON);
+                                return true;
+                            }
+                        }
+                    } else if(args[0].equals("del")) {
 
-                // command to create abu new area
+                    } else if(args[0].equals("list")) {
+
+                    }
+                }
+                // COMMAND: ADDTOWN
+                // Creates a new town. Towns are different from player houses
+                // TODO: Establish differences between towns and houses
                 if (cmd.getName().equalsIgnoreCase("addtown")) {
                     if (args.length > 1) {
                         // first, check that arg[0] (size) is an integer
@@ -166,7 +202,8 @@ public class BitQuest extends JavaPlugin {
                         error(player, "Please specify area name and size!");
                         return false;
                     }
-                } 
+                }
+                // COMMAND: DELTOWN
                 // deltown command for deleting the town you're currently in
                 if (cmd.getName().equalsIgnoreCase("deltown")) {
                     JsonObject area = areaForLocation(((Player) sender).getLocation());
