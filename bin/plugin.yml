@@ -22,3 +22,6 @@ commands:
   spectate:
     description: "Allows moderators to spectate players' actions"
     usage: /spectate <player>
+  mod:
+    description: "Utility to add/remove/list moderators"
+    usage: /mod <add|remove|list>
