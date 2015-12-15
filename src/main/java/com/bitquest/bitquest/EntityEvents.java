@@ -55,7 +55,7 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException {
+    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException {
         User user = new User(event.getPlayer());
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
@@ -298,7 +298,7 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    void onEntityDamage(EntityDamageEvent event) {
+    void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         double rawdamage = event.getDamage();
 
         int damagerlevel = 1;

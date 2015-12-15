@@ -20,11 +20,15 @@ import java.text.ParseException;
  * Created by explodi on 11/6/15.
  */
 public class User {
-
+    public Wallet wallet;
     private String clan;
     private Player player;
-    public User(Player player) {
+    public User(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         this.player=player;
+        if(BitQuest.REDIS.get("public"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())==null) {
+            generateBitcoinAddress();
+        }
+        this.wallet=new Wallet(BitQuest.REDIS.get("public"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         loadUserData();
     }
     public void addExperience(int exp) {
