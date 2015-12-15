@@ -49,6 +49,8 @@ public class BitQuest extends JavaPlugin {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
 
+    public Wallet wallet=null;
+
     @Override
     public void onEnable() {
         log("BitQuest starting...");
@@ -58,12 +60,16 @@ public class BitQuest extends JavaPlugin {
         // registers listener classes
         getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
         getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
+        getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
 
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
         getDataFolder().mkdir();
         if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
+        }
+        if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
+            wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
     }
 

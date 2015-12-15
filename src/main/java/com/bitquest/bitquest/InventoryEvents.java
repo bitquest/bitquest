@@ -1,5 +1,6 @@
 package com.bitquest.bitquest;
 
+import com.google.gson.JsonObject;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -11,8 +12,15 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,8 +41,14 @@ public class InventoryEvents implements Listener {
         final Inventory inventory = event.getInventory();
         // Merchant inventory
         if(inventory.getName().equals("Market")) {
-            // TODO: Implement market callbacks
             ItemStack clicked = event.getCurrentItem();
+            player.closeInventory();
+            event.setCancelled(true);
+            // TODO: try/catch
+            User user=new User(player);
+            if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
+                player.getInventory().addItem(event.getCurrentItem());
+            }
 
         }
         // compass inventory
