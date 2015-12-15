@@ -74,7 +74,6 @@ public class InventoryEvents implements Listener {
 
             }
 
-            player.sendMessage("You clicked the compass inventory!");
             event.setCancelled(true);
         }
     }
