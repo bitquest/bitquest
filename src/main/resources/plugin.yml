@@ -1,8 +1,8 @@
 name: BitQuest
 version: 1.1
-author: The BitQuest Open Source Project
+author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
-description: The Minecraft server that runs on Bitcoin
+description: The BitQuest Open Source Project
 commands:
   addtown:
     description: "Creates a new town in the standing location"

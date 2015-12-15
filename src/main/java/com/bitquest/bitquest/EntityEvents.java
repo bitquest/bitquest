@@ -148,6 +148,12 @@ public class EntityEvents implements Listener {
             	World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
                 
+                // If its a guardian, then don't change its type so that ocean monuments aren't empty
+                if(entityType.equals(EntityType.GUARDIAN)) {
+                	world.spawnEntity(entity.getLocation(), entityType);
+                	return;
+                }
+                
                 int num = BitQuest.rand(0, 13);
                 // change the mob type to a random type
                 switch (num) {
