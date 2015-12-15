@@ -33,6 +33,8 @@ public class InventoryEvents implements Listener {
         // Merchant inventory
         if(inventory.getName().equals("Market")) {
             // TODO: Implement market callbacks
+            ItemStack clicked = event.getCurrentItem();
+
         }
         // compass inventory
         if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
