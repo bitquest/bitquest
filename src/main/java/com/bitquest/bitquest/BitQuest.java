@@ -28,6 +28,10 @@ public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
+    public final static UUID BITCOIN_ADDRESS = System.getenv("ADMIN_BITCOIN_ADDRESS") != null ? UUID.fromString(System.getenv("ADMIN_BITCOIN_ADDRESS")) : null;
+    public final static UUID BITCOIN_PRIVATE_KEY = System.getenv("ADMIN_BITCOIN_PRIVATE_KEY") != null ? UUID.fromString(System.getenv("ADMIN_BITCOIN_PRIVATE_KEY")) : null;
+    public final static UUID BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? UUID.fromString(System.getenv("BLOCKCYPHER_API_KEY")) : null;
+
     // If env MOD_OPS exists, server automatically ops moderators
     public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
     // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379

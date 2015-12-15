@@ -1,6 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" build-on-make="true" name="bitquest">
-    <output-path>$PROJECT_DIR$/build</output-path>
-    <root id="archive" name="bitquest.jar" />
-  </artifact>
-</component>

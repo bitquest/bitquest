@@ -55,7 +55,7 @@ public class EntityEvents implements Listener {
     	}
     }
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
+    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException {
         User user=new User(event.getPlayer());
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
@@ -64,6 +64,12 @@ public class EntityEvents implements Listener {
         bitQuest.REDIS.set("uuid"+event.getPlayer().getName(),event.getPlayer().getUniqueId().toString());
         // Updates UUID-to-name database
         bitQuest.REDIS.set("name"+event.getPlayer().getUniqueId().toString(),event.getPlayer().getName());
+        // Prints the user balance
+        event.getPlayer().sendMessage(ChatColor.YELLOW+"Your Bitcoin balance is: "+user.bitcoinBalance());
+        if(bitQuest.isModerator(event.getPlayer())==true && bitQuest.MOD_OPS!=null) {
+            event.getPlayer().setOp(true);
+            event.getPlayer().sendMessage(ChatColor.YELLOW+"You are a moderator on this server.");
+        }
     }
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
