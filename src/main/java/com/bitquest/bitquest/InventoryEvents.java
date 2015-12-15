@@ -30,8 +30,11 @@ public class InventoryEvents implements Listener {
     void onInventoryClick(InventoryClickEvent event) throws IOException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
+        // Merchant inventory
+        if(inventory.getName().equals("Market")) {
+            // TODO: Implement market callbacks
+        }
         // compass inventory
-
         if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
 

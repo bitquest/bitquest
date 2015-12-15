@@ -129,6 +129,9 @@ public class BitQuest extends JavaPlugin {
                     return true;
                 }
             }
+            if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+                return true;
+            }
             return false;
 
     }
@@ -143,11 +146,12 @@ public class BitQuest extends JavaPlugin {
         // we don't allow server commands (yet?)
         if (sender instanceof Player) {
             Player player = (Player) sender;
-            if (player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+            if (isModerator(player)==true) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
                     if(args[0].equals("add")) {
+                        // Sub-command: /mod add
                         if(REDIS.get("uuid"+args[1])!=null) {
                             UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
                             REDIS.sadd("moderators",uuid.toString());
@@ -157,6 +161,7 @@ public class BitQuest extends JavaPlugin {
                             return true;
                         }
                     } else if(args[0].equals("del")) {
+                        // Sub-command: /mod del
                         if(REDIS.get("uuid"+args[1])!=null) {
                             UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
                             REDIS.srem("moderators",uuid.toString());
@@ -164,6 +169,7 @@ public class BitQuest extends JavaPlugin {
                         }
                         return false;
                     } else if(args[0].equals("list")) {
+                        // Sub-command: /mod list
                         Set<String> moderators=REDIS.smembers("moderators");
                         for(String uuid:moderators) {
                             sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
