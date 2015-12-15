@@ -34,10 +34,15 @@ import java.util.regex.Pattern;
 public class EntityEvents implements Listener {
     BitQuest bitQuest;
     StringBuilder rawwelcome = new StringBuilder();
+    public static Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
 
+    
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
 
+        ItemStack button = new ItemStack(Material.DIAMOND);
+        marketInventory.setItem(0, button);
+        
         for (String line : bitQuest.getConfig().getStringList("welcomeMessage")) {
             for (ChatColor color : ChatColor.values()) {
                 line.replaceAll("<" + color.name() + ">", color.toString());
@@ -628,17 +633,7 @@ public class EntityEvents implements Listener {
         if (event.getRightClicked().getType().equals(EntityType.VILLAGER)) {
             event.setCancelled(true);
             // compass
-            Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
-
-            ItemStack button = new ItemStack(Material.DIAMOND);
-            ItemMeta buttonMeta = button.getItemMeta();
-            buttonMeta.setDisplayName("Diamond");
-            ArrayList<String> Lore = new ArrayList<String>();
-            Lore.add("20 bits");
-            buttonMeta.setLore(Lore);
-            button.setItemMeta(buttonMeta);
-            marketInventory.setItem(0, button);
-
+            
             // open menu
             event.getPlayer().openInventory(marketInventory);
         }

@@ -40,7 +40,7 @@ public class InventoryEvents implements Listener {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         // Merchant inventory
-        if(inventory.getName().equals("Market")) {
+        if(inventory.equals(EntityEvents.marketInventory)) {
             ItemStack clicked = event.getCurrentItem();
             player.closeInventory();
             event.setCancelled(true);
@@ -49,6 +49,7 @@ public class InventoryEvents implements Listener {
             if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
                 player.getInventory().addItem(event.getCurrentItem());
             }
+
 
         }
         // compass inventory
