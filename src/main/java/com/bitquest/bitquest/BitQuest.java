@@ -29,9 +29,9 @@ public class BitQuest extends JavaPlugin {
     // Links to the administration account via Environment Variables
 
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
-    public final static String BITCOIN_ADDRESS = System.getenv("ADMIN_BITCOIN_ADDRESS") != null ? UUID.fromString(System.getenv("ADMIN_BITCOIN_ADDRESS")) : null;
-    public final static String BITCOIN_PRIVATE_KEY = System.getenv("ADMIN_BITCOIN_PRIVATE_KEY") != null ? UUID.fromString(System.getenv("ADMIN_BITCOIN_PRIVATE_KEY")) : null;
-    public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? UUID.fromString(System.getenv("BLOCKCYPHER_API_KEY")) : null;
+    public final static String BITCOIN_ADDRESS = System.getenv("ADMIN_BITCOIN_ADDRESS") != null ? System.getenv("ADMIN_BITCOIN_ADDRESS") : null;
+    public final static String BITCOIN_PRIVATE_KEY = System.getenv("ADMIN_BITCOIN_PRIVATE_KEY") != null ? System.getenv("ADMIN_BITCOIN_PRIVATE_KEY") : null;
+    public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
 
     // If env MOD_OPS exists, server automatically ops moderators
     public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
