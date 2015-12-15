@@ -32,9 +32,10 @@ public class InventoryEvents implements Listener {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         // Merchant inventory
-        if(inventory.getName().equals("Market")) {
-            // TODO: Implement market callbacks
-            ItemStack clicked = event.getCurrentItem();
+        if(inventory.equals(EntityEvents.marketInventory)) {
+        	
+        	event.setCancelled(true);
+        	player.setItemOnCursor(event.getCurrentItem());
 
         }
         // compass inventory
