@@ -44,7 +44,7 @@ public class InventoryEvents implements Listener {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         		
         		ItemStack clicked = event.getCurrentItem();
-        		player.sendMessage(ChatColor.YELLOW+"purchasing "+clicked.getClass().getName());
+        		player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
 
         		player.closeInventory();
         		event.setCancelled(true);
