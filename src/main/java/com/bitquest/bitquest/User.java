@@ -28,8 +28,9 @@ public class User {
         if(BitQuest.REDIS.get("public"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())==null) {
             generateBitcoinAddress();
         }
-        this.wallet=new Wallet(BitQuest.REDIS.get("public"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
+        this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         loadUserData();
+        System.out.println("new user with address "+this.wallet.address);
     }
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
@@ -63,9 +64,9 @@ public class User {
         }
         in.close();
 
-        //print result
         JSONParser parser = new JSONParser();
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+        System.out.println(response.toString());
         BitQuest.REDIS.set("private"+this.player.getUniqueId().toString(), (String) jsonobj.get("private"));
         BitQuest.REDIS.set("public"+this.player.getUniqueId().toString(), (String) jsonobj.get("public"));
         BitQuest.REDIS.set("address"+this.player.getUniqueId().toString(), (String) jsonobj.get("address"));
