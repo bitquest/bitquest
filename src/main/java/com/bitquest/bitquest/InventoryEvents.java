@@ -52,6 +52,7 @@ public class InventoryEvents implements Listener {
         		User user=new User(player);
         		if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
         			player.getInventory().addItem(event.getCurrentItem());
+                    player.sendMessage(ChatColor.GREEN+clicked.getClass().getName()+" purchased");
         		} else {
         			player.sendMessage(ChatColor.RED+"transaction failed");
         		}
