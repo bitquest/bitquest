@@ -41,19 +41,24 @@ public class InventoryEvents implements Listener {
         final Inventory inventory = event.getInventory();
         // Merchant inventory
         if(inventory.equals(EntityEvents.marketInventory)) {
-            ItemStack clicked = event.getCurrentItem();
-            player.sendMessage(ChatColor.YELLOW+"purchasing "+clicked.getClass().getName());
+        	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+        		
+        		ItemStack clicked = event.getCurrentItem();
+        		player.sendMessage(ChatColor.YELLOW+"purchasing "+clicked.getClass().getName());
 
-            player.closeInventory();
-            event.setCancelled(true);
-            // TODO: try/catch
-            User user=new User(player);
-            if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
-                player.getInventory().addItem(event.getCurrentItem());
-            } else {
-                player.sendMessage(ChatColor.RED+"transaction failed");
-            }
-
+        		player.closeInventory();
+        		event.setCancelled(true);
+        		// TODO: try/catch
+        		User user=new User(player);
+        		if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
+        			player.getInventory().addItem(event.getCurrentItem());
+        		} else {
+        			player.sendMessage(ChatColor.RED+"transaction failed");
+        		}
+        		
+        	} else {
+        		event.setCancelled(true);
+        	}
 
         }
         // compass inventory
