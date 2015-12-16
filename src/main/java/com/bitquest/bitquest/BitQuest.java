@@ -53,7 +53,6 @@ public class BitQuest extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        REDIS.del("moderators");
         log("BitQuest starting...");
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
