@@ -53,36 +53,70 @@ public class Wallet {
         payload.addProperty("from_private",this.privatekey);
         payload.addProperty("to_address",wallet.address);
         payload.addProperty("value_satoshis",sat);
-
-        URL url = new URL("https://api.blockcypher.com/v1/bcy/main/txs/micro?token="+BitQuest.BLOCKCYPHER_API_KEY);
+        URL url = new URL("https://api.blockcypher.com/v1/btc/main/txs/micro?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+        String inputLine = "";
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        con.setDoOutput(true);
-        OutputStreamWriter out = new   OutputStreamWriter(con.getOutputStream());
-        out.write(payload.toString());
-        out.close();
-        int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("Payload : " + payload);
-        System.out.println("Response Code : " + responseCode);
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+        try {
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Payload : " + payload.toString());
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+            out.write(payload.toString());
+            out.close();
+            int responseCode = con.getResponseCode();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
+            System.out.println("Response Code : " + responseCode);
 
-        if(responseCode==200) {
-            return true;
-        } else {
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            if (responseCode == 200||responseCode==201) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch(IOException ioe) {
+            System.err.println("IOException: " + ioe);
+
+            InputStream error = con.getErrorStream();
+
+            try {
+                int data = error.read();
+                while (data != -1) {
+                    //do something with data...
+                    //System.out.println(data);
+                    inputLine = inputLine + (char)data;
+                    data = error.read();
+                    //inputLine = inputLine + (char)data;
+                }
+                error.close();
+            } catch (Exception ex) {
+                try {
+                    if (error != null) {
+                        error.close();
+                    }
+                } catch (Exception e) {
+                    return false;
+                }
+            }
+
+            System.out.println(inputLine);
+
+
             return false;
         }
+
     }
+
 }
