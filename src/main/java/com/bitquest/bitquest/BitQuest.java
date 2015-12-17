@@ -4,11 +4,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Sound;
+import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -68,6 +64,7 @@ public class BitQuest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
         getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+        getServer().getPluginManager().registerEvents(new SignEvents(this), this);
 
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
@@ -166,6 +163,7 @@ public class BitQuest extends JavaPlugin {
         // we don't allow server commands (yet?)
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            // MODERATOR COMMANDS
             if (isModerator(player)==true) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("mod")) {
@@ -259,10 +257,10 @@ public class BitQuest extends JavaPlugin {
                 	}
                 	return true;
                 }
-            }
+            } else {
+                // PLAYER COMMANDS
 
-            error((Player) sender, "You don't have permission to do that!");
-            return true;
+            }
         }
         sender.sendMessage(ChatColor.RED+"This command is for players only!");
         return true;

@@ -95,31 +95,21 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
         // announce new area
-        World world = event.getPlayer().getWorld();
-        if (world.getName().endsWith("_nether") == false && world.getName().endsWith("_the_end") == false) {
-            JsonObject newarea = bitQuest.areaForLocation(event.getTo());
-            if (newarea != null) {
-                if ((event.getPlayer().hasMetadata("area") == true && newarea.get("uuid").getAsString().equals(event.getPlayer().getMetadata("area").get(0).asString()) == false) || event.getPlayer().hasMetadata("area") == false) {
-                    event.getPlayer().setMetadata("area", new FixedMetadataValue(bitQuest, newarea.get("uuid").getAsString()));
+        int x1=event.getFrom().getChunk().getX();
+        int z1=event.getFrom().getChunk().getZ();
 
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + newarea.get("name").getAsString() + " ]");
-                }
+        int x2=event.getTo().getChunk().getX();
+        int z2=event.getTo().getChunk().getZ();
+        if(bitQuest.REDIS.get("chunk"+x1+","+z1+"name").equals(bitQuest.REDIS.get("chunk"+x2+","+z2+"name"))==false) {
+            if(bitQuest.REDIS.get("chunk"+x2+","+"z2")!=null) {
+                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+bitQuest.REDIS.get("chunk"+x2+","+"z2")+" ]");
+
             } else {
-                if (event.getPlayer().hasMetadata("area") == true) {
-                    event.getPlayer().removeMetadata("area", bitQuest);
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ the wilderness ]");
-                }
+                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ the wilderness ]");
             }
 
-            JsonObject oldarea = bitQuest.areaForLocation(event.getFrom());
-            if ((oldarea == null && newarea != null) || (oldarea != null && newarea == null)) {
-                if (newarea == null) {
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ the wilderness ]");
-                } else {
-                    event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + newarea.get("name").getAsString() + " ]");
-                }
-            }
-        }
+           }
+        event.getFrom();
     }
 
     @EventHandler
