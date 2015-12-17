@@ -9,11 +9,8 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
-import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -25,6 +22,7 @@ import org.bukkit.potion.PotionEffectType;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,15 +98,16 @@ public class EntityEvents implements Listener {
 
         int x2=event.getTo().getChunk().getX();
         int z2=event.getTo().getChunk().getZ();
-        if(bitQuest.REDIS.get("chunk"+x1+","+z1+"name").equals(bitQuest.REDIS.get("chunk"+x2+","+z2+"name"))==false) {
-            if(bitQuest.REDIS.get("chunk"+x2+","+"z2")!=null) {
-                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+bitQuest.REDIS.get("chunk"+x2+","+"z2")+" ]");
 
-            } else {
-                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ the wilderness ]");
-            }
+        String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+        String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-           }
+        if(name1==null) name1="the wilderness";
+        if(name2==null) name2="the wilderness";
+
+        if(name1.equals(name2)==false) {
+            event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+        }
         event.getFrom();
     }
 
@@ -145,6 +144,48 @@ public class EntityEvents implements Listener {
         event.setKeepLevel(true);
         event.setDeathMessage(null);
     }
+    @EventHandler
+    void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
+        LivingEntity entity = e.getEntity();
+
+
+
+        int level = new Double(entity.getMaxHealth() / 4).intValue();
+
+        if (entity instanceof Monster) {
+            if (entity.hasMetadata("level")) {
+                level = entity.getMetadata("level").get(0).asInt();
+            }
+
+            int money = 0;
+
+            if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+                EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
+                if (damage.getDamager() instanceof Player) {
+                    final Player player = (Player) damage.getDamager();
+                    final User user = new User(player);
+
+                    int maxexp = new Double(Math.ceil(level / 16)).intValue() + 1;
+                    e.setDroppedExp(0);
+                    money = 0;
+
+                    money = bitQuest.rand(20000, 50000);
+                    if(bitQuest.wallet.balance()>money) {
+                        if(bitQuest.wallet.transaction(money,user.wallet)==true) {
+                            player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
+                        }
+                    }
+                }
+
+            } else {
+                e.setDroppedExp(0);
+            }
+        } else {
+            e.setDroppedExp(0);
+        }
+
+    }
+
 
     // TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it would be better to
     //          find a way to instead set the EntityType of the event. Is there any way to do that?
@@ -152,7 +193,7 @@ public class EntityEvents implements Listener {
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
         LivingEntity entity = e.getEntity();
-        if (bitQuest.areaForLocation(e.getLocation()) != null) {
+        if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
             e.setCancelled(true);
         } else if (entity instanceof Monster) {
             // Disable mob spawners. Keep mob farmers away
@@ -161,71 +202,6 @@ public class EntityEvents implements Listener {
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
 
-                // If its a guardian, then don't change its type so that ocean monuments aren't empty
-                if (entityType.equals(EntityType.GUARDIAN)) {
-                    world.spawnEntity(entity.getLocation(), entityType);
-                    return;
-                }
-
-                int num = BitQuest.rand(0, 13);
-                // change the mob type to a random type
-                switch (num) {
-                    case 0:
-                        // if the world is nether/end, spawn a ghast. else, spawn a spider.
-                        if (world.getName().endsWith("_nether") == true || world.getName().endsWith("_the_end") == true) {
-                            entityType = EntityType.GHAST;
-                        } else {
-                            entityType = EntityType.SPIDER;
-                        }
-                        break;
-                    case 1:
-                        entityType = EntityType.WITCH;
-                        break;
-                    case 2:
-                        entityType = EntityType.PIG_ZOMBIE;
-                        break;
-                    case 3:
-                        entityType = EntityType.MAGMA_CUBE;
-                        break;
-                    case 4:
-                        entityType = EntityType.BLAZE;
-                        break;
-                    case 5:
-                        entityType = EntityType.SILVERFISH;
-                        break;
-                    case 6:
-                        entityType = EntityType.CAVE_SPIDER;
-                        break;
-                    case 7:
-                        entityType = EntityType.ZOMBIE;
-                        break;
-                    case 8:
-                        entityType = EntityType.SKELETON;
-                        break;
-                    case 9:
-                        entityType = EntityType.CREEPER;
-                        break;
-                    case 10:
-                        entityType = EntityType.ENDERMAN;
-                        break;
-                    case 11:
-                        entityType = EntityType.GUARDIAN;
-                        break;
-                    case 12:
-                        entityType = EntityType.ENDERMITE;
-                        break;
-                    default:
-                        entityType = EntityType.SPIDER;
-                        break;
-                }
-                // we spawn another entity with the custom type
-                // the entity should have a CUSTOM SpawnReason, so it is handled below
-                world.spawnEntity(entity.getLocation(), entityType);
-
-                // if spawn cause was a plugin
-            } else if (e.getSpawnReason() == SpawnReason.CUSTOM) {
-                World world = e.getLocation().getWorld();
-                EntityType entityType = entity.getType();
 
                 int level = 1;
 

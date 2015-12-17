@@ -1,5 +1,6 @@
 package com.bitquest.bitquest;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,12 +25,14 @@ public class SignEvents implements Listener {
         String name = event.getLine(0);
         if(!name.isEmpty()) {
             User user=new User(player);
-            if(user.wallet.transaction(1000,bitQuest.wallet)==true) {
+            if(user.wallet.transaction(10000,bitQuest.wallet)==true) {
                 Chunk chunk =player.getWorld().getChunkAt(player.getLocation());
                 int x=chunk.getX();
                 int z=chunk.getZ();
                 bitQuest.REDIS.set("chunk"+x+","+z+"owner",player.getUniqueId().toString());
                 bitQuest.REDIS.set("chunk"+x+","+z+"name",name);
+            } else {
+                player.sendMessage(ChatColor.RED+"claim payment failed");
             };
         }
 
