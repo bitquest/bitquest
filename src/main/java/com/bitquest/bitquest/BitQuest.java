@@ -37,7 +37,8 @@ public class BitQuest extends JavaPlugin {
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
 
     // If env MOD_OPS exists, server automatically ops moderators
-    public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
+
+    // public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
     // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
