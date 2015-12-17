@@ -43,7 +43,8 @@ public class BitQuest extends JavaPlugin {
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
 
-    public static Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
+    // TODO: Find out why this crashes the server
+    // public static Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
     
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
@@ -76,9 +77,9 @@ public class BitQuest extends JavaPlugin {
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
-        Objective objective = scoreboard.registerNewObjective("value1", "value2");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
+        // Objective objective = scoreboard.registerNewObjective("value1", "value2");
+        // objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        // objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
     }
 
     public void log(String msg) {
