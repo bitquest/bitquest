@@ -70,12 +70,12 @@ public class EntityEvents implements Listener {
         // Prints the user balance
         event.getPlayer().sendMessage(ChatColor.YELLOW + "Your Bitcoin address is: " + user.getAddress());
 
-        event.getPlayer().sendMessage(ChatColor.YELLOW + "Your Bitcoin balance is: " + user.wallet.balance());
+        event.getPlayer().sendMessage(ChatColor.YELLOW + "Your Bitcoin balance is: " + user.wallet.balance()/100 + " bits");
         event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
 
         if (bitQuest.isModerator(event.getPlayer()) == true) {
             event.getPlayer().sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            event.getPlayer().sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance());
+            event.getPlayer().sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance()/100 + " bits");
             event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
         }
