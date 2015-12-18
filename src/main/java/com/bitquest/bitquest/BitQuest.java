@@ -42,8 +42,8 @@ public class BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
 
     // TODO: Find out why this crashes the server
-    public static ScoreboardManager manager = Bukkit.getScoreboardManager();
-    public static Scoreboard scoreboard = manager.getNewScoreboard();
+    // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
+    // public static Scoreboard scoreboard = manager.getNewScoreboard();
     
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
@@ -78,9 +78,9 @@ public class BitQuest extends JavaPlugin {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
         
-        Objective objective = scoreboard.registerNewObjective("value1", "value2");
-        objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
+        // Objective objective = scoreboard.registerNewObjective("value1", "value2");
+        // objective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        // objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
         
     }
 
