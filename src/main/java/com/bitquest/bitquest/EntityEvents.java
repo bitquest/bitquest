@@ -79,6 +79,8 @@ public class EntityEvents implements Listener {
             event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
         }
+        Bukkit.getWorld("world").spawnCreature(new Location(Bukkit.getWorld("world"),0,64,0), EntityType.VILLAGER);
+
     }
 
     @EventHandler
@@ -169,7 +171,7 @@ public class EntityEvents implements Listener {
                     e.setDroppedExp(0);
                     money = 0;
 
-                    money = bitQuest.rand(20000, 50000);
+                    money = bitQuest.rand(2000, 5000);
                     if(bitQuest.wallet.balance()>money) {
                         if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                             player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
@@ -197,8 +199,9 @@ public class EntityEvents implements Listener {
             e.setCancelled(true);
         } else if (entity instanceof Monster) {
             // Disable mob spawners. Keep mob farmers away
-            if (e.getSpawnReason() == CreatureSpawnEvent.SpawnReason.NATURAL) {
+            if(e.getSpawnReason()== SpawnReason.SPAWNER) {
                 e.setCancelled(true);
+            } else {
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
 
@@ -264,11 +267,6 @@ public class EntityEvents implements Listener {
                         entity.getEquipment().setItemInHand(bow);
                     }
                 }
-
-                // if spawn cause was something else
-            } else {
-                e.setCancelled(true);
-                return;
             }
         }
     }
