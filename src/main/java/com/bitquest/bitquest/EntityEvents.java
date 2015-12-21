@@ -167,7 +167,6 @@ public class EntityEvents implements Listener {
                 level = entity.getMetadata("level").get(0).asInt();
             }
 
-            int money = 0;
 
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -177,32 +176,26 @@ public class EntityEvents implements Listener {
 
                     int maxexp = new Double(Math.ceil(level / 16)).intValue() + 1;
                     e.setDroppedExp(0);
-                    money = 0;
+                    final int money = bitQuest.rand(0, level*1000);
 
-                    money = bitQuest.rand(  0, level*1000);
-                    if(bitQuest.wallet.balance()>money && money>2000) {
-                        if(bitQuest.wallet.transaction(money,user.wallet)==true) {
-                            player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
-                        }
-                    }
+
+
+                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
                     scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
                         @Override
                         public void run() {
-                            // A villager is born
                             try {
-                                if(user.wallet.transaction(10000, bitQuest.wallet)) {
-
-                                    bitQuest.REDIS.set("chunk"+x+","+z+"owner",player.getUniqueId().toString());
-                                    bitQuest.REDIS.set("chunk"+x+","+z+"name",name);
-                                    player.sendMessage(ChatColor.GREEN+"Land claimed! you are now owner of "+name);
-                                } else {
-                                    player.sendMessage(ChatColor.RED+"claim payment failed");
+                                if(bitQuest.wallet.balance()>money && money>2000) {
+                                    if(bitQuest.wallet.transaction(money,user.wallet)==true) {
+                                        player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
+                                    }
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
+                            } catch (org.json.simple.parser.ParseException e1) {
+                                e1.printStackTrace();
                             }
-                            ;
                         }
                     }, 1L);
 
