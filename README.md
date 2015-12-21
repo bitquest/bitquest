@@ -59,7 +59,7 @@ In the bitquest directory
 ```sh
 $ redis-server
 ```
-Now you will be able to enter to your localhost bitquest minecraft server connecting adding ```localhost``` as server
+Now you will be able to enter to your localhost bitquest minecraft server adding ```localhost``` as server
 
 ![Alt text](http://i.imgur.com/4ZPm0d9.png)
 
