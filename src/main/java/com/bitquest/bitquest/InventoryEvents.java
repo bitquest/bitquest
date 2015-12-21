@@ -1,14 +1,13 @@
 package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
+import org.bukkit.*;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -22,6 +21,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,17 +30,28 @@ import java.util.regex.Pattern;
  */
 public class InventoryEvents implements Listener {
     BitQuest bitQuest;
+    ArrayList<Trade> trades;
+    public static Inventory marketInventory;
+
 
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
 
+        trades=new ArrayList<Trade>();
+        trades.add(new Trade(new ItemStack(Material.DIAMOND,1),2000));
+        trades.add(new Trade(new ItemStack(Material.WOOL,16),2000));
+        marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
+        for (int i = 0; i < trades.size(); i++) {
+            ItemStack button = new ItemStack(trades.get(i).itemStack);
+            marketInventory.setItem(i, button);
+        }
     }
     @EventHandler
     void onInventoryClick(InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         // Merchant inventory
-        if(inventory.equals(EntityEvents.marketInventory)) {
+        if(inventory.equals(marketInventory)) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         		
         		ItemStack clicked = event.getCurrentItem();
@@ -101,5 +112,17 @@ public class InventoryEvents implements Listener {
 
             event.setCancelled(true);
         }
+    }
+    @EventHandler
+    void onInteract(PlayerInteractEntityEvent event) {
+        // VILLAGER
+        if (event.getRightClicked().getType().equals(EntityType.VILLAGER)) {
+            event.setCancelled(true);
+            // compass
+
+            // open menu
+            event.getPlayer().openInventory(marketInventory);
+        }
+
     }
 }
