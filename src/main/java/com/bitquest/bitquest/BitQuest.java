@@ -56,18 +56,12 @@ public class BitQuest extends JavaPlugin {
 
     public Wallet wallet=null;
 
-    // scoreboard objectives and teams
-    public ScoreboardManager scoreboardManager;
-    public Scoreboard walletScoreboard;
-    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
-    public Objective walletScoreboardObjective;
+
 
     @Override
     public void onEnable() {
         log("BitQuest starting...");
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
@@ -107,8 +101,8 @@ public class BitQuest extends JavaPlugin {
         }, 0L, 90L);
     }
     public void updateAllScoreboards() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        for (Player p : Bukkit.getOnlinePlayers()) {
-            updateScoreboard(p);
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            new User(player).updateScoreboard();
         }
     }
     public void log(String msg) {
@@ -124,13 +118,7 @@ public class BitQuest extends JavaPlugin {
         recipient.sendMessage(ChatColor.RED + msg);
         recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
-    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName("Wallet");
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        score.setScore(new User(player).wallet.balance());
-        player.setScoreboard(walletScoreboard);
-    }
+
     public JsonObject areaForLocation(Location location) {
         List<String> areas = REDIS.lrange("areas", 0, -1);
         for (String areaJSON : areas) {

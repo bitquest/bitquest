@@ -3,7 +3,9 @@ package com.bitquest.bitquest;
 import com.google.gson.JsonObject;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -30,9 +32,32 @@ public class User {
         }
         this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         loadUserData();
+        scoreboardManager = Bukkit.getScoreboardManager();
+        walletScoreboard= scoreboardManager.getNewScoreboard();
+        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
     }
+    // scoreboard objectives and teams
+    public ScoreboardManager scoreboardManager;
+    public Scoreboard walletScoreboard;
+    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
+    public Objective walletScoreboardObjective;
+
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
+    }
+    public int experience() {
+        if(BitQuest.REDIS.get("exp"+this.player.getUniqueId().toString())==null) {
+            return 0;
+        } else {
+            return Integer.parseInt(BitQuest.REDIS.get("exp"+this.player.getUniqueId().toString()));
+        }
+    }
+    public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
+        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        walletScoreboardObjective.setDisplayName("Wallet");
+        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+        score.setScore(new User(player).wallet.balance());
+        player.setScoreboard(walletScoreboard);
     }
     public String getAddress() {
         return BitQuest.REDIS.get("address"+this.player.getUniqueId().toString());

@@ -93,7 +93,6 @@ public class EntityEvents implements Listener {
             }
         }, 300L);
                 // Update scoreboard
-                bitQuest.updateScoreboard(player);
 
 
     }
