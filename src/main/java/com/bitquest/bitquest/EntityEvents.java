@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -79,7 +80,13 @@ public class EntityEvents implements Listener {
             event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
         }
-        Bukkit.getWorld("world").spawnCreature(new Location(Bukkit.getWorld("world"),0,64,0), EntityType.VILLAGER);
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+            @Override
+            public void run() {
+                Bukkit.getWorld("world").spawnCreature(Bukkit.getWorld("world").getSpawnLocation(), EntityType.VILLAGER);
+            }
+        }, 2000L);
 
     }
 
@@ -210,11 +217,11 @@ public class EntityEvents implements Listener {
 
                 // give a random lvl depending on world
                 if (world.getName().endsWith("_nether") == true) {
-                    level = BitQuest.rand(1, 128);
+                    level = BitQuest.rand(64, 128);
                 } else if (world.getName().endsWith("_end") == true) {
-                    level = BitQuest.rand(1, 64);
+                    level = BitQuest.rand(8, 64);
                 } else {
-                    level = BitQuest.rand(1, 16);
+                    level = BitQuest.rand(1, 8);
                 }
 
                 entity.setMaxHealth(level * 4);
