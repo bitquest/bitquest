@@ -44,7 +44,7 @@ public class BitQuest extends JavaPlugin {
     // TODO: Find out why this crashes the server
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
     // public static Scoreboard scoreboard = manager.getNewScoreboard();
-    
+    public final static int LAND_PRICE=2000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
