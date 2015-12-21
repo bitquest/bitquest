@@ -626,10 +626,10 @@ public class EntityEvents implements Listener {
         }
     }
     @EventHandler
-    public void ChestSaves(PlayerInteractEvent event){
+    public void onPlayerInteract(PlayerInteractEvent event){
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
-        if(b.getType()== Material.CHEST){
+        if(b!=null && b.getType()== Material.CHEST){
             if(bitQuest.canBuild(b.getLocation(),event.getPlayer())==false) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED+"This chest belongs to somebody else");
