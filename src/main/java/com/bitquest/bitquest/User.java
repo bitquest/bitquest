@@ -30,7 +30,6 @@ public class User {
         }
         this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         loadUserData();
-        System.out.println("new user with address "+this.wallet.address);
     }
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);

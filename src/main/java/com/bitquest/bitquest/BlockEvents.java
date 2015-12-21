@@ -40,15 +40,9 @@ public class BlockEvents implements Listener {
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
     	} else if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
-    		JsonObject area = bitQuest.areaForLocation(event.getBlock().getLocation());
-    		// Check if the area has a name so the player doesn't receive "null"
-    		// in theory, all properties should have names, but just incase...
-    		if(area.get("name") != null) {
-    			bitQuest.error(event.getPlayer(), "You may not break blocks in " + area.get("name").getAsString() + "!");
-    		} else {
-    			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
-    		}
-            event.setCancelled(true);
+			event.setCancelled(true);
+
+			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
         }
     }
 	@EventHandler
