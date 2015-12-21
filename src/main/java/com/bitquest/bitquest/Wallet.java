@@ -18,8 +18,11 @@ public class Wallet {
         this.address=address;
         this.privatekey=privatekey;
     }
-    public String address;
-    private String privatekey;
+    public Wallet(String address) {
+        this.address=address;
+    }
+    public String address=null;
+    private String privatekey=null;
     int balance() throws IOException, ParseException {
         URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();

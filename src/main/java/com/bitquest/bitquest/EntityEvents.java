@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
+import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -11,6 +12,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
+import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -617,6 +619,16 @@ public class EntityEvents implements Listener {
 
         }
     }
-
+    @EventHandler
+    public void ChestSaves(PlayerInteractEvent event){
+        Block b = event.getClickedBlock();
+        Player p = event.getPlayer();
+        if(b.getType()== Material.CHEST){
+            if(bitQuest.canBuild(b.getLocation(),event.getPlayer())==false) {
+                event.setCancelled(true);
+                p.sendMessage(ChatColor.RED+"This chest belongs to somebody else");
+            }
+        }
+    }
 
 }

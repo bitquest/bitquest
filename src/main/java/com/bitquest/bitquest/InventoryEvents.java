@@ -40,6 +40,7 @@ public class InventoryEvents implements Listener {
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.DIAMOND,1),2000));
         trades.add(new Trade(new ItemStack(Material.WOOL,16),2000));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,16),2000));
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
         for (int i = 0; i < trades.size(); i++) {
             ItemStack button = new ItemStack(trades.get(i).itemStack);
@@ -55,18 +56,21 @@ public class InventoryEvents implements Listener {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         		
         		ItemStack clicked = event.getCurrentItem();
-        		player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
+                if(clicked.getType()!=Material.AIR) {
+                    player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
 
-        		player.closeInventory();
-        		event.setCancelled(true);
-        		// TODO: try/catch
-        		User user=new User(player);
-        		if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
-        			player.getInventory().addItem(event.getCurrentItem());
-                    player.sendMessage(ChatColor.GREEN+clicked.getClass().getName()+" purchased");
-        		} else {
-        			player.sendMessage(ChatColor.RED+"transaction failed");
-        		}
+                    player.closeInventory();
+                    event.setCancelled(true);
+                    // TODO: try/catch
+                    User user=new User(player);
+                    if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
+                        player.getInventory().addItem(event.getCurrentItem());
+                        player.sendMessage(ChatColor.GREEN+""+clicked.getType()+" purchased");
+                    } else {
+                        player.sendMessage(ChatColor.RED+"transaction failed");
+                    }
+                }
+
         		
         	} else {
         		event.setCancelled(true);

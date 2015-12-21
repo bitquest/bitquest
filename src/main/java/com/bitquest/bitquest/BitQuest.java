@@ -1,5 +1,7 @@
 package com.bitquest.bitquest;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,6 +21,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import redis.clients.jedis.Jedis;
+import sun.jvm.hotspot.debugger.AddressException;
 
 /**
  * Created by explodi on 11/1/15.
@@ -169,6 +172,42 @@ public class BitQuest extends JavaPlugin {
         // we don't allow server commands (yet?)
         if (sender instanceof Player) {
             Player player = (Player) sender;
+            // PLAYER COMMANDS
+            if(cmd.getName().equalsIgnoreCase("cashout")) {
+                if(args[0].isEmpty()==false) {
+                    player.sendMessage(ChatColor.YELLOW+"Sending wallet balance to "+args[0]+"...");
+                    // validate e-mail address
+                    String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+                    java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+                    java.util.regex.Matcher m = p.matcher(args[0]);
+                    if(m.matches()==true) {
+                        // TODO: send money through xapo
+                    } else {
+                        try {
+
+                            Wallet outsideWallet=new Wallet(args[0]);
+                            Wallet playerWallet= null;
+                                playerWallet = new User(player).wallet;
+
+                            int balance=playerWallet.balance();
+                            if(playerWallet.transaction(balance,outsideWallet)==true) {
+                                player.sendMessage(ChatColor.GREEN+"Succesfully sent "+balance+" SAT to external address.");
+                            } else {
+                                player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                } else {
+                    return false;
+                }
+            }
             // MODERATOR COMMANDS
             if (isModerator(player)==true) {
                 // COMMAND: MOD
