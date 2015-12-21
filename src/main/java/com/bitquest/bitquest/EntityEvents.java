@@ -84,9 +84,10 @@ public class EntityEvents implements Listener {
         scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
             @Override
             public void run() {
-                Bukkit.getWorld("world").spawnCreature(Bukkit.getWorld("world").getSpawnLocation(), EntityType.VILLAGER);
+                // A villager is born
+                Bukkit.getWorld("world").spawnEntity(Bukkit.getWorld("world").getSpawnLocation(), EntityType.VILLAGER);
             }
-        }, 2000L);
+        }, 5L);
 
     }
 
@@ -178,8 +179,8 @@ public class EntityEvents implements Listener {
                     e.setDroppedExp(0);
                     money = 0;
 
-                    money = bitQuest.rand(2000, 5000);
-                    if(bitQuest.wallet.balance()>money) {
+                    money = bitQuest.rand(  0, level*1000);
+                    if(bitQuest.wallet.balance()>money && money>2000) {
                         if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                             player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
                         }
