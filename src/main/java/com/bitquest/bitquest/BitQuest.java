@@ -11,17 +11,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Objective;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.*;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import redis.clients.jedis.Jedis;
-import sun.jvm.hotspot.debugger.AddressException;
 
 /**
  * Created by explodi on 11/1/15.
@@ -59,6 +56,12 @@ public class BitQuest extends JavaPlugin {
 
     public Wallet wallet=null;
 
+    // scoreboard objectives and teams
+    ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
+    public Scoreboard walletScoreboard = scoreboardManager.getNewScoreboard();
+    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
+    public Objective walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+
     @Override
     public void onEnable() {
         log("BitQuest starting...");
@@ -84,9 +87,27 @@ public class BitQuest extends JavaPlugin {
         // Objective objective = scoreboard.registerNewObjective("value1", "value2");
         // objective.setDisplaySlot(DisplaySlot.SIDEBAR);
         // objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
-        
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    updateAllScoreboards();
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 0L, 90L);
     }
-
+    public void updateAllScoreboards() throws ParseException, org.json.simple.parser.ParseException, IOException {
+        for (Player p : Bukkit.getOnlinePlayers()) {
+            updateScoreboard(p);
+        }
+    }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
@@ -100,7 +121,13 @@ public class BitQuest extends JavaPlugin {
         recipient.sendMessage(ChatColor.RED + msg);
         recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
-
+    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        walletScoreboardObjective.setDisplayName("Wallet");
+        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+        score.setScore(new User(player).wallet.balance());
+        player.setScoreboard(walletScoreboard);
+    }
     public JsonObject areaForLocation(Location location) {
         List<String> areas = REDIS.lrange("areas", 0, -1);
         for (String areaJSON : areas) {
@@ -173,7 +200,7 @@ public class BitQuest extends JavaPlugin {
         if (sender instanceof Player) {
             Player player = (Player) sender;
             // PLAYER COMMANDS
-            if(cmd.getName().equalsIgnoreCase("cashout")) {
+            if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args[0].isEmpty()==false) {
                     player.sendMessage(ChatColor.YELLOW+"Sending wallet balance to "+args[0]+"...");
                     // validate e-mail address
@@ -204,6 +231,7 @@ public class BitQuest extends JavaPlugin {
                         }
 
                     }
+                    return true;
                 } else {
                     return false;
                 }
@@ -307,7 +335,6 @@ public class BitQuest extends JavaPlugin {
 
             }
         }
-        sender.sendMessage(ChatColor.RED+"This command is for players only!");
         return true;
     }
 }

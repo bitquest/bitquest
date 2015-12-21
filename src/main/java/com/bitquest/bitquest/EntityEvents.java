@@ -21,6 +21,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Score;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -81,6 +83,7 @@ public class EntityEvents implements Listener {
 
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        final Player player=event.getPlayer();
         scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -89,6 +92,9 @@ public class EntityEvents implements Listener {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 300L);
+                // Update scoreboard
+                bitQuest.updateScoreboard(player);
+
 
     }
 

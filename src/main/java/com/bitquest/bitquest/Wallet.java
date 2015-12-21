@@ -47,7 +47,7 @@ public class Wallet {
 
         //print result
         JSONParser parser = new JSONParser();
-        System.out.println(response.toString());
+        // System.out.println(response.toString());
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
         return ((Number) jsonobj.get("final_balance")).intValue();
     }
