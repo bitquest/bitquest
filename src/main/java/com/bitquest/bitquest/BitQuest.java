@@ -57,14 +57,17 @@ public class BitQuest extends JavaPlugin {
     public Wallet wallet=null;
 
     // scoreboard objectives and teams
-    ScoreboardManager scoreboardManager = Bukkit.getScoreboardManager();
-    public Scoreboard walletScoreboard = scoreboardManager.getNewScoreboard();
+    public ScoreboardManager scoreboardManager;
+    public Scoreboard walletScoreboard;
     // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
-    public Objective walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+    public Objective walletScoreboardObjective;
 
     @Override
     public void onEnable() {
         log("BitQuest starting...");
+        scoreboardManager = Bukkit.getScoreboardManager();
+        walletScoreboard= scoreboardManager.getNewScoreboard();
+        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
