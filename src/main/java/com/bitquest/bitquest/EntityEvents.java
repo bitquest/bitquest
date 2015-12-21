@@ -85,9 +85,10 @@ public class EntityEvents implements Listener {
             @Override
             public void run() {
                 // A villager is born
-                Bukkit.getWorld("world").spawnEntity(Bukkit.getWorld("world").getSpawnLocation(), EntityType.VILLAGER);
+                World world=Bukkit.getWorld("world");
+                world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
-        }, 5L);
+        }, 300L);
 
     }
 
