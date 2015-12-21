@@ -116,7 +116,9 @@ public class BitQuest extends JavaPlugin {
     public boolean canBuild(Location location, Player player) {
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
-        if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")!=null) {
+        if(isModerator(player)==true) {
+            return true;
+        } else if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")!=null) {
             if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner").equals(player.getUniqueId().toString())) {
                 return true;
             } else {
