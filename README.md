@@ -31,7 +31,7 @@ This will generate a new file at ```bitquest/build/libs/bitquest-all.jar``` that
 
 ### Run server in localhost
 #### Spigot
-- Make a new directory called ```spigot``` and download there the last [bitquest's spigot](http://jenkins.bitquest.co/job/spigot/) .
+- Make a new directory called ```spigot``` and download there the last [BitQuest's spigot](http://jenkins.bitquest.co/job/spigot/) .
 - Go to this directory and run spigot
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
@@ -45,10 +45,14 @@ to
 ```sh
 eula=true
 ```
-
-- Copy or move your ```bitquest/build/libs/bitquest-all.jar``` file to ```spigot/plugins/```
-
 - Run spigot again
+```sh
+$ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
+```
+Now you should have a new directory ```spigot/plugins/```
+- Close the server with ```cmd + C```
+- Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/```
+- Run spigot again to run the server with bitquest plugin
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 ````
