@@ -50,13 +50,8 @@ public class BlockEvents implements Listener {
 		// set clan
 		// first, we check if the player has permission to build
 		if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
-			JsonObject area = bitQuest.areaForLocation(event.getBlock().getLocation());
-			if(area.get("name") != null) {
-				bitQuest.error(event.getPlayer(), "You may not place blocks in " + area.get("name").getAsString() + "!");
-			} else {
-				bitQuest.error(event.getPlayer(), "You may not place blocks here!");
-			}
 			event.setCancelled(true);
+			bitQuest.error(event.getPlayer(), "You may not place blocks here!");
 		} else if (event.getBlock().getType() == Material.STANDING_BANNER) {
 
 			if (bitQuest.areaForLocation(event.getBlock().getLocation()) != null) {
