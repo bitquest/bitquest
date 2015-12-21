@@ -185,6 +185,28 @@ public class EntityEvents implements Listener {
                             player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
                         }
                     }
+
+                    scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+                        @Override
+                        public void run() {
+                            // A villager is born
+                            try {
+                                if(user.wallet.transaction(10000, bitQuest.wallet)) {
+
+                                    bitQuest.REDIS.set("chunk"+x+","+z+"owner",player.getUniqueId().toString());
+                                    bitQuest.REDIS.set("chunk"+x+","+z+"name",name);
+                                    player.sendMessage(ChatColor.GREEN+"Land claimed! you are now owner of "+name);
+                                } else {
+                                    player.sendMessage(ChatColor.RED+"claim payment failed");
+                                }
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                            ;
+                        }
+                    }, 1L);
+
+
                 }
 
             } else {
