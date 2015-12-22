@@ -128,7 +128,7 @@ public class EntityEvents implements Listener {
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
                 if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.EYE_OF_ENDER) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                         if(player.getBedSpawnLocation()!=null) {
                             // TODO: tp player home
                             player.sendMessage(ChatColor.GREEN+"Teleporting to your bed...");
@@ -157,27 +157,7 @@ public class EntityEvents implements Listener {
                     event.setCancelled(true);
                 }
                 if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.COMPASS) {
-                if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                    // TODO: tp player home
-                    player.sendMessage(ChatColor.GREEN+"Teleporting to your bed...");
-                    player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-                    World world=Bukkit.getWorld("world");
 
-                    final Location spawn=player.getBedSpawnLocation();
-
-                    Chunk c = spawn.getChunk();
-                    if (!c.isLoaded()) {
-                        c.load();
-                    }
-                    bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
-
-                        public void run() {
-                            player.teleport(spawn);
-                            player.removeMetadata("teleporting", bitQuest);
-                        }
-                    }, 60L);
-
-                }
                 if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     // TODO: open the tps inventory
                     player.sendMessage(ChatColor.GREEN+"Teleporting to satoshi town...");
