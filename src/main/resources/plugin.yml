@@ -4,18 +4,12 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
+  wallet:
+    description: "Displays your BitQuest wallet info"
+    usage: "/wallet"
   transfer:
     description: "Sends your BitQuest wallet balance to an external address of your own"
     usage: /transfer <bitcoin address or e-mail>
-  addtown:
-    description: "Creates a new town in the standing location"
-    usage: /addtown <size> <name>
-  deltown:
-    description: "Deletes area from the server (Where currently standing)"
-    usage: /deltown
-  publicarea:
-    description: "Makes area public; If already public reverts it to private"
-    usage: /publicarea
   ban:
     description: "Adds player to the ban list"
     usage: /ban <player>

@@ -36,11 +36,18 @@ public class InventoryEvents implements Listener {
 
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
-
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.DIAMOND,1),2000));
         trades.add(new Trade(new ItemStack(Material.WOOL,16),2000));
         trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,16),2000));
+        trades.add(new Trade(new ItemStack(Material.BOOKSHELF,1),2000));
+        trades.add(new Trade(new ItemStack(Material.PRISMARINE,64),2000));
+        trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),2000));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),2000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),2000));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),2000));
+        trades.add(new Trade(new ItemStack(Material.WOOD,64),2000));
+        trades.add(new Trade(new ItemStack(Material.FENCE,64),2000));
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
         for (int i = 0; i < trades.size(); i++) {
             ItemStack button = new ItemStack(trades.get(i).itemStack);

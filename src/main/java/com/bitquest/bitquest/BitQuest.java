@@ -185,12 +185,43 @@ public class BitQuest extends JavaPlugin {
     final int minNameSize = 3;
     final int maxNameSize = 16;
 
+    public void sendWalletInfo(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+
+        User user= new User(player);
+        player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
+        player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
+        player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
+        player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
+
+    };
+
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
         if (sender instanceof Player) {
             Player player = (Player) sender;
             // PLAYER COMMANDS
+            if(cmd.getName().equalsIgnoreCase("wallet")) {
+                try {
+                    User user=new User(player);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    sendWalletInfo(player);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args[0].isEmpty()==false) {
                     player.sendMessage(ChatColor.YELLOW+"Sending wallet balance to "+args[0]+"...");

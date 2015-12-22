@@ -71,11 +71,7 @@ public class EntityEvents implements Listener {
         // Updates UUID-to-name database
         bitQuest.REDIS.set("name" + event.getPlayer().getUniqueId().toString(), event.getPlayer().getName());
         // Prints the user balance
-        event.getPlayer().sendMessage(ChatColor.YELLOW + "Your Bitcoin address is: " + user.getAddress());
-
-        event.getPlayer().sendMessage(ChatColor.YELLOW + "Your Bitcoin balance is: " + user.wallet.balance()/100 + " bits");
-        event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
-
+        bitQuest.sendWalletInfo(event.getPlayer());
         if (bitQuest.isModerator(event.getPlayer()) == true) {
             event.getPlayer().sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             event.getPlayer().sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance()/100 + " bits");
