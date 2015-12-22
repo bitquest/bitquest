@@ -48,6 +48,8 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),2000));
         trades.add(new Trade(new ItemStack(Material.WOOD,64),2000));
         trades.add(new Trade(new ItemStack(Material.FENCE,64),2000));
+        trades.add(new Trade(new ItemStack(Material.COMPASS,1),2000));
+        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),2000));
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
         for (int i = 0; i < trades.size(); i++) {
             ItemStack button = new ItemStack(trades.get(i).itemStack);
