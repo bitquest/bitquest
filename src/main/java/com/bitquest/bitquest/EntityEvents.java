@@ -285,9 +285,9 @@ public class EntityEvents implements Listener {
 
                 // give a random lvl depending on world
                 if (world.getName().endsWith("_nether") == true) {
-                    level = BitQuest.rand(64, 128);
+                    level = BitQuest.rand(32, 64);
                 } else if (world.getName().endsWith("_end") == true) {
-                    level = BitQuest.rand(8, 64);
+                    level = BitQuest.rand(8, 32);
                 } else {
                     level = BitQuest.rand(1, 8);
                 }
