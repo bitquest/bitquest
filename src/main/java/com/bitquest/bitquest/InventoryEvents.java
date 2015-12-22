@@ -37,6 +37,7 @@ public class InventoryEvents implements Listener {
     public static ContainerAnvil anvil;
 
     public InventoryEvents(BitQuest plugin) {
+    	System.out.println(anvil);
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.DIAMOND,1),2000));
