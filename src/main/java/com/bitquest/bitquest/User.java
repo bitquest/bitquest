@@ -54,9 +54,9 @@ public class User {
     }
     public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName("Wallet");
+        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Wallet");
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        score.setScore(new User(player).wallet.balance());
+        score.setScore(new User(player).wallet.balance()/100);
         player.setScoreboard(walletScoreboard);
     }
     public String getAddress() {
