@@ -62,7 +62,12 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException {
-        User user = new User(event.getPlayer());
+        Player player=event.getPlayer();
+        User user = new User(player);
+        // check and set experience
+        player.setTotalExperience((Integer) user.experience());
+        user.updateLevels();
+
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
         event.getPlayer().sendMessage(welcome);
@@ -79,7 +84,6 @@ public class EntityEvents implements Listener {
 
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        final Player player=event.getPlayer();
         scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -245,7 +249,9 @@ public class EntityEvents implements Listener {
                         }
                     }, 1L);
 
-
+                    // calculate and add experience
+                    int exp = (level * 128);
+                    user.addExperience(exp);
                 }
 
             } else {
