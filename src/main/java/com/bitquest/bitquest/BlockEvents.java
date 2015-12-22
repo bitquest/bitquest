@@ -91,30 +91,7 @@ public class BlockEvents implements Listener {
 		} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
 			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
     		event.setCancelled(true);
-		} else if (event.getBlock().getType() == Material.BED_BLOCK) {
-            List<String> areas = bitQuest.REDIS.lrange("areas", 0, -1);
-
-            for (String areaJSON : areas) {
-                Gson gson = new Gson();
-                JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
-                // Check if player already owns a plot
-                // In the future this might change as we allow players to get more than one plot.
-                if (area.get("owner").getAsString().equals(event.getPlayer().getUniqueId().toString())) {
-                    bitQuest.error(event.getPlayer(), "You already own a home plot");
-                    event.setCancelled(true);
-                    return;
-                }
-                // checks that new area is far enough from other areas
-                if (BitQuest.distance(event.getBlock().getLocation(), new Location(event.getPlayer().getWorld(),area.get("x").getAsDouble(), 0, area.get("z").getAsDouble())) < area.get("size").getAsInt()) {
-                    bitQuest.error(event.getPlayer(), "This area is too close to " + area.get("name").getAsString());
-                }
-            }
-            if (bitQuest.createNewArea(event.getBlock().getLocation(), event.getPlayer(), event.getPlayer().getDisplayName() + "'s home", 32)) {
-                bitQuest.success(event.getPlayer(), "Congratulations! This is your new home!");
-            } else {
-                bitQuest.error(event.getPlayer(), "There was an error registering your home...");
-            }
-        }
+		}
 
         
 	}
