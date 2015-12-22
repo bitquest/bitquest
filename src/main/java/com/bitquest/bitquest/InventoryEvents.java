@@ -25,8 +25,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.minecraft.server.v1_8_R1.ContainerAnvil;
-
 /**
  * Created by cristian on 11/27/15.
  */
@@ -34,10 +32,8 @@ public class InventoryEvents implements Listener {
     BitQuest bitQuest;
     ArrayList<Trade> trades;
     public static Inventory marketInventory;
-    public static ContainerAnvil anvil;
 
     public InventoryEvents(BitQuest plugin) {
-    	System.out.println(anvil);
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.DIAMOND,1),2000));
