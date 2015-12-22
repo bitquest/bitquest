@@ -44,6 +44,9 @@ public class User {
 
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
+        updateLevels();
+        player.setTotalExperience(experience());
+
     }
     public int experience() {
         if(BitQuest.REDIS.get("exp"+this.player.getUniqueId().toString())==null) {
@@ -58,6 +61,26 @@ public class User {
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
         score.setScore(new User(player).wallet.balance()/100);
         player.setScoreboard(walletScoreboard);
+    }
+
+    public void updateLevels() {
+        int factor=4;
+        int exp=player.getTotalExperience();
+        double maxexp=2000*Math.pow((factor*127),2);
+        if(exp>maxexp) {
+            player.setTotalExperience(new Double(maxexp).intValue());
+        }
+        int level=1;
+        double rawlevel=((Math.sqrt(exp/2000))/factor)+1;
+        level=new Double(rawlevel).intValue();
+        player.setLevel(level);
+        player.setExp((float) (rawlevel-level));
+        setPlayerMaxHealth();
+    }
+    public void setPlayerMaxHealth() {
+        int health=20+new Double(player.getLevel()/6.4).intValue();
+        if(health>40) health=40;
+        player.setMaxHealth(health);
     }
     public String getAddress() {
         return BitQuest.REDIS.get("address"+this.player.getUniqueId().toString());

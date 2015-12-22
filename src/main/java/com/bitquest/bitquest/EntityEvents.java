@@ -62,7 +62,12 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException {
-        User user = new User(event.getPlayer());
+        Player player=event.getPlayer();
+        User user = new User(player);
+        // check and set experience
+        player.setTotalExperience((Integer) user.experience());
+        user.updateLevels();
+
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
         event.getPlayer().sendMessage(welcome);
@@ -79,7 +84,6 @@ public class EntityEvents implements Listener {
 
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        final Player player=event.getPlayer();
         scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -128,7 +132,7 @@ public class EntityEvents implements Listener {
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
                 if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.EYE_OF_ENDER) {
-                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
+                    if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                         if(player.getBedSpawnLocation()!=null) {
                             // TODO: tp player home
                             player.sendMessage(ChatColor.GREEN+"Teleporting to your bed...");
@@ -157,27 +161,7 @@ public class EntityEvents implements Listener {
                     event.setCancelled(true);
                 }
                 if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.COMPASS) {
-                if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK) {
-                    // TODO: tp player home
-                    player.sendMessage(ChatColor.GREEN+"Teleporting to your bed...");
-                    player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-                    World world=Bukkit.getWorld("world");
 
-                    final Location spawn=player.getBedSpawnLocation();
-
-                    Chunk c = spawn.getChunk();
-                    if (!c.isLoaded()) {
-                        c.load();
-                    }
-                    bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
-
-                        public void run() {
-                            player.teleport(spawn);
-                            player.removeMetadata("teleporting", bitQuest);
-                        }
-                    }, 60L);
-
-                }
                 if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
                     // TODO: open the tps inventory
                     player.sendMessage(ChatColor.GREEN+"Teleporting to satoshi town...");
@@ -210,7 +194,7 @@ public class EntityEvents implements Listener {
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
-            event.getDamager().sendMessage(ChatColor.BOLD + name + " - " + health + "/" + maxHealth);
+            // event.getDamager().sendMessage(ChatColor.BOLD + name + " - " + health + "/" + maxHealth);
         }
     }
 
@@ -265,7 +249,9 @@ public class EntityEvents implements Listener {
                         }
                     }, 1L);
 
-
+                    // calculate and add experience
+                    int exp = (level * 128);
+                    user.addExperience(exp);
                 }
 
             } else {
@@ -299,9 +285,9 @@ public class EntityEvents implements Listener {
 
                 // give a random lvl depending on world
                 if (world.getName().endsWith("_nether") == true) {
-                    level = BitQuest.rand(64, 128);
+                    level = BitQuest.rand(32, 64);
                 } else if (world.getName().endsWith("_end") == true) {
-                    level = BitQuest.rand(8, 64);
+                    level = BitQuest.rand(8, 32);
                 } else {
                     level = BitQuest.rand(1, 8);
                 }
@@ -542,11 +528,9 @@ public class EntityEvents implements Listener {
                 player = (Player) damager;
                 int factor = 0;
                 if (event.getEntity() instanceof Monster) {
-                    factor = 32;
+                    factor = 2;
                 }
-                if (event.getEntity() instanceof Monster && event.getEntity().hasMetadata("boss")) {
-                    factor = factor * 2;
-                }
+
 
 
                 if (finaldamage > 0 && factor > 0) {
