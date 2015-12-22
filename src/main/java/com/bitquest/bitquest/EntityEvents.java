@@ -250,7 +250,7 @@ public class EntityEvents implements Listener {
                     }, 1L);
 
                     // calculate and add experience
-                    int exp = (level * 128);
+                    int exp = (level * 1024);
                     user.addExperience(exp);
                 }
 
@@ -528,11 +528,9 @@ public class EntityEvents implements Listener {
                 player = (Player) damager;
                 int factor = 0;
                 if (event.getEntity() instanceof Monster) {
-                    factor = 32;
+                    factor = 128;
                 }
-                if (event.getEntity() instanceof Monster && event.getEntity().hasMetadata("boss")) {
-                    factor = factor * 2;
-                }
+
 
 
                 if (finaldamage > 0 && factor > 0) {

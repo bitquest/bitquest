@@ -44,6 +44,7 @@ public class User {
 
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
+        player.sendMessage("Your experience is "+experience());
         updateLevels();
     }
     public int experience() {
