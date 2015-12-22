@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -52,6 +53,11 @@ public class InventoryEvents implements Listener {
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
         for (int i = 0; i < trades.size(); i++) {
             ItemStack button = new ItemStack(trades.get(i).itemStack);
+            ItemMeta meta = button.getItemMeta();
+            ArrayList<String> lore = new ArrayList<String>();
+            lore.add("Price: "+trades.get(i).price+"SAT");
+            meta.setLore(lore);
+            button.setItemMeta(meta);
             marketInventory.setItem(i, button);
         }
     }
@@ -72,7 +78,12 @@ public class InventoryEvents implements Listener {
                     // TODO: try/catch
                     User user=new User(player);
                     if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
-                        player.getInventory().addItem(event.getCurrentItem());
+                        ItemStack item = event.getCurrentItem();
+                        ItemMeta meta = item.getItemMeta();
+                        ArrayList<String> Lore = new ArrayList<String>();
+                        meta.setLore(null);
+                        item.setItemMeta(meta);
+                        player.getInventory().addItem(item);
                         player.sendMessage(ChatColor.GREEN+""+clicked.getType()+" purchased");
                     } else {
                         player.sendMessage(ChatColor.RED+"transaction failed");
