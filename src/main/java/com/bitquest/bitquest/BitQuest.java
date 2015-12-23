@@ -227,6 +227,7 @@ public class BitQuest extends JavaPlugin {
                 if(args[0].equals("invite")) {
                     // check that argument is not empty
                     if(!args[1].isEmpty()) {
+                        // TODO: you shouldn't be able to invite yourself
                         // check if user is in the uuid database
                         if(REDIS.get("uuid"+args[1])!=null) {
                             // user is in the uuid database
@@ -280,6 +281,7 @@ public class BitQuest extends JavaPlugin {
                 }
                 if(args[0].equals("leave")) {
                     if(REDIS.get("clan"+player.getUniqueId().toString())!=null) {
+                        // TODO: when a clan gets emptied, should be removed from the "clans" set
                         player.sendMessage(ChatColor.GREEN+"You are no longer part of the "+REDIS.get("clan"+player.getUniqueId().toString())+" clan");
                         REDIS.del("clan"+player.getUniqueId().toString());
                         return true;
