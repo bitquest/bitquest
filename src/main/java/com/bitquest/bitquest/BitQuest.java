@@ -322,6 +322,7 @@ public class BitQuest extends JavaPlugin {
                     java.util.regex.Matcher m = p.matcher(args[0]);
                     if(m.matches()==true) {
                         // TODO: send money through xapo
+                        
                     } else {
                         try {
 
