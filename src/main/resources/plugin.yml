@@ -4,6 +4,9 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
+  clan:
+    description: "used for creating, joining, operating clans"
+    usage: "/clan <new|invite|kick|join|leave>"
   wallet:
     description: "Displays your BitQuest wallet info"
     usage: "/wallet"

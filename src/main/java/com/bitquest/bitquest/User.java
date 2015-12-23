@@ -31,7 +31,6 @@ public class User {
             generateBitcoinAddress();
         }
         this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
-        loadUserData();
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
@@ -149,26 +148,7 @@ public class User {
 
 
     }
-    private boolean loadUserData() {
-        try {
-            if (BitQuest.REDIS.get(player.getUniqueId().toString()) != null) {
-                Bukkit.getLogger().info(BitQuest.REDIS.get(player.getUniqueId().toString()));
-                return true;
-            } else {
-                // creates new player data entry and writes it to REDIS
-                JsonObject playerData = new JsonObject();
-                playerData.addProperty("exp", 0);
-                BitQuest.REDIS.set(player.getUniqueId().toString(), playerData.toString());
-                return true;
-            }
-        } catch(final Exception e) {
-        	// Log the error.
-        	Bukkit.getLogger().warning("Error saving "+player.getName()+"'s data: "+e.getLocalizedMessage());
-        	Bukkit.getLogger().warning("Below are the details of the error:");
-        	e.printStackTrace();
-            return false;
-        }
-    }
+
     private boolean setClan(String tag) {
         // TODO: Write user clan info
         return false;
