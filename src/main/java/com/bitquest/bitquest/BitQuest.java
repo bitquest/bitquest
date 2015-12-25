@@ -32,6 +32,7 @@ public class BitQuest extends JavaPlugin {
     public final static String BITCOIN_ADDRESS = System.getenv("BITCOIN_ADDRESS") != null ? System.getenv("BITCOIN_ADDRESS") : null;
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
+    public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
 
     // If env MOD_OPS exists, server automatically ops moderators
 
@@ -44,7 +45,7 @@ public class BitQuest extends JavaPlugin {
     // TODO: Find out why this crashes the server
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
     // public static Scoreboard scoreboard = manager.getNewScoreboard();
-    public final static int LAND_PRICE=2000;
+    public final static int LAND_PRICE=20000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);

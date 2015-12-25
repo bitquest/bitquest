@@ -8,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.IOException;
@@ -37,7 +38,13 @@ public class SignEvents implements Listener {
                 public void run() {
                     // A villager is born
                     try {
-                        if(user.wallet.transaction(bitQuest.LAND_PRICE, bitQuest.wallet)) {
+                        Wallet paymentWallet;
+                        if(bitQuest.LAND_BITCOIN_ADDRESS!=null) {
+                            paymentWallet=new Wallet(bitQuest.LAND_BITCOIN_ADDRESS);
+                        } else {
+                            paymentWallet=bitQuest.wallet;
+                        }
+                        if(user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
 
                             bitQuest.REDIS.set("chunk"+x+","+z+"owner",player.getUniqueId().toString());
                             bitQuest.REDIS.set("chunk"+x+","+z+"name",name);
