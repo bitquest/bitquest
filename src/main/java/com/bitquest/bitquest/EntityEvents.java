@@ -83,6 +83,8 @@ public class EntityEvents implements Listener {
             event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
         }
+        
+        // TODO: Why is this scheduled in player join? why not in onenable? - Xeyler
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
             @Override
@@ -208,8 +210,6 @@ public class EntityEvents implements Listener {
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
         LivingEntity entity = e.getEntity();
 
-
-
         int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
@@ -238,7 +238,7 @@ public class EntityEvents implements Listener {
                             try {
                                 if(bitQuest.wallet.balance()>money && money>2000) {
                                     if(bitQuest.wallet.transaction(money,user.wallet)==true) {
-                                        player.sendMessage(ChatColor.GREEN+"You got loot! "+money);
+                                        player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+" bits of loot!");
                                     }
                                 }
                             } catch (IOException e1) {
