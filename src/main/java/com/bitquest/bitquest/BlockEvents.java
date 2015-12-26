@@ -96,12 +96,13 @@ public class BlockEvents implements Listener {
         
 	}
     // Make a sweet block regeneration ^_^
+	// TODO: Some blocks are still affected in this method...
     @EventHandler
 	void onExplode(EntityExplodeEvent event) {
 		
 		for(Block block : event.blockList()) {
 			
-			if(block.getType() != Material.AIR) {
+			if(block.getType() != Material.AIR && block.getType() != Material.CHEST) {
 			
 				final BlockState state = block.getState();
 				
