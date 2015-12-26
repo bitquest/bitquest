@@ -48,13 +48,13 @@ public class SignEvents implements Listener {
 
                             bitQuest.REDIS.set("chunk"+x+","+z+"owner",player.getUniqueId().toString());
                             bitQuest.REDIS.set("chunk"+x+","+z+"name",name);
-                            player.sendMessage(ChatColor.GREEN+"Congratulations! this land is now named "+name+" and you are the owner");
+                            player.sendMessage(ChatColor.GREEN+"Congratulations! You're now the owner of " + name + "!");
                         } else {
                             int balance=new User(player).wallet.balance();
                             if(balance<bitQuest.LAND_PRICE) {
-                                player.sendMessage(ChatColor.RED+"claim payment failed. (missing "+(bitQuest.LAND_PRICE-balance)+")");
+                                player.sendMessage(ChatColor.RED+"You don't have enough money! You need "+(bitQuest.LAND_PRICE-balance)/100+" more Bits.");
                             } else {
-                                player.sendMessage(ChatColor.RED+"claim payment failed. please try again later");
+                                player.sendMessage(ChatColor.RED+"Claim payment failed. Please try again later.");
                             }
                         }
                     } catch (IOException e) {

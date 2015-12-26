@@ -196,7 +196,6 @@ public class EntityEvents implements Listener {
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
-            // event.getDamager().sendMessage(ChatColor.BOLD + name + " - " + health + "/" + maxHealth);
         }
     }
 
@@ -228,8 +227,6 @@ public class EntityEvents implements Listener {
                     e.setDroppedExp(0);
                     final int money = bitQuest.rand(0, level*1000);
 
-
-
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
                     scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
@@ -238,8 +235,13 @@ public class EntityEvents implements Listener {
                             try {
                                 if(bitQuest.wallet.balance()>money && money>2000) {
                                     if(bitQuest.wallet.transaction(money,user.wallet)==true) {
-                                        player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+" bits of loot!");
+                                        player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
                                     }
+                                    try {
+										user.updateScoreboard();
+									} catch (ParseException e) {
+										e.printStackTrace();
+									}
                                 }
                             } catch (IOException e1) {
                                 e1.printStackTrace();

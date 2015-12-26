@@ -82,9 +82,6 @@ public class BitQuest extends JavaPlugin {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
         
-        // Objective objective = scoreboard.registerNewObjective("value1", "value2");
-        // objective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        // objective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString()+ "Quest");
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
