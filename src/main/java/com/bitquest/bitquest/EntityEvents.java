@@ -67,6 +67,7 @@ public class EntityEvents implements Listener {
         // check and set experience
         player.setTotalExperience((Integer) user.experience());
         user.updateLevels();
+        user.updateScoreboard();
 
         String welcome = rawwelcome.toString();
         welcome.replace("<name>", event.getPlayer().getName());
