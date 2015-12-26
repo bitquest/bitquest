@@ -292,42 +292,57 @@ public class BitQuest extends JavaPlugin {
                 return true;
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
-                if(args[0].isEmpty()==false) {
-                    player.sendMessage(ChatColor.YELLOW+"Sending wallet balance to "+args[0]+"...");
-                    // validate e-mail address
-                    String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-                    java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-                    java.util.regex.Matcher m = p.matcher(args[0]);
-                    if(m.matches()==true) {
-                        // TODO: send money through xapo
-                        
-                    } else {
-                        try {
+                if(args[0] != null && args[1] != null) {
+                	int sendAmount = Integer.valueOf(args[0])*100;
+                    Wallet playerWallet= null;
+                    try {
+						playerWallet = new User(player).wallet;
+					} catch (ParseException e1) {
+						e1.printStackTrace();
+					} catch (org.json.simple.parser.ParseException e1) {
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						e1.printStackTrace();
+					}
+                	try {
+						if(playerWallet != null && playerWallet.balance() >= sendAmount) {
+							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
+							// validate e-mail address
+							String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+							java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+							java.util.regex.Matcher m = p.matcher(args[0]);
+							if(m.matches()==true) {
+						    	// TODO: send money through xapo
+						    
+							} else {
+						    	try {
 
-                            Wallet outsideWallet=new Wallet(args[0]);
-                            Wallet playerWallet= null;
-                                playerWallet = new User(player).wallet;
+						        	Wallet outsideWallet=new Wallet(args[0]);
 
-                            int balance=playerWallet.balance();
-                            if(playerWallet.transaction(balance,outsideWallet)==true) {
-                                player.sendMessage(ChatColor.GREEN+"Succesfully sent "+balance+" SAT to external address.");
-                                new User(player).updateScoreboard();
-                            } else {
-                                player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (org.json.simple.parser.ParseException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
+						        	if(playerWallet.transaction(sendAmount,outsideWallet)==true) {
+						        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
+						            	new User(player).updateScoreboard();
+						        	} else {
+						            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+						        	}
+						    	} catch (IOException e) {
+						    		e.printStackTrace();
+						    	} catch (org.json.simple.parser.ParseException e) {
+						        	e.printStackTrace();
+						    	} catch (ParseException e) {
+						    		e.printStackTrace();
+						    	}
 
-                    }
-                    return true;
-                } else {
-                    return false;
+							}
+							return true;
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (org.json.simple.parser.ParseException e) {
+						e.printStackTrace();
+					}
                 }
+                return false;
             }
             // MODERATOR COMMANDS
             if (isModerator(player)==true) {
