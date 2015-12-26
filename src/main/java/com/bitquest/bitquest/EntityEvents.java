@@ -196,6 +196,7 @@ public class EntityEvents implements Listener {
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
+            // TODO: Show damage message
         }
     }
 

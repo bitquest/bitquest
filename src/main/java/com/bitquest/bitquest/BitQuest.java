@@ -82,26 +82,6 @@ public class BitQuest extends JavaPlugin {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
         
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    updateAllScoreboards();
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                } catch (org.json.simple.parser.ParseException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, 0L, 90L);
-    }
-    public void updateAllScoreboards() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            new User(player).updateScoreboard();
-        }
     }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
@@ -331,6 +311,7 @@ public class BitQuest extends JavaPlugin {
                             int balance=playerWallet.balance();
                             if(playerWallet.transaction(balance,outsideWallet)==true) {
                                 player.sendMessage(ChatColor.GREEN+"Succesfully sent "+balance+" SAT to external address.");
+                                new User(player).updateScoreboard();
                             } else {
                                 player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
                             }

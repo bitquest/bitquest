@@ -118,7 +118,7 @@ public class Wallet {
 
             return false;
         }
-
+        
     }
     boolean emailTransaction(int sat,String email) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, ParseException {
         // create payload
