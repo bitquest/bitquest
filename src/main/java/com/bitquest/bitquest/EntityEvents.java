@@ -134,32 +134,34 @@ public class EntityEvents implements Listener {
     public void onClick(PlayerInteractEvent event) {
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
-                if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.EYE_OF_ENDER) {
-                    if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                        if(player.getBedSpawnLocation()!=null) {
-                            // TODO: tp player home
-                            player.sendMessage(ChatColor.GREEN+"Teleporting to your bed...");
-                            player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-                            World world=Bukkit.getWorld("world");
+                if (event.getItem().getType() == Material.EYE_OF_ENDER) {
+                    if (!player.hasMetadata("teleporting")) {
+                        if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                            if (player.getBedSpawnLocation() != null) {
+                                // TODO: tp player home
+                                player.sendMessage(ChatColor.GREEN + "Teleporting to your bed...");
+                                player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
+                                World world = Bukkit.getWorld("world");
 
-                            final Location spawn=player.getBedSpawnLocation();
+                                final Location spawn = player.getBedSpawnLocation();
 
-                            Chunk c = spawn.getChunk();
-                            if (!c.isLoaded()) {
-                                c.load();
-                            }
-                            bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
-
-                                public void run() {
-                                    player.teleport(spawn);
-                                    player.removeMetadata("teleporting", bitQuest);
+                                Chunk c = spawn.getChunk();
+                                if (!c.isLoaded()) {
+                                    c.load();
                                 }
-                            }, 60L);
-                        } else {
-                            player.sendMessage(ChatColor.RED+"You must sleep in a bed before using the ender eye teleport");
+                                bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
+
+                                    public void run() {
+                                        player.teleport(spawn);
+                                        player.removeMetadata("teleporting", bitQuest);
+                                    }
+                                }, 60L);
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You must sleep in a bed before using the ender eye teleport");
+                            }
+
+
                         }
-
-
                     }
                     event.setCancelled(true);
                 }
@@ -685,3 +687,4 @@ public class EntityEvents implements Listener {
     }
 
 }
+
