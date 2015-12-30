@@ -27,6 +27,7 @@ import org.bukkit.scoreboard.Score;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -676,12 +677,19 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
+        Material[] protectedBlocks = {
+                Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
+                Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
+                Material.FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE,
+                Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER,
+                Material.DROPPER
+        };
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
-        if(b!=null && b.getType()== Material.CHEST){
-            if(bitQuest.canBuild(b.getLocation(),event.getPlayer())==false) {
+        if(b!=null && Arrays.asList(protectedBlocks).contains(b.getType())) {
+            if(!bitQuest.canBuild(b.getLocation(),event.getPlayer())) {
                 event.setCancelled(true);
-                p.sendMessage(ChatColor.RED+"This chest belongs to somebody else");
+                p.sendMessage(ChatColor.RED+"You don't have permission to do that");
             }
         }
     }
