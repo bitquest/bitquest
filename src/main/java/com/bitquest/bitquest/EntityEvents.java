@@ -1,7 +1,5 @@
 package com.bitquest.bitquest;
 
-import com.google.gson.JsonObject;
-
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -12,23 +10,16 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.player.*;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.scoreboard.DisplaySlot;
-import org.bukkit.scoreboard.Score;
-
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -229,7 +220,6 @@ public class EntityEvents implements Listener {
                     final User user = new User(player);
 
                     int maxexp = new Double(Math.ceil(level / 16)).intValue() + 1;
-                    e.setDroppedExp(0);
                     final int money = bitQuest.rand(0, level*1000);
 
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -694,5 +684,13 @@ public class EntityEvents implements Listener {
         }
     }
 
+    // Cancel every experience orb spawn because we're handling exp manually
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+    	if(event.getEntityType().equals(EntityType.EXPERIENCE_ORB)) {
+    		event.setCancelled(true);
+    	}
+    }
+    
 }
 
