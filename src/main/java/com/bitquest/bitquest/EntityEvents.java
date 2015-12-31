@@ -466,8 +466,10 @@ public class EntityEvents implements Listener {
                     damagerlevel = 32;
                 }
                 // do not harm
-                if (projectile.getShooter() instanceof Player && event.getEntity() instanceof Horse) {
-                    event.setCancelled(true);
+                if (projectile.getShooter() instanceof Player) {
+                	if(event.getEntity() instanceof Horse || event.getEntity() instanceof Player) {
+                		event.setCancelled(true);
+                	}
                 }
             }
 
