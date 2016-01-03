@@ -684,6 +684,15 @@ public class EntityEvents implements Listener {
                 p.sendMessage(ChatColor.RED+"You don't have permission to do that");
             }
         }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.getMaterial() == Material.FLINT_AND_STEEL) {
+                if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+                    event.setCancelled(true);
+                    p.sendMessage(ChatColor.RED + "You don't have permission to do that");
+                }
+            }
+        }
     }
 
     // Cancel every experience orb spawn because we're handling exp manually
@@ -692,6 +701,24 @@ public class EntityEvents implements Listener {
     	if(event.getEntityType().equals(EntityType.EXPERIENCE_ORB)) {
     		event.setCancelled(true);
     	}
+    }
+
+    @EventHandler
+    void onPlayerBucketFill(PlayerBucketFillEvent event) {
+        Player p = event.getPlayer();
+        if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
+            p.sendMessage(ChatColor.RED+"You don't have permission to do that");
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
+        Player p = event.getPlayer();
+        if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
+            p.sendMessage(ChatColor.RED+"You don't have permission to do that");
+            event.setCancelled(true);
+        }
     }
     
 }
