@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.bukkit.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
@@ -81,6 +82,15 @@ public class BitQuest extends JavaPlugin {
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
+        
+        // TODO: This can be removed once we're out of beta testing
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                Bukkit.broadcastMessage(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "NOTICE > " + ChatColor.RED + "The BetaQuest world will be reset once testing is finished.");
+            }
+        }, 0, 6000L);
         
     }
     public void log(String msg) {
