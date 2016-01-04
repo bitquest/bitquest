@@ -76,6 +76,14 @@ public class SignEvents implements Listener {
                     }
                 }, 1L);
 
+            }else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString())) {
+                if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
+                    player.sendMessage(ChatColor.RED + "You already own this land");
+                } else {
+                    // Rename land
+                    player.sendMessage(ChatColor.GREEN + "You own this land. Renaming to " + name);
+                    bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                }
             }
         }
 
