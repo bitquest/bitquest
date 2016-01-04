@@ -698,7 +698,8 @@ public class EntityEvents implements Listener {
     // Cancel every experience orb spawn because we're handling exp manually
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
-    	if(event.getEntityType().equals(EntityType.EXPERIENCE_ORB)) {
+        Entity entity = event.getEntity();
+    	if(entity instanceof ExperienceOrb) {
     		event.setCancelled(true);
     	}
     }
