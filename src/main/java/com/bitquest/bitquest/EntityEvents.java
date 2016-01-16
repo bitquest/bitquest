@@ -226,40 +226,42 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
 
-                    final int money;
+                    final int money = bitQuest.rand(1, 5)*100;
                     int random = bitQuest.rand(1, 10);
                     int levelChance = (int) Math.sqrt(Math.min(100, level));
                     // levelChance should be a maximum of 10 and a minimum of 0
                     if(random <= levelChance) {
-                        money = bitQuest.rand(1, 5);
+
+                    	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+                    	scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+                        	@Override
+                        	public void run() {
+                            	try {
+                                	if(bitQuest.wallet.balance()>money) {
+                                    	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
+                                    		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
+                                    	}
+                                    	try {
+											user.updateScoreboard();
+										} catch (ParseException e) {
+											e.printStackTrace();
+										}
+                                	}
+                            	} catch (IOException e1) {
+                                	e1.printStackTrace();
+                            	} catch (org.json.simple.parser.ParseException e1) {
+                            		e1.printStackTrace();
+                            	}
+                        	}
+                    	}, 1L);
+
                     } else {
-                    	money = 0;
+                    	player.sendMessage(ChatColor.RED + "You didn't get " + money + " bits.");
+                    	player.sendMessage(ChatColor.RED + "random: " + random);
+                    	player.sendMessage(ChatColor.RED + "levelChance: " + levelChance);
                     }
-
-                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-                    scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                if(bitQuest.wallet.balance()>money) {
-                                    if(bitQuest.wallet.transaction(money,user.wallet)==true) {
-                                        player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
-                                    }
-                                    try {
-										user.updateScoreboard();
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-                                }
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            } catch (org.json.simple.parser.ParseException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }, 1L);
-
+                    
                     // calculate and add experience
                     int exp = (level * 128);
                     user.addExperience(exp);
