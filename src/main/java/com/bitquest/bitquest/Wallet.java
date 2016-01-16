@@ -82,7 +82,6 @@ public class Wallet {
             int responseCode = con.getResponseCode();
 
             System.out.println("Response Code : " + responseCode);
-            Bukkit.broadcastMessage("Response Code: " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
@@ -90,7 +89,6 @@ public class Wallet {
 
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
-                Bukkit.broadcastMessage(inputLine);
             }
             in.close();
 

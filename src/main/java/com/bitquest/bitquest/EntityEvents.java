@@ -241,16 +241,12 @@ public class EntityEvents implements Listener {
                                 	if(bitQuest.wallet.balance()>money) {
                                     	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                     		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
-                                    	} else {
-                                    		player.sendMessage(ChatColor.RED+"There was an error giving you loot.");
                                     	}
                                     	try {
 											user.updateScoreboard();
 										} catch (ParseException e) {
 											e.printStackTrace();
 										}
-                                	} else {
-                                		player.sendMessage(ChatColor.RED+"Not enough BTC to give you loot.");
                                 	}
                             	} catch (IOException e1) {
                                 	e1.printStackTrace();
@@ -260,10 +256,6 @@ public class EntityEvents implements Listener {
                         	}
                     	}, 1L);
 
-                    } else {
-                    	player.sendMessage(ChatColor.RED + "You didn't get " + money + " bits.");
-                    	player.sendMessage(ChatColor.RED + "random: " + random);
-                    	player.sendMessage(ChatColor.RED + "levelChance: " + levelChance);
                     }
                     
                     // calculate and add experience
