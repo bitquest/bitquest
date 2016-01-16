@@ -96,49 +96,7 @@ public class BlockEvents implements Listener {
 
         
 	}
-    // Make a sweet block regeneration ^_^
-	// TODO: Some blocks are still affected in this method...
-    @EventHandler
-	void onExplode(EntityExplodeEvent event) {
-		
-		for(Block block : event.blockList()) {
-			
-			if(block.getType() != Material.AIR && block.getType() != Material.CHEST) {
-			
-				final BlockState state = block.getState();
-				
-				int delay;
-				
-				if(block.getType().hasGravity()) {
-					
-					delay = 141;
-					
-				} else {
-					
-					delay = bitQuest.rand(80, 140);
-					
-				}
-				
-				// Set block to air so that no blocks drop
-				block.setType(Material.AIR);
-			
-				// Regenerate all the blocks in a random order
-				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
-				
-					public void run() {
-
-						state.update(true, false);
-					
-					}
-				
-				}, delay);
-			
-			}
-			
-		}
-		
-	}
-
+	
 	@EventHandler
 	void onBlockExp(BlockExpEvent event) {
 		event.setExpToDrop(0);
