@@ -226,13 +226,14 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
 
-                    int d20 = bitQuest.rand(1, 20);
                     final int money;
-                    if(d20 == 7) {
-                        // lucky number 7
+                    int random = bitQuest.rand(1, 10);
+                    int levelChance = (int) Math.sqrt(Math.min(100, level));
+                    // levelChance should be a maximum of 10 and a minimum of 0
+                    if(random <= levelChance) {
                         money = bitQuest.rand(1, 5);
                     } else {
-                        money = bitQuest.rand(1, 5);
+                    	money = 0;
                     }
 
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -241,7 +242,7 @@ public class EntityEvents implements Listener {
                         @Override
                         public void run() {
                             try {
-                                if(bitQuest.wallet.balance()>money && money>2000) {
+                                if(bitQuest.wallet.balance()>money) {
                                     if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                         player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
                                     }
