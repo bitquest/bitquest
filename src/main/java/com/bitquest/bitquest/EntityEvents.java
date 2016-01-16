@@ -298,7 +298,11 @@ public class EntityEvents implements Listener {
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(8, 32);
                 } else {
-                    level = BitQuest.rand(1, 8);
+                	int distanceLevel = Math.min((int) e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0))^(1/3), 20);
+                    int offset = bitQuest.rand(-distanceLevel/5, -distanceLevel/5);
+                	level = distanceLevel + offset;
+                	Bukkit.broadcastMessage("distanceLevel: " + distanceLevel + "offset: " + offset + "level: " + level);
+                    
                 }
 
                 entity.setMaxHealth(level * 4);
