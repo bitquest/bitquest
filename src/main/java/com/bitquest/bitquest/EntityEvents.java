@@ -721,6 +721,11 @@ public class EntityEvents implements Listener {
             event.setCancelled(true);
         }
     }
-    
+
+    @EventHandler
+	void onExplode(EntityExplodeEvent event) {
+		event.setCancelled(true);
+	}
+
 }
 

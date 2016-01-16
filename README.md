@@ -1,6 +1,6 @@
 # BitQuest
 
-[BitQuest](https://bitquest.co/) is an initiative to make a Bitcoin-denominated Minecraft server with MMORPG elements, as the form of a plugin. To play the last version of BitQuest go to ```Multiplayer->Add Server``` and add this server address 
+[BitQuest](http://bitquest.co/) is an initiative to make a Bitcoin-denominated Minecraft server with MMORPG elements, as the form of a plugin. To play the last version of BitQuest go to ```Multiplayer->Add Server``` and add this server address 
 ```sh
 beta.bitquest.co
 ```
