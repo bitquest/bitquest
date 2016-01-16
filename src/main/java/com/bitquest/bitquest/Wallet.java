@@ -90,6 +90,7 @@ public class Wallet {
 
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
+                Bukkit.broadcastMessage(inputLine);
             }
             in.close();
 
