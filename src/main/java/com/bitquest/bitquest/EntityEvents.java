@@ -53,6 +53,13 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
+    void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+
+        event.setAmount(0);
+        new User(event.getPlayer()).updateLevels();
+    }
+
+    @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException {
         Player player=event.getPlayer();
         User user = new User(player);
