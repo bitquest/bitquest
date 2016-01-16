@@ -219,14 +219,13 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
 
-                    int maxexp = new Double(Math.ceil(level / 16)).intValue() + 1;
                     int d20 = bitQuest.rand(1, 20);
                     final int money;
-                    if(d20==7) {
+                    if(d20 == 7) {
                         // lucky number 7
-                        money = bitQuest.rand(0, level*1000);
+                        money = bitQuest.rand(1, 5);
                     } else {
-                        money = bitQuest.rand(0, level*1000);
+                        money = bitQuest.rand(1, 5);
                     }
 
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
