@@ -63,7 +63,7 @@ public class User {
     }
 
     public void updateLevels() {
-        int factor=4;
+        int factor=2;
         int exp=player.getTotalExperience();
         double maxexp=2000*Math.pow((factor*127),2);
         if(exp>maxexp) {

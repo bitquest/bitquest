@@ -465,7 +465,7 @@ public class EntityEvents implements Listener {
                 if (projectile.getShooter() instanceof Ghast) {
                     damagerlevel = 32;
                 }
-                // do not harm
+                // make love, not war
                 if (projectile.getShooter() instanceof Player) {
                 	if(event.getEntity() instanceof Horse || event.getEntity() instanceof Player) {
                 		event.setCancelled(true);
