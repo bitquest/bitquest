@@ -82,6 +82,7 @@ public class Wallet {
             int responseCode = con.getResponseCode();
 
             System.out.println("Response Code : " + responseCode);
+            Bukkit.broadcastMessage("Response Code: " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
