@@ -227,12 +227,15 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
-
-                    final int money = bitQuest.rand(1, 5)*100;
+                    // maximum loot in SAT is level*1000
+                    // level 2 = 20 bits maximum
+                    // level 100 = 1000 bits maximum
+                    final int money = bitQuest.rand(0, level)*1000;
                     int random = bitQuest.rand(1, 10);
                     int levelChance = (int) Math.sqrt(Math.min(100, level));
                     // levelChance should be a maximum of 10 and a minimum of 0
-                    if(random <= levelChance) {
+                    // the minumum bitcoin transaction via blockcypher is 2000 SAT or 20 bits.
+                    if(money>2000 && random <= levelChance) {
 
                     	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
