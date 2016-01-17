@@ -303,7 +303,6 @@ public class EntityEvents implements Listener {
                 	int distanceLevel = (int) Math.min(Math.ceil(Math.pow(e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1.0/3.0)), 20);
                     int offset = bitQuest.rand(-distanceLevel/5, distanceLevel/5);
                 	level = distanceLevel + offset;
-                	Bukkit.broadcastMessage("distanceLevel: " + distanceLevel + " offset: " + offset + " level: " + level);
                     
                 }
 
