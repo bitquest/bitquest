@@ -17,6 +17,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.permissions.BroadcastPermissions;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -298,10 +300,10 @@ public class EntityEvents implements Listener {
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(8, 32);
                 } else {
-                	int distanceLevel = Math.min((int) Math.pow((int)e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1/3), 20);
+                	int distanceLevel = (int) Math.min(Math.ceil(Math.pow(e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1.0/3.0)), 20);
                     int offset = bitQuest.rand(-distanceLevel/5, -distanceLevel/5);
                 	level = distanceLevel + offset;
-                	Bukkit.broadcastMessage(String.valueOf(Math.pow((int)e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1/3)));
+                	Bukkit.broadcastMessage("distanceLevel: " + distanceLevel + " offset: " + offset + " level: " + level);
                     
                 }
 
