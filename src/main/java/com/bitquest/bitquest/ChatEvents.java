@@ -76,6 +76,14 @@ public class ChatEvents implements Listener {
 			
 			if(recipients.size() <= 1) {
 				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Nobody is within earshot! Try shouting.");
+				IChatBaseComponent comp = ChatSerializer
+			            .a("{\"text\":\"" + "Click " + 
+			            "\",\"extra\":[{\"text\":\"" + "here!" + 
+			            "\",\"clickEvent\":{\"action\":\"run_command\",\"value\":\"" + 
+			            "me " + message + "\"}}]}");
+
+			PacketPlayOutChat packet = new PacketPlayOutChat(comp, true);
+			((CraftPlayer) <player>).getHandle().playerConnection.sendPacket(packet);
 			} else {
 				for(Player recipient : recipients) {
 					recipient.sendMessage(event.getFormat());
