@@ -300,7 +300,7 @@ public class EntityEvents implements Listener {
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(8, 32);
                 } else {
-                	int distanceLevel = (int) Math.min(Math.ceil(Math.pow(e.getLocation().distance(world.getSpawnLocation()), 1.0/3.0)), 20);
+                	int distanceLevel = (int) Math.min(Math.ceil(Math.pow(e.getLocation().distance(world.getSpawnLocation()), 2)/5000000), 20);
                     int offset = bitQuest.rand(-distanceLevel/5, 0);
                 	level = distanceLevel + offset;
                     
