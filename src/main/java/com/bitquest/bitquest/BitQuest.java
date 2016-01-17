@@ -186,7 +186,7 @@ public class BitQuest extends JavaPlugin {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-    	if(cmd.getName().equalsIgnoreCase("say") && args.length > 0) {
+    	if(cmd.getLabel().equalsIgnoreCase("say") && args.length > 0) {
 			StringBuilder builder = new StringBuilder();
 			for(String arg : args) {
 				builder.append(arg + " ");
@@ -201,7 +201,7 @@ public class BitQuest extends JavaPlugin {
 			
 		}
 		
-		if(cmd.getName().equalsIgnoreCase("me") && args.length > 0) {
+		if(cmd.getLabel().equalsIgnoreCase("me") && args.length > 0) {
 			StringBuilder builder = new StringBuilder();
 			for(String arg : args) {
 				builder.append(arg + " ");
@@ -216,7 +216,7 @@ public class BitQuest extends JavaPlugin {
 			
 		}
 		
-		if(cmd.getName().equalsIgnoreCase("tell") && args.length >= 2) {
+		if(cmd.getLabel().equalsIgnoreCase("tell") && args.length >= 2) {
 			
 			if(Bukkit.getPlayer(args[0]) != null) {
 				Player recipient = Bukkit.getPlayer(args[0]);
