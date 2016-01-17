@@ -68,6 +68,7 @@ public class BitQuest extends JavaPlugin {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
         // registers listener classes
+        getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
         getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);

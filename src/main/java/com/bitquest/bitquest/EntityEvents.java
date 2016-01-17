@@ -17,6 +17,8 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.util.permissions.BroadcastPermissions;
+
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Arrays;
@@ -226,39 +228,38 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
 
-                    int d20 = bitQuest.rand(1, 20);
-                    final int money;
-                    if(d20 == 7) {
-                        // lucky number 7
-                        money = bitQuest.rand(1, 5);
-                    } else {
-                        money = bitQuest.rand(1, 5);
+                    final int money = bitQuest.rand(1, 5)*100;
+                    int random = bitQuest.rand(1, 10);
+                    int levelChance = (int) Math.sqrt(Math.min(100, level));
+                    // levelChance should be a maximum of 10 and a minimum of 0
+                    if(random <= levelChance) {
+
+                    	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+                    	scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+                        	@Override
+                        	public void run() {
+                            	try {
+                                	if(bitQuest.wallet.balance()>money) {
+                                    	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
+                                    		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
+                                    	}
+                                    	try {
+											user.updateScoreboard();
+										} catch (ParseException e) {
+											e.printStackTrace();
+										}
+                                	}
+                            	} catch (IOException e1) {
+                                	e1.printStackTrace();
+                            	} catch (org.json.simple.parser.ParseException e1) {
+                            		e1.printStackTrace();
+                            	}
+                        	}
+                    	}, 1L);
+
                     }
-
-                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-                    scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                if(bitQuest.wallet.balance()>money && money>2000) {
-                                    if(bitQuest.wallet.transaction(money,user.wallet)==true) {
-                                        player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
-                                    }
-                                    try {
-										user.updateScoreboard();
-									} catch (ParseException e) {
-										e.printStackTrace();
-									}
-                                }
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
-                            } catch (org.json.simple.parser.ParseException e1) {
-                                e1.printStackTrace();
-                            }
-                        }
-                    }, 1L);
-
+                    
                     // calculate and add experience
                     int exp = (level * 128);
                     user.addExperience(exp);
@@ -299,7 +300,10 @@ public class EntityEvents implements Listener {
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(8, 32);
                 } else {
-                    level = BitQuest.rand(1, 8);
+                	int distanceLevel = (int) Math.min(Math.ceil(e.getLocation().distance(world.getSpawnLocation())/500), 20);
+                    int offset = bitQuest.rand(-distanceLevel/5, 0);
+                	level = distanceLevel + offset;
+                    
                 }
 
                 entity.setMaxHealth(level * 4);
