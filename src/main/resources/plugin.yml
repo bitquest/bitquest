@@ -4,6 +4,13 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
+   tell:
+      usage: /<command> <player> <message>
+      aliases: [msg, t]
+   say:
+      usage: /<command> <message>
+   me:
+      usage: /<command> <message>
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
