@@ -450,7 +450,61 @@ public class BitQuest extends JavaPlugin {
                 	return true;
                 }
             } else {
-                // PLAYER COMMANDS
+            	if(cmd.getLabel().equalsIgnoreCase("say") && args.length > 0) {
+        			StringBuilder builder = new StringBuilder();
+        			for(String arg : args) {
+        				builder.append(arg + " ");
+        			}
+        			String message = builder.toString().trim();
+        			if(sender instanceof org.bukkit.command.ConsoleCommandSender) {
+        				Bukkit.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Server> " + ChatColor.WHITE + message);
+        			} else {
+        				Bukkit.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + sender.getName() + "> " + ChatColor.WHITE + message);
+        			}
+        			return true;
+        			
+        		}
+        		
+        		if(cmd.getLabel().equalsIgnoreCase("me") && args.length > 0) {
+        			StringBuilder builder = new StringBuilder();
+        			for(String arg : args) {
+        				builder.append(arg + " ");
+        			}
+        			String message = builder.toString().trim();
+        			if(sender instanceof org.bukkit.command.ConsoleCommandSender) {
+        				Bukkit.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Server " + ChatColor.WHITE + message);
+        			} else {
+        				Bukkit.broadcastMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + sender.getName() + " " + ChatColor.WHITE + message);
+        			}
+        			return true;
+        			
+        		}
+        		
+        		if(cmd.getLabel().equalsIgnoreCase("tell") && args.length >= 2) {
+        			
+        			if(Bukkit.getPlayer(args[0]) != null) {
+        				Player recipient = Bukkit.getPlayer(args[0]);
+        				StringBuilder builder = new StringBuilder();
+        				for(int i = 1; i < args.length; i++) {
+        					builder.append(args[i]).append(" ");
+        				}
+        				String message = builder.toString().trim();
+        				recipient.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + sender.getName() + " > You " + ChatColor.WHITE + message);
+        				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "You > " + recipient.getName() + " " + ChatColor.WHITE + message);
+        				System.out.println(sender.getName() + " > " + recipient.getName() + " " + message);
+        				if(recipient.equals(sender)) {
+        					recipient.sendMessage(ChatColor.RED + "You just messaged yourself... ITS A PARADOX!");
+        					recipient.playSound(recipient.getLocation(), Sound.GHAST_SCREAM, 10, 1);
+        				} else {
+        					recipient.playSound(recipient.getLocation(), Sound.CAT_MEOW, 10, 1);
+        				}
+        			} else {
+        				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Tell> " + ChatColor.RED + "Couldn't find player: " + args[0]);
+        			}
+        				
+        			return true;
+        			
+        		}
 
             }
         }
