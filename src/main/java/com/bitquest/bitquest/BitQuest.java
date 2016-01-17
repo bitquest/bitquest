@@ -327,7 +327,7 @@ public class BitQuest extends JavaPlugin {
 							} else {
 						    	try {
 
-						        	Wallet outsideWallet=new Wallet(args[0]);
+						        	Wallet outsideWallet=new Wallet(args[1]);
 
 						        	if(playerWallet.transaction(sendAmount,outsideWallet)==true) {
 						        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
