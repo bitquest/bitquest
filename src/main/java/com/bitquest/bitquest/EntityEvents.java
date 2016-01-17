@@ -298,10 +298,10 @@ public class EntityEvents implements Listener {
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(8, 32);
                 } else {
-                	int distanceLevel = Math.min((int) Math.pow(e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1/3), 20);
+                	int distanceLevel = Math.min((int) Math.pow((int)e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1/3), 20);
                     int offset = bitQuest.rand(-distanceLevel/5, -distanceLevel/5);
                 	level = distanceLevel + offset;
-                	Bukkit.broadcastMessage("distance: " + e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)) + " distanceLevel: " + distanceLevel + " offset: " + offset + " level: " + level);
+                	Bukkit.broadcastMessage(String.valueOf(Math.pow((int)e.getLocation().distance(new Location(world, 0, e.getLocation().getY(), 0)), 1/3)));
                     
                 }
 
