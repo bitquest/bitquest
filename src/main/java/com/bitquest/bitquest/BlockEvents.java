@@ -39,12 +39,11 @@ public class BlockEvents implements Listener {
 	@EventHandler
 	void onBlockCatchFire(BlockIgniteEvent event) {
 		if(event.getPlayer() != null) {
-			if (!bitQuest.canBuild(event.getIgnitingBlock().getLocation(), event.getPlayer())) {
+			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 				event.setCancelled(true);
 				event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
 			}
-		}
-		if(!event.getCause().equals(IgniteCause.FLINT_AND_STEEL) && event.getBlock() != null) {
+		} else {
 			event.setCancelled(true);
 		}
 	}
@@ -66,7 +65,6 @@ public class BlockEvents implements Listener {
 	void onBlockPlace(BlockPlaceEvent event) {
 		// set clan
 		// first, we check if the player has permission to build
-		if(!event.getBlock().getType().equals(Material.FIRE)) {
 			if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
 				event.setCancelled(true);
             	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
@@ -110,7 +108,6 @@ public class BlockEvents implements Listener {
 				bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
     			event.setCancelled(true);
 			}
-		}
 
         
 	}
