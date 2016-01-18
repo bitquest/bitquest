@@ -232,7 +232,7 @@ public class EntityEvents implements Listener {
                     // level 100 = 1000 bits maximum
                     final int money = bitQuest.rand(2, level)*1000;
                     int random = bitQuest.rand(1, 10);
-                    int levelChance = (int) Math.ceil(level/10);
+                    int levelChance = (int) Math.ceil(level/10D);
                     // levelChance should be a maximum of 10 and a minimum of 0
                     // the minumum bitcoin transaction via blockcypher is 2000 SAT or 20 bits.
                     if(player.getName().equals("xX_Xeyler_Xx")) {
