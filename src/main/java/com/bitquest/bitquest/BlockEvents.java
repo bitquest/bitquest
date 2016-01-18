@@ -66,7 +66,7 @@ public class BlockEvents implements Listener {
 	void onBlockPlace(BlockPlaceEvent event) {
 		// set clan
 		// first, we check if the player has permission to build
-		if(event.getBlock().getType().equals(Material.FIRE)) {
+		if(!event.getBlock().getType().equals(Material.FIRE)) {
 			if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
 				event.setCancelled(true);
             	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
