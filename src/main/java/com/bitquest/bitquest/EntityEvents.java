@@ -96,7 +96,6 @@ public class EntityEvents implements Listener {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 300L);
-                // Update scoreboard
 
 
     }
@@ -705,15 +704,6 @@ public class EntityEvents implements Listener {
             }
         }
 
-    }
-
-    // Cancel every experience orb spawn because we're handling exp manually
-    @EventHandler
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        Entity entity = event.getEntity();
-    	if(entity instanceof ExperienceOrb) {
-    		event.setCancelled(true);
-    	}
     }
 
     @EventHandler

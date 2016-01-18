@@ -59,8 +59,6 @@ public class BitQuest extends JavaPlugin {
 
     public Wallet wallet=null;
 
-
-
     @Override
     public void onEnable() {
         log("BitQuest starting...");

@@ -115,9 +115,4 @@ public class BlockEvents implements Listener {
         
 	}
 	
-	@EventHandler
-	void onBlockExp(BlockExpEvent event) {
-		event.setExpToDrop(0);
-	}
-    
 }
