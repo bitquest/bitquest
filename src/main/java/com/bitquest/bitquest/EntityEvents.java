@@ -705,14 +705,6 @@ public class EntityEvents implements Listener {
             }
         }
 
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            if (event.getMaterial() == Material.FLINT_AND_STEEL) {
-                if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
-                    event.setCancelled(true);
-                    p.sendMessage(ChatColor.RED + "You don't have permission to do that");
-                }
-            }
-        }
     }
 
     // Cancel every experience orb spawn because we're handling exp manually

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +17,9 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExpEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 /**
@@ -31,6 +34,19 @@ public class BlockEvents implements Listener {
 		
 		bitQuest = plugin;
 		
+	}
+	
+	@EventHandler
+	void onBlockCatchFire(BlockIgniteEvent event) {
+		if(event.getPlayer() != null) {
+			if (!bitQuest.canBuild(event.getIgnitingBlock().getLocation(), event.getPlayer())) {
+				event.setCancelled(true);
+				event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that");
+			}
+		}
+		if(!event.getCause().equals(IgniteCause.FLINT_AND_STEEL)) {
+			event.setCancelled(true);
+		}
 	}
 	
     @EventHandler
