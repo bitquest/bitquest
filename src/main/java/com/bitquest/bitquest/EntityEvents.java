@@ -235,11 +235,6 @@ public class EntityEvents implements Listener {
                     int levelChance = (int) Math.ceil(level/10D);
                     // levelChance should be a maximum of 10 and a minimum of 0
                     // the minumum bitcoin transaction via blockcypher is 2000 SAT or 20 bits.
-                    if(player.getName().equals("xX_Xeyler_Xx")) {
-                    	player.sendMessage("Money: " + money);
-                    	player.sendMessage("random: " + random);
-                    	player.sendMessage("levelChance: " + levelChance);
-                    }
                     if(random <= levelChance) {
 
                     	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -251,8 +246,6 @@ public class EntityEvents implements Listener {
                                 	if(bitQuest.wallet.balance()>money) {
                                     	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                     		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
-                                    	} else {
-                                    		player.sendMessage("There was an error processing the transaction!");
                                     	}
                                     	try {
 											user.updateScoreboard();
