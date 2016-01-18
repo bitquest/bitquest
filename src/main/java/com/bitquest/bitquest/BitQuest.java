@@ -7,6 +7,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.*;
+import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
@@ -128,6 +129,9 @@ public class BitQuest extends JavaPlugin {
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
         if(isModerator(player)==true) {
             return true;
+        } else if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
+        	// If theyre not in the overworld, they cant build
+        	return false;
         } else if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")!=null) {
             if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner").equals(player.getUniqueId().toString())) {
                 return true;
