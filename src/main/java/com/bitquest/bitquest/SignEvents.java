@@ -25,11 +25,11 @@ public class SignEvents implements Listener {
     }
     @EventHandler
     public void onSignChange(SignChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-    	
+
+		final Player player = event.getPlayer();
     	// Check that the world is overworld
-    	if(!event.getBlock().getWorld().getEnvironment().equals(Environment.NORMAL)) {
+    	if(!event.getBlock().getWorld().getName().endsWith("_nether") && !event.getBlock().getWorld().getName().endsWith("_end")) {
     		final String specialCharacter = "^";
-    		final Player player = event.getPlayer();
     		final String[] lines = event.getLines();
     		final String signText = lines[0] + lines[1] + lines[2] + lines[3];
     		Chunk chunk = event.getBlock().getWorld().getChunkAt(event.getBlock().getLocation());
@@ -91,6 +91,10 @@ public class SignEvents implements Listener {
     			}
     		}
         
+    	} else if(event.getBlock().getWorld().getName().endsWith("_nether")) {
+    		player.sendMessage(ChatColor.RED + "No claiming in the nether!");
+    	} else if(event.getBlock().getWorld().getName().endsWith("_end")) {
+    		player.sendMessage(ChatColor.RED + "No claiming in the end!");
     	}
 
     }
