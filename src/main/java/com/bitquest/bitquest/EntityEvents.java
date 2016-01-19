@@ -102,9 +102,14 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        User user = new User(event.getPlayer());
-        if (user.getAddress() == null) {
-            user.generateBitcoinAddress();
+        if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
+
+            User user = new User(event.getPlayer());
+            if (user.getAddress() == null) {
+                user.generateBitcoinAddress();
+            }
+        } else {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
 
     }
