@@ -412,56 +412,17 @@ public class BitQuest extends JavaPlugin {
                         return true;
                     }
                 }
-                // COMMAND: ADDTOWN
-                // Creates a new town. Towns are different from player houses
-                // TODO: Establish differences between towns and houses
-                if (cmd.getName().equalsIgnoreCase("addtown")) {
-                    if (args.length > 1) {
-                        // first, check that arg[0] (size) is an integer
-                        try {
-                            int size = Integer.parseInt(args[0]);
-                            if (size >= minLandSize && size <= maxLandSize) {
-                                StringBuilder builder = new StringBuilder();
-                                for (int i = 1; i < args.length; i++) {
-                                    builder.append(args[i]).append(" ");
-                                }
-                                String name = builder.toString().trim();
+                if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
+                    if(REDIS.get("uuid"+args[0])!=null) {
+                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
+                        REDIS.sadd("banlist",uuid.toString());
+                        // TODO: Kick player if online
+                        return true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        return true;
+                    }
 
-                                // ensure that name is alphanumeric and is within character limits
-                                if (!name.matches("^.*[^a-zA-Z0-9 ].*$") && name.length() >= minNameSize && name.length() <= maxNameSize) {
-                                    if (createNewArea(player.getLocation(), player, name, size)) {
-                                        success(player, "Area '" + name + "' was created.");
-                                    } else {
-                                        error(player, "Error creating area");
-                                    }
-                                    return true;
-                                } else {
-                                    error(player, "Invalid land name! Must be " + minNameSize + "-" + maxNameSize + " characters!");
-                                    return false;
-                                }
-                            } else {
-                                error(player, "Invalid land size! Must be " + minLandSize + "-" + maxLandSize + "!");
-                                return false;
-                            }
-                        } catch (Exception e) {
-                            error(player, "Invalid land size! Must be " + minLandSize + "-" + maxLandSize + "!" + e.getLocalizedMessage());
-                            return false;
-                        }
-                    } else {
-                        error(player, "Please specify area name and size!");
-                        return false;
-                    }
-                }
-                // COMMAND: DELTOWN
-                // deltown command for deleting the town you're currently in
-                if (cmd.getName().equalsIgnoreCase("deltown")) {
-                    JsonObject area = areaForLocation(((Player) sender).getLocation());
-                    if (area != null) {
-                        sender.sendMessage(REDIS.lrem("areas", 1, area.toString()).toString());
-                    } else {
-                        sender.sendMessage("0");
-                    }
-                    return true;
                 }
                 if (cmd.getName().equalsIgnoreCase("spectate") && args.length == 1) {
                 	
