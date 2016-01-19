@@ -305,11 +305,11 @@ public class BitQuest extends JavaPlugin {
                 return true;
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
-                if(args[0] != null && args[1] != null) {
+                if(args.length == 2) {
                 	int sendAmount = Integer.valueOf(args[0])*100;
-                    Wallet playerWallet= null;
+                    Wallet fromWallet = null;
                     try {
-						playerWallet = new User(player).wallet;
+						fromWallet = new User(player).wallet;
 					} catch (ParseException e1) {
 						e1.printStackTrace();
 					} catch (org.json.simple.parser.ParseException e1) {
@@ -318,7 +318,30 @@ public class BitQuest extends JavaPlugin {
 						e1.printStackTrace();
 					}
                 	try {
-						if(playerWallet != null && playerWallet.balance() >= sendAmount) {
+						if(fromWallet != null && fromWallet.balance() >= sendAmount) {
+							for(OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+								if(offlinePlayer.getPlayer().getName().equals(args[0])) {
+									try {
+										Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
+
+										if(fromWallet.transaction(sendAmount, toWallet)) {
+							        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
+							            	new User(player).updateScoreboard();
+							            	return true;
+										} else {
+							            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+							        	}
+										
+									} catch (ParseException e) {
+										e.printStackTrace();
+									} catch (org.json.simple.parser.ParseException e1) {
+										e1.printStackTrace();
+									} catch (IOException e1) {
+										e1.printStackTrace();
+									}
+									
+								}
+							}
 							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 							// validate e-mail address
 							String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
@@ -330,9 +353,9 @@ public class BitQuest extends JavaPlugin {
 							} else {
 						    	try {
 
-						        	Wallet outsideWallet=new Wallet(args[1]);
+						        	Wallet toWallet = new Wallet(args[1]);
 
-						        	if(playerWallet.transaction(sendAmount,outsideWallet)==true) {
+						        	if(fromWallet.transaction(sendAmount,toWallet)==true) {
 						        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
 						            	new User(player).updateScoreboard();
 						        	} else {
