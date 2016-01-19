@@ -64,7 +64,8 @@ public class SignEvents implements Listener {
     							} else {
     								int balance = new User(player).wallet.balance();
     								if (balance < bitQuest.LAND_PRICE) {
-    									player.sendMessage(ChatColor.RED + "You don't have enough money! You need " + (bitQuest.LAND_PRICE - balance) / 100 + " more Bits.");
+    									player.sendMessage(ChatColor.RED + "You don't have enough money! You need " + 
+    										ChatColor.BOLD + Math.ceil((bitQuest.LAND_PRICE-balance)/100) + ChatColor.RED + " more Bits.");
     								} else {
     									player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
     								}

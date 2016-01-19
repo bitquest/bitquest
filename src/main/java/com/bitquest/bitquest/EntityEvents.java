@@ -209,7 +209,7 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onDeath(PlayerDeathEvent event) {
+    public void onPlayerDeath(PlayerDeathEvent event) {
         event.setKeepInventory(true);
         event.setKeepLevel(true);
         event.setDeathMessage(null);
@@ -237,7 +237,6 @@ public class EntityEvents implements Listener {
                     final int money = bitQuest.rand(2, level)*1000;
                     int random = bitQuest.rand(1, 10);
                     int levelChance = (int) Math.ceil(level/10D);
-                    // levelChance should be a maximum of 10 and a minimum of 0
                     // the minumum bitcoin transaction via blockcypher is 2000 SAT or 20 bits.
                     if(random <= levelChance) {
 
@@ -250,6 +249,7 @@ public class EntityEvents implements Listener {
                                 	if(bitQuest.wallet.balance()>money) {
                                     	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                     		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
+                                    		player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                     	}
                                     	try {
 											user.updateScoreboard();
