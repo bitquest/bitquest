@@ -242,7 +242,7 @@ public class EntityEvents implements Listener {
 
                     	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-                    	scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+                    	scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         	@Override
                         	public void run() {
                             	try {
@@ -263,7 +263,7 @@ public class EntityEvents implements Listener {
                             		e1.printStackTrace();
                             	}
                         	}
-                    	}, 1L);
+                    	});
 
                     }
                     

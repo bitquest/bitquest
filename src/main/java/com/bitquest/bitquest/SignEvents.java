@@ -44,7 +44,7 @@ public class SignEvents implements Listener {
     				final User user = new User(player);
     				player.sendMessage(ChatColor.YELLOW + "Claiming land...");
     				BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-    				scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
+    				scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
     					@Override
     					public void run() {
     						// A villager is born
@@ -79,7 +79,7 @@ public class SignEvents implements Listener {
     						}
     						;
     					}
-    				}, 1L);
+    				});
 
     			}else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString())) {
     				if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {

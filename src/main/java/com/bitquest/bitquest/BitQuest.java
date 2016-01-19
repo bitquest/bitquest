@@ -2,6 +2,7 @@ package com.bitquest.bitquest;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +13,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
@@ -190,7 +193,7 @@ public class BitQuest extends JavaPlugin {
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         // we don't allow server commands (yet?)
         if (sender instanceof Player) {
-            Player player = (Player) sender;
+            final Player player = (Player) sender;
             // PLAYER COMMANDS
             if(cmd.getName().equalsIgnoreCase("clan")) {
 
@@ -306,7 +309,7 @@ public class BitQuest extends JavaPlugin {
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args.length == 2) {
-                	int sendAmount = Integer.valueOf(args[0])*100;
+                	final int sendAmount = Integer.valueOf(args[0])*100;
                     Wallet fromWallet = null;
                     try {
 						fromWallet = new User(player).wallet;
@@ -319,30 +322,36 @@ public class BitQuest extends JavaPlugin {
 					}
                 	try {
 						if(fromWallet != null && fromWallet.balance() >= sendAmount) {
-							for(OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
+							for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
 								if(offlinePlayer.getPlayer().getName().equals(args[0])) {
-									try {
-										Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
+									final Wallet finalFromWallet = fromWallet;
+									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+				    				scheduler.runTaskAsynchronously(this, new Runnable() {
+				    					@Override
+				    					public void run() {
+				    						try {
+												Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
 
-										if(fromWallet.transaction(sendAmount, toWallet)) {
-							        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
-							            	new User(player).updateScoreboard();
-							            	return true;
-										} else {
-							            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-							        	}
-										
-									} catch (ParseException e) {
-										e.printStackTrace();
-									} catch (org.json.simple.parser.ParseException e1) {
-										e1.printStackTrace();
-									} catch (IOException e1) {
-										e1.printStackTrace();
-									}
-									
+												if(finalFromWallet.transaction(sendAmount, toWallet)) {
+									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to external address.");
+									            	new User(player).updateScoreboard();
+												} else {
+									            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+									        	}
+												
+											} catch (ParseException e) {
+												e.printStackTrace();
+											} catch (org.json.simple.parser.ParseException e1) {
+												e1.printStackTrace();
+											} catch (IOException e1) {
+												e1.printStackTrace();
+											}
+				    					}
+				    				});
+					            	return true;
 								}
 							}
-							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 							// validate e-mail address
 							String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
 							java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);

@@ -12,6 +12,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.scheduler.BukkitScheduler;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -65,34 +66,51 @@ public class InventoryEvents implements Listener {
         }
     }
     @EventHandler
-    void onInventoryClick(InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
+    void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         // Merchant inventory
         if(inventory.equals(marketInventory)) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         		
-        		ItemStack clicked = event.getCurrentItem();
-                if(clicked.getType()!=Material.AIR) {
-                    player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
+        		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+				scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+					@Override
+					public void run() {
+		        		ItemStack clicked = event.getCurrentItem();
+		                if(clicked.getType()!=Material.AIR) {
+		                    player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
 
-                    player.closeInventory();
-                    event.setCancelled(true);
-                    // TODO: try/catch
-                    User user=new User(player);
-                    if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
-                        ItemStack item = event.getCurrentItem();
-                        ItemMeta meta = item.getItemMeta();
-                        ArrayList<String> Lore = new ArrayList<String>();
-                        meta.setLore(null);
-                        item.setItemMeta(meta);
-                        player.getInventory().addItem(item);
-                        player.sendMessage(ChatColor.GREEN+""+clicked.getType()+" purchased");
-                    } else {
-                        player.sendMessage(ChatColor.RED+"transaction failed");
-                    }
-                }
-
+		                    player.closeInventory();
+		                    event.setCancelled(true);
+		                    // TODO: try/catch
+		                    User user;
+		                    try {
+		                    	user = new User(player);
+								if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
+								    ItemStack item = event.getCurrentItem();
+								    ItemMeta meta = item.getItemMeta();
+								    ArrayList<String> Lore = new ArrayList<String>();
+								    meta.setLore(null);
+								    item.setItemMeta(meta);
+								    player.getInventory().addItem(item);
+								    player.sendMessage(ChatColor.GREEN+""+clicked.getType()+" purchased");
+								} else {
+								    player.sendMessage(ChatColor.RED+"transaction failed");
+								}
+							} catch (IllegalArgumentException e) {
+								e.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							} catch (ParseException e) {
+								e.printStackTrace();
+							} catch (org.json.simple.parser.ParseException e) {
+								e.printStackTrace();
+							}
+		                }
+						;
+					}
+				});
         		
         	} else {
         		event.setCancelled(true);
