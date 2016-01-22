@@ -39,20 +39,15 @@ public class BlockEvents implements Listener {
 	
 	@EventHandler
 	void onBlockCatchFire(BlockIgniteEvent event) {
-		if(event.getPlayer() != null) {
-			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
-				event.setCancelled(true);
-				event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
+		Bukkit.broadcastMessage(event.getCause().toString());
+		if(event.getCause().equals(IgniteCause.FLINT_AND_STEEL)) {
+			if(event.getPlayer() != null) {
+				if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+					event.setCancelled(true);
+					event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
+				}
 			}
-		} else {
-			event.setCancelled(true);
-		}
-	}
-	
-	@EventHandler
-	void onFireSpread(BlockSpreadEvent event) {
-		Bukkit.broadcastMessage(event.getBlock().toString());
-		if(event.getBlock().equals(Material.FIRE)) {
+		} else if(event.getCause().equals(IgniteCause.SPREAD)) {
 			event.setCancelled(true);
 		}
 	}
