@@ -19,6 +19,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockSpreadEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
@@ -44,6 +45,13 @@ public class BlockEvents implements Listener {
 				event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
 			}
 		} else {
+			event.setCancelled(true);
+		}
+	}
+	
+	@EventHandler
+	void onFireSpread(BlockSpreadEvent event) {
+		if(event.getBlock().equals(Material.FIRE)) {
 			event.setCancelled(true);
 		}
 	}
