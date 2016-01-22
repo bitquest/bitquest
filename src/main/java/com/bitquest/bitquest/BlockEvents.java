@@ -51,6 +51,7 @@ public class BlockEvents implements Listener {
 	
 	@EventHandler
 	void onFireSpread(BlockSpreadEvent event) {
+		Bukkit.broadcastMessage(event.getBlock().toString());
 		if(event.getBlock().equals(Material.FIRE)) {
 			event.setCancelled(true);
 		}
