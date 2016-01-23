@@ -39,7 +39,6 @@ public class BlockEvents implements Listener {
 	
 	@EventHandler
 	void onBlockCatchFire(BlockIgniteEvent event) {
-		Bukkit.broadcastMessage(event.getCause().toString());
 		if(event.getCause().equals(IgniteCause.FLINT_AND_STEEL)) {
 			if(event.getPlayer() != null) {
 				if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
@@ -48,7 +47,6 @@ public class BlockEvents implements Listener {
 				}
 			}
 		} else if(event.getCause().equals(IgniteCause.SPREAD)) {
-			Bukkit.broadcastMessage("Cancelled spread! <3");
 			event.setCancelled(true);
 		}
 	}
