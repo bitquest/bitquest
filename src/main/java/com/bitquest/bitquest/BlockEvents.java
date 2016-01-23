@@ -48,6 +48,7 @@ public class BlockEvents implements Listener {
 				}
 			}
 		} else if(event.getCause().equals(IgniteCause.SPREAD)) {
+			Bukkit.broadcastMessage("Cancelled spread! <3");
 			event.setCancelled(true);
 		}
 	}
