@@ -16,6 +16,7 @@ import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
 import org.bukkit.event.block.BlockExpEvent;
 import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -49,6 +50,11 @@ public class BlockEvents implements Listener {
 		} else if(event.getCause().equals(IgniteCause.SPREAD)) {
 			event.setCancelled(true);
 		}
+	}
+	
+	@EventHandler
+	void onBlockBurn(BlockBurnEvent event) {
+		event.setCancelled(true);
 	}
 	
     @EventHandler
