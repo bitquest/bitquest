@@ -53,6 +53,14 @@ You can use [eclipse](https://eclipse.org/downloads/) or [intellij](https://www.
 ### Installing Dependencies
 - Be sure you have installed the [last version of java](http://www.java.com/en/download) version 
 
+Note: if you are running a Debian-based Linux distribution like Ubuntu, you can run the setup script included instead of following the rest of these instructions:
+#### Ubuntu
+```sh
+$ cd setup_scripts
+$ ./ubuntu.sh
+```
+Make sure you are in the setup_scripts directory before running the script.
+
 - Install gradle and redis
 
 #### OSX
@@ -83,7 +91,7 @@ This will generate a new file at ```bitquest/build/libs/bitquest-all.jar``` that
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 ```
 #### OSX and Ubuntu
-If is the first time this will generate a bunch of files and directories.
+The first time it runs it will generate a bunch of files and directories.
 - Open ```spigot/eula.txt``` and change 
 ```sh
 eula=false
@@ -100,12 +108,15 @@ $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 Now you should have a new directory ```spigot/plugins/```
 - Close the server with ```cmd + C```
 - Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/``` or make a symbolic link:
+
 #### OSX and  Ubuntu
 ```sh
 $ ln -s $bitquest/bitquest/build/libs/bitquest-all.jar $spigot/plugins/bitquest-all.jar
 ```
 where ```$bitquest``` is your bitquest root directory and ```$spigot``` is the directory containing your spigot jar.
 - Run spigot again to run the server with bitquest plugin
+
+
 #### OSX and Ubuntu
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
@@ -114,6 +125,8 @@ $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 #### Redis
 In the bitquest directory
 - Run the redis server
+
+
 #### OSX and Ubuntu
 ```sh
 $ redis-server
