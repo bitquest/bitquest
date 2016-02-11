@@ -53,7 +53,8 @@ You can use [eclipse](https://eclipse.org/downloads/) or [intellij](https://www.
 ### Installing Dependencies
 - Be sure you have installed the [last version of java](http://www.java.com/en/download) version 
 
-- Install gradle and redis running
+- Install gradle and redis
+
 #### OSX
 Install [brew](http://brew.sh/), then run
 ```sh
@@ -100,14 +101,13 @@ Now you should have a new directory ```spigot/plugins/```
 - Close the server with ```cmd + C```
 - Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/``` or make a symbolic link:
 #### OSX and  Ubuntu
+```sh
+$ ln -s $bitquest/bitquest/build/libs/bitquest-all.jar $spigot/plugins/bitquest-all.jar
 ```
-sh ln -s $bitquest/bitquest/build/libs/bitquest-all.jar $spigot/plugins/bitquest-all.jar
-```
-where $bitquest is your bitquest root directory and $spigot is the directory containing your spigot jar.
+where ```$bitquest``` is your bitquest root directory and ```$spigot``` is the directory containing your spigot jar.
 - Run spigot again to run the server with bitquest plugin
 #### OSX and Ubuntu
-```
-sh
+```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 ```
 
