@@ -59,7 +59,9 @@ Note: if you are running a Debian-based Linux distribution like Ubuntu, you can 
 $ cd setup_scripts
 $ ./ubuntu.sh
 ```
-Make sure you are in the setup_scripts directory before running the script.
+Make sure you are in the setup_scripts directory before running the script. Otherwise, follow the rest of the instructions.
+
+### Manual Setup
 
 - Install gradle and redis
 
