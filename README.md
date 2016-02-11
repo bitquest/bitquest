@@ -61,7 +61,7 @@ $ ./ubuntu.sh
 ```
 Make sure you are in the setup_scripts directory before running the script. Otherwise, follow the rest of the instructions.
 
-### Manual Setup
+## Manual Setup
 
 - Install gradle and redis
 
