@@ -24,6 +24,8 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.enchantment.EnchantItemEvent;
 
 /**
  * Created by explodi on 11/7/15.
@@ -54,11 +56,22 @@ public class EntityEvents implements Listener {
         }
     }
 
+    
     @EventHandler
-    void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-
+    public void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {    
         event.setAmount(0);
         new User(event.getPlayer()).updateLevels();
+    }
+    
+    @EventHandler
+    public void onEnchantItemEvent(EnchantItemEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        // Simply setting the cost to zero does not work. there are probably
+        // checks downstream for this. Instead cancel out the cost.
+        // None of this actually changes the bitquest xp anyway, so just make
+        // things look correct for the user. This only works for the enchantment table,
+        // not the anvil.
+        event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.getExpLevelCost());
+        
     }
 
     @EventHandler
