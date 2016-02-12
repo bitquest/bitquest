@@ -47,23 +47,37 @@ Everybody is welcome to contribute. :D
 Here are the instructions to modify, install and run the server as localhost.
 
 # Installation
-## OSX
 ### Framework
 You can use [eclipse](https://eclipse.org/downloads/) or [intellij](https://www.jetbrains.com/idea/) to open and modify this project
 
 ### Installing Dependencies
 - Be sure you have installed the [last version of java](http://www.java.com/en/download) version 
-- Install [brew](http://brew.sh/)
-- Install gradle running
+
+Note: if you are running a Debian-based Linux distribution like Ubuntu, you can run the setup script included instead of following the rest of these instructions:
+#### Ubuntu
 ```sh
-$ brew install gradle
+$ cd setup_scripts
+$ ./ubuntu.sh
 ```
-- Install redis running
+Make sure you are in the setup_scripts directory before running the script. Otherwise, follow the rest of the instructions.
+
+## Manual Setup
+
+- Install gradle and redis
+
+#### OSX
+Install [brew](http://brew.sh/), then run
 ```sh
-$ brew install redis
+$ brew install gradle redis
+```
+#### Ubuntu
+```sh
+$ sudo apt-get install gradle redis-server
 ```
 
+
 ### Compile project
+#### OSX and Ubuntu
 To compile project go to the bitquest directory and run
 ```sh
 $ ./gradlew shadowJar
@@ -72,12 +86,14 @@ This will generate a new file at ```bitquest/build/libs/bitquest-all.jar``` that
 
 ### Run server in localhost
 #### Spigot
-- Make a new directory called ```spigot``` and download there the last [BitQuest's spigot](http://jenkins.bitquest.co/job/spigot/) .
+- Make a new directory called ```spigot``` and download there the last [BitQuest's spigot](http://jenkins.bitquest.co/job/spigot/) . If you get an error regarding a missing main manifest attribute, make sure you downloaded the actual spigot jar and not the spigot-api jar.
 - Go to this directory and run spigot
+#### OSX and Ubuntu
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 ```
-If is the first time this will generate a bunch of files and directories.
+#### OSX and Ubuntu
+The first time it runs it will generate a bunch of files and directories.
 - Open ```spigot/eula.txt``` and change 
 ```sh
 eula=false
@@ -87,20 +103,33 @@ to
 eula=true
 ```
 - Run spigot again
+#### OSX and Ubuntu
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
 ```
 Now you should have a new directory ```spigot/plugins/```
 - Close the server with ```cmd + C```
-- Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/```
+- Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/``` or make a symbolic link:
+
+#### OSX and  Ubuntu
+```sh
+$ ln -s $bitquest/bitquest/build/libs/bitquest-all.jar $spigot/plugins/bitquest-all.jar
+```
+where ```$bitquest``` is your bitquest root directory and ```$spigot``` is the directory containing your spigot jar.
 - Run spigot again to run the server with bitquest plugin
+
+
+#### OSX and Ubuntu
 ```sh
 $ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
-````
+```
 
 #### Redis
 In the bitquest directory
 - Run the redis server
+
+
+#### OSX and Ubuntu
 ```sh
 $ redis-server
 ```
