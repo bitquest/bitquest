@@ -28,3 +28,6 @@ commands:
   claim:
     description: "Purchase land in the location where you stand"
     usage: /claim
+  emergencystop:
+    description: "Stops the server cleanly in case of emergency"
+    usage: /emergencystop    

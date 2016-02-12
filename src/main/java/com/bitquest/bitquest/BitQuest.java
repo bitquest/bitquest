@@ -444,9 +444,13 @@ public class BitQuest extends JavaPlugin {
                 	}
                 	return true;
                 }
+                if (cmd.getName().equalsIgnoreCase("emergencystop")) {
+                    Bukkit.shutdown();               
+                    return true;
+                }            
+            
             } else {
                 // PLAYER COMMANDS
-
             }
         }
         return true;
