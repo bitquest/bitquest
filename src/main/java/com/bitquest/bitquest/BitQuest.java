@@ -445,14 +445,6 @@ public class BitQuest extends JavaPlugin {
                 	return true;
                 }
                 if (cmd.getName().equalsIgnoreCase("emergencystop")) {
-                    ((Player) sender).kickPlayer("Test message");
-                    Bukkit.shutdown();               
-                    return true;
-                }            
-            
-            } else {
-                // PLAYER COMMANDS
-                if (cmd.getName().equalsIgnoreCase("emergencystop")) {
                     StringBuilder message = new StringBuilder();
                     message.append(sender.getName())
                             .append(" has shut down the server for emergency reasons");
@@ -469,7 +461,11 @@ public class BitQuest extends JavaPlugin {
                     
                     Bukkit.shutdown();               
                     return true;
-                }
+                }           
+            
+            } else {
+                // PLAYER COMMANDS
+
             }
         }
         return true;
