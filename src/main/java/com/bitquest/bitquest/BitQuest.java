@@ -445,12 +445,31 @@ public class BitQuest extends JavaPlugin {
                 	return true;
                 }
                 if (cmd.getName().equalsIgnoreCase("emergencystop")) {
+                    ((Player) sender).kickPlayer("Test message");
                     Bukkit.shutdown();               
                     return true;
                 }            
             
             } else {
                 // PLAYER COMMANDS
+                if (cmd.getName().equalsIgnoreCase("emergencystop")) {
+                    StringBuilder message = new StringBuilder();
+                    message.append(sender.getName())
+                            .append(" has shut down the server for emergency reasons");
+                    
+                    if (args.length > 0) {
+                        message.append(": ");
+                        for (String word : args) {
+                            message.append(word).append(" ");
+                        }
+                    }
+                    for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
+                        currentPlayer.kickPlayer(message.toString());
+                    }
+                    
+                    Bukkit.shutdown();               
+                    return true;
+                }
             }
         }
         return true;
