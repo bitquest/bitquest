@@ -262,7 +262,7 @@ public class EntityEvents implements Listener {
                                 	if(bitQuest.wallet.balance()>money) {
                                     	if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                     		player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
-                                    		player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                    		// player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                     	}
                                     	try {
 											user.updateScoreboard();
