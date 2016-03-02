@@ -180,7 +180,6 @@ public class BitQuest extends JavaPlugin {
     final int maxNameSize = 16;
 
     public void sendWalletInfo(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-
         User user= new User(player);
         player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
@@ -426,6 +425,10 @@ public class BitQuest extends JavaPlugin {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.sadd("banlist",uuid.toString());
                         // TODO: Kick player if online
+                        Player kickedout=Bukkit.getPlayer(args[0]);
+                        if(kickedout!=null) {
+                            kickedout.kickPlayer("Sorry.");
+                        }
                         return true;
                     } else {
                         sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
