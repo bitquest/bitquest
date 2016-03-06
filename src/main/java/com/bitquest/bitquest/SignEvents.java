@@ -1,5 +1,6 @@
 package com.bitquest.bitquest;
 
+import com.evilmidget38.UUIDFetcher;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -14,6 +15,7 @@ import org.bukkit.scheduler.BukkitScheduler;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.UUID;
 
 /**
  * Created by cristian on 12/17/15.
@@ -36,7 +38,7 @@ public class SignEvents implements Listener {
     		final int x=chunk.getX();
     		final int z=chunk.getZ();
 
-    		if (signText.substring(0,1).equals(specialCharacter) && signText.substring(signText.length()-1).equals(specialCharacter)) {
+    		if (signText.length() > 0 && signText.substring(0,1).equals(specialCharacter) && signText.substring(signText.length()-1).equals(specialCharacter)) {
 
     			final String name = signText.substring(1,signText.length()-1);
 
@@ -82,12 +84,31 @@ public class SignEvents implements Listener {
     				});
 
     			}else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString())) {
-					if (name.equals("abandon")){
-						// Abandon land
+					if (name.equals("abandon")) {
+                        // Abandon land
                         bitQuest.REDIS.del("chunk" + x + "," + z + "owner");
                         bitQuest.REDIS.del("chunk" + x + "," + z + "name");
-					}
-    				if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
+                    }else if (name.startsWith("transfer ") && name.length() > 9) {
+                        // If the name starts with "trasnfer " and have at lest one more character,
+                        // transfer land
+                        final String newOwner = name.substring(9);
+                        player.sendMessage(ChatColor.YELLOW+"Transfering land to " + newOwner + "...");
+
+                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
+                                    bitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                                    player.sendMessage(ChatColor.GREEN + "This land now belongs to "+newOwner);
+                                } catch (Exception e) {
+                                    player.sendMessage(ChatColor.RED + "Could not get uuid of "+ newOwner);
+                                }
+                            }
+                        });
+
+                    }else if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
     					player.sendMessage(ChatColor.RED + "You already own this land!");
     				} else {
     					// Rename land
