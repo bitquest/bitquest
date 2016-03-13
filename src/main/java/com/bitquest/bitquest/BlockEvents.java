@@ -119,7 +119,7 @@ public class BlockEvents implements Listener {
         List<Block> blocks = event.getBlocks();
         BlockFace direction = event.getDirection();
 
-        if (blocks != null) {
+        if (!blocks.isEmpty()) {
             Block lastBlock = blocks.get(blocks.size() - 1);
             Block nextBlock = lastBlock.getRelative(direction);
 
