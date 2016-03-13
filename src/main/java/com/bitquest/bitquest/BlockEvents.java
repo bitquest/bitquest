@@ -138,5 +138,30 @@ public class BlockEvents implements Listener {
             }
         }
     }
-	
+
+    @EventHandler
+    void onPistonRetract(BlockPistonRetractEvent event) {
+        Block piston = event.getBlock();
+        BlockFace direction = event.getDirection();
+        Block nextBlock = piston.getRelative(direction, -2); // Direction is inverted?
+
+        if (event.isSticky()) {
+            Chunk pistonChunk = piston.getChunk();
+            Chunk blockChunk = nextBlock.getChunk();
+
+            String owner1, owner2;
+            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+                    if (!owner1.equals(owner2)){
+                        event.setCancelled(true);
+                        piston.getRelative(event.getDirection()).setType(Material.AIR);
+                    }
+                } else {
+                    event.setCancelled(true);
+                    piston.getRelative(event.getDirection()).setType(Material.AIR);
+                }
+            }
+        }
+    }
+
 }
