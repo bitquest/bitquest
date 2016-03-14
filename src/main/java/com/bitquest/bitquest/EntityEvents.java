@@ -70,7 +70,7 @@ public class EntityEvents implements Listener {
         // None of this actually changes the bitquest xp anyway, so just make
         // things look correct for the user. This only works for the enchantment table,
         // not the anvil.
-        event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.getExpLevelCost());
+        event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.whichButton() + 1);
         
     }
 
