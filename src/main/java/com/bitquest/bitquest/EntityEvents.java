@@ -709,9 +709,9 @@ public class EntityEvents implements Listener {
         Material[] protectedBlocks = {
                 Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
                 Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
-                Material.FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE,
-                Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER,
-                Material.DROPPER
+                Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
+                Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE,
+                Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER
         };
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
