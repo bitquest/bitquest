@@ -5,22 +5,14 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.Sign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockBurnEvent;
-import org.bukkit.event.block.BlockExpEvent;
-import org.bukkit.event.block.BlockIgniteEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.block.BlockSpreadEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
@@ -120,5 +112,56 @@ public class BlockEvents implements Listener {
 
         
 	}
-	
+
+    @EventHandler
+    void onPistonExtends(BlockPistonExtendEvent event) {
+        Block piston = event.getBlock();
+        List<Block> blocks = event.getBlocks();
+        BlockFace direction = event.getDirection();
+
+        if (!blocks.isEmpty()) {
+            Block lastBlock = blocks.get(blocks.size() - 1);
+            Block nextBlock = lastBlock.getRelative(direction);
+
+            Chunk pistonChunk = piston.getChunk();
+            Chunk blockChunk = nextBlock.getChunk();
+
+            String owner1, owner2;
+            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+                    if (!owner1.equals(owner2)){
+                        event.setCancelled(true);
+                    }
+                } else {
+                    event.setCancelled(true);
+                }
+            }
+        }
+    }
+
+    @EventHandler
+    void onPistonRetract(BlockPistonRetractEvent event) {
+        Block piston = event.getBlock();
+        BlockFace direction = event.getDirection();
+        Block nextBlock = piston.getRelative(direction, -2); // Direction is inverted?
+
+        if (event.isSticky()) {
+            Chunk pistonChunk = piston.getChunk();
+            Chunk blockChunk = nextBlock.getChunk();
+
+            String owner1, owner2;
+            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+                    if (!owner1.equals(owner2)){
+                        event.setCancelled(true);
+                        piston.getRelative(event.getDirection()).setType(Material.AIR);
+                    }
+                } else {
+                    event.setCancelled(true);
+                    piston.getRelative(event.getDirection()).setType(Material.AIR);
+                }
+            }
+        }
+    }
+
 }
