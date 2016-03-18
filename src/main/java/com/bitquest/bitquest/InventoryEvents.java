@@ -72,45 +72,46 @@ public class InventoryEvents implements Listener {
         // Merchant inventory
         if(inventory.equals(marketInventory)) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
-        		
-        		BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-				scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-					@Override
-					public void run() {
-		        		ItemStack clicked = event.getCurrentItem();
-		                if(clicked.getType()!=Material.AIR) {
-		                    player.sendMessage(ChatColor.YELLOW+"Purchasing "+clicked.getType()+"...");
+                final ItemStack clicked = event.getCurrentItem();
+                if(clicked.getType()!=Material.AIR) {
+                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-		                    player.closeInventory();
-		                    event.setCancelled(true);
-		                    // TODO: try/catch
-		                    User user;
-		                    try {
-		                    	user = new User(player);
-								if(user.wallet.transaction(2000,bitQuest.wallet)==true) {
-								    ItemStack item = event.getCurrentItem();
-								    ItemMeta meta = item.getItemMeta();
-								    ArrayList<String> Lore = new ArrayList<String>();
-								    meta.setLore(null);
-								    item.setItemMeta(meta);
-								    player.getInventory().addItem(item);
-								    player.sendMessage(ChatColor.GREEN+""+clicked.getType()+" purchased");
-								} else {
-								    player.sendMessage(ChatColor.RED+"transaction failed");
-								}
-							} catch (IllegalArgumentException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
-							} catch (ParseException e) {
-								e.printStackTrace();
-							} catch (org.json.simple.parser.ParseException e) {
-								e.printStackTrace();
-							}
-		                }
-						;
-					}
-				});
+                    player.sendMessage(ChatColor.YELLOW + "Purchasing " + clicked.getType() + "...");
+
+                    player.closeInventory();
+                    event.setCancelled(true);
+                    scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                        @Override
+                        public void run() {
+
+                                // TODO: try/catch
+                                User user;
+                                try {
+                                    user = new User(player);
+                                    if (user.wallet.transaction(2000, bitQuest.wallet) == true) {
+                                        ItemStack item = event.getCurrentItem();
+                                        ItemMeta meta = item.getItemMeta();
+                                        ArrayList<String> Lore = new ArrayList<String>();
+                                        meta.setLore(null);
+                                        item.setItemMeta(meta);
+                                        player.getInventory().addItem(item);
+                                        player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "transaction failed");
+                                    }
+                                } catch (IllegalArgumentException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                        }
+                    });
+                }
         		
         	} else {
         		event.setCancelled(true);
