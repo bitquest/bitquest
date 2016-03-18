@@ -336,7 +336,7 @@ public class BitQuest extends JavaPlugin {
 							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 							for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 System.out.println(offlinePlayer);
-								if(offlinePlayer.getPlayer().getName()!=null && args[1]!=null && offlinePlayer.getPlayer().getName().equals(args[1])) {
+								if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
 									final Wallet finalFromWallet = fromWallet;
 									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 				    				scheduler.runTaskAsynchronously(this, new Runnable() {
