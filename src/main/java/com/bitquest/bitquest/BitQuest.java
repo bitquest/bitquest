@@ -86,8 +86,28 @@ public class BitQuest extends JavaPlugin {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
         
-        
-        
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getServer().getOnlinePlayers()){
+                    User user= null;
+                    System.out.println(player);
+                    try {
+                        user = new User(player);
+                        user.updateScoreboard();
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }, 0, 300L);
+
     }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);

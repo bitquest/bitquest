@@ -31,15 +31,19 @@ public class User {
             generateBitcoinAddress();
         }
         this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+
     }
+
     // scoreboard objectives and teams
     public ScoreboardManager scoreboardManager;
     public Scoreboard walletScoreboard;
     // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
     public Objective walletScoreboardObjective;
+    public void createScoreBoard() {
+        scoreboardManager = Bukkit.getScoreboardManager();
+        walletScoreboard= scoreboardManager.getNewScoreboard();
+        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+    }
 
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("exp"+this.player.getUniqueId().toString(),exp);
@@ -55,11 +59,14 @@ public class User {
         }
     }
     public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        score.setScore(new User(player).wallet.balance()/100);
-        player.setScoreboard(walletScoreboard);
+        if(walletScoreboardObjective!=null) {
+            walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+            Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+            score.setScore(new User(player).wallet.balance()/100);
+            player.setScoreboard(walletScoreboard);
+        }
+
     }
 
     public void updateLevels() {

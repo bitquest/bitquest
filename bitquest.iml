@@ -19,7 +19,7 @@
     <orderEntry type="library" name="Gradle: org.apache.commons:commons-pool2:2.3" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: junit:junit:4.11" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: org.hamcrest:hamcrest-core:1.3" level="project" />
-    <orderEntry type="library" name="commons-codec-1.9" level="project" />
-    <orderEntry type="library" name="spigot-api-1.9-R0.1-SNAPSHOT-shaded" level="project" />
+    <orderEntry type="library" name="Gradle: org.bukkit:spigot-api:1.9-R0.1-SNAPSHOT-shaded" level="project" />
+    <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.9" level="project" />
   </component>
 </module>
