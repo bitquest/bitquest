@@ -33,7 +33,7 @@ public class Wallet {
     private String privatekey=null;
     int balance() throws IOException, ParseException {
         // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
-        URL url = new URL("https://blockchain.info/address/"+address+"?format=json");
+        URL url = new URL("https://blockchain.info/address/"+address+"?format=json&limit=1");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
