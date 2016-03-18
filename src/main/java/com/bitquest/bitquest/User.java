@@ -59,9 +59,7 @@ public class User {
         }
     }
     public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+
         if(walletScoreboardObjective!=null) {
             walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
             walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
