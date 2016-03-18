@@ -101,11 +101,11 @@ public class BitQuest extends JavaPlugin {
                     } catch (org.json.simple.parser.ParseException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        // TODO: Handle blockcypher rate limiting
                     }
                 }
             }
-        }, 0, 100L);
+        }, 0, 200L);
 
     }
     public void log(String msg) {
