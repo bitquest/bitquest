@@ -43,6 +43,7 @@ public class User {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+
     }
 
     public void addExperience(int exp) {
@@ -59,14 +60,15 @@ public class User {
         }
     }
     public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-
-        if(walletScoreboardObjective!=null) {
+        if (walletScoreboardObjective == null) {
+            createScoreBoard();
+        }
             walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
             walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
             Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
             score.setScore(wallet.balance()/100);
             player.setScoreboard(walletScoreboard);
-        }
+
 
     }
 

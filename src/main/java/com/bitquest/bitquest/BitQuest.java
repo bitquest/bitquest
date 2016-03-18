@@ -101,7 +101,7 @@ public class BitQuest extends JavaPlugin {
                     } catch (org.json.simple.parser.ParseException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
-                        // TODO: Handle blockcypher rate limiting
+                        // TODO: Handle rate limiting
                     }
                 }
             }
@@ -335,7 +335,8 @@ public class BitQuest extends JavaPlugin {
 						if(fromWallet != null && fromWallet.balance() >= sendAmount) {
 							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 							for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-								if(offlinePlayer.getPlayer().getName().equals(args[0])) {
+                                System.out.println(offlinePlayer);
+								if(offlinePlayer.getPlayer().getName()!=null && args[1]!=null && offlinePlayer.getPlayer().getName().equals(args[1])) {
 									final Wallet finalFromWallet = fromWallet;
 									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 				    				scheduler.runTaskAsynchronously(this, new Runnable() {
@@ -360,6 +361,9 @@ public class BitQuest extends JavaPlugin {
 											}
 				    					}
 				    				});
+                                    User user=new User(player);
+                                    user.createScoreBoard();
+                                    user.updateScoreboard();
 					            	return true;
 								}
 							}
@@ -396,7 +400,9 @@ public class BitQuest extends JavaPlugin {
 						e.printStackTrace();
 					} catch (org.json.simple.parser.ParseException e) {
 						e.printStackTrace();
-					}
+					} catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
                 return false;
             }
