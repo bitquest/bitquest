@@ -60,7 +60,6 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {    
         event.setAmount(0);
-        new User(event.getPlayer()).updateLevels();
     }
     
     @EventHandler
@@ -79,8 +78,9 @@ public class EntityEvents implements Listener {
         Player player=event.getPlayer();
         User user = new User(player);
         // check and set experience
-        player.setTotalExperience((Integer) user.experience());
-        user.updateLevels();
+        // player.setTotalExperience((Integer) user.experience());
+        user.setTotalExperience((Integer) user.experience());
+        // user.updateLevels();
         user.createScoreBoard();
         user.updateScoreboard();
 
@@ -235,14 +235,14 @@ public class EntityEvents implements Listener {
         int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
-            if (entity.hasMetadata("level")) {
-                level = entity.getMetadata("level").get(0).asInt();
-            }
+           // if (entity.hasMetadata("level")) {
+            //    level = entity.getMetadata("level").get(0).asInt();
+            // }
 
 
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
-                if (damage.getDamager() instanceof Player && level >= 2) {
+                if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
                     // maximum loot in SAT is level*1000
@@ -282,8 +282,7 @@ public class EntityEvents implements Listener {
                     }
                     
                     // calculate and add experience
-                    int exp = (level * 128);
-                    user.addExperience(exp);
+                    user.addExperience(level);
                 }
 
             } else {
@@ -570,9 +569,6 @@ public class EntityEvents implements Listener {
 
 
 
-                if (finaldamage > 0 && factor > 0) {
-                    (new User(player)).addExperience(damagedlevel * factor);
-                }
 
             }
         } else {
