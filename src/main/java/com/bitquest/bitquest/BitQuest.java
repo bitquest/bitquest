@@ -94,6 +94,7 @@ public class BitQuest extends JavaPlugin {
                     User user= null;
                     try {
                         user = new User(player);
+                        user.createScoreBoard();
                         user.updateScoreboard();
 
                     } catch (ParseException e) {
