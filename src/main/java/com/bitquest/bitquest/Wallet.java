@@ -35,11 +35,10 @@ public class Wallet {
     private String privatekey=null;
     int balance() throws IOException, ParseException {
         Random random = new Random();
-
-        URL url = new URL("https://blockchain.info/address/"+address+"?format=json&limit=1");
+        URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
 
             if (random.nextBoolean()) {
-                url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+                // url = new URL("https://blockchain.info/address/"+address+"?format=json&limit=1");
 
             }
         // System.out.println(url.toString());

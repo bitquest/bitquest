@@ -106,7 +106,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 200L);
+        }, 0, 2000L);
 
     }
     public void log(String msg) {
