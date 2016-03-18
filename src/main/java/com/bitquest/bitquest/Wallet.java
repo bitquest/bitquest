@@ -2,6 +2,7 @@ package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.SystemUtils;
 import org.bukkit.Bukkit;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -17,6 +18,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Random;
 
 /**
  * Created by cristian on 12/15/15.
@@ -32,8 +34,15 @@ public class Wallet {
     public String address=null;
     private String privatekey=null;
     int balance() throws IOException, ParseException {
-        // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+        Random random = new Random();
+
         URL url = new URL("https://blockchain.info/address/"+address+"?format=json&limit=1");
+
+            if (random.nextBoolean()) {
+                url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+
+            }
+        // System.out.println(url.toString());
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
