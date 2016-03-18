@@ -92,7 +92,6 @@ public class BitQuest extends JavaPlugin {
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()){
                     User user= null;
-                    System.out.println(player);
                     try {
                         user = new User(player);
                         user.updateScoreboard();
