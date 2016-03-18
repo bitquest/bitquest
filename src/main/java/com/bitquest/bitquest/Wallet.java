@@ -39,9 +39,6 @@ public class Wallet {
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
         int responseCode = con.getResponseCode();
-        // System.out.println("\nSending 'POST' request to URL : " + url);
-        // System.out.println("Post parameters : " + urlParameters);
-        // System.out.println("Response Code : " + responseCode);
 
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
@@ -53,9 +50,7 @@ public class Wallet {
         }
         in.close();
 
-        //print result
         JSONParser parser = new JSONParser();
-        // System.out.println(response.toString());
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
         return ((Number) jsonobj.get("final_balance")).intValue();
     }

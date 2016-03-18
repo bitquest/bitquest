@@ -86,14 +86,7 @@ public class BitQuest extends JavaPlugin {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
         
-        // TODO: This can be removed once we're out of beta testing
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                Bukkit.broadcastMessage(ChatColor.DARK_RED + ChatColor.BOLD.toString() + "NOTICE > " + ChatColor.RED + "The BetaQuest world will be reset once testing is finished.");
-            }
-        }, 0, 6000L);
+        
         
     }
     public void log(String msg) {
