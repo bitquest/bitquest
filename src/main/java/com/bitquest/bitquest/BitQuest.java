@@ -85,6 +85,7 @@ public class BitQuest extends JavaPlugin {
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
         }
+        REDIS.configSet("SAVE","900 1 300 10 60 10000");
         
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
