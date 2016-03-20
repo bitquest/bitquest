@@ -48,15 +48,15 @@ public class User {
     }
 
     public void addExperience(int exp) {
-        BitQuest.REDIS.incrBy("experience."+this.player.getUniqueId().toString(),exp);
+        BitQuest.REDIS.incrBy("experience.raw."+this.player.getUniqueId().toString(),exp);
         setTotalExperience(experience());
 
     }
     public int experience() {
-        if(BitQuest.REDIS.get("experience."+this.player.getUniqueId().toString())==null) {
+        if(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString())==null) {
             return 0;
         } else {
-            return Integer.parseInt(BitQuest.REDIS.get("experience."+this.player.getUniqueId().toString()));
+            return Integer.parseInt(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString()));
         }
     }
     public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -71,7 +71,11 @@ public class User {
 
 
     }
-    public void setTotalExperience(int xp) {
+    public void setTotalExperience(int rawxp) {
+        // xp = the square root of raw exp
+        int xp = (int)Math.sqrt((double)rawxp);
+        if(xp<1) xp=1;
+       // System.out.println(xp);
         /*
         AUTHOR: Dev_Richard (https://www.spigotmc.org/members/dev_richard.38792/)
         DESC: A simple and easy to use class that can get and set a player's total experience points.
@@ -88,8 +92,8 @@ public class User {
             int experienceNeeded = (2 * level) + 7;
             float experience = (float) remainder / (float) experienceNeeded;
             experience = round(experience, 2);
-            System.out.println("xpForLevel: " + xpForLevel);
-            System.out.println(experience);
+           // System.out.println("xpForLevel: " + xpForLevel);
+           // System.out.println(experience);
 
             //Set Everything
             player.setLevel(level);
