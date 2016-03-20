@@ -13,6 +13,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -75,6 +76,7 @@ public class BitQuest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
         getServer().getPluginManager().registerEvents(new SignEvents(this), this);
+        getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
 
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
@@ -110,6 +112,7 @@ public class BitQuest extends JavaPlugin {
         }, 0, 2000L);
 
     }
+
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
