@@ -87,7 +87,8 @@ public class InventoryEvents implements Listener {
                                 User user;
                                 try {
                                     user = new User(player);
-                                    if (user.wallet.transaction(2000, bitQuest.wallet) == true) {
+                                    // TODO: use the SAT amount from the Trade object
+                                    if (user.wallet.transaction(10000, bitQuest.wallet) == true) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
                                         ArrayList<String> Lore = new ArrayList<String>();
