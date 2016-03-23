@@ -1,30 +1,31 @@
 # BitQuest
 
-[BitQuest](http://bitquest.co/) is an initiative to make a Bitcoin-denominated Minecraft server with MMORPG elements, as the form of a plugin. To play the last version of BitQuest go to ```Multiplayer->Add Server``` and add this server address 
+[BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements, as the form of a plugin. 
+
+# Play BitQuest
+To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address: 
 ```sh
-beta.bitquest.co
+play.bitquest.co
 ```
 
 
 # How it works?
-## Everyone have a wallet
-The [BitQuest](https://bitquest.co/) server and every player and have it's own bitcoin wallet with one address. Any player can receive and send bitcoin to any address (even outside the game) making on-chain transactions.
+## Everyone is a Bitcoin wallet
+The [BitQuest](https://bitquest.co/) server and every player has a bitcoin address. Any player can receive and send bitcoin to any address inside or outside the game. This is useful for buying materials, selling crafts, trading, tipping, etcetera.
 ![A player just joined the server](http://i.imgur.com/1A6wkaB.png)
 ![The playercan see it's bitcoin balance](http://i.imgur.com/5g5pBXB.png)
-Thanks to the open nature of bitcoin players can even watch it's transaction history looking for they address in any blockchain explorer like [Insight](https://insight.bitpay.com/) or [Blockchain.Info](https://blockchain.info/).
+Thanks to the open nature of Bitcoin, all transactions in the server can be seen on the Blockchain using tools like [Insight](https://insight.bitpay.com/) or [Blockchain.Info](https://blockchain.info/). This is helpful for debugging and transparency.
 
-## Everyone can get loot
+## And there's loot!
 Every time a player kills an enemy (mob) there is a chance to get loot. If that is the case the server makes a transaction directly from the server address to the player address and the player is notified.
 ![A player got loot](http://i.imgur.com/cxqXmt2.png)
 
 ## Everyone can send money anywhere
-To send transactions players can press ```t``` to open minecraft's command line and type:
+You can send Bitcoin to an outside wallet or other players using the Minecraft console command:
 ```sh
-/transfer <recipient-bitcoin-address>
+/transfer <amount> <recipient-bitcoin-address>
 ```
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
-This will make a bitcoin transaction to the recipient's address. That address could be the player personal one, another BitQuest player's one, the server's one or any other.
-
 ![Player notification](http://i.imgur.com/PHmomoS.png)
 ![Player's public transaction](http://i.imgur.com/JPO4AXt.png)
 Players can also send money using email instead of a bitcoin address using:
@@ -35,7 +36,7 @@ Players can also send money using email instead of a bitcoin address using:
 With this method the recipient will receive an email notifying that a bitcoin transaction has been made to a [XAPO wallet](https://xapo.com/wallet/) linked to his email.
 
 ## Server address
-Server address should be ideally always with bitcoin to transfer loot constantly to players. This address is also used to receive donations.
+The BitQuest server has it's own address, used for giving Loot to players
 
 ## About the back-end technology
 
