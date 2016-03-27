@@ -14,8 +14,7 @@ COPY server.properties /spigot/
 COPY build/libs/bitquest-all.jar /spigot/plugins/
 RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar
 # DOWNLOAD AND BUILD DOWNER
-RUN cd /tmp && git clone https://github.com/bitquest/downer.git
-RUN cd /tmp/downer && ./gradlew setupWorkspace && ./gradlew jar && cp build/libs/downer.jar /spigot/plugins/
+RUN cd /spigot/plugins/ && wget http://jenkins.bitquest.co/job/downer/lastSuccessfulBuild/artifact/build/libs/downer-1.0.jar
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 RUN cd /tmp && java -jar BuildTools.jar --rev 1.9
