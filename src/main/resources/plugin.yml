@@ -30,4 +30,4 @@ commands:
     usage: /claim
   emergencystop:
     description: "Stops the server cleanly in case of emergency"
-    usage: /emergencystop [reason]   
+    usage: /emergencystop [reason]
