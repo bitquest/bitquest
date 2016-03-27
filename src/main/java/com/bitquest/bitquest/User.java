@@ -28,10 +28,9 @@ public class User {
     private Player player;
     public User(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         this.player=player;
-        if(BitQuest.REDIS.get("public"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())==null||BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())==null) {
-            generateBitcoinAddress();
+        if(BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())!=null&&BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())!=null) {
+            this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         }
-        this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
 
     }
 
