@@ -355,7 +355,7 @@ public class BitQuest extends JavaPlugin {
 												Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
 
 												if(finalFromWallet.transaction(sendAmount, toWallet)) {
-									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to external address.");
+									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to "+offlinePlayer.getName()+".");
 									            	new User(player).updateScoreboard();
 												} else {
 									            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
