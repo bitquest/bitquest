@@ -59,7 +59,9 @@ public class BlockEvents implements Listener {
     	} else if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
 			event.setCancelled(true);
 			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
-        }
+        } else {
+			event.setCancelled(false);
+		}
     }
 	@EventHandler
 	void onBlockPlace(BlockPlaceEvent event) {
@@ -107,6 +109,8 @@ public class BlockEvents implements Listener {
 			} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
 				bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
     			event.setCancelled(true);
+			} else {
+				event.setCancelled(false);
 			}
 
         
