@@ -1,5 +1,7 @@
 package com.bitquest.bitquest;
 
+import com.mixpanel.mixpanelapi.ClientDelivery;
+import com.mixpanel.mixpanelapi.MixpanelAPI;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -30,6 +32,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -123,11 +126,24 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        System.out.println("onPlayerLogin");
+    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException, JSONException {
+
         Player player=event.getPlayer();
-        if(!event.getPlayer().hasPlayedBefore()) {
-            event.getPlayer().sendMessage("Welcome to BitQuest");
+        if(bitQuest.messageBuilder!=null) {
+
+            // Create an event
+            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
+            org.json.JSONObject props = new org.json.JSONObject();
+            props.put("$name", player.getName());
+            org.json.JSONObject update = bitQuest.messageBuilder.set(player.getUniqueId().toString(), props);
+
+
+            ClientDelivery delivery = new ClientDelivery();
+            delivery.addMessage(sentEvent);
+            delivery.addMessage(update);
+
+            MixpanelAPI mixpanel = new MixpanelAPI();
+            mixpanel.deliver(delivery);
         }
         if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
 
@@ -172,6 +188,8 @@ public class EntityEvents implements Listener {
         if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString())==null||BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString())==null) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later.");
         }
+
+
     }
 
     @EventHandler

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import com.mixpanel.mixpanelapi.MessageBuilder;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -39,15 +40,14 @@ public class BitQuest extends JavaPlugin {
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
-    // Support statsd
+    // Support for statsd is planned but not implemented
     public final static String STATSD_HOST = System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
     public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : null;
     public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : null;
-
-    // If env MOD_OPS exists, server automatically ops moderators
-
-    // public final static String MOD_OPS = System.getenv("MOD_OPS") != null ? System.getenv("MOD_OPS") : null;
-    // Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
+    // Support for mixpanel analytics
+    public final static String MIXPANEL_TOKEN = System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
+    public MessageBuilder messageBuilder;
+    // REDIS: Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
@@ -95,7 +95,10 @@ public class BitQuest extends JavaPlugin {
             System.out.println("Warning: world wallet address not defined in environment");
         }
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
-        
+        if(MIXPANEL_TOKEN!=null) {
+            messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
+            System.out.println("Mixpanel support is on");
+        }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
