@@ -1,6 +1,8 @@
 package com.bitquest.bitquest;
 
 import com.evilmidget38.UUIDFetcher;
+import com.mixpanel.mixpanelapi.ClientDelivery;
+import com.mixpanel.mixpanelapi.MixpanelAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -62,7 +64,18 @@ public class SignEvents implements Listener {
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
     								player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-    								new User(player).updateScoreboard();
+									if(bitQuest.messageBuilder!=null) {
+
+										// Create an event
+										org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+
+
+										ClientDelivery delivery = new ClientDelivery();
+										delivery.addMessage(sentEvent);
+
+										MixpanelAPI mixpanel = new MixpanelAPI();
+										mixpanel.deliver(delivery);
+									}
     							} else {
     								int balance = new User(player).wallet.balance();
     								if (balance < bitQuest.LAND_PRICE) {

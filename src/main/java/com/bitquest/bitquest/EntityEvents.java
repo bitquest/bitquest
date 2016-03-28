@@ -329,6 +329,18 @@ public class EntityEvents implements Listener {
                                     if(bitQuest.wallet.transaction(money,user.wallet)==true) {
                                         player.sendMessage(ChatColor.GREEN+"You got "+ChatColor.BOLD+money/100+ChatColor.GREEN+" bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                        if(bitQuest.messageBuilder!=null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+
+
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
+
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
                                     }
                                     try {
                                         user.updateScoreboard();
@@ -346,6 +358,18 @@ public class EntityEvents implements Listener {
 
                     // calculate and add experience
                     user.addExperience(level);
+                    if(bitQuest.messageBuilder!=null) {
+
+                        // Create an event
+                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
+
+
+                        ClientDelivery delivery = new ClientDelivery();
+                        delivery.addMessage(sentEvent);
+
+                        MixpanelAPI mixpanel = new MixpanelAPI();
+                        mixpanel.deliver(delivery);
+                    }
                 }
 
             } else {

@@ -1,6 +1,8 @@
 package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
+import com.mixpanel.mixpanelapi.ClientDelivery;
+import com.mixpanel.mixpanelapi.MixpanelAPI;
 import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -98,6 +100,18 @@ public class InventoryEvents implements Listener {
                                         item.setItemMeta(meta);
                                         player.getInventory().addItem(item);
                                         player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                        if(bitQuest.messageBuilder!=null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+
+
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
+
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
                                     } else {
                                         player.sendMessage(ChatColor.RED + "transaction failed");
                                     }
