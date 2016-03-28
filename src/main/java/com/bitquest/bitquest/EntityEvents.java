@@ -19,13 +19,21 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.permissions.BroadcastPermissions;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by explodi on 11/7/15.
@@ -117,6 +125,10 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         System.out.println("onPlayerLogin");
+        Player player=event.getPlayer();
+        if(!event.getPlayer().hasPlayedBefore()) {
+            event.getPlayer().sendMessage("Welcome to BitQuest");
+        }
         if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
 
             User user = new User(event.getPlayer());
@@ -124,9 +136,37 @@ public class EntityEvents implements Listener {
         } else {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
-        if(event.getPlayer().hasPlayedBefore()==false) {
-            User user=new User(event.getPlayer());
-            user.generateBitcoinAddress();
+        if(bitQuest.REDIS.get("private"+player.getUniqueId().toString())==null) {
+            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setDoOutput(true);
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+            wr.flush();
+            wr.close();
+            int responseCode = con.getResponseCode();
+            // System.out.println("\nSending 'POST' request to URL : " + url);
+            // System.out.println("Post parameters : " + urlParameters);
+            // System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            JSONParser parser = new JSONParser();
+            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+            System.out.println(response.toString());
+            BitQuest.REDIS.set("private"+player.getUniqueId().toString(), (String) jsonobj.get("private"));
+            BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
+            BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
         }
         if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString())==null||BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString())==null) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later.");
