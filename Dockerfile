@@ -9,8 +9,7 @@ RUN apt-get install -y oracle-java8-set-default
 RUN apt-get install -y git
 RUN mkdir /spigot
 RUN mkdir /spigot/plugins
-COPY server.properties /spigot/
-COPY build/libs/bitquest-all.jar /spigot/plugins/
+WORKDIR /spigot
 RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar
 # DOWNLOAD AND BUILD DOWNER
 RUN cd /spigot/plugins/ && wget http://jenkins.bitquest.co/job/downer/lastSuccessfulBuild/artifact/build/libs/downer-1.0.jar
@@ -18,7 +17,8 @@ RUN cd /spigot/plugins/ && wget http://jenkins.bitquest.co/job/downer/lastSucces
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 RUN cd /tmp && java -jar BuildTools.jar --rev 1.9
 RUN cp /tmp/Spigot/Spigot-Server/target/spigot-1.9-R0.1-SNAPSHOT.jar /spigot/spigot.jar
-WORKDIR /spigot
-RUN echo "eula=true" > eula.txt
+RUN cd /spigot && echo "eula=true" > eula.txt
 # COPY server-icon.png /spigot/
+COPY server.properties /spigot/
+COPY build/libs/bitquest-all.jar /spigot/plugins/
 CMD java -jar spigot.jar
