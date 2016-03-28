@@ -137,6 +137,7 @@ public class EntityEvents implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
         if(bitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&bitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
+            System.out.println("Generating new address...")
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -149,7 +150,7 @@ public class EntityEvents implements Listener {
             int responseCode = con.getResponseCode();
             // System.out.println("\nSending 'POST' request to URL : " + url);
             // System.out.println("Post parameters : " + urlParameters);
-            // System.out.println("Response Code : " + responseCode);
+            System.out.println("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
