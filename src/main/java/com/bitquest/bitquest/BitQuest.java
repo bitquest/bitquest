@@ -90,6 +90,9 @@ public class BitQuest extends JavaPlugin {
         }
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
+            System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
+        } else {
+            System.out.println("Warning: world wallet address not defined in environment");
         }
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
         

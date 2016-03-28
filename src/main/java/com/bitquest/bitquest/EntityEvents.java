@@ -137,7 +137,7 @@ public class EntityEvents implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
         if(bitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&bitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
-            System.out.println("Generating new address...")
+            System.out.println("Generating new address...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("POST");
@@ -300,7 +300,7 @@ public class EntityEvents implements Listener {
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
-                    if(d20==20 && money>10000) {
+//                    if(d20==20 && money>10000) {
 
                     	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
@@ -325,8 +325,7 @@ public class EntityEvents implements Listener {
                         	}
                     	});
 
-                    }
-                    
+
                     // calculate and add experience
                     user.addExperience(level);
                 }
