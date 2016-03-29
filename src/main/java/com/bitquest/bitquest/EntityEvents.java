@@ -147,7 +147,8 @@ public class EntityEvents implements Listener {
         event.getPlayer().sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
         event.getPlayer().sendMessage(ChatColor.YELLOW+"There's tons of useful stuff there!");
         event.getPlayer().sendMessage("");
-        event.getPlayer().sendMessage(ChatColor.BLUE+" "+ChatColor.UNDERLINE+"    http://wiki.bitquest.co");
+        event.getPlayer().sendMessage(ChatColor.BLUE+"     "+ChatColor.UNDERLINE+"http://wiki.bitquest.co");
+        event.getPlayer().sendMessage("");
 
     }
 
