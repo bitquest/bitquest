@@ -194,23 +194,25 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        // announce new area
-        int x1=event.getFrom().getChunk().getX();
-        int z1=event.getFrom().getChunk().getZ();
+        if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
+            // announce new area
+            int x1=event.getFrom().getChunk().getX();
+            int z1=event.getFrom().getChunk().getZ();
 
-        int x2=event.getTo().getChunk().getX();
-        int z2=event.getTo().getChunk().getZ();
+            int x2=event.getTo().getChunk().getX();
+            int z2=event.getTo().getChunk().getZ();
 
-        String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-        String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+            String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+            String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-        if(name1==null) name1="the wilderness";
-        if(name2==null) name2="the wilderness";
+            if(name1==null) name1="the wilderness";
+            if(name2==null) name2="the wilderness";
 
-        if(name1.equals(name2)==false) {
-            event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+            if(name1.equals(name2)==false) {
+                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+            }
         }
-        event.getFrom();
+
     }
 
     @EventHandler

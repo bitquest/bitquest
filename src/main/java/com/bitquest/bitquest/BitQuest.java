@@ -186,15 +186,9 @@ public class BitQuest extends JavaPlugin {
     }
 
     public boolean isModerator(Player player) {
-            Set<String> moderators=REDIS.smembers("moderators");
-
-            for(String uuid : moderators) {
-
-                if(player.getUniqueId().toString().equals(uuid)) {
-                    return true;
-                }
-            }
-            if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+            if(REDIS.sismember("moderators",player.getUniqueId().toString())==true) {
+                return true;
+            } else if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
                 return true;
             }
             return false;
