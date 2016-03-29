@@ -128,6 +128,7 @@ public class EntityEvents implements Listener {
             org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
             org.json.JSONObject props = new org.json.JSONObject();
             props.put("$name", player.getName());
+            props.put("$ip",player.getAddress());
             org.json.JSONObject update = bitQuest.messageBuilder.set(player.getUniqueId().toString(), props);
 
 
