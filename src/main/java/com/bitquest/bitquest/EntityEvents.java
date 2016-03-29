@@ -122,13 +122,17 @@ public class EntityEvents implements Listener {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 300L);
+        String ip=player.getAddress().toString().split("/")[0].split(":")[0];
+        System.out.println("User "+player.getName()+"logged in with IP "+ip);
+        bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         if(bitQuest.messageBuilder!=null) {
 
             // Create an event
             org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
             org.json.JSONObject props = new org.json.JSONObject();
             props.put("$name", player.getName());
-            props.put("$ip",player.getAddress());
+
+            props.put("$ip",ip);
             org.json.JSONObject update = bitQuest.messageBuilder.set(player.getUniqueId().toString(), props);
 
 
@@ -139,6 +143,11 @@ public class EntityEvents implements Listener {
             MixpanelAPI mixpanel = new MixpanelAPI();
             mixpanel.deliver(delivery);
         }
+        event.getPlayer().sendMessage("");
+        event.getPlayer().sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
+        event.getPlayer().sendMessage(ChatColor.YELLOW+"There's tons of useful stuff there!");
+        event.getPlayer().sendMessage("");
+        event.getPlayer().sendMessage(ChatColor.BLUE+" "+ChatColor.UNDERLINE+"    http://wiki.bitquest.co");
 
     }
 
