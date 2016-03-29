@@ -85,8 +85,9 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException {
+    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         Player player=event.getPlayer();
+
         User user = new User(player);
         // check and set experience
         // player.setTotalExperience((Integer) user.experience());
@@ -121,14 +122,6 @@ public class EntityEvents implements Listener {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 300L);
-
-
-    }
-
-    @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException, JSONException {
-
-        Player player=event.getPlayer();
         if(bitQuest.messageBuilder!=null) {
 
             // Create an event
@@ -145,6 +138,14 @@ public class EntityEvents implements Listener {
             MixpanelAPI mixpanel = new MixpanelAPI();
             mixpanel.deliver(delivery);
         }
+
+    }
+
+    @EventHandler
+    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+
+        Player player=event.getPlayer();
+
         if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
 
             User user = new User(event.getPlayer());
