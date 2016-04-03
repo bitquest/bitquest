@@ -373,7 +373,7 @@ public class EntityEvents implements Listener {
 
 
                     // calculate and add experience
-                    user.addExperience(level);
+                    user.addExperience(bitQuest.rand(level*2, level*3));
                     if(bitQuest.messageBuilder!=null) {
 
                         // Create an event
