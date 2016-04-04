@@ -416,19 +416,18 @@ public class EntityEvents implements Listener {
 
 
                 int level = 1;
-
                 // give a random lvl depending on world
-                if (world.getName().endsWith("_nether") == true) {
-                    level = BitQuest.rand(32, 64);
-                } else if (world.getName().endsWith("_end") == true) {
-                    level = BitQuest.rand(8, 32);
-                } else {
-                	int distanceLevel = (int) Math.min(Math.ceil(e.getLocation().distance(world.getSpawnLocation())/250), 20);
-                    int offset = bitQuest.rand(-2, 2);
-                	level = Math.max(distanceLevel + offset, 1);
-                    
-                }
+                int distanceLevel = (int)Math.ceil(e.getLocation().distance(world.getSpawnLocation())/256);
 
+                if (world.getName().endsWith("_nether") == true) {
+                    level = Math.min(BitQuest.rand(0, distanceLevel*2),64);
+                } else if (world.getName().endsWith("_end") == true) {
+                    level = Math.min(BitQuest.rand(0, distanceLevel*4),128);
+                } else {
+                    level = Math.min(BitQuest.rand(0, distanceLevel),32);
+                }
+                if(level<1) level=1;
+                
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
