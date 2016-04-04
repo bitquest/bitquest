@@ -35,12 +35,9 @@ public class Wallet {
     private String privatekey=null;
     int balance() throws IOException, ParseException {
         Random random = new Random();
-        URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+       // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+        URL url=new URL("https://bitcoin.toshi.io/api/v0/addresses/"+address);
 
-            if (random.nextBoolean()) {
-                // url = new URL("https://blockchain.info/address/"+address+"?format=json&limit=1");
-
-            }
         // System.out.println(url.toString());
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -61,7 +58,9 @@ public class Wallet {
 
         JSONParser parser = new JSONParser();
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-        return ((Number) jsonobj.get("final_balance")).intValue();
+//        return ((Number) jsonobj.get("final_balance")).intValue();
+        return ((Number) jsonobj.get("balance")).intValue();
+
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {
         JsonObject payload=new JsonObject();

@@ -417,7 +417,7 @@ public class EntityEvents implements Listener {
 
                 int level = 1;
                 // give a random lvl depending on world
-                int distanceLevel = (int)Math.ceil(e.getLocation().distance(world.getSpawnLocation())/256);
+                int distanceLevel = (int)Math.ceil(e.getLocation().distance(world.getSpawnLocation())/128);
 
                 if (world.getName().endsWith("_nether") == true) {
                     level = Math.min(BitQuest.rand(0, distanceLevel*2),64);
