@@ -54,8 +54,9 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),10000));
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),10000));
-        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,64),50000));
+//        will be re enabled with a different price
+//        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),10000));
+        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),50000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),10000));
         trades.add(new Trade(new ItemStack(Material.SOUL_SAND,16),10000));
         trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),10000));
