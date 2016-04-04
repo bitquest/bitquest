@@ -208,7 +208,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
+        if(event.getFrom().getWorld().getName().endsWith("_nether") == false && event.getFrom().getWorld().getName().endsWith("_end") == false && event.getFrom().getChunk()!=event.getTo().getChunk()) {
             // announce new area
             int x1=event.getFrom().getChunk().getX();
             int z1=event.getFrom().getChunk().getZ();
