@@ -24,6 +24,8 @@ import java.util.Random;
  * Created by cristian on 12/15/15.
  */
 public class Wallet {
+    public int balance;
+    public int confirmedBalance;
     public Wallet(String address,String privatekey) {
         this.address=address;
         this.privatekey=privatekey;
@@ -34,6 +36,10 @@ public class Wallet {
     public String address=null;
     private String privatekey=null;
     int balance() throws IOException, ParseException {
+        this.updateBalance();
+        return this.balance;
+    }
+    void updateBalance() throws IOException, ParseException {
         Random random = new Random();
        // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
         URL url=new URL("https://bitcoin.toshi.io/api/v0/addresses/"+address);
@@ -59,7 +65,8 @@ public class Wallet {
         JSONParser parser = new JSONParser();
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
 //        return ((Number) jsonobj.get("final_balance")).intValue();
-        return ((Number) jsonobj.get("unconfirmed_balance")).intValue();
+        this.balance=((Number) jsonobj.get("unconfirmed_balance")).intValue();
+        this.confirmedBalance=((Number) jsonobj.get("balance")).intValue();
 
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {

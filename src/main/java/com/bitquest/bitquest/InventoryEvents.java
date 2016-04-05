@@ -118,7 +118,12 @@ public class InventoryEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "transaction failed");
+                                        user.wallet.updateBalance();
+                                        if(user.wallet.balance>user.wallet.confirmedBalance) {
+                                            player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
+                                        }
                                     }
                                 } catch (IllegalArgumentException e) {
                                     e.printStackTrace();
