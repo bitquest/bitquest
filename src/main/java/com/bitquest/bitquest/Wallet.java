@@ -35,8 +35,14 @@ public class Wallet {
     }
     public String address=null;
     private String privatekey=null;
-    int balance() throws IOException, ParseException {
-        this.updateBalance();
+    int balance() {
+        try {
+            this.updateBalance();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return this.balance;
     }
     void updateBalance() throws IOException, ParseException {
