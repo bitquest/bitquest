@@ -59,7 +59,7 @@ public class Wallet {
         JSONParser parser = new JSONParser();
         final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
 //        return ((Number) jsonobj.get("final_balance")).intValue();
-        return ((Number) jsonobj.get("balance")).intValue();
+        return ((Number) jsonobj.get("unconfirmed_balance")).intValue();
 
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {
