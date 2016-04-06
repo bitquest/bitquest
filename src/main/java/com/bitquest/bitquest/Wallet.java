@@ -39,11 +39,11 @@ public class Wallet {
         try {
             this.updateBalance();
         } catch (IOException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         } catch (ParseException e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
-        return this.balance;
+        return this.balance+this.confirmedBalance;
     }
     void updateBalance() throws IOException, ParseException {
         Random random = new Random();
