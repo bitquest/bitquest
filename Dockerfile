@@ -12,7 +12,9 @@ RUN mkdir /spigot/plugins
 WORKDIR /spigot
 RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar
 # DOWNLOAD AND BUILD DOWNER
-RUN cd /spigot/plugins/ && wget http://jenkins.bitquest.co/job/downer/lastSuccessfulBuild/artifact/build/libs/downer-1.0.jar
+RUN cd /tmp && git clone https://github.com/bitquest/downer.git
+RUN cd /tmp/downer && ./gradlew setupWorkspace && ./gradlew build
+RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 RUN cd /tmp && java -jar BuildTools.jar --rev 1.9
@@ -23,4 +25,4 @@ COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
 COPY build/libs/bitquest-all.jar /spigot/plugins/
-CMD -Xmx8G -Xms8G -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=45 -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:InitiatingHeapOccupancyPercent=10 -XX:G1MixedGCLiveThresholdPercent=50 -XX:+AggressiveOpts -jar spigot.jar
+CMD java -Xmx8G -Xms8G -XX:+AlwaysPreTouch -XX:+DisableExplicitGC -XX:+UseG1GC -XX:+UnlockExperimentalVMOptions -XX:MaxGCPauseMillis=45 -XX:TargetSurvivorRatio=90 -XX:G1NewSizePercent=50 -XX:G1MaxNewSizePercent=80 -XX:InitiatingHeapOccupancyPercent=10 -XX:G1MixedGCLiveThresholdPercent=50 -XX:+AggressiveOpts -jar spigot.jar
