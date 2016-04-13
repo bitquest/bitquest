@@ -106,5 +106,5 @@ world-settings:
     arrow-despawn-rate: 1200
     enable-zombie-pigmen-portal-spawns: true
     wither-spawn-sound-radius: 0
-    view-distance: 4
+    view-distance: 8
     hanging-tick-frequency: 100
