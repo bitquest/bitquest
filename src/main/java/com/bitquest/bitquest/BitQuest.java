@@ -120,6 +120,14 @@ public class BitQuest extends JavaPlugin {
                 }
             }
         }, 0, 1000L);
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                // A villager is born
+                World world=Bukkit.getWorld("world");
+                world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
+            }
+        }, 0, 100000L);
 
     }
 

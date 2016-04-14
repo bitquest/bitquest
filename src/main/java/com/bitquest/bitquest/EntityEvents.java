@@ -88,7 +88,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
-        Player player=event.getPlayer();
+        final Player player=event.getPlayer();
         if(player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         }
@@ -117,36 +117,46 @@ public class EntityEvents implements Listener {
 
         }
         
-        // TODO: Why is this scheduled in player join? why not in onenable? - Xeyler
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.scheduleSyncDelayedTask(bitQuest, new Runnable() {
-            @Override
-            public void run() {
-                // A villager is born
-                World world=Bukkit.getWorld("world");
-                world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
-            }
-        }, 300L);
-        String ip=player.getAddress().toString().split("/")[1].split(":")[0];
+
+        final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         if(bitQuest.messageBuilder!=null) {
 
             // Create an event
-            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
-            org.json.JSONObject props = new org.json.JSONObject();
-            props.put("$name", player.getName());
+            new BukkitRunnable() {
 
-            props.put("$ip",ip);
-            org.json.JSONObject update = bitQuest.messageBuilder.set(player.getUniqueId().toString(), props);
+                @Override
+                public void run() {
+                    // What you want to schedule goes here
+                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
+                    org.json.JSONObject props = new org.json.JSONObject();
+                    try {
+                        props.put("$name", player.getName());
+                        props.put("$ip",ip);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
+                    org.json.JSONObject update = bitQuest.messageBuilder.set(player.getUniqueId().toString(), props);
 
 
-            ClientDelivery delivery = new ClientDelivery();
-            delivery.addMessage(sentEvent);
-            delivery.addMessage(update);
+                    ClientDelivery delivery = new ClientDelivery();
+                    delivery.addMessage(sentEvent);
+                    delivery.addMessage(update);
 
-            MixpanelAPI mixpanel = new MixpanelAPI();
-            mixpanel.deliver(delivery);
+                    MixpanelAPI mixpanel = new MixpanelAPI();
+                    try {
+                        mixpanel.deliver(delivery);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }.runTaskLater(bitQuest, 20);
+
+
         }
         event.getPlayer().sendMessage("");
         event.getPlayer().sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
