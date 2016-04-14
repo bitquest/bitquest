@@ -119,7 +119,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 100L);
+        }, 0, 1000L);
 
     }
 
