@@ -93,30 +93,7 @@ public class EntityEvents implements Listener {
             player.setOp(true);
         }
 
-        User user = new User(player);
-        // check and set experience
-        // player.setTotalExperience((Integer) user.experience());
-        user.setTotalExperience((Integer) user.experience());
-        // user.updateLevels();
-        user.createScoreBoard();
-        user.updateScoreboard();
 
-        String welcome = rawwelcome.toString();
-        welcome.replace("<name>", event.getPlayer().getName());
-        event.getPlayer().sendMessage(welcome);
-        // Updates name-to-UUID database
-        bitQuest.REDIS.set("uuid" + event.getPlayer().getName(), event.getPlayer().getUniqueId().toString());
-        // Updates UUID-to-name database
-        bitQuest.REDIS.set("name" + event.getPlayer().getUniqueId().toString(), event.getPlayer().getName());
-        // Prints the user balance
-        bitQuest.sendWalletInfo(event.getPlayer());
-        if (bitQuest.isModerator(event.getPlayer()) == true) {
-            event.getPlayer().sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            event.getPlayer().sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance()/100 + " bits");
-            event.getPlayer().sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
-
-        }
-        
 
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
@@ -152,18 +129,52 @@ public class EntityEvents implements Listener {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
+                    User user = null;
+                    try {
+                        user = new User(player);
+                        // check and set experience
+                        // player.setTotalExperience((Integer) user.experience());
+                        user.setTotalExperience((Integer) user.experience());
+                        // user.updateLevels();
+                        user.createScoreBoard();
+                        user.updateScoreboard();
+
+                        String welcome = rawwelcome.toString();
+                        welcome.replace("<name>", player.getName());
+                        player.sendMessage(welcome);
+                        // Updates name-to-UUID database
+                        bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
+                        // Updates UUID-to-name database
+                        bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+                        // Prints the user balance
+                        bitQuest.sendWalletInfo(player);
+                        if (bitQuest.isModerator(player) == true) {
+                            player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
+                            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance()/100 + " bits");
+                            player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
+
+                        }
+                        player.sendMessage("");
+                        player.sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
+                        player.sendMessage(ChatColor.YELLOW+"There's tons of useful stuff there!");
+                        player.sendMessage("");
+                        player.sendMessage(ChatColor.BLUE+"     "+ChatColor.UNDERLINE+"http://wiki.bitquest.co");
+                        player.sendMessage("");
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
                 }
 
-            }.runTaskLater(bitQuest, 20);
+            }.runTaskLater(bitQuest, 10);
 
 
         }
-        event.getPlayer().sendMessage("");
-        event.getPlayer().sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
-        event.getPlayer().sendMessage(ChatColor.YELLOW+"There's tons of useful stuff there!");
-        event.getPlayer().sendMessage("");
-        event.getPlayer().sendMessage(ChatColor.BLUE+"     "+ChatColor.UNDERLINE+"http://wiki.bitquest.co");
-        event.getPlayer().sendMessage("");
+
 
     }
 
