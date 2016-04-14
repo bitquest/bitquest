@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.util.permissions.BroadcastPermissions;
 
@@ -336,7 +337,8 @@ public class EntityEvents implements Listener {
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
-                    if(money>10000) {
+                    // The loot goes out only if d20 is 20, because of lag concerns
+                    if(money>10000 && d20==20) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
@@ -377,16 +379,27 @@ public class EntityEvents implements Listener {
                     // calculate and add experience
                     user.addExperience(bitQuest.rand(level*2, level*3));
                     if(bitQuest.messageBuilder!=null) {
+                        new BukkitRunnable() {
 
-                        // Create an event
-                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
+                            @Override
+                            public void run() {
+                                // Create an event
+                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
 
 
-                        ClientDelivery delivery = new ClientDelivery();
-                        delivery.addMessage(sentEvent);
+                                ClientDelivery delivery = new ClientDelivery();
+                                delivery.addMessage(sentEvent);
 
-                        MixpanelAPI mixpanel = new MixpanelAPI();
-                        mixpanel.deliver(delivery);
+                                MixpanelAPI mixpanel = new MixpanelAPI();
+                                try {
+                                    mixpanel.deliver(delivery);
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                }
+                            }
+
+                        }.runTaskLater(bitQuest, 20);
+
                     }
                 }
 
