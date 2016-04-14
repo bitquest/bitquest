@@ -30,6 +30,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.EventPriority;
@@ -441,9 +442,18 @@ public class EntityEvents implements Listener {
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
         Chunk chunk=e.getLocation().getChunk();
         // Makes monsters appear in different chunks to prevent mob farming
-        if(bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"spawn")==null) {
-            bitQuest.REDIS.set("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"spawn","1");
-            bitQuest.REDIS.expire("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"spawn",30000);
+        final Location location=e.getLocation();
+        if(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn")==null) {
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    bitQuest.REDIS.set("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn","1");
+                    bitQuest.REDIS.expire("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn",30000);
+                }
+
+            }.runTaskLater(bitQuest, 20);
+
             LivingEntity entity = e.getEntity();
             if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
                 e.setCancelled(true);
