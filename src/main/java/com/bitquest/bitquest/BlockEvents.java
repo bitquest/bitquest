@@ -1,5 +1,6 @@
 package com.bitquest.bitquest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -65,6 +66,7 @@ public class BlockEvents implements Listener {
     }
 	@EventHandler
 	void onBlockPlace(BlockPlaceEvent event) {
+
 		// set clan
 		// first, we check if the player has permission to build
 			if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {

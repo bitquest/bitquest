@@ -36,43 +36,42 @@ public class Wallet {
     public String address=null;
     private String privatekey=null;
     int balance() {
-        try {
-            this.updateBalance();
-        } catch (IOException e) {
-            // e.printStackTrace();
-        } catch (ParseException e) {
-            // e.printStackTrace();
-        }
+        this.updateBalance();
         return this.balance+this.confirmedBalance;
     }
-    void updateBalance() throws IOException, ParseException {
-        Random random = new Random();
-       // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
-        URL url=new URL("https://bitcoin.toshi.io/api/v0/addresses/"+address);
+    void updateBalance() {
+        try {
+            // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+            URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
-        // System.out.println(url.toString());
-        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            // System.out.println(url.toString());
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-        int responseCode = con.getResponseCode();
+            int responseCode = con.getResponseCode();
 
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
 
-        JSONParser parser = new JSONParser();
-        final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+            JSONParser parser = new JSONParser();
+            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
 //        return ((Number) jsonobj.get("final_balance")).intValue();
-        this.balance=((Number) jsonobj.get("unconfirmed_balance")).intValue();
-        this.confirmedBalance=((Number) jsonobj.get("balance")).intValue();
+            this.balance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
+            this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
+        } catch (IOException e) {
+            // wallet might be new and it's not listed on the blockchain yet
+        } catch (ParseException e) {
+            // There is a problem with the balance API
+        }
 
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {
