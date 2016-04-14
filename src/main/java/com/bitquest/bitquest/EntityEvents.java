@@ -328,13 +328,13 @@ public class EntityEvents implements Listener {
                     // maximum loot in SAT is level*10000
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
-                    final int money = bitQuest.rand(1, level)*10000;
+                    final int money = bitQuest.rand(1, level*10000);
                     // a 20 sided dice, D&D style
                     int d20 = bitQuest.rand(1, 20);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
-                    if(d20==20 && money>10000) {
+                    if(money>10000) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
