@@ -361,7 +361,7 @@ public class EntityEvents implements Listener {
                                     try {
                                         user.updateScoreboard();
                                     } catch (ParseException e) {
-                                        e.printStackTrace();
+                                       // e.printStackTrace();
                                     }
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
