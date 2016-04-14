@@ -68,10 +68,14 @@ public class SignEvents implements Listener {
 
 										// Create an event
 										org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+										org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), bitQuest.LAND_PRICE/100,null);
 
 
 										ClientDelivery delivery = new ClientDelivery();
 										delivery.addMessage(sentEvent);
+										delivery.addMessage(sentCharge);
+
+
 
 										MixpanelAPI mixpanel = new MixpanelAPI();
 										mixpanel.deliver(delivery);
