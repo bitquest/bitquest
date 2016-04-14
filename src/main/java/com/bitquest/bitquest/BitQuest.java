@@ -108,7 +108,7 @@ public class BitQuest extends JavaPlugin {
                     try {
                         user = new User(player);
                         user.createScoreBoard();
-                        user.updateScoreboard();
+                 //       user.updateScoreboard();
 
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -451,11 +451,22 @@ public class BitQuest extends JavaPlugin {
                     if(REDIS.get("uuid"+args[0])!=null) {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.sadd("banlist",uuid.toString());
-                        // TODO: Kick player if online
                         Player kickedout=Bukkit.getPlayer(args[0]);
                         if(kickedout!=null) {
                             kickedout.kickPlayer("Sorry.");
                         }
+                        return true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        return true;
+                    }
+
+                }
+                if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
+                    if(REDIS.get("uuid"+args[0])!=null) {
+                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
+                        REDIS.srem("banlist",uuid.toString());
+
                         return true;
                     } else {
                         sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
