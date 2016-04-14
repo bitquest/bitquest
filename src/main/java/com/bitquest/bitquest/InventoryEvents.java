@@ -50,19 +50,17 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
         trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
         trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
-        trades.add(new Trade(new ItemStack(Material.RAIL,64),10000));
+        trades.add(new Trade(new ItemStack(Material.RAILS,64),10000));
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
-        trades.add(new Trade(new ItemStack(Material.REEDS,8),10000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),20000));
         trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
         trades.add(new Trade(new ItemStack(Material.DIAMOND,8),20000));
-        trades.add(new Trade(new ItemStack(Material.END_STONE,16),20000));
+        trades.add(new Trade(new ItemStack(Material.ENDER_STONE,16),20000));
         trades.add(new Trade(new ItemStack(Material.IRON_INGOT,64),20000));
         trades.add(new Trade(new ItemStack(Material.NETHERRACK,16),20000));
-        trades.add(new Trade(new ItemStack(Material.NETHER_QUARTZ,64),20000));
-        trades.add(new Trade(new ItemStack(Material.NETHER_WART,8),20000));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ,64),20000));
         trades.add(new Trade(new ItemStack(Material.SOUL_SAND,16),20000));
         trades.add(new Trade(new ItemStack(Material.SPONGE,8),20000));
         trades.add(new Trade(new ItemStack(Material.WOOD,64),20000));
@@ -73,7 +71,6 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),30000));
         trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),30000));
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,64),30000));
-        trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),40000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),50000));
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
@@ -82,7 +79,7 @@ public class InventoryEvents implements Listener {
             ItemStack button = new ItemStack(trades.get(i).itemStack);
             ItemMeta meta = button.getItemMeta();
             ArrayList<String> lore = new ArrayList<String>();
-            lore.add("Price: "+trades.get(i).price+"SAT");
+            lore.add("Price: "+trades.get(i).price/100);
             meta.setLore(lore);
             button.setItemMeta(meta);
             marketInventory.setItem(i, button);
