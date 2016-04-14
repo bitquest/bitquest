@@ -124,7 +124,7 @@ public class EntityEvents implements Listener {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 300L);
-        String ip=player.getAddress().toString().split("/")[0].split(":")[0];
+        String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         if(bitQuest.messageBuilder!=null) {
