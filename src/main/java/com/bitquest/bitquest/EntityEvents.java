@@ -88,7 +88,9 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         Player player=event.getPlayer();
-        
+        if(player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
+            player.setOp(true);
+        }
 
         User user = new User(player);
         // check and set experience
