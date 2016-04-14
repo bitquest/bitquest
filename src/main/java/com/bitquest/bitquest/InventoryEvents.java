@@ -40,27 +40,42 @@ public class InventoryEvents implements Listener {
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
-        trades.add(new Trade(new ItemStack(Material.DIAMOND,8),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),10000));
-        trades.add(new Trade(new ItemStack(Material.WOOL,64),10000));
-        trades.add(new Trade(new ItemStack(Material.PRISMARINE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),10000));
-        trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),10000));
-        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
-        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
-        trades.add(new Trade(new ItemStack(Material.WOOD,64),10000));
-        trades.add(new Trade(new ItemStack(Material.FENCE,64),10000));
+        trades.add(new Trade(new ItemStack(Material.BED,1),10000));
+        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),10000));
         trades.add(new Trade(new ItemStack(Material.COMPASS,1),10000));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),10000));
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),10000));
+        trades.add(new Trade(new ItemStack(Material.FENCE,64),10000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
+        trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
+        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
+        trades.add(new Trade(new ItemStack(Material.RAIL,64),10000));
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
-//        will be re enabled with a different price
-//        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),10000));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
+        trades.add(new Trade(new ItemStack(Material.REEDS,8),10000));
+        trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),20000));
+        trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
+        trades.add(new Trade(new ItemStack(Material.DIAMOND,8),20000));
+        trades.add(new Trade(new ItemStack(Material.END_STONE,16),20000));
+        trades.add(new Trade(new ItemStack(Material.IRON_INGOT,64),20000));
+        trades.add(new Trade(new ItemStack(Material.NETHERRACK,16),20000));
+        trades.add(new Trade(new ItemStack(Material.NETHER_QUARTZ,64),20000));
+        trades.add(new Trade(new ItemStack(Material.NETHER_WART,8),20000));
+        trades.add(new Trade(new ItemStack(Material.SOUL_SAND,16),20000));
+        trades.add(new Trade(new ItemStack(Material.SPONGE,8),20000));
+        trades.add(new Trade(new ItemStack(Material.WOOD,64),20000));
+        trades.add(new Trade(new ItemStack(Material.WOOL,64),20000));
+        trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,16),30000));
+        trades.add(new Trade(new ItemStack(Material.GOLD_INGOT,64),30000));
+        trades.add(new Trade(new ItemStack(Material.PRISMARINE,64),30000));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),30000));
+        trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),30000));
+        trades.add(new Trade(new ItemStack(Material.GLOWSTONE,64),30000));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),40000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),50000));
-        trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),10000));
-        trades.add(new Trade(new ItemStack(Material.SOUL_SAND,16),10000));
-        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),10000));
-        trades.add(new Trade(new ItemStack(Material.NETHERRACK,16),10000));
+        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
         for (int i = 0; i < trades.size(); i++) {
