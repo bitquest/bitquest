@@ -93,7 +93,7 @@ public class InventoryEvents implements Listener {
         if(inventory.equals(marketInventory)) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
-                if(clicked.getType()!=Material.AIR) {
+                if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
                     player.sendMessage(ChatColor.YELLOW + "Purchasing " + clicked.getType() + "...");
