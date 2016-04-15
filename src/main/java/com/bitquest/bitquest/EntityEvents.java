@@ -465,7 +465,7 @@ public class EntityEvents implements Listener {
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             System.out.println(spawnkey);
             bitQuest.REDIS.set(spawnkey,"1");
-            bitQuest.REDIS.expire(spawnkey,3000);
+            bitQuest.REDIS.expire(spawnkey,30000);
 
             LivingEntity entity = e.getEntity();
             if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
@@ -539,7 +539,7 @@ public class EntityEvents implements Listener {
                             if (BitQuest.rand(0, 64) < level) {
                                 randomEnchantItem(bow);
                             }
-                            entity.getEquipment().setItemInHand(bow);
+                            // entity.getEquipment().setItemInHand(bow);
                         }
                     }
                 }
