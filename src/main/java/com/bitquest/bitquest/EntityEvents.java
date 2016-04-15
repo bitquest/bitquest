@@ -101,9 +101,10 @@ public class EntityEvents implements Listener {
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         if(bitQuest.messageBuilder!=null) {
 
-            // Create an event
-            new BukkitRunnable() {
 
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+            scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
                 public void run() {
                     // What you want to schedule goes here
@@ -111,7 +112,7 @@ public class EntityEvents implements Listener {
                     org.json.JSONObject props = new org.json.JSONObject();
                     try {
                         props.put("$name", player.getName());
-                        props.put("$ip",ip);
+                        props.put("$ip", ip);
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -151,15 +152,15 @@ public class EntityEvents implements Listener {
                         bitQuest.sendWalletInfo(player);
                         if (bitQuest.isModerator(player) == true) {
                             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-                            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: "+bitQuest.wallet.balance()/100 + " bits");
-                            player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
+                            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
+                            player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
                         }
                         player.sendMessage("");
-                        player.sendMessage(ChatColor.YELLOW+"Don't forget to visit the BitQuest Wiki");
-                        player.sendMessage(ChatColor.YELLOW+"There's tons of useful stuff there!");
+                        player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
+                        player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
                         player.sendMessage("");
-                        player.sendMessage(ChatColor.BLUE+"     "+ChatColor.UNDERLINE+"http://wiki.bitquest.co");
+                        player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://wiki.bitquest.co");
                         player.sendMessage("");
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -171,7 +172,7 @@ public class EntityEvents implements Listener {
 
                 }
 
-            }.runTaskLater(bitQuest, 10);
+            });
 
 
         }
@@ -401,7 +402,11 @@ public class EntityEvents implements Listener {
                     // calculate and add experience
                     user.addExperience(bitQuest.rand(level*2, level*3));
                     if(bitQuest.messageBuilder!=null) {
-                        new BukkitRunnable() {
+
+                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+
 
                             @Override
                             public void run() {
@@ -420,7 +425,7 @@ public class EntityEvents implements Listener {
                                 }
                             }
 
-                        }.runTaskLater(bitQuest, 20);
+                        });
 
                     }
                 }
@@ -444,15 +449,17 @@ public class EntityEvents implements Listener {
         // Makes monsters appear in different chunks to prevent mob farming
         final Location location=e.getLocation();
         if(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn")==null) {
-            new BukkitRunnable() {
 
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+            scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
                 public void run() {
                     bitQuest.REDIS.set("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn","1");
                     bitQuest.REDIS.expire("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn",30000);
                 }
 
-            }.runTaskLater(bitQuest, 20);
+            });
 
             LivingEntity entity = e.getEntity();
             if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
