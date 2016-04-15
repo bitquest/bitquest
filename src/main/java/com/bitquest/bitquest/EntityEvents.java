@@ -101,15 +101,60 @@ public class EntityEvents implements Listener {
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
+        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+            @Override
+            public void run() {
+                // What you want to schedule goes here
+                try {
+                    // check and set experience
+                    // player.setTotalExperience((Integer) user.experience());
+                    user.setTotalExperience((Integer) user.experience());
+                    // user.updateLevels();
+                    user.updateScoreboard();
+
+                    String welcome = rawwelcome.toString();
+                    welcome.replace("<name>", player.getName());
+                    player.sendMessage(welcome);
+                    // Updates name-to-UUID database
+                    bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
+                    // Updates UUID-to-name database
+                    bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+                    // Prints the user balance
+                    bitQuest.sendWalletInfo(player);
+                    if (bitQuest.isModerator(player) == true) {
+                        player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
+                        player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
+                        player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
+
+                    }
+                    player.sendMessage("");
+                    player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
+                    player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
+                    player.sendMessage("");
+                    player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://wiki.bitquest.co");
+                    player.sendMessage("");
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+
+
+
         if(bitQuest.messageBuilder!=null) {
 
 
-            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
             scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
                 public void run() {
-                    // What you want to schedule goes here
                     org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Login", null);
                     org.json.JSONObject props = new org.json.JSONObject();
                     try {
@@ -133,41 +178,7 @@ public class EntityEvents implements Listener {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    try {
-                        // check and set experience
-                        // player.setTotalExperience((Integer) user.experience());
-                        user.setTotalExperience((Integer) user.experience());
-                        // user.updateLevels();
-                        user.updateScoreboard();
 
-                        String welcome = rawwelcome.toString();
-                        welcome.replace("<name>", player.getName());
-                        player.sendMessage(welcome);
-                        // Updates name-to-UUID database
-                        bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
-                        // Updates UUID-to-name database
-                        bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
-                        // Prints the user balance
-                        bitQuest.sendWalletInfo(player);
-                        if (bitQuest.isModerator(player) == true) {
-                            player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-                            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
-                            player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
-
-                        }
-                        player.sendMessage("");
-                        player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
-                        player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
-                        player.sendMessage("");
-                        player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://wiki.bitquest.co");
-                        player.sendMessage("");
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
 
                 }
 
