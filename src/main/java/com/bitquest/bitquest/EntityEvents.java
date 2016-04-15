@@ -93,7 +93,9 @@ public class EntityEvents implements Listener {
         if(player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         }
+        final User user = new User(player);
 
+        user.createScoreBoard();
 
 
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
@@ -131,14 +133,11 @@ public class EntityEvents implements Listener {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    User user = null;
                     try {
-                        user = new User(player);
                         // check and set experience
                         // player.setTotalExperience((Integer) user.experience());
                         user.setTotalExperience((Integer) user.experience());
                         // user.updateLevels();
-                        user.createScoreBoard();
                         user.updateScoreboard();
 
                         String welcome = rawwelcome.toString();
