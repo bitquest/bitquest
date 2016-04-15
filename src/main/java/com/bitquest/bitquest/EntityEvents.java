@@ -461,12 +461,12 @@ public class EntityEvents implements Listener {
         if(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn")==null) {
 
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
+            final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
             scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
                 public void run() {
-                    bitQuest.REDIS.set("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn","1");
-                    bitQuest.REDIS.expire("chunk"+location.getX()+","+location.getChunk().getZ()+"spawn",30000);
+                    bitQuest.REDIS.set(spawnkey,"1");
+                    bitQuest.REDIS.expire(spawnkey,30000);
                 }
 
             });
