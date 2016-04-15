@@ -102,7 +102,12 @@ public class EntityEvents implements Listener {
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        if (bitQuest.isModerator(player) == true) {
+            player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
+            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
+            player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
+        }
         scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -123,12 +128,7 @@ public class EntityEvents implements Listener {
                     bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
                     // Prints the user balance
                     bitQuest.sendWalletInfo(player);
-                    if (bitQuest.isModerator(player) == true) {
-                        player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-                        player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
-                        player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
-                    }
                     player.sendMessage("");
                     player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
                     player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
