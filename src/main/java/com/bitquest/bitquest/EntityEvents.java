@@ -458,18 +458,14 @@ public class EntityEvents implements Listener {
         Chunk chunk=e.getLocation().getChunk();
         // Makes monsters appear in different chunks to prevent mob farming
         final Location location=e.getLocation();
-        if(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn")==null) {
+        final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
 
+        if(bitQuest.REDIS.get(spawnkey)==null) {
+            System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
-            scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-                @Override
-                public void run() {
-                    bitQuest.REDIS.set(spawnkey,"1");
-                    bitQuest.REDIS.expire(spawnkey,30000);
-                }
-
-            });
+            System.out.println(spawnkey);
+            bitQuest.REDIS.set(spawnkey,"1");
+            bitQuest.REDIS.expire(spawnkey,3000);
 
             LivingEntity entity = e.getEntity();
             if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
@@ -551,215 +547,230 @@ public class EntityEvents implements Listener {
         }
 
     }
-
     @EventHandler
     void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        double rawdamage = event.getDamage();
-
-        int damagerlevel = 1;
-        int damagedlevel = 1;
-
 
         // damage by entity
         if (event instanceof EntityDamageByEntityEvent) {
-            Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
-
-            // damager is player
-            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-                Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
-                damagerlevel = player.getLevel();
-
-                if (event.getEntity() instanceof ItemFrame) {
-                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
-                        event.setCancelled(true);
-                    }
-                }
-                // Player vs. Horse
-                if (event.getEntity() instanceof Horse && player.isOp() == false) {
-                    Horse horse = (Horse) event.getEntity();
-                    if (horse.hasMetadata("owner")) {
-                        if (horse.getMetadata("owner").get(0).asString().equals(player.getUniqueId().toString())) {
-                            event.setCancelled(false);
-                        } else {
-                            event.setCancelled(true);
-                        }
-                    }
-                } else if (event.getEntity() instanceof Animals) {
-                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
-                        event.setCancelled(true);
-                    }
-
-                }
                 // Player vs. Villager
-                if (event.getEntity() instanceof Villager && player.isOp() == false) {
+                if (event.getEntity() instanceof Villager) {
                     event.setCancelled(true);
                 }
-
-                // PvP
-                if (event.getEntity() instanceof Player) {
-                    // TODO: Define how PvP is going to work (arenas?)
+                // PvP is always off
+                if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
                     event.setCancelled(true);
                 }
-                // damaged is monster
-                if (event.getEntity() instanceof Monster) {
-                    Monster monster = (Monster) event.getEntity();
-                    damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
-
-                    if (monster.hasMetadata("level")) {
-                        damagedlevel = monster.getMetadata("level").get(0).asInt();
-                    }
-
-                }
-            }
-            // damager is monster
-            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Monster) {
-                Monster monster = (Monster) ((EntityDamageByEntityEvent) event).getDamager();
-                damagerlevel = new Double(monster.getMaxHealth() / 4).intValue();
-                if (monster.hasMetadata("level")) {
-                    damagerlevel = monster.getMetadata("level").get(0).asInt();
-
-                }
-                // monster vs player
-                if (event.getEntity() instanceof Player) {
-                    Player damaged = (Player) event.getEntity();
-                    damagedlevel = damaged.getLevel();
-                }
-            }
-            // damager is projectile
-            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile) {
-                final Projectile projectile = (Projectile) ((EntityDamageByEntityEvent) event).getDamager();
-
-                // shooter is player
-                if (projectile.getShooter() instanceof Player) {
-                    Player shooter = (Player) projectile.getShooter();
-                    damager = shooter;
-                    damagerlevel = shooter.getLevel();
-
-                    // shoot villagers
-                    if (event.getEntity() instanceof Villager) {
-                        event.setCancelled(true);
-                    }
-                    // shoot monsters
-                    if (event.getEntity() instanceof Giant) {
-                        event.setCancelled(true);
-                    }
-                    if (event.getEntity() instanceof Monster) {
-                        Monster monster = (Monster) event.getEntity();
-                        damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
-
-                        if (monster.hasMetadata("damage")) {
-                            int damage = monster.getMetadata("damage").get(0).asInt();
-                            damage = damage + 1;
-                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
-                        } else {
-                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
-                        }
-
-
-                    }
-
-                }
-                // shooter is monster
-                if (projectile.getShooter() instanceof Monster) {
-                    Monster shooter = (Monster) projectile.getShooter();
-
-                    damager = shooter;
-                    damagerlevel = new Double(shooter.getMaxHealth() / 8).intValue();
-                    if (shooter.hasMetadata("level")) {
-                        damagerlevel = shooter.getMetadata("level").get(0).asInt();
-                    }
-
-                }
-                // shooter is ghast
-                if (projectile.getShooter() instanceof Ghast) {
-                    damagerlevel = 32;
-                }
-                // make love, not war
-                if (projectile.getShooter() instanceof Player) {
-                	if(event.getEntity() instanceof Horse || event.getEntity() instanceof Player) {
-                		event.setCancelled(true);
-                	}
-                }
-            }
-
-            // begins to recalculate damage
-            double attack = 0;
-            double defense = 0;
-            boolean miss = false;
-
-            // attacker phase
-            int d20 = bitQuest.rand(1, 20);
-
-            if (d20 > 4) {
-                // hit
-                attack = damagerlevel;
-                if (d20 > 18) {
-                    attack = attack * 2;
-                }
-            } else {
-                // miss
-                rawdamage = 0;
-                miss = true;
-            }
-
-
-            // victim phase
-            d20 = bitQuest.rand(1, 20);
-            if (d20 > 4) {
-                // hit
-                defense = damagedlevel;
-            } else {
-                // miss
-                defense = 0;
-            }
-
-
-            double finaldamage = attack + rawdamage - defense;
-
-            if (finaldamage < 0) {
-                finaldamage = 0;
-            }
-            if (miss == true) {
-                event.setCancelled(true);
-            }
-            event.setDamage(finaldamage);
-
-            Player player = null;
-
-            // damage notification if is op
-            if (event.getEntity() instanceof Player) {
-                player = (Player) event.getEntity();
-
-            }
-            if (damager instanceof Player) {
-                // adds experience per damage
-                player = (Player) damager;
-                int factor = 0;
-                if (event.getEntity() instanceof Monster) {
-                    factor = 2;
-                }
-
-
-
-
-            }
-        } else {
-            // damage is not done between entities
-            if (event.getEntity() instanceof Monster) {
-                Monster monster = (Monster) event.getEntity();
-                if (monster.hasMetadata("damage")) {
-                    int damage = monster.getMetadata("damage").get(0).asInt();
-                    damage = damage + 1;
-                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
-                } else {
-                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
-                }
-
-            }
         }
-
-
     }
+
+//    @EventHandler
+//    void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+//        double rawdamage = event.getDamage();
+//
+//        int damagerlevel = 1;
+//        int damagedlevel = 1;
+//
+//
+//        // damage by entity
+//        if (event instanceof EntityDamageByEntityEvent) {
+//            Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
+//
+//            // damager is player
+//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+//                Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
+//                damagerlevel = player.getLevel();
+//
+//                if (event.getEntity() instanceof ItemFrame) {
+//                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
+//                        event.setCancelled(true);
+//                    }
+//                }
+//                // Player vs. Horse
+//                if (event.getEntity() instanceof Horse && player.isOp() == false) {
+//                    Horse horse = (Horse) event.getEntity();
+//                    if (horse.hasMetadata("owner")) {
+//                        if (horse.getMetadata("owner").get(0).asString().equals(player.getUniqueId().toString())) {
+//                            event.setCancelled(false);
+//                        } else {
+//                            event.setCancelled(true);
+//                        }
+//                    }
+//                } else if (event.getEntity() instanceof Animals) {
+//                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
+//                        event.setCancelled(true);
+//                    }
+//
+//                }
+//                // Player vs. Villager
+//                if (event.getEntity() instanceof Villager && player.isOp() == false) {
+//                    event.setCancelled(true);
+//                }
+//
+//                // PvP
+//                if (event.getEntity() instanceof Player) {
+//                    // TODO: Define how PvP is going to work (arenas?)
+//                    event.setCancelled(true);
+//                }
+//                // damaged is monster
+//                if (event.getEntity() instanceof Monster) {
+//                    Monster monster = (Monster) event.getEntity();
+//                    damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
+//
+//                    if (monster.hasMetadata("level")) {
+//                        damagedlevel = monster.getMetadata("level").get(0).asInt();
+//                    }
+//
+//                }
+//            }
+//            // damager is monster
+//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Monster) {
+//                Monster monster = (Monster) ((EntityDamageByEntityEvent) event).getDamager();
+//                damagerlevel = new Double(monster.getMaxHealth() / 4).intValue();
+//                if (monster.hasMetadata("level")) {
+//                    damagerlevel = monster.getMetadata("level").get(0).asInt();
+//
+//                }
+//                // monster vs player
+//                if (event.getEntity() instanceof Player) {
+//                    Player damaged = (Player) event.getEntity();
+//                    damagedlevel = damaged.getLevel();
+//                }
+//            }
+//            // damager is projectile
+//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile) {
+//                final Projectile projectile = (Projectile) ((EntityDamageByEntityEvent) event).getDamager();
+//
+//                // shooter is player
+//                if (projectile.getShooter() instanceof Player) {
+//                    Player shooter = (Player) projectile.getShooter();
+//                    damager = shooter;
+//                    damagerlevel = shooter.getLevel();
+//
+//                    // shoot villagers
+//                    if (event.getEntity() instanceof Villager) {
+//                        event.setCancelled(true);
+//                    }
+//                    // shoot monsters
+//                    if (event.getEntity() instanceof Giant) {
+//                        event.setCancelled(true);
+//                    }
+//                    if (event.getEntity() instanceof Monster) {
+//                        Monster monster = (Monster) event.getEntity();
+//                        damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
+//
+//                        if (monster.hasMetadata("damage")) {
+//                            int damage = monster.getMetadata("damage").get(0).asInt();
+//                            damage = damage + 1;
+//                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
+//                        } else {
+//                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
+//                        }
+//
+//
+//                    }
+//
+//                }
+//                // shooter is monster
+//                if (projectile.getShooter() instanceof Monster) {
+//                    Monster shooter = (Monster) projectile.getShooter();
+//
+//                    damager = shooter;
+//                    damagerlevel = new Double(shooter.getMaxHealth() / 8).intValue();
+//                    if (shooter.hasMetadata("level")) {
+//                        damagerlevel = shooter.getMetadata("level").get(0).asInt();
+//                    }
+//
+//                }
+//                // shooter is ghast
+//                if (projectile.getShooter() instanceof Ghast) {
+//                    damagerlevel = 32;
+//                }
+//                // make love, not war
+//                if (projectile.getShooter() instanceof Player) {
+//                	if(event.getEntity() instanceof Horse || event.getEntity() instanceof Player) {
+//                		event.setCancelled(true);
+//                	}
+//                }
+//            }
+//
+//            // begins to recalculate damage
+//            double attack = 0;
+//            double defense = 0;
+//            boolean miss = false;
+//
+//            // attacker phase
+//            int d20 = bitQuest.rand(1, 20);
+//
+//            if (d20 > 4) {
+//                // hit
+//                attack = damagerlevel;
+//                if (d20 > 18) {
+//                    attack = attack * 2;
+//                }
+//            } else {
+//                // miss
+//                rawdamage = 0;
+//                miss = true;
+//            }
+//
+//
+//            // victim phase
+//            d20 = bitQuest.rand(1, 20);
+//            if (d20 > 4) {
+//                // hit
+//                defense = damagedlevel;
+//            } else {
+//                // miss
+//                defense = 0;
+//            }
+//
+//
+//            double finaldamage = attack + rawdamage - defense;
+//
+//            if (finaldamage < 0) {
+//                finaldamage = 0;
+//            }
+//            if (miss == true) {
+//                event.setCancelled(true);
+//            }
+//            event.setDamage(finaldamage);
+//
+//            Player player = null;
+//
+//            // damage notification if is op
+//            if (event.getEntity() instanceof Player) {
+//                player = (Player) event.getEntity();
+//
+//            }
+//            if (damager instanceof Player) {
+//                // adds experience per damage
+//                player = (Player) damager;
+//                int factor = 0;
+//                if (event.getEntity() instanceof Monster) {
+//                    factor = 2;
+//                }
+//
+//
+//
+//
+//            }
+//        } else {
+//            // damage is not done between entities
+//            if (event.getEntity() instanceof Monster) {
+//                Monster monster = (Monster) event.getEntity();
+//                if (monster.hasMetadata("damage")) {
+//                    int damage = monster.getMetadata("damage").get(0).asInt();
+//                    damage = damage + 1;
+//                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
+//                } else {
+//                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
+//                }
+//
+//            }
+//        }
+//
+//
+//    }
 
 
     public void useRandomEquipment(LivingEntity entity, int level) {
