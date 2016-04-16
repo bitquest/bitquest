@@ -464,8 +464,8 @@ public class EntityEvents implements Listener {
             System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             System.out.println(spawnkey);
-            bitQuest.REDIS.set(spawnkey,"1");
-            bitQuest.REDIS.expire(spawnkey,30000);
+            // bitQuest.REDIS.set(spawnkey,"1");
+           //  bitQuest.REDIS.expire(spawnkey,30000);
 
             LivingEntity entity = e.getEntity();
             if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
