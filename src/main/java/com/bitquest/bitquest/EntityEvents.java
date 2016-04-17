@@ -461,14 +461,14 @@ public class EntityEvents implements Listener {
         final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
 
         if(bitQuest.REDIS.get(spawnkey)==null) {
-            System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
+           // System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            System.out.println(spawnkey);
+            // System.out.println(spawnkey);
             // bitQuest.REDIS.set(spawnkey,"1");
            //  bitQuest.REDIS.expire(spawnkey,30000);
 
             LivingEntity entity = e.getEntity();
-            if (bitQuest.REDIS.get("chunk"+e.getLocation().getX()+","+e.getLocation().getChunk().getZ()+"owner")!=null) {
+            if (bitQuest.REDIS.get(spawnkey)!=null) {
                 e.setCancelled(true);
             } else if (entity instanceof Monster) {
                 // Disable mob spawners. Keep mob farmers away
