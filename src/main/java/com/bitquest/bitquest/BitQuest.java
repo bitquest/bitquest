@@ -474,7 +474,7 @@ public class BitQuest extends JavaPlugin {
                     }
 
                 }
-                if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
+                if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
                     if(REDIS.get("uuid"+args[0])!=null) {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.srem("banlist",uuid.toString());
