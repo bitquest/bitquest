@@ -48,7 +48,7 @@ public class SignEvents implements Listener {
     				final User user = new User(player);
     				player.sendMessage(ChatColor.YELLOW + "Claiming land...");
     				BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-    				scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+    				scheduler.runTask(bitQuest, new Runnable() {
     					@Override
     					public void run() {
     						// A villager is born

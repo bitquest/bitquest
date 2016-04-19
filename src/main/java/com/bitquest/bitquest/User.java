@@ -25,13 +25,12 @@ import java.text.ParseException;
 public class User {
     public Wallet wallet;
     private String clan;
-    private Player player;
+    public Player player;
     public User(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         this.player=player;
         if(BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())!=null&&BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())!=null) {
             this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         }
-
     }
 
     // scoreboard objectives and teams

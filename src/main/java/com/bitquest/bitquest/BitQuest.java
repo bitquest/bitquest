@@ -26,6 +26,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPoolConfig;
 
 /**
  * Created by explodi on 11/1/15.
@@ -208,12 +210,12 @@ public class BitQuest extends JavaPlugin {
     final int minNameSize = 3;
     final int maxNameSize = 16;
 
-    public void sendWalletInfo(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        User user= new User(player);
-        player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
-        player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
-        player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
-        player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
+    public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
+
+        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
+        user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
+        user.player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
+        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
 
     };
 
@@ -325,7 +327,8 @@ public class BitQuest extends JavaPlugin {
                     e.printStackTrace();
                 }
                 try {
-                    sendWalletInfo(player);
+                    User user=new User(player);
+                    sendWalletInfo(user);
                 } catch (ParseException e) {
                     e.printStackTrace();
                 } catch (org.json.simple.parser.ParseException e) {
@@ -356,11 +359,12 @@ public class BitQuest extends JavaPlugin {
 								if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
 									final Wallet finalFromWallet = fromWallet;
 									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-				    				scheduler.runTaskAsynchronously(this, new Runnable() {
+                                    final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
+
+                                    scheduler.runTaskAsynchronously(this, new Runnable() {
 				    					@Override
 				    					public void run() {
 				    						try {
-												Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
 
 												if(finalFromWallet.transaction(sendAmount, toWallet)) {
 									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to "+offlinePlayer.getName()+".");
