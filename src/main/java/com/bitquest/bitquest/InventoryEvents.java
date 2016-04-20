@@ -160,9 +160,7 @@ public class InventoryEvents implements Listener {
         		event.setCancelled(true);
         	}
 
-        }
-        // compass inventory
-        if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
+        } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
 
             ItemStack clicked = event.getCurrentItem();
@@ -199,6 +197,8 @@ public class InventoryEvents implements Listener {
             }
 
             event.setCancelled(true);
+        } else {
+            event.setCancelled(false);
         }
     }
     @EventHandler
@@ -210,6 +210,8 @@ public class InventoryEvents implements Listener {
 
             // open menu
             event.getPlayer().openInventory(marketInventory);
+        } else {
+            event.setCancelled(false);
         }
 
     }
