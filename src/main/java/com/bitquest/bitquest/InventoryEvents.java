@@ -7,8 +7,11 @@ import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -209,5 +212,14 @@ public class InventoryEvents implements Listener {
             event.getPlayer().openInventory(marketInventory);
         }
 
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryOpen(InventoryOpenEvent event)
+    {
+        event.setCancelled(false);
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryInteract(InventoryInteractEvent event) {
+        event.setCancelled(false);
     }
 }
