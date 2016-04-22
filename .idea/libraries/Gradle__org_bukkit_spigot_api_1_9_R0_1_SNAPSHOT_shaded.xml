@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: org.bukkit:spigot-api:1.9-R0.1-SNAPSHOT-shaded">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/lib/spigot-api-1.9-R0.1-SNAPSHOT-shaded.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

@@ -24,5 +24,5 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-COPY build/libs/bitquest-all.jar /spigot/plugins/
+COPY build/libs/bitquest-2.0-all.jar /spigot/plugins/
 CMD java -Xmx8G -Xms8G -jar spigot.jar

@@ -7,8 +7,11 @@ import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryInteractEvent;
+import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -100,15 +103,13 @@ public class InventoryEvents implements Listener {
 
                     player.closeInventory();
                     event.setCancelled(true);
+                    final User user = new User(player);
+
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
                         public void run() {
 
-                                // TODO: try/catch
-                                User user;
                                 try {
-                                    user = new User(player);
-                                    // TODO: use the SAT amount from the Trade object
                                     int sat = 0;
                                     for (int i = 0; i < trades.size(); i++) {
                                         if (clicked.getType() == trades.get(i).itemStack.getType())
@@ -149,10 +150,6 @@ public class InventoryEvents implements Listener {
                                     e.printStackTrace();
                                 } catch (IOException e) {
                                     e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
                                 }
 
                         }
@@ -163,9 +160,7 @@ public class InventoryEvents implements Listener {
         		event.setCancelled(true);
         	}
 
-        }
-        // compass inventory
-        if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
+        } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
 
             ItemStack clicked = event.getCurrentItem();
@@ -202,6 +197,8 @@ public class InventoryEvents implements Listener {
             }
 
             event.setCancelled(true);
+        } else {
+            event.setCancelled(false);
         }
     }
     @EventHandler
@@ -213,7 +210,18 @@ public class InventoryEvents implements Listener {
 
             // open menu
             event.getPlayer().openInventory(marketInventory);
+        } else {
+            event.setCancelled(false);
         }
 
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryOpen(InventoryOpenEvent event)
+    {
+        event.setCancelled(false);
+    }
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onInventoryInteract(InventoryInteractEvent event) {
+        event.setCancelled(false);
     }
 }

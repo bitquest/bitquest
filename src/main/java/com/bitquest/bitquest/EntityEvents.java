@@ -108,6 +108,14 @@ public class EntityEvents implements Listener {
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
 
         }
+        String welcome = rawwelcome.toString();
+        welcome.replace("<name>", player.getName());
+        player.sendMessage(welcome);
+        // Updates name-to-UUID database
+        bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
+        // Updates UUID-to-name database
+        bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+        // Prints the user balance
         scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -119,15 +127,8 @@ public class EntityEvents implements Listener {
                     // user.updateLevels();
                     user.updateScoreboard();
 
-                    String welcome = rawwelcome.toString();
-                    welcome.replace("<name>", player.getName());
-                    player.sendMessage(welcome);
-                    // Updates name-to-UUID database
-                    bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
-                    // Updates UUID-to-name database
-                    bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
-                    // Prints the user balance
-                    bitQuest.sendWalletInfo(player);
+
+                    bitQuest.sendWalletInfo(user);
 
                     player.sendMessage("");
                     player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
@@ -374,12 +375,12 @@ public class EntityEvents implements Listener {
                     if(money>10000 && d20==20) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
+                        final Wallet userWallet=user.wallet;
                         scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                             @Override
                             public void run() {
                                 try {
-                                    if (bitQuest.wallet.transaction(money, user.wallet) == true) {
+                                    if (bitQuest.wallet.transaction(money, userWallet) == true) {
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                         if (bitQuest.messageBuilder != null) {

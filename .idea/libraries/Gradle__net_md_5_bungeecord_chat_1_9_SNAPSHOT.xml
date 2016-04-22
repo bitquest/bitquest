@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: net.md-5:bungeecord-chat:1.9-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/net/md-5/bungeecord-chat/1.9-SNAPSHOT/bungeecord-chat-1.9-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
