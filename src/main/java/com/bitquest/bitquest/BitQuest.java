@@ -482,6 +482,14 @@ public class BitQuest extends JavaPlugin {
                     }
 
                 }
+                if (cmd.getName().equalsIgnoreCase("banlist")) {
+                    Set<String> banlist=REDIS.smembers("banlist");
+                    for(String uuid:banlist) {
+                        sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
+                    }
+                    return true;
+
+                }
                 if (cmd.getName().equalsIgnoreCase("spectate") && args.length == 1) {
                 	
                 	if(Bukkit.getPlayer(args[0]) != null) {
