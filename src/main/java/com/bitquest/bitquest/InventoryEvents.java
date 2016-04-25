@@ -47,17 +47,21 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),10000));
         trades.add(new Trade(new ItemStack(Material.COMPASS,1),10000));
         trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),10000));
+        trades.add(new Trade(new ItemStack(Material.BOAT,1),10000));
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),10000));
         trades.add(new Trade(new ItemStack(Material.FENCE,64),10000));
         trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
         trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
         trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
         trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
-        trades.add(new Trade(new ItemStack(Material.RAILS,64),10000));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),10000)); //cheap price for a faster, AFK railroad development ;)
+        trades.add(new Trade(new ItemStack(Material.RAILS,64),10000)); //we still need these to slow down, you know.
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
         trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
+        trades.add(new Trade(new ItemStack(Material.BOW,1),10000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),20000));
+        trades.add(new Trade(new ItemStack(Material.REDSTONE,16),20000));
         trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
         trades.add(new Trade(new ItemStack(Material.DIAMOND,8),20000));
         trades.add(new Trade(new ItemStack(Material.ENDER_STONE,16),20000));
@@ -70,11 +74,17 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.WOOL,64),20000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,16),30000));
         trades.add(new Trade(new ItemStack(Material.GOLD_INGOT,64),30000));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,6),30000));
+        trades.add(new Trade(new ItemStack(Material.ARROW,64),30000));
         trades.add(new Trade(new ItemStack(Material.PRISMARINE,64),30000));
         trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),30000));
         trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),30000));
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,64),30000));
-        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),50000));
+        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
+        trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
+        trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); //If we have a lot of horses in Satoshi, we want to ride them!
+        trades.add(new Trade(new ItemStack(Material.DIAMOND_HORSE_ARMOUR,1),55000)); //essential
+        trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
         marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
