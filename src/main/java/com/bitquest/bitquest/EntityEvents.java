@@ -352,10 +352,17 @@ public class EntityEvents implements Listener {
         int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
-           // if (entity.hasMetadata("level")) {
-            //    level = entity.getMetadata("level").get(0).asInt();
-            // }
-
+            Location location=entity.getLocation();
+            final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
+            int baselevel;
+            if(bitQuest.REDIS.get(spawnkey)!=null) {
+                baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
+            } else {
+                baselevel=0;
+            }
+            if (baselevel > 0) {
+                bitQuest.REDIS.decr(spawnkey);
+            }
 
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -469,20 +476,12 @@ public class EntityEvents implements Listener {
         if (baselevel < 32) {
             bitQuest.REDIS.incr(spawnkey);
         }
-        System.out.println(bitQuest.REDIS.get(spawnkey));
-        System.out.println(baselevel);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        System.out.println(spawnkey);
-        if(baselevel>0) {
 
-            System.out.println(bitQuest.REDIS.get(spawnkey));
-            bitQuest.REDIS.set(spawnkey, "1");
-            bitQuest.REDIS.expire(spawnkey, 30000);
+
 
             LivingEntity entity = e.getEntity();
-            if (bitQuest.REDIS.get(spawnkey) != null) {
-                e.setCancelled(true);
-            } else if (entity instanceof Monster) {
+            if (entity instanceof Monster && baselevel>0) {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
@@ -496,11 +495,11 @@ public class EntityEvents implements Listener {
                     int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
 
                     if (world.getName().endsWith("_nether") == true) {
-                        level = Math.min(BitQuest.rand(0, distanceLevel * 4), 64);
+                        level =BitQuest.rand(0, baselevel * 2);
                     } else if (world.getName().endsWith("_end") == true) {
-                        level = Math.min(BitQuest.rand(0, distanceLevel * 8), 128);
+                        level = BitQuest.rand(0, baselevel * 4);
                     } else {
-                        level = Math.min(BitQuest.rand(0, distanceLevel), 32);
+                        level = BitQuest.rand(0, baselevel);
                     }
                     if (level < 1) level = 1;
 
@@ -555,7 +554,8 @@ public class EntityEvents implements Listener {
                         }
                     }
                 }
-            }
+        } else {
+            e.setCancelled(true);
         }
     }
     @EventHandler
