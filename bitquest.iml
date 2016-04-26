@@ -21,6 +21,7 @@
     <orderEntry type="library" name="Gradle: commons-codec:commons-codec:1.9" level="project" />
     <orderEntry type="library" name="Gradle: com.mixpanel:mixpanel-java:1.4.4" level="project" />
     <orderEntry type="library" name="Gradle: org.json:json:20090211" level="project" />
+    <orderEntry type="library" name="Gradle: redis.clients:jedis:2.8.0" level="project" />
     <orderEntry type="library" name="Gradle: org.spigotmc:spigot-api:1.9-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: org.spigotmc:spigot:1.9-R0.1-SNAPSHOT" level="project" />
     <orderEntry type="library" name="Gradle: commons-lang:commons-lang:2.6" level="project" />
@@ -32,6 +33,5 @@
     <orderEntry type="library" name="Gradle: javax.persistence:persistence-api:1.0" level="project" />
     <orderEntry type="library" name="Gradle: org.hamcrest:hamcrest-core:1.1" level="project" />
     <orderEntry type="library" name="Gradle: com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="Gradle: redis.clients:jedis:2.8.0" level="project" />
   </component>
 </module>

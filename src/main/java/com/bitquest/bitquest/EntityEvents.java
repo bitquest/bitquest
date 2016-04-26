@@ -365,14 +365,14 @@ public class EntityEvents implements Listener {
                     // maximum loot in SAT is level*10000
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
-                    final int money = bitQuest.rand(1, level*10000);
+                    final int money = 10000;
                     // a 20 sided dice, D&D style
-                    int d20 = bitQuest.rand(1, 20);
+                    int d256 = bitQuest.rand(1, 256);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
                     // The loot goes out only if d20 is 20, because of lag concerns
-                    if(money>10000 && d20==20) {
+                    if(money>10000 && level>d256) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
@@ -460,20 +460,31 @@ public class EntityEvents implements Listener {
         // Makes monsters appear in different chunks to prevent mob farming
         final Location location=e.getLocation();
         final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
+        int baselevel;
+        if(bitQuest.REDIS.get(spawnkey)!=null) {
+            baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
+        } else {
+            baselevel=0;
+        }
+        if (baselevel < 32) {
+            bitQuest.REDIS.incr(spawnkey);
+        }
+        System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
+        System.out.println(baselevel);
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        System.out.println(spawnkey);
+        if(baselevel>0) {
 
-        if(bitQuest.REDIS.get(spawnkey)==null) {
-           // System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
-            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            // System.out.println(spawnkey);
-            // bitQuest.REDIS.set(spawnkey,"1");
-           //  bitQuest.REDIS.expire(spawnkey,30000);
+            System.out.println(bitQuest.REDIS.get(spawnkey));
+            bitQuest.REDIS.set(spawnkey, "1");
+            bitQuest.REDIS.expire(spawnkey, 30000);
 
             LivingEntity entity = e.getEntity();
-            if (bitQuest.REDIS.get(spawnkey)!=null) {
+            if (bitQuest.REDIS.get(spawnkey) != null) {
                 e.setCancelled(true);
             } else if (entity instanceof Monster) {
                 // Disable mob spawners. Keep mob farmers away
-                if(e.getSpawnReason()== SpawnReason.SPAWNER) {
+                if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
                 } else {
                     World world = e.getLocation().getWorld();
@@ -482,16 +493,16 @@ public class EntityEvents implements Listener {
 
                     int level = 1;
                     // give a random lvl depending on world
-                    int distanceLevel = (int)Math.ceil(e.getLocation().distance(world.getSpawnLocation())/128);
+                    int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
 
                     if (world.getName().endsWith("_nether") == true) {
-                        level = Math.min(BitQuest.rand(0, distanceLevel*2),64);
+                        level = Math.min(BitQuest.rand(0, distanceLevel * 4), 64);
                     } else if (world.getName().endsWith("_end") == true) {
-                        level = Math.min(BitQuest.rand(0, distanceLevel*4),128);
+                        level = Math.min(BitQuest.rand(0, distanceLevel * 8), 128);
                     } else {
-                        level = Math.min(BitQuest.rand(0, distanceLevel),32);
+                        level = Math.min(BitQuest.rand(0, distanceLevel), 32);
                     }
-                    if(level<1) level=1;
+                    if (level < 1) level = 1;
 
                     entity.setMaxHealth(level * 4);
                     entity.setHealth(level * 4);
@@ -546,7 +557,6 @@ public class EntityEvents implements Listener {
                 }
             }
         }
-
     }
     @EventHandler
     void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
