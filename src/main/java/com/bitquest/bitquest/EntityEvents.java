@@ -469,7 +469,7 @@ public class EntityEvents implements Listener {
         if (baselevel < 32) {
             bitQuest.REDIS.incr(spawnkey);
         }
-        System.out.println(bitQuest.REDIS.get("chunk"+location.getX()+","+location.getZ()+"spawn"));
+        System.out.println(bitQuest.REDIS.get(spawnkey));
         System.out.println(baselevel);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         System.out.println(spawnkey);
