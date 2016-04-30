@@ -374,12 +374,12 @@ public class EntityEvents implements Listener {
                     // level 100 = 1000 bits maximum
                     final int money = 10000;
                     // a 20 sided dice, D&D style
-                    int d256 = bitQuest.rand(1, 256);
+                    int d128 = bitQuest.rand(1, 128);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
                     // The loot goes out only if d20 is 20, because of lag concerns
-                    if(money>10000 && level>d256) {
+                    if(money>10000 && level>=d128) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
