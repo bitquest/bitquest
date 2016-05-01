@@ -237,7 +237,7 @@ public class EntityEvents implements Listener {
             BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
         }
         if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString())==null||BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString())==null) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later.");
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later. If this problem persists, please write to bitquest@bitquest.co");
         }
 
 
