@@ -465,7 +465,7 @@ public class EntityEvents implements Listener {
         if(bitQuest.REDIS.get(spawnkey)!=null) {
             baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
         } else {
-            baselevel=0;
+            baselevel=1;
         }
         if (baselevel < 32) {
             bitQuest.REDIS.incr(spawnkey);
