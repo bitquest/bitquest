@@ -363,24 +363,22 @@ public class BitQuest extends JavaPlugin {
 									final Wallet finalFromWallet = fromWallet;
 									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                                     final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
-
+                                    REDIS.expire("balance"+player.getUniqueId().toString(),5);
                                     scheduler.runTaskAsynchronously(this, new Runnable() {
 				    					@Override
 				    					public void run() {
 				    						try {
 
-												if(finalFromWallet.transaction(sendAmount, toWallet)) {
-									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to "+offlinePlayer.getName()+".");
-									            	new User(player).updateScoreboard();
-												} else {
-									            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-									        	}
-												
-											} catch (ParseException e) {
-												e.printStackTrace();
-											} catch (org.json.simple.parser.ParseException e1) {
-												e1.printStackTrace();
-											} catch (IOException e1) {
+                                                if (finalFromWallet.transaction(sendAmount, toWallet)) {
+                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
+                                                    if (offlinePlayer.isOnline() == true) {
+                                                        offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
+                                                    }
+                                                } else {
+                                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
+                                                }
+
+                                            } catch (IOException e1) {
 												e1.printStackTrace();
 											}
 				    					}
