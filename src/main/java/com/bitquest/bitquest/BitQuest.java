@@ -53,6 +53,9 @@ public class BitQuest extends JavaPlugin {
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
+    // FAILS
+    // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
+
 
     // TODO: Find out why this crashes the server
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();

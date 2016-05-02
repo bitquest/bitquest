@@ -116,10 +116,7 @@ public class EntityEvents implements Listener {
         // Updates UUID-to-name database
         bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
         // Prints the user balance
-        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-            @Override
-            public void run() {
-                // What you want to schedule goes here
+
                 try {
                     // check and set experience
                     // player.setTotalExperience((Integer) user.experience());
@@ -143,9 +140,6 @@ public class EntityEvents implements Listener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-            }
-
-        });
 
 
 
