@@ -38,7 +38,6 @@ import java.util.regex.Pattern;
 public class InventoryEvents implements Listener {
     BitQuest bitQuest;
     ArrayList<Trade> trades;
-    public static Inventory marketInventory;
 
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -87,23 +86,14 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
-        marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
-        for (int i = 0; i < trades.size(); i++) {
-            ItemStack button = new ItemStack(trades.get(i).itemStack);
-            ItemMeta meta = button.getItemMeta();
-            ArrayList<String> lore = new ArrayList<String>();
-            lore.add("Price: "+trades.get(i).price/100);
-            meta.setLore(lore);
-            button.setItemMeta(meta);
-            marketInventory.setItem(i, button);
-        }
+
     }
     @EventHandler
     void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         // Merchant inventory
-        if(inventory.equals(marketInventory)) {
+        if(inventory.getName().equalsIgnoreCase("Market")) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
@@ -220,6 +210,16 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
+            Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
+            for (int i = 0; i < trades.size(); i++) {
+                ItemStack button = new ItemStack(trades.get(i).itemStack);
+                ItemMeta meta = button.getItemMeta();
+                ArrayList<String> lore = new ArrayList<String>();
+                lore.add("Price: "+trades.get(i).price/100);
+                meta.setLore(lore);
+                button.setItemMeta(meta);
+                marketInventory.setItem(i, button);
+            }
             event.getPlayer().openInventory(marketInventory);
         } else {
             event.setCancelled(false);
