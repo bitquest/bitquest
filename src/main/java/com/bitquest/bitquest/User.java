@@ -61,13 +61,19 @@ public class User {
         if (walletScoreboardObjective == null) {
             createScoreBoard();
         }
-            walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-            Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-            score.setScore(wallet.balance()/100);
-            player.setScoreboard(walletScoreboard);
-
-
+        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+        int balance;
+        if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())==true) {
+            balance=Integer.parseInt(BitQuest.REDIS.get("balance"+player.getUniqueId().toString()));
+        } else {
+            balance=wallet.balance();
+            BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(balance));
+            BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),10);
+        }
+        score.setScore(balance/100);
+        player.setScoreboard(walletScoreboard);
     }
     public void setTotalExperience(int rawxp) {
         // xp = the square root of raw exp

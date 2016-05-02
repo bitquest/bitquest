@@ -113,7 +113,7 @@ public class BitQuest extends JavaPlugin {
                     try {
                         user = new User(player);
                         user.createScoreBoard();
-                 //       user.updateScoreboard();
+                        user.updateScoreboard();
 
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -124,7 +124,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 1000L);
+        }, 0, 10L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -132,7 +132,7 @@ public class BitQuest extends JavaPlugin {
                 World world=Bukkit.getWorld("world");
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
-        }, 0, 100000L);
+        }, 0, 10000L);
 
     }
 
