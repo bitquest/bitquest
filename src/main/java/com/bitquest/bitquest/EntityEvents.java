@@ -367,7 +367,7 @@ public class EntityEvents implements Listener {
                     // maximum loot in SAT is level*10000
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
-                    final int money = 10000;
+                    final int money = 20000;
                     // a 20 sided dice, D&D style
                     int d128 = bitQuest.rand(1, 128);
 

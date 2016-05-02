@@ -42,23 +42,23 @@ public class InventoryEvents implements Listener {
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
-        trades.add(new Trade(new ItemStack(Material.BED,1),10000));
-        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),10000));
-        trades.add(new Trade(new ItemStack(Material.COMPASS,1),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),10000));
-        trades.add(new Trade(new ItemStack(Material.BOAT,1),10000));
-        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),10000));
-        trades.add(new Trade(new ItemStack(Material.FENCE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
-        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
-        trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
-        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
+        trades.add(new Trade(new ItemStack(Material.BED,1),20000));
+        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),20000));
+        trades.add(new Trade(new ItemStack(Material.COMPASS,1),20000));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,64),20000));
+        trades.add(new Trade(new ItemStack(Material.BOAT,1),20000));
+        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),20000));
+        trades.add(new Trade(new ItemStack(Material.FENCE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),20000));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),20000));
+        trades.add(new Trade(new ItemStack(Material.LEATHER,64),20000));
+        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,32),20000));
    //     trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),10000)); //cheap price for a faster, AFK railroad development ;)
-        trades.add(new Trade(new ItemStack(Material.RAILS,64),10000)); //we still need these to slow down, you know.
-        trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
-        trades.add(new Trade(new ItemStack(Material.BOW,1),10000));
+        trades.add(new Trade(new ItemStack(Material.RAILS,64),20000)); //we still need these to slow down, you know.
+        trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),20000));
+        trades.add(new Trade(new ItemStack(Material.BOW,2),20000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),20000));
         trades.add(new Trade(new ItemStack(Material.REDSTONE,16),20000));
         trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
