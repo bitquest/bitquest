@@ -347,7 +347,7 @@ public class EntityEvents implements Listener {
 
         if (entity instanceof Monster) {
             Location location=entity.getLocation();
-            final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
+            String spawnkey=spawnKey(entity.getLocation());
             int baselevel;
             if(bitQuest.REDIS.get(spawnkey)!=null) {
                 baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
@@ -356,8 +356,9 @@ public class EntityEvents implements Listener {
             }
             if (baselevel > 0) {
                 bitQuest.REDIS.decr(spawnkey);
+                baselevel=baselevel-1;
             }
-
+            System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
@@ -451,7 +452,10 @@ public class EntityEvents implements Listener {
 
     }
 
+    String spawnKey(Location location) {
+        return location.getWorld().getName()+location.getChunk().getX()+","+location.getChunk().getZ()+"spawn";
 
+    }
     // TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it would be better to
     //          find a way to instead set the EntityType of the event. Is there any way to do that?
     // TODO: Magma Cubes don't get levels or custom names for some reason...
@@ -460,7 +464,7 @@ public class EntityEvents implements Listener {
         Chunk chunk=e.getLocation().getChunk();
         // Makes monsters appear in different chunks to prevent mob farming
         final Location location=e.getLocation();
-        final String spawnkey="chunk"+location.getX()+","+location.getChunk().getZ()+"spawn";
+        String spawnkey=spawnKey(e.getLocation());
         int baselevel;
         if(bitQuest.REDIS.get(spawnkey)!=null) {
             baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
@@ -470,6 +474,7 @@ public class EntityEvents implements Listener {
         if (baselevel < 32) {
             bitQuest.REDIS.incr(spawnkey);
         }
+        System.out.println("spawn: "+spawnkey+": "+baselevel);
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
 
