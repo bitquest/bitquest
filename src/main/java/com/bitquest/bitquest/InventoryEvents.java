@@ -149,7 +149,7 @@ public class InventoryEvents implements Listener {
                                         }
                                     } else {
                                         user.wallet.updateBalance();
-                                        if (user.wallet.balance > user.wallet.confirmedBalance) {
+                                        if (user.wallet.balance != user.wallet.confirmedBalance) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
                                         } else if(user.wallet.balance()<sat) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
