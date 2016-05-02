@@ -348,6 +348,7 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster) {
             Location location=entity.getLocation();
             String spawnkey=spawnKey(entity.getLocation());
+            
             int baselevel;
             if(bitQuest.REDIS.get(spawnkey)!=null) {
                 baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
@@ -368,7 +369,6 @@ public class EntityEvents implements Listener {
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
                     final int money = 20000;
-                    // a 20 sided dice, D&D style
                     int d128 = bitQuest.rand(1, 128);
 
                     int levelChance = (int) Math.ceil(level/10D);
@@ -476,17 +476,20 @@ public class EntityEvents implements Listener {
             if(bitQuest.REDIS.get(spawnkey)!=null) {
                 baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
             } else {
-                baselevel=1;
+                baselevel=0;
             }
-            if (baselevel < 32) {
+            int d20 = bitQuest.rand(1, 20);
+
+            if (baselevel < 32 && d20==20) {
                 bitQuest.REDIS.incr(spawnkey);
+                baselevel=baselevel+1;
             }
             System.out.println("spawn: "+spawnkey+": "+baselevel);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                 e.setCancelled(true);
-            } else {
+            } else if(baselevel>0) {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
@@ -555,6 +558,8 @@ public class EntityEvents implements Listener {
                         // entity.getEquipment().setItemInHand(bow);
                     }
                 }
+            } else {
+                e.setCancelled(true);
             }
         } else {
             e.setCancelled(false);
