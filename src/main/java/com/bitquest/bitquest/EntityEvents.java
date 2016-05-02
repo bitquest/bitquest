@@ -378,6 +378,8 @@ public class EntityEvents implements Listener {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
+                        BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
+
                         scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                             @Override
                             public void run() {

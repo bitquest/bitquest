@@ -112,7 +112,7 @@ public class BitQuest extends JavaPlugin {
                     User user= null;
                     try {
                         user = new User(player);
-                        user.createScoreBoard();
+                       // user.createScoreBoard();
                         user.updateScoreboard();
 
                     } catch (ParseException e) {
@@ -124,7 +124,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 10L);
+        }, 0, 60L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {

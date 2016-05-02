@@ -114,6 +114,7 @@ public class InventoryEvents implements Listener {
                     player.closeInventory();
                     event.setCancelled(true);
                     final User user = new User(player);
+                    BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
