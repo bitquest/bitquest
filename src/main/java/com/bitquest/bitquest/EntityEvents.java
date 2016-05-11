@@ -348,7 +348,7 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster) {
             Location location=entity.getLocation();
             String spawnkey=spawnKey(entity.getLocation());
-            
+
             int baselevel;
             if(bitQuest.REDIS.get(spawnkey)!=null) {
                 baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
