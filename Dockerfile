@@ -18,7 +18,7 @@ RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
 RUN cd /tmp && java -jar BuildTools.jar --rev 1.9.4
-RUN cp /tmp/Spigot/Spigot-Server/target/spigot-1.9-R0.1-SNAPSHOT.jar /spigot/spigot.jar
+RUN cp /tmp/Spigot/Spigot-Server/target/spigot-1.9.4-R0.1-SNAPSHOT.jar /spigot/spigot.jar
 RUN cd /spigot && echo "eula=true" > eula.txt
 # COPY server-icon.png /spigot/
 COPY server.properties /spigot/
