@@ -132,7 +132,7 @@ public class BitQuest extends JavaPlugin {
                 World world=Bukkit.getWorld("world");
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
-        }, 0, 10000L);
+        }, 0, 100000L);
 
     }
 

@@ -338,6 +338,8 @@ public class EntityEvents implements Listener {
         event.setKeepInventory(true);
         event.setKeepLevel(true);
         event.setDeathMessage(null);
+        String spawnkey=spawnKey(event.getEntity().getLocation());
+        bitQuest.REDIS.expire(spawnkey,30);
     }
     @EventHandler
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
@@ -359,6 +361,7 @@ public class EntityEvents implements Listener {
                 bitQuest.REDIS.decr(spawnkey);
                 baselevel=baselevel-1;
             }
+            bitQuest.REDIS.expire(spawnkey,30000);
             System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -473,10 +476,11 @@ public class EntityEvents implements Listener {
             final Location location=e.getLocation();
             String spawnkey=spawnKey(e.getLocation());
             int baselevel;
-            if(bitQuest.REDIS.get(spawnkey)!=null) {
-                baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
+            if(bitQuest.REDIS.exists(spawnkey)) {
+                bitQuest.REDIS.expire(spawnkey,30000);
+                baselevel=16;
             } else {
-                baselevel=0;
+                baselevel=32;
             }
             int d20 = bitQuest.rand(1, 20);
 
