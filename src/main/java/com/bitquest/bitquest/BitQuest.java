@@ -133,6 +133,7 @@ public class BitQuest extends JavaPlugin {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 0, 100000L);
+        REDIS.set("lastloot","nobody");
 
     }
 
