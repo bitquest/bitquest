@@ -77,7 +77,7 @@ public class User {
     }
     public void setTotalExperience(int rawxp) {
         // xp = the square root of raw exp
-        int xp = rawxp/256;
+        int xp = (int)Math.sqrt((double)rawxp);
         if(xp<1) xp=1;
        // System.out.println(xp);
         /*
