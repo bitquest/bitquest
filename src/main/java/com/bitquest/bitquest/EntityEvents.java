@@ -131,7 +131,7 @@ public class EntityEvents implements Listener {
                     player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
                     player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
                     player.sendMessage("");
-                    player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://wiki.bitquest.co");
+                    player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
                     player.sendMessage("");
                 } catch (ParseException e) {
                     e.printStackTrace();
@@ -381,6 +381,7 @@ public class EntityEvents implements Listener {
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
                     if(money>10000 && level>=d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
                         BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
+
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
                         BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
