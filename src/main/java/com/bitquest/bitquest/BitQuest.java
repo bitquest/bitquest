@@ -124,7 +124,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 60L);
+        }, 0, 120L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
