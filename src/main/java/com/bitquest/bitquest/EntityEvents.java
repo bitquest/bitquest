@@ -881,8 +881,8 @@ public class EntityEvents implements Listener {
 	}
 
 	// enchant an item
-	public static void randomEnchantItem(ItemStack item) {
-		ItemMeta meta = item.getItemMeta();
+	public static void randomEnchantItem(final ItemStack item) {
+		final ItemMeta meta = item.getItemMeta();
 		Enchantment enchantment = null;
 		if (BitQuest.rand(0, 64) == 0) 
 			enchantment = Enchantment.ARROW_FIRE;
