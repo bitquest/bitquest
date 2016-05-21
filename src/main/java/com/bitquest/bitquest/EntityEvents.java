@@ -18,10 +18,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
-import org.bukkit.util.permissions.BroadcastPermissions;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -29,11 +26,8 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
-import java.util.Date;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.json.JSONException;
 import org.json.simple.JSONObject;
@@ -56,7 +50,7 @@ public class EntityEvents implements Listener {
         
         for (String line : bitQuest.getConfig().getStringList("welcomeMessage")) {
             for (ChatColor color : ChatColor.values()) {
-                line.replaceAll("<" + color.name() + ">", color.toString());
+                line = line.replaceAll("<" + color.name() + ">", color.toString());
             }
             // add links
             final Pattern pattern = Pattern.compile("<link>(.+?)</link>");
@@ -64,7 +58,7 @@ public class EntityEvents implements Listener {
             matcher.find();
             String link = matcher.group(1);
             // Right here we need to replace the link variable with a minecraft-compatible link
-            line.replaceAll("<link>" + link + "<link>", link);
+            line = line.replaceAll("<link>" + link + "<link>", link);
 
             rawwelcome.append(line);
         }
@@ -89,8 +83,8 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
-        final Player player=event.getPlayer();
-        if(bitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
+        final Player player = event.getPlayer();
+        if(bitQuest.ADMIN_UUID != null && player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         }
         final User user = new User(player);
@@ -98,10 +92,10 @@ public class EntityEvents implements Listener {
         user.createScoreBoard();
 
 
-        final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
+        final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        
         if (bitQuest.isModerator(player) == true) {
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
@@ -109,7 +103,7 @@ public class EntityEvents implements Listener {
 
         }
         String welcome = rawwelcome.toString();
-        welcome.replace("<name>", player.getName());
+        welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
         // Updates name-to-UUID database
         bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
@@ -143,10 +137,8 @@ public class EntityEvents implements Listener {
 
 
 
-        if(bitQuest.messageBuilder!=null) {
-
-
-
+        if(bitQuest.messageBuilder != null) {
+        	BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
                 public void run() {
@@ -173,31 +165,22 @@ public class EntityEvents implements Listener {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-
                 }
-
             });
-
-
         }
-
-
     }
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
 
-        Player player=event.getPlayer();
+        Player player = event.getPlayer();
 
-        if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
-
-            User user = new User(event.getPlayer());
-
-        } else {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
+        if(bitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString()) == true) {
+        	event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
+        	return;
         }
-        if(bitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&bitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
+        
+        if(bitQuest.REDIS.exists("address" + player.getUniqueId().toString()) == false && bitQuest.REDIS.exists("private"+player.getUniqueId().toString()) == false) {
             System.out.println("Generating new address...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -230,7 +213,7 @@ public class EntityEvents implements Listener {
             BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
             BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
         }
-        if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString())==null||BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString())==null) {
+        if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString()) == null || BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString()) == null) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later. If this problem persists, please write to bitquest@bitquest.co");
         }
 
@@ -247,11 +230,13 @@ public class EntityEvents implements Listener {
             int x2=event.getTo().getChunk().getX();
             int z2=event.getTo().getChunk().getZ();
 
-            String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-            String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+            String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name") != null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+            String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name") != null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-            if(name1==null) name1="the wilderness";
-            if(name2==null) name2="the wilderness";
+            if(name1 == null) 
+            	name1="the wilderness";
+            if(name2==null)
+            	name2="the wilderness";
 
             if(name1.equals(name2)==false) {
                 event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
@@ -271,7 +256,6 @@ public class EntityEvents implements Listener {
                                 // TODO: tp player home
                                 player.sendMessage(ChatColor.GREEN + "Teleporting to your bed...");
                                 player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-                                World world = Bukkit.getWorld("world");
 
                                 final Location spawn = player.getBedSpawnLocation();
 
@@ -476,8 +460,7 @@ public class EntityEvents implements Listener {
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
             // Makes monsters appear in different chunks to prevent mob farming
-            final Location location=e.getLocation();
-            String spawnkey=spawnKey(e.getLocation());
+            String spawnkey = spawnKey(e.getLocation());
             int baselevel;
             if(bitQuest.REDIS.exists(spawnkey)) {
                 bitQuest.REDIS.expire(spawnkey,300000);
@@ -496,7 +479,7 @@ public class EntityEvents implements Listener {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                 e.setCancelled(true);
-            } else if(baselevel>0) {
+            } else if(baselevel > 0) {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
@@ -507,7 +490,7 @@ public class EntityEvents implements Listener {
                 int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
 
                 if (world.getName().endsWith("_nether") == true) {
-                    level =BitQuest.rand(0, baselevel * 2);
+                    level = BitQuest.rand(0, baselevel * 2);
                 } else if (world.getName().endsWith("_end") == true) {
                     level = BitQuest.rand(0, baselevel * 4);
                 } else {
