@@ -1,2 +1,11 @@
 spigot:
   build: .
+  volumes:
+    - "./build/libs/:/spigot/plugins"
+  ports:
+    - "25565:25565"
+  links:
+    - redis
+  command: java -jar spigot.jar
+redis:
+  image: redis
