@@ -1,4 +1,7 @@
 spigot:
+  extends:
+    file: development.yml
+    service: spigot
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"
