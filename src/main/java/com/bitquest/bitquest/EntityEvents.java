@@ -179,7 +179,6 @@ public class EntityEvents implements Listener {
         	event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         	return;
         }
-        new User(event.getPlayer());
         
         if(bitQuest.REDIS.exists("address" + player.getUniqueId().toString()) == false && bitQuest.REDIS.exists("private"+player.getUniqueId().toString()) == false) {
             System.out.println("Generating new address...");
