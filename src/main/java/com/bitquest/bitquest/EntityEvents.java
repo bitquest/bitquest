@@ -42,7 +42,7 @@ public class EntityEvents implements Listener {
 	BitQuest bitQuest;
 	StringBuilder rawwelcome = new StringBuilder();
 
-	static final Material[] protectedBlocks = {
+	private static final Material[] PROTECTEDBLOCKS = {
 		Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
 		Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
 		Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
@@ -945,7 +945,7 @@ public class EntityEvents implements Listener {
 		final Block b = event.getClickedBlock();
 		final Player p = event.getPlayer();
 		
-		if(b != null && Arrays.asList(protectedBlocks).contains(b.getType())) {
+		if(b != null && Arrays.asList(PROTECTEDBLOCKS).contains(b.getType())) {
 			if(!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
 				event.setCancelled(true);
 				p.sendMessage(ChatColor.RED+"You don't have permission to do that");
