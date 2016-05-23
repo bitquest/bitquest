@@ -508,11 +508,8 @@ public class EntityEvents implements Listener {
                 }
                 z=z+1;
             }
-            if (baselevel > 0) {
-                bitQuest.REDIS.decr(spawnkey);
-                baselevel=baselevel-1;
-            }
-//            System.out.println("spawn: "+spawnkey+": "+baselevel);
+
+            System.out.println("spawn: "+spawnkey+": "+baselevel);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
