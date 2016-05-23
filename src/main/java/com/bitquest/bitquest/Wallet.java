@@ -42,7 +42,7 @@ public class Wallet {
     void updateBalance() {
         try {
             System.out.println("updating balance...");
-            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance?token=" + BitQuest.BLOCKCYPHER_API_KEY);
             // URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
             System.out.println(url.toString());

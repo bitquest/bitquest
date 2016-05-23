@@ -505,7 +505,7 @@ public class EntityEvents implements Listener {
                         // System.out.println(key);
                         if (bitQuest.REDIS.exists(key) == true) {
                            // System.out.println(bitQuest.REDIS.get(key));
-                            baselevel = baselevel - 4;
+                            baselevel = baselevel - 1;
                             //System.out.println(baselevel);
                         }
                         x = x + 1;
