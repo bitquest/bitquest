@@ -421,7 +421,7 @@ public class EntityEvents implements Listener {
 
                     }
                     // calculate and add experience
-                    user.addExperience(level);
+                    user.addExperience(level*4);
                     if(bitQuest.messageBuilder!=null) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
