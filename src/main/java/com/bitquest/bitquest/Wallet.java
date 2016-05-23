@@ -41,10 +41,11 @@ public class Wallet {
     }
     void updateBalance() {
         try {
+            System.out.println("updating balance...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
             // URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
-            // System.out.println(url.toString());
+            System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
@@ -68,6 +69,8 @@ public class Wallet {
             this.balance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
             this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
         } catch (IOException e) {
+            System.out.println("problem updating balance");
+            System.out.println(e);
             // wallet might be new and it's not listed on the blockchain yet
         } catch (ParseException e) {
             // There is a problem with the balance API
