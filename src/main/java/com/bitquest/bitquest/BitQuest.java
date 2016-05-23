@@ -215,6 +215,7 @@ public class BitQuest extends JavaPlugin {
     final int maxNameSize = 16;
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        BitQuest.REDIS.del("balance"+user.player.getUniqueId().toString());
 
         user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
