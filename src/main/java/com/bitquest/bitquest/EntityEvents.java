@@ -493,7 +493,7 @@ public class EntityEvents implements Listener {
             }
             baselevel=32;
             Chunk chunk=entity.getLocation().getChunk();
-            int range=8;
+            int range=32;
             int x=chunk.getX()-range;
             int z=chunk.getZ()-range;
             while (z<(chunk.getZ()+range)) {
