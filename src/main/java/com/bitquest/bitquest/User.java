@@ -140,7 +140,7 @@ public class User {
 //        }
         // player.setTotalExperience(rawxp);
         // lower factor, experience is easier to get. you can increase to get the opposite effect
-        int factor=512;
+        int factor=256;
         int level= (int) Math.sqrt(rawxp/factor);
         int nextlevel=(int) Math.pow(level+1,2);
 
