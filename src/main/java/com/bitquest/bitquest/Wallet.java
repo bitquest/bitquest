@@ -41,8 +41,8 @@ public class Wallet {
     }
     void updateBalance() {
         try {
-            // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
-            URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
+            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
+            // URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
             // System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
