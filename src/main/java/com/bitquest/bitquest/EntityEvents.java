@@ -512,6 +512,9 @@ public class EntityEvents implements Listener {
                     }
                     z = z + 1;
                 }
+            } else if(e.getLocation().getWorld().getName().equals("world_nether")) {
+                baselevel=baselevel-(int)(e.getLocation().getY()/8);
+                System.out.println(e.getLocation().getY());
             }
             System.out.println("spawn: "+spawnkey+": "+baselevel);
 
@@ -823,13 +826,14 @@ public class EntityEvents implements Listener {
     public void useRandomEquipment(LivingEntity entity, int level) {
 
         // give sword
-        if (BitQuest.rand(0, 32) < level) {
+        if (BitQuest.rand(0, 32) < level && entity instanceof Skeleton==false) {
             ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_AXE);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOOD_SWORD);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_SWORD);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.DIAMOND_SWORD);
+
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
