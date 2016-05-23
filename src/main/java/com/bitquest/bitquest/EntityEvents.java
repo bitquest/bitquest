@@ -498,7 +498,7 @@ public class EntityEvents implements Listener {
                 int x = chunk.getX() - range;
                 int z = chunk.getZ() - range;
                 while (z < (chunk.getZ() + range)) {
-                    System.out.println("x: " + x + "z:" + z);
+                   // System.out.println("x: " + x + "z:" + z);
                     while (x < (chunk.getX() + range)) {
                         if (bitQuest.REDIS.exists("chunk" + x + "," + z + "name") == true) {
                           //  System.out.println(bitQuest.REDIS.get("chunk" + x + "," + z + "name"));
