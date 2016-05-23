@@ -92,7 +92,10 @@ public class EntityEvents implements Listener {
         final Player player=event.getPlayer();
         if(bitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
+        } else {
+            player.setOp(false);
         }
+        player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
 
         user.createScoreBoard();
