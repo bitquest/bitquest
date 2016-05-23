@@ -37,7 +37,7 @@ public class Wallet {
     private String privatekey=null;
     int balance() {
         this.updateBalance();
-        return this.balance+this.confirmedBalance;
+        return this.balance;
     }
     void updateBalance() {
         try {
