@@ -100,7 +100,7 @@ public class EntityEvents implements Listener {
 
         user.createScoreBoard();
 
-
+        user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
@@ -421,7 +421,7 @@ public class EntityEvents implements Listener {
 
                     }
                     // calculate and add experience
-                    user.addExperience(bitQuest.rand(level*2, level*3));
+                    user.addExperience(level);
                     if(bitQuest.messageBuilder!=null) {
 
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();

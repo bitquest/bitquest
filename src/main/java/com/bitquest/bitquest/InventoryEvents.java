@@ -92,6 +92,8 @@ public class InventoryEvents implements Listener {
     void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
+        final User user=new User(player);
+        user.setTotalExperience(user.experience());
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
@@ -103,7 +105,6 @@ public class InventoryEvents implements Listener {
 
                     player.closeInventory();
                     event.setCancelled(true);
-                    final User user = new User(player);
                     BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
