@@ -492,16 +492,19 @@ public class EntityEvents implements Listener {
                 baselevel=baselevel+1;
             }
             baselevel=32;
+           System.out.println(e.getLocation().getWorld().getName());
             if(e.getLocation().getWorld().getName().equals("world") ==true) {
                 Chunk chunk = entity.getLocation().getChunk();
-                int range = 128;
-                int x = chunk.getX() - range;
+                int range = 8;
                 int z = chunk.getZ() - range;
                 while (z < (chunk.getZ() + range)) {
-                   // System.out.println("x: " + x + "z:" + z);
+                    int x = chunk.getX() - range;
+
                     while (x < (chunk.getX() + range)) {
-                        if (bitQuest.REDIS.exists("chunk" + x + "," + z + "name") == true) {
-                          //  System.out.println(bitQuest.REDIS.get("chunk" + x + "," + z + "name"));
+                        String key="chunk" + x + "," + z + "name";
+                        // System.out.println(key);
+                        if (bitQuest.REDIS.exists(key) == true) {
+                           // System.out.println(bitQuest.REDIS.get(key));
                             baselevel = baselevel - 4;
                             //System.out.println(baselevel);
                         }
