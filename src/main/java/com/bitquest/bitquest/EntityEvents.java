@@ -360,10 +360,7 @@ public class EntityEvents implements Listener {
             } else {
                 baselevel=0;
             }
-            if (baselevel > 0) {
-                bitQuest.REDIS.decr(spawnkey);
-                baselevel=baselevel-1;
-            }
+
             bitQuest.REDIS.expire(spawnkey,30000);
             System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
@@ -493,6 +490,26 @@ public class EntityEvents implements Listener {
             if (baselevel < 32 && d20==20) {
                 bitQuest.REDIS.incr(spawnkey);
                 baselevel=baselevel+1;
+            }
+            baselevel=32;
+            Chunk chunk=entity.getLocation().getChunk();
+            int range=4;
+            int x=chunk.getX()-range;
+            int z=chunk.getZ()-range;
+            while (z<(chunk.getZ()+range)) {
+                System.out.println("x: "+x+"z:"+z);
+                while(x<(chunk.getX()+range)) {
+                    if(bitQuest.REDIS.exists("chunk"+x+","+z+"name")== true) {
+                        System.out.println(bitQuest.REDIS.get("chunk"+x+","+z+"name"));
+                        System.out.println(baselevel);
+                    }
+                    x=x+1;
+                }
+                z=z+1;
+            }
+            if (baselevel > 0) {
+                bitQuest.REDIS.decr(spawnkey);
+                baselevel=baselevel-1;
             }
 //            System.out.println("spawn: "+spawnkey+": "+baselevel);
 
