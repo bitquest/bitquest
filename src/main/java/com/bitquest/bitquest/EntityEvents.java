@@ -494,7 +494,7 @@ public class EntityEvents implements Listener {
             baselevel=32;
             if(e.getLocation().getWorld().getName().equals("world") ==true) {
                 Chunk chunk = entity.getLocation().getChunk();
-                int range = 32;
+                int range = 128;
                 int x = chunk.getX() - range;
                 int z = chunk.getZ() - range;
                 while (z < (chunk.getZ() + range)) {
