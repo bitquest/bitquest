@@ -493,7 +493,7 @@ public class EntityEvents implements Listener {
             }
             baselevel=32;
             Chunk chunk=entity.getLocation().getChunk();
-            int range=4;
+            int range=8;
             int x=chunk.getX()-range;
             int z=chunk.getZ()-range;
             while (z<(chunk.getZ()+range)) {
@@ -501,6 +501,7 @@ public class EntityEvents implements Listener {
                 while(x<(chunk.getX()+range)) {
                     if(bitQuest.REDIS.exists("chunk"+x+","+z+"name")== true) {
                         System.out.println(bitQuest.REDIS.get("chunk"+x+","+z+"name"));
+                        baselevel=baselevel-1;
                         System.out.println(baselevel);
                     }
                     x=x+1;
