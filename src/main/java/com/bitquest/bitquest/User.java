@@ -141,11 +141,13 @@ public class User {
         // player.setTotalExperience(rawxp);
         // lower factor, experience is easier to get. you can increase to get the opposite effect
         int factor=256;
-        int level= (int) Math.sqrt(rawxp/factor);
-        int nextlevel=(int) Math.pow(level+1,2);
-
+        int level= (int) Math.round(Math.sqrt(rawxp/factor));
+        int nextlevel=(int) Math.pow(level+1,2)*factor;
+        System.out.println("level: "+level);
+        System.out.println("rawxp:"+rawxp);
+        System.out.println("nextlevel: "+nextlevel);
         player.setLevel(level);
-        float progress=((float)rawxp/(float)factor)/(float)nextlevel;
+        float progress=((float)rawxp/(float)nextlevel);
         player.setExp(progress);
         setPlayerMaxHealth();
     }
