@@ -511,9 +511,9 @@ public class EntityEvents implements Listener {
                         String key="chunk" + x + "," + z + "name";
                         // System.out.println(key);
                         if (bitQuest.REDIS.exists(key) == true) {
-                            System.out.println(bitQuest.REDIS.get(key));
+                            // System.out.println(bitQuest.REDIS.get(key));
                             baselevel = baselevel - 1;
-                            System.out.println(baselevel);
+                            // System.out.println(baselevel);
                         }
                         x = x + 1;
                     }
@@ -521,9 +521,9 @@ public class EntityEvents implements Listener {
                 }
             } else if(e.getLocation().getWorld().getName().equals("world_nether")) {
                 baselevel=baselevel-(int)(e.getLocation().getY()/8);
-                System.out.println(e.getLocation().getY());
+                // System.out.println(e.getLocation().getY());
             }
-            System.out.println("spawn: "+spawnkey+": "+baselevel);
+            // System.out.println("spawn: "+spawnkey+": "+baselevel);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
