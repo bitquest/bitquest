@@ -110,13 +110,13 @@ public class EntityEvents implements Listener {
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        
         if (bitQuest.isModerator(player) == true) {
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
-
         }
+        
         String welcome = rawwelcome.toString();
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
@@ -126,35 +126,32 @@ public class EntityEvents implements Listener {
         bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
         // Prints the user balance
 
-                try {
-                    // check and set experience
-                    // player.setTotalExperience((Integer) user.experience());
-                    user.setTotalExperience((Integer) user.experience());
-                    // user.updateLevels();
-                    user.updateScoreboard();
+        try {
+        	// check and set experience
+        	// player.setTotalExperience((Integer) user.experience());
+        	user.setTotalExperience((Integer) user.experience());
+        	// user.updateLevels();
+        	user.updateScoreboard();
 
 
-                    bitQuest.sendWalletInfo(user);
+        	bitQuest.sendWalletInfo(user);
 
-                    player.sendMessage("");
-                    player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
-                    player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
-                    player.sendMessage("");
-                    player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
-                    player.sendMessage("");
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                } catch (org.json.simple.parser.ParseException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        	player.sendMessage("");
+        	player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
+        	player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
+        	player.sendMessage("");
+        	player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
+        	player.sendMessage("");
+        } catch (ParseException e) {
+        	e.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e) {
+        	e.printStackTrace();
+        } catch (IOException e) {
+        	e.printStackTrace();
+        }
 
-
-
-        if(bitQuest.messageBuilder!=null) {
-
-
+        if(bitQuest.messageBuilder != null) {
+        	final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
             scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
@@ -353,13 +350,12 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
-        LivingEntity entity = e.getEntity();
+        final LivingEntity entity = e.getEntity();
 
         int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
-            Location location=entity.getLocation();
-            String spawnkey=spawnKey(entity.getLocation());
+            final String spawnkey = spawnKey(entity.getLocation());
 
             int baselevel;
             if(bitQuest.REDIS.get(spawnkey)!=null) {
@@ -371,7 +367,7 @@ public class EntityEvents implements Listener {
             bitQuest.REDIS.expire(spawnkey,30000);
             System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-                EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
+                final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
@@ -379,7 +375,7 @@ public class EntityEvents implements Listener {
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
                     final int money = 20000;
-                    int d128 = bitQuest.rand(1, 128);
+                    final int d128 = bitQuest.rand(1, 128);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
@@ -389,7 +385,7 @@ public class EntityEvents implements Listener {
                     if(money>10000 && level>=d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
                         BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
 
-                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                        final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
                         BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
@@ -431,7 +427,7 @@ public class EntityEvents implements Listener {
                     user.addExperience(level);
                     if(bitQuest.messageBuilder!=null) {
 
-                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                        final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
                         scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
 
