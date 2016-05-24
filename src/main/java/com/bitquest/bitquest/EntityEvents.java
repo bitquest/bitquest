@@ -30,6 +30,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,6 +49,11 @@ public class EntityEvents implements Listener {
     BitQuest bitQuest;
     StringBuilder rawwelcome = new StringBuilder();
 
+    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
+            Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
+            Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
+            Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE,
+            Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER);
     
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -936,18 +942,12 @@ public class EntityEvents implements Listener {
 
         }
     }
+    
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
-        Material[] protectedBlocks = {
-                Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
-                Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
-                Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
-                Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE,
-                Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER
-        };
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
-        if(b!=null && Arrays.asList(protectedBlocks).contains(b.getType())) {
+        if(b!=null && PROTECTED_BLOCKS.contains(b.getType())) {
             if(!bitQuest.canBuild(b.getLocation(),event.getPlayer())) {
                 event.setCancelled(true);
                 p.sendMessage(ChatColor.RED+"You don't have permission to do that");
