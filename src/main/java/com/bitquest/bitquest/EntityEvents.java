@@ -263,8 +263,12 @@ public class EntityEvents implements Listener {
             if(name1==null) name1="the wilderness";
             if(name2==null) name2="the wilderness";
 
-            if(name1.equals(name2)==false) {
-                event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+            if(name1.equals(name2) == false) {
+            	if(name2.equals("the wilderness")){
+            		event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
+            	}else{
+            		event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+            	}
             }
         }
 
