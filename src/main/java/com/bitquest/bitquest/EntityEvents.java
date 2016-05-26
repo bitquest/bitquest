@@ -607,23 +607,23 @@ public class EntityEvents implements Listener {
     @EventHandler
     void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
 
-        // damage by entity
-        if (event instanceof EntityDamageByEntityEvent) {
-        		// Player vs. Animal in claimed location
-        		if (event.getEntity() instanceof Animals && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player){
-        			if(!bitQuest.canBuild(event.getEntity().getLocation(), (Player)((EntityDamageByEntityEvent) event).getDamager())){
-        				event.setCancelled(true);
-        			}
-        		}
-                // Player vs. Villager
-                if (event.getEntity() instanceof Villager) {
-                    event.setCancelled(true);
-                }
-                // PvP is always off
-                if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-                    event.setCancelled(true);
-                }
-        }
+    	// damage by entity
+    	if (event instanceof EntityDamageByEntityEvent) {
+    		// Player vs. Animal in claimed location
+    		if (event.getEntity() instanceof Animals && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player){
+    			if(!bitQuest.canBuild(event.getEntity().getLocation(), (Player)((EntityDamageByEntityEvent) event).getDamager())){
+    				event.setCancelled(true);
+    			}
+    		}
+    		// Player vs. Villager
+    		if (event.getEntity() instanceof Villager) {
+    			event.setCancelled(true);
+    		}
+    		// PvP is always off
+    		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+    			event.setCancelled(true);
+    		}
+    	}
     }
 
 //    @EventHandler
