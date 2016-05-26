@@ -22,8 +22,9 @@ public class ChatEvents implements Listener {
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent event) {
 		
-		String message = event.getMessage();
+		String messageUnescaped = event.getMessage();
 		Player sender = event.getPlayer();
+		String message = messageUnescaped.replace("%%", "%%%%"); // escape any % signs to prevent a breakdown in chat script
 
 		if(message.startsWith("@")) {
 			event.setCancelled(true);
