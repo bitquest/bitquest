@@ -44,6 +44,10 @@ public class SignEvents implements Listener {
 
     			final String name = signText.substring(1,signText.length()-1);
 
+			if (name.equals("the wilderness")) {
+				player.sendMessage(ChatColor.RED + "You cannot name your land that.");
+				return;
+			}
     			if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner") == null) {
     				final User user = new User(player);
     				player.sendMessage(ChatColor.YELLOW + "Claiming land...");
