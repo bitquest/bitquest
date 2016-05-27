@@ -77,6 +77,7 @@ public class ChatEvents implements Listener {
 			
 			if(recipients.size() <= 1) {
 				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Nobody is within earshot! Try shouting.");
+				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Shout by placing a ! before messages.");
 			} else {
 				for(Player recipient : recipients) {
 					recipient.sendMessage(event.getFormat());
