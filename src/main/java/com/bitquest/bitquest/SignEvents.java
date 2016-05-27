@@ -44,7 +44,7 @@ public class SignEvents implements Listener {
 
     			final String name = signText.substring(1,signText.length()-1);
 
-			if (name.equals("the wilderness")) {
+			if (name.equalsIgnoreCase("the wilderness")) {
 				player.sendMessage(ChatColor.RED + "You cannot name your land that.");
 				return;
 			}
