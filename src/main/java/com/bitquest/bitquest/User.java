@@ -143,11 +143,16 @@ public class User {
         int factor=256;
         int level= (int) Math.round(Math.sqrt(rawxp/factor));
         int nextlevel=(int) Math.pow(level+1,2)*factor;
+        int prevlevel=0;
+        if(level>0) {
+            prevlevel=(int) Math.pow(level,2)*factor;
+        }
         System.out.println("level: "+level);
         System.out.println("rawxp:"+rawxp);
+        System.out.println("prevlevel: "+prevlevel);
         System.out.println("nextlevel: "+nextlevel);
         player.setLevel(level);
-        float progress=((float)rawxp/(float)nextlevel);
+        float progress=(((float)rawxp-prevlevel)/(float)nextlevel);
         player.setExp(progress);
         setPlayerMaxHealth();
     }
