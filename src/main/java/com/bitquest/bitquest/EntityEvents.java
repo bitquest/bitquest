@@ -424,7 +424,7 @@ public class EntityEvents implements Listener {
 
                     }
                     // calculate and add experience
-                    user.addExperience(level*4);
+                    user.addExperience(level*2);
                     if(bitQuest.messageBuilder!=null) {
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -619,7 +619,10 @@ public class EntityEvents implements Listener {
     		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
     			event.setCancelled(true);
     		}
-    	}
+
+
+
+        }
     }
 
 //    @EventHandler
