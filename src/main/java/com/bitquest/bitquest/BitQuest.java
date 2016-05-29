@@ -168,7 +168,7 @@ public class BitQuest extends JavaPlugin {
 
     public boolean canBuild(Location location, Player player) {
         public claimusers = bitQuest.REDIS.get("chunk" + x + "," + z + "builders");
-        final String playeruuid = player.getUniqueId().toString()
+        final String playeruuid = player.getUniqueId().toString();
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
         if(isModerator(player)==true) {
@@ -193,12 +193,14 @@ public class BitQuest extends JavaPlugin {
     public boolean createNewArea(Location location, Player owner, String name, int size) {
         // write the new area to REDIS
         JsonObject areaJSON = new JsonObject();
+        public ArrayList claimusers = new ArrayList();
         areaJSON.addProperty("size", size);
         areaJSON.addProperty("owner", owner.getUniqueId().toString());
         areaJSON.addProperty("name", name);
         areaJSON.addProperty("x", location.getX());
         areaJSON.addProperty("z", location.getZ());
         areaJSON.addProperty("uuid", UUID.randomUUID().toString());
+        areaJSON.addProperty("builders", claimusers);
         REDIS.lpush("areas", areaJSON.toString());
         // TODO: Check if redis actually appended the area to list and return the success of the operation
         return true;

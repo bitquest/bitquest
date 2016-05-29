@@ -61,7 +61,6 @@ public class SignEvents implements Listener {
     								paymentWallet = bitQuest.wallet;
     							}
     							if (user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
-
                     public ArrayList claimusers = new ArrayList();
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
