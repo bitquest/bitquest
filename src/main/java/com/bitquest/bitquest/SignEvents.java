@@ -62,9 +62,10 @@ public class SignEvents implements Listener {
     							}
     							if (user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
 
+                    public ArrayList claimusers = new ArrayList();
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                    public ArrayList<String> claimusers = new ArrayList<String>();
+                    bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
     								player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
 									if(bitQuest.messageBuilder!=null) {
 
@@ -133,8 +134,10 @@ public class SignEvents implements Listener {
                 			final String adduser = signText.substring(1,signText.length()-1);
                       public void run() {
                         try{
+                      public claimusers = bitQuest.REDIS.get("chunk" + x + "," + z + "builders");
                       UUID adduserUUID = UUIDFetcher.getUUIDOf(adduser);
                       claimusers.add(adduserUUID.toString());
+                      bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
                       player.sendMessage(ChatColor.GREEN + "This land is now shared with "+adduser);
                     } catch (Exception e){
                       player.sendMessage(ChatColor.RED + "Could not get uuid of "+ adduser);
