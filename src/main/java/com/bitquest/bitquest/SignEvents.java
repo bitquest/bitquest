@@ -128,7 +128,7 @@ public class SignEvents implements Listener {
 
                     }else if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
     					player.sendMessage(ChatColor.RED + "You already own this land!");
-    				} else if (signText.length() > 0 && signText.substring(0,1).equals(specialCharacter) && signText.substring(signText.length()-1).equals(specialCharacter)) {
+    				} else if (signText.length() > 0 && signText.substring(0,1).equals(specialCharacter2) && signText.substring(signText.length()-1).equals(specialCharacter2)) {
                 			final String adduser = signText.substring(1,signText.length()-1);
                       public void run() {
                         try{
