@@ -64,7 +64,7 @@ public class SignEvents implements Listener {
 
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                    ArrayList<String> claimusers = new ArrayList<String>();
+                    public ArrayList<String> claimusers = new ArrayList<String>();
     								player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
 									if(bitQuest.messageBuilder!=null) {
 
