@@ -157,6 +157,7 @@ public class BitQuest extends JavaPlugin {
             JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
             int x = area.get("x").getAsInt();
             int z = area.get("z").getAsInt();
+            ArrayList claimusers = new ArrayList();
             int size = area.get("size").getAsInt();
             if (location.getX() > (x - size) && location.getX() < (x + size) && location.getZ() > (z - size) && location.getZ() < (z + size)) {
                 return area;
@@ -194,7 +195,10 @@ public class BitQuest extends JavaPlugin {
     public boolean createNewArea(Location location, Player owner, String name, int size) {
         // write the new area to REDIS
         JsonObject areaJSON = new JsonObject();
+<<<<<<< HEAD
         ArrayList claimusers = new ArrayList();
+=======
+>>>>>>> origin/master
         areaJSON.addProperty("size", size);
         areaJSON.addProperty("owner", owner.getUniqueId().toString());
         areaJSON.addProperty("name", name);
