@@ -61,7 +61,6 @@ public class SignEvents implements Listener {
     								paymentWallet = bitQuest.wallet;
     							}
     							if (user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
-                    public ArrayList claimusers = new ArrayList();
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
                     bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
@@ -133,7 +132,7 @@ public class SignEvents implements Listener {
                 			final String adduser = signText.substring(1,signText.length()-1);
                       public void run() {
                         try{
-                      public claimusers = bitQuest.REDIS.get("chunk" + x + "," + z + "builders");
+                      claimusers = bitQuest.REDIS.get("chunk" + x + "," + z + "builders");
                       UUID adduserUUID = UUIDFetcher.getUUIDOf(adduser);
                       claimusers.add(adduserUUID.toString());
                       bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
