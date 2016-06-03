@@ -184,6 +184,8 @@ public class BitQuest extends JavaPlugin {
             } else {
                 return false;
             }
+        } else if (REDIS.sismember(chunk + "builders", playeruuid)) {
+            return true;
         } else {
             return true;
         }
