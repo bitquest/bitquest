@@ -124,6 +124,40 @@ public class SignEvents implements Listener {
                             }
                         });
 
+                    } else if (name.startsWith("add ") && name.length() > 4) {
+						final String builder = name.substring(4);
+						player.sendMessage(ChatColor.YELLOW+"Adding " + builder + "...");
+
+						BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+						scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+							@Override
+							public void run() {
+								try {
+									final String builderUUID = UUIDFetcher.getUUIDOf(builder).toString();
+									bitQuest.REDIS.sadd(chunk + "builders", builderUUID);
+									player.sendMessage(ChatColor.GREEN + "Now " + builder + " can build in this land.");
+								} catch (Exception e) {
+									player.sendMessage(ChatColor.RED + "Could not get uuid of " + builder);
+								}
+							}
+						});
+					} else if (name.startsWith("remove ") && name.length() > 7) {
+                        final String builder = name.substring(7);
+                        player.sendMessage(ChatColor.YELLOW+"Removing " + builder + "...");
+
+                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    final String builderUUID = UUIDFetcher.getUUIDOf(builder).toString();
+                                    bitQuest.REDIS.srem(chunk + "builders", builderUUID);
+                                    player.sendMessage(ChatColor.GREEN + "Now " + builder + " can't build in this land.");
+                                } catch (Exception e) {
+                                    player.sendMessage(ChatColor.RED + "Could not get uuid of " + builder);
+                                }
+                            }
+                        });
                     } else if (bitQuest.REDIS.get(chunk + "name").equals(name)) {
     					player.sendMessage(ChatColor.RED + "You already own this land!");
     				} else {
