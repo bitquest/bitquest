@@ -36,15 +36,14 @@ public class SignEvents implements Listener {
     		final String specialCharacter = "^";
     		final String[] lines = event.getLines();
     		final String signText = lines[0] + lines[1] + lines[2] + lines[3];
-    		Chunk chunk = event.getBlock().getWorld().getChunkAt(event.getBlock().getLocation());
-    		final int x=chunk.getX();
-    		final int z=chunk.getZ();
+    		Chunk chunkLocation = event.getBlock().getWorld().getChunkAt(event.getBlock().getLocation());
+			final String chunk = "chunk" + chunkLocation.getX() + "," + chunkLocation.getZ();
 
     		if (signText.length() > 0 && signText.substring(0,1).equals(specialCharacter) && signText.substring(signText.length()-1).equals(specialCharacter)) {
 
     			final String name = signText.substring(1,signText.length()-1);
 
-    			if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner") == null) {
+    			if (bitQuest.REDIS.get(chunk + "owner") == null) {
     				final User user = new User(player);
     				player.sendMessage(ChatColor.YELLOW + "Claiming land...");
     				BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -61,8 +60,8 @@ public class SignEvents implements Listener {
     							}
     							if (user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
 
-    								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-    								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+    								bitQuest.REDIS.set(chunk + "owner", player.getUniqueId().toString());
+    								bitQuest.REDIS.set(chunk + "name", name);
     								player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
 									if(bitQuest.messageBuilder!=null) {
 
@@ -100,11 +99,11 @@ public class SignEvents implements Listener {
     					}
     				});
 
-    			}else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString())) {
+    			}else if (bitQuest.REDIS.get(chunk + "owner").equals(player.getUniqueId().toString())) {
 					if (name.equals("abandon")) {
                         // Abandon land
-                        bitQuest.REDIS.del("chunk" + x + "," + z + "owner");
-                        bitQuest.REDIS.del("chunk" + x + "," + z + "name");
+                        bitQuest.REDIS.del(chunk + "owner");
+                        bitQuest.REDIS.del(chunk + "name");
                     }else if (name.startsWith("transfer ") && name.length() > 9) {
                         // If the name starts with "trasnfer " and have at lest one more character,
                         // transfer land
@@ -117,7 +116,7 @@ public class SignEvents implements Listener {
                             public void run() {
                                 try {
                                     UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                    bitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                                    bitQuest.REDIS.set(chunk + "owner", newOwnerUUID.toString());
                                     player.sendMessage(ChatColor.GREEN + "This land now belongs to "+newOwner);
                                 } catch (Exception e) {
                                     player.sendMessage(ChatColor.RED + "Could not get uuid of "+ newOwner);
@@ -125,12 +124,12 @@ public class SignEvents implements Listener {
                             }
                         });
 
-                    }else if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
+                    } else if (bitQuest.REDIS.get(chunk + "name").equals(name)) {
     					player.sendMessage(ChatColor.RED + "You already own this land!");
     				} else {
     					// Rename land
     					player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
-    					bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+    					bitQuest.REDIS.set(chunk + "name", name);
     				}
     			}
     		}
