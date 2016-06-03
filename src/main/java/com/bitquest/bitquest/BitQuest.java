@@ -178,14 +178,14 @@ public class BitQuest extends JavaPlugin {
         } else if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
         	// If theyre not in the overworld, they cant build
         	return false;
+        } else if (REDIS.sismember(chunk + "builders", playeruuid)) {
+            return true;
         } else if (REDIS.get(chunk + "owner")!=null) {
             if (REDIS.get(chunk + "owner").equals(playeruuid)) {
                 return true;
             } else {
                 return false;
             }
-        } else if (REDIS.sismember(chunk + "builders", playeruuid)) {
-            return true;
         } else {
             return true;
         }
