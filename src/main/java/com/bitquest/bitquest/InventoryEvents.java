@@ -71,6 +71,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SPONGE,8),20000));
         trades.add(new Trade(new ItemStack(Material.WOOD,64),20000));
         trades.add(new Trade(new ItemStack(Material.WOOL,64),20000));
+        trades.add(new Trade(new ItemStack(Material.PAPER,32),20000)) //needed
         trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,16),30000));
         trades.add(new Trade(new ItemStack(Material.GOLD_INGOT,64),30000));
         trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,6),30000));
@@ -79,11 +80,16 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),30000));
         trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),30000));
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,64),30000));
+        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),30000));
+        trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 32),30000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
+        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),40000));//Super demanded
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
         trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); //If we have a lot of horses in Satoshi, we want to ride them!
        // trades.add(new Trade(new ItemStack(Material.DIAMOND_HORSE_ARMOUR,1),55000)); //essential
+        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,32),50000)); //Finally we add it.
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,1,(short)6),60000)); //cool
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
 
