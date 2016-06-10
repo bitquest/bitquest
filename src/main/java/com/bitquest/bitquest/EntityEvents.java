@@ -861,7 +861,7 @@ public class EntityEvents implements Listener {
         // give helmet
         if (BitQuest.rand(0, 32) < level) {
             ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.IRON_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.DIAMOND_HELMET);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
