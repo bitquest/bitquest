@@ -502,7 +502,7 @@ public class EntityEvents implements Listener {
            System.out.println(e.getLocation().getWorld().getName());
             if(e.getLocation().getWorld().getName().equals("world") ==true) {
                 Chunk chunk = entity.getLocation().getChunk();
-                int range = 8;
+                int range = 16;
                 int z = chunk.getZ() - range;
                 while (z < (chunk.getZ() + range)) {
                     int x = chunk.getX() - range;
