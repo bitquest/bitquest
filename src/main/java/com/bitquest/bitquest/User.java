@@ -70,7 +70,7 @@ public class User {
         } else {
             balance=wallet.balance();
             BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(balance));
-            BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),1000);
+            BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
         }
         score.setScore(balance/100);
         player.setScoreboard(walletScoreboard);
