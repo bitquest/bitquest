@@ -55,6 +55,12 @@ Running locally via Docker is the fastest way to develop and test code. Docker i
 1. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
 [Get Docker](http://docs.docker.com/mac/started/)
 2. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
+3. Create development.yml file, where your local variables are. A good starting point is:
+```
+spigot:
+  environment:
+    - SPIGOT_ENV=development
+```
 
 ## Setting up the Gradle Workspace
 There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
