@@ -1,6 +1,10 @@
 # BitQuest
 
-[BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements, as the form of a plugin. 
+[BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements. This repository is the open source code running on the server.
+
+# Important Note
+This server is still under development, and bugs can, and most likely will, happen. Please report any bugs to a moderator promptly, to ensure they are fixed. Also note that your wallet is not guaranteed, and you may experience issues with your balance. For this reason, it is highly recommended that you do not deposit large amounts, or anything you do not wish to place at risk by being tied to the server. In addition, if you are caught breaking rules and are banned, you forfeit your access to your server wallet, and all funds tied to it. With this said, rules are non-negotiable, and will be strictly enforced. This server is a fair server, and anyone abusing any system set in place will be punished. Please play fair, have fun, and enjoy the server
+
 
 # Play BitQuest
 To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address: 
@@ -47,22 +51,10 @@ Everybody is welcome to contribute. :D
 
 Here are the instructions to modify, install and run the server as localhost.
 
-# Running BitQuest locally using Docker
 
-Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different.
+# Building BitQuest
 
-## Installing requirements
-1. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
-[Get Docker](http://docs.docker.com/mac/started/)
-2. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
-3. Create development.yml file, where your local variables are. A good starting point is:
-```
-spigot:
-  environment:
-    - SPIGOT_ENV=development
-```
-
-## Setting up the Gradle Workspace
+## Setup Workspace
 There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
 
 ````
@@ -75,8 +67,10 @@ gradlew.bat setupWorkspace
 ````
 (Windows Powershell)
 
-## Compile BitQuest
-We compile using the gradle shadowJar task that will create a file under build/libs. Since this folder is "synced" with docker, you won't need to restart the server to update changes. (Just use /reload) inside the game
+## Compile BitQuest and generate a JAR file
+After the workspace is set up, we can compile using the gradle shadowJar task that will create a file under build/libs. Since this folder is "synced" with docker, you won't need to restart the server to update changes. (Just use /reload) inside the game
+
+# Linux and OSX
 
 ````
 ./gradlew shadowJar
@@ -88,7 +82,24 @@ gradlew.bat shadowJar
 ````
 (Windows Powershell)
 
-## Configure your server
+# Running BitQuest locally with Docker
+
+Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different.
+
+1. Build BitQuest using the instructions above.
+2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
+[Get Docker](http://docs.docker.com/mac/started/)
+3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
+4. Create development.yml file, where your local variables are. A good starting point is:
+````
+spigot:
+  environment:
+    - SPIGOT_ENV=development
+````
+
+The server will run with a local volume pointing to your latest jar built with Gradle. That means you can /reload inside the server and watch changes without restarting the Spigot server.
+
+# Running a BitQuest server
 To run BitQuest you'll need to specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
 
 Here's an example of a development.yml file (please note we use spaces instead of tabs):
@@ -102,6 +113,7 @@ spigot:
     - BLOCKCYPHER_API_KEY=some_api_key
     - ADMIN_UUID=921baf7a-893b-4249-b6a7-ae010ff75551
 ```` 
+
 
 ## Running BitQuest
 From the directroy where this repository was cloned, just run:
