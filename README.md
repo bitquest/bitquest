@@ -96,10 +96,15 @@ spigot:
     - SPIGOT_ENV=development
 ````
 
+5. Run your test server with docker-compose:
+
+````
+docker-compose up
+````
 The server will run with a local volume pointing to your latest jar built with Gradle. That means you can /reload inside the server and watch changes without restarting the Spigot server.
 
 # Running a BitQuest server
-To run BitQuest you'll need to specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
+To run BitQuest might want to do the same steps as with a local test server, but specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
 
 Here's an example of a development.yml file (please note we use spaces instead of tabs):
 
@@ -114,12 +119,7 @@ spigot:
 ```` 
 
 
-## Running BitQuest
-From the directroy where this repository was cloned, just run:
 
-````
-docker-compose up
-````
 
 You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload````command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.
 
