@@ -69,7 +69,7 @@ task buildSpigot(type: JavaExec) {
         dependsOn = ['cleanSpigotBuild', 'downloadBuildTool']
     }
     main = '-jar'
-    args new File(spigotBuildDir, "BuildTools.jar").getAbsolutePath(), "--rev", project.property("apibuildtoolversion")
+    args new File(spigotBuildDir, "BuildTools.jar").getAbsolutePath()
     workingDir = spigotBuildDir
 }
 
