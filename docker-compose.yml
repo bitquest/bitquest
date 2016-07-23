@@ -12,3 +12,8 @@ spigot:
   command: java -jar spigot.jar
 redis:
   image: redis
+rcli:
+  image: redis:latest
+  links:
+    - redis
+  command: redis-cli -h redis
