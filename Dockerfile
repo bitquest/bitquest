@@ -17,7 +17,7 @@ RUN cd /tmp/downer && ./gradlew setupWorkspace && ./gradlew build
 RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-RUN cd /tmp && java -jar BuildTools.jar
+RUN cd /tmp && java -jar BuildTools.jar --rev 1.10.2
 RUN cp /tmp/Spigot/Spigot-Server/target/spigot-1.10.2-R0.1-SNAPSHOT.jar /spigot/spigot.jar
 RUN cd /spigot && echo "eula=true" > eula.txt
 # COPY server-icon.png /spigot/
