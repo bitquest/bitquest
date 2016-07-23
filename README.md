@@ -96,7 +96,7 @@ spigot:
     - SPIGOT_ENV=development
 ````
 
-5. Run your test server with docker-compose:
+To start your test server with docker-compose you can now run:
 
 ````
 docker-compose up
