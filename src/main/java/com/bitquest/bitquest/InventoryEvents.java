@@ -96,7 +96,7 @@ public class InventoryEvents implements Listener {
         user.setTotalExperience(user.experience());
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
-          if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+            if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -164,9 +164,9 @@ public class InventoryEvents implements Listener {
                     });
                 }
             
-          } else {
-            event.setCancelled(true);
-          }
+            } else {
+              event.setCancelled(true);
+            }
 
         } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
