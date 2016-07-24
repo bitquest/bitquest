@@ -118,7 +118,10 @@ public class InventoryEvents implements Listener {
                                             sat = trades.get(i).price;
 
                                     }
-                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+																		
+																		int openSlots = player.getInventory().getSize() - player.getInventory().getContents().length;
+																		
+                                    if (openSlots > 0 && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
                                         ArrayList<String> Lore = new ArrayList<String>();
@@ -126,6 +129,7 @@ public class InventoryEvents implements Listener {
                                         item.setItemMeta(meta);
                                         player.getInventory().addItem(item);
                                         player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+																				
                                         if (bitQuest.messageBuilder != null) {
 
                                             // Create an event
@@ -140,7 +144,9 @@ public class InventoryEvents implements Listener {
                                         }
                                     } else {
                                         user.wallet.updateBalance();
-                                        if (user.wallet.balance != user.wallet.confirmedBalance) {
+                                        if (openSlots < 1) {
+																					player.sendMessage(ChatColor.RED + "You don't have any open slots in your inventory");
+																				} else if (user.wallet.balance != user.wallet.confirmedBalance) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
                                         } else if(user.wallet.balance()<sat) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
