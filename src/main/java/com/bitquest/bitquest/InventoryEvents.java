@@ -110,62 +110,66 @@ public class InventoryEvents implements Listener {
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
                         public void run() {
+                            try {
+                                int sat = 0;
+                                for (int i = 0; i < trades.size(); i++) {
+                                    if (clicked.getType() == trades.get(i).itemStack.getType())
+                                        sat = trades.get(i).price;
 
-                                try {
-                                    int sat = 0;
-                                    for (int i = 0; i < trades.size(); i++) {
-                                        if (clicked.getType() == trades.get(i).itemStack.getType())
-                                            sat = trades.get(i).price;
-
-                                    }
-                                    
-                                    int openSlots = player.getInventory().getSize() - player.getInventory().getContents().length;
-                                    
-                                    if (openSlots > 0 && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
-                                        ItemStack item = event.getCurrentItem();
-                                        ItemMeta meta = item.getItemMeta();
-                                        ArrayList<String> Lore = new ArrayList<String>();
-                                        meta.setLore(null);
-                                        item.setItemMeta(meta);
-                                        player.getInventory().addItem(item);
-                                        player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
-                                        
-                                        if (bitQuest.messageBuilder != null) {
-
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
-
-
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    } else {
-                                        user.wallet.updateBalance();
-                                        if (openSlots < 1) {
-                                            player.sendMessage(ChatColor.RED + "You don't have any open slots in your inventory");
-                                        } else if (user.wallet.balance != user.wallet.confirmedBalance) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
-                                        } else if(user.wallet.balance()<sat) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
-                                        }
-                                    }
-                                } catch (IllegalArgumentException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
+                                
+                                boolean hasOpenSlots = false;
+                                for (ItemStack item : player.getInventory().getContents()) {
+                                    if (item == null) {
+                                        hasOpenSlots = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (hasOpenSlots && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    ItemStack item = event.getCurrentItem();
+                                    ItemMeta meta = item.getItemMeta();
+                                    ArrayList<String> Lore = new ArrayList<String>();
+                                    meta.setLore(null);
+                                    item.setItemMeta(meta);
+                                    player.getInventory().addItem(item);
+                                    player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                    
+                                    if (bitQuest.messageBuilder != null) {
 
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+
+
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
+
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
+                                    }
+                                } else {
+                                    user.wallet.updateBalance();
+                                    if (!hasOpenSlots) {
+                                        player.sendMessage(ChatColor.RED + "You don't have any open slots in your inventory");
+                                    } else if (user.wallet.balance != user.wallet.confirmedBalance) {
+                                        player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
+                                    } else if(user.wallet.balance()<sat) {
+                                        player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
+                                    }
+                                }
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }
             
             } else {
-              event.setCancelled(true);
+                event.setCancelled(true);
             }
 
         } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
