@@ -120,7 +120,10 @@ public class InventoryEvents implements Listener {
                                 
                                 boolean hasOpenSlots = false;
                                 for (ItemStack item : player.getInventory().getContents()) {
-                                    if (item == null) {
+                                    if (item == null || (
+                                        item.getType() == clicked.getType() &&
+                                        item.stackSize + clicked.stackSize < item.getMaxStackSize()
+                                    )) {
                                         hasOpenSlots = true;
                                         break;
                                     }
