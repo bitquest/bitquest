@@ -34,6 +34,7 @@ public class SignEvents implements Listener {
     	// Check that the world is overworld
     	if(!event.getBlock().getWorld().getName().endsWith("_nether") && !event.getBlock().getWorld().getName().endsWith("_end")) {
     		final String specialCharacter = "^";
+        final String specialCharacter2 = "*";
     		final String[] lines = event.getLines();
     		final String signText = lines[0] + lines[1] + lines[2] + lines[3];
     		Chunk chunk = event.getBlock().getWorld().getChunkAt(event.getBlock().getLocation());
@@ -60,9 +61,9 @@ public class SignEvents implements Listener {
     								paymentWallet = bitQuest.wallet;
     							}
     							if (user.wallet.transaction(bitQuest.LAND_PRICE, paymentWallet)) {
-
     								bitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
     								bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                    bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
     								player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
 									if(bitQuest.messageBuilder!=null) {
 
@@ -83,7 +84,7 @@ public class SignEvents implements Listener {
     							} else {
     								int balance = new User(player).wallet.balance();
     								if (balance < bitQuest.LAND_PRICE) {
-    									player.sendMessage(ChatColor.RED + "You don't have enough money! You need " + 
+    									player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
     										ChatColor.BOLD + Math.ceil((bitQuest.LAND_PRICE-balance)/100) + ChatColor.RED + " more Bits.");
     								} else {
     									player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
@@ -127,14 +128,27 @@ public class SignEvents implements Listener {
 
                     }else if (bitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
     					player.sendMessage(ChatColor.RED + "You already own this land!");
-    				} else {
+    				} else if (signText.length() > 0 && signText.substring(0,1).equals(specialCharacter2) && signText.substring(signText.length()-1).equals(specialCharacter2)) {
+                			final String adduser = signText.substring(1,signText.length()-1);
+                      public void run() {
+                        try{
+                      claimusers = bitQuest.REDIS.get("chunk" + x + "," + z + "builders");
+                      UUID adduserUUID = UUIDFetcher.getUUIDOf(adduser);
+                      claimusers.add(adduserUUID.toString());
+                      bitQuest.REDIS.set("chunk" + x + "," + z + "builders", claimusers);
+                      player.sendMessage(ChatColor.GREEN + "This land is now shared with "+adduser);
+                    } catch (Exception e){
+                      player.sendMessage(ChatColor.RED + "Could not get uuid of "+ adduser);
+                    }
+
+            }else {
     					// Rename land
     					player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
     					bitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
     				}
     			}
     		}
-        
+
     	} else if(event.getBlock().getWorld().getName().endsWith("_nether")) {
     		player.sendMessage(ChatColor.RED + "No claiming in the nether!");
     	} else if(event.getBlock().getWorld().getName().endsWith("_end")) {
@@ -143,4 +157,3 @@ public class SignEvents implements Listener {
 
     }
 }
-

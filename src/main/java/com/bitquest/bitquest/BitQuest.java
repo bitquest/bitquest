@@ -157,6 +157,7 @@ public class BitQuest extends JavaPlugin {
             JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
             int x = area.get("x").getAsInt();
             int z = area.get("z").getAsInt();
+            ArrayList claimusers = new ArrayList();
             int size = area.get("size").getAsInt();
             if (location.getX() > (x - size) && location.getX() < (x + size) && location.getZ() > (z - size) && location.getZ() < (z + size)) {
                 return area;
@@ -167,6 +168,9 @@ public class BitQuest extends JavaPlugin {
     }
 
     public boolean canBuild(Location location, Player player) {
+        ArrayList claimusers = REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"builders")
+        // Declared up here to make it less messy.
+        final String playeruuid = player.getUniqueId().toString();
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
         if(isModerator(player)==true) {
@@ -177,7 +181,10 @@ public class BitQuest extends JavaPlugin {
         } else if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")!=null) {
             if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner").equals(player.getUniqueId().toString())) {
                 return true;
-            } else {
+            } else if (claimusers.contains(playeruuid)) {
+              return true;
+              }
+            else {
                 return false;
             }
         } else {
@@ -188,12 +195,17 @@ public class BitQuest extends JavaPlugin {
     public boolean createNewArea(Location location, Player owner, String name, int size) {
         // write the new area to REDIS
         JsonObject areaJSON = new JsonObject();
+<<<<<<< HEAD
+        ArrayList claimusers = new ArrayList();
+=======
+>>>>>>> origin/master
         areaJSON.addProperty("size", size);
         areaJSON.addProperty("owner", owner.getUniqueId().toString());
         areaJSON.addProperty("name", name);
         areaJSON.addProperty("x", location.getX());
         areaJSON.addProperty("z", location.getZ());
         areaJSON.addProperty("uuid", UUID.randomUUID().toString());
+        areaJSON.addProperty("builders", claimusers);
         REDIS.lpush("areas", areaJSON.toString());
         // TODO: Check if redis actually appended the area to list and return the success of the operation
         return true;
@@ -397,7 +409,7 @@ public class BitQuest extends JavaPlugin {
 							java.util.regex.Matcher m = p.matcher(args[0]);
 							if(m.matches()==true) {
 						    	// TODO: send money through xapo
-						    
+
 							} else {
 						    	try {
 
@@ -498,7 +510,7 @@ public class BitQuest extends JavaPlugin {
 
                 }
                 if (cmd.getName().equalsIgnoreCase("spectate") && args.length == 1) {
-                	
+
                 	if(Bukkit.getPlayer(args[0]) != null) {
                 		((Player) sender).setGameMode(GameMode.SPECTATOR);
                     	((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
@@ -512,7 +524,7 @@ public class BitQuest extends JavaPlugin {
                     StringBuilder message = new StringBuilder();
                     message.append(sender.getName())
                             .append(" has shut down the server for emergency reasons");
-                    
+
                     if (args.length > 0) {
                         message.append(": ");
                         for (String word : args) {
@@ -522,11 +534,11 @@ public class BitQuest extends JavaPlugin {
                     for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
                         currentPlayer.kickPlayer(message.toString());
                     }
-                    
-                    Bukkit.shutdown();               
+
+                    Bukkit.shutdown();
                     return true;
-                }           
-            
+                }
+
             } else {
                 // PLAYER COMMANDS
 
@@ -535,4 +547,3 @@ public class BitQuest extends JavaPlugin {
         return true;
     }
 }
-
