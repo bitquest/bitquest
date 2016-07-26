@@ -379,14 +379,14 @@ public class EntityEvents implements Listener {
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
                     final int money = 20000;
-                    final int d128 = bitQuest.rand(1, 128);
+                    final int d128 = BitQuest.rand(1, 128);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
                     // The loot goes out only if d20 is 20, because of lag concerns
 
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(money>10000 && level>=d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
+                    if(money > 10000 && level >= d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
                         BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
