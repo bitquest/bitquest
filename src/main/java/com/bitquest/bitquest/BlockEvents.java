@@ -57,7 +57,7 @@ public class BlockEvents implements Listener {
     		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
-    	} else if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+    	} else if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 			event.setCancelled(true);
 			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
         } else {
@@ -69,7 +69,7 @@ public class BlockEvents implements Listener {
 
 		// set clan
 		// first, we check if the player has permission to build
-			if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 				event.setCancelled(true);
             	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
 			} else if (event.getBlock().getType() == Material.STANDING_BANNER) {

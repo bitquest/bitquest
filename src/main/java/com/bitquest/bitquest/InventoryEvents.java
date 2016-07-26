@@ -118,7 +118,7 @@ public class InventoryEvents implements Listener {
                                             sat = trades.get(i).price;
 
                                     }
-                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
                                         ArrayList<String> Lore = new ArrayList<String>();
