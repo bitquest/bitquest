@@ -96,7 +96,7 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         final Player player=event.getPlayer();
-        if(bitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
+        if(BitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(BitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         } else {
             player.setOp(false);
@@ -109,7 +109,7 @@ public class EntityEvents implements Listener {
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
-        bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
+        BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         
         if (bitQuest.isModerator(player) == true) {
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
@@ -121,9 +121,9 @@ public class EntityEvents implements Listener {
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
         // Updates name-to-UUID database
-        bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
+        BitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
         // Updates UUID-to-name database
-        bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+        BitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
         // Prints the user balance
 
         try {
@@ -196,14 +196,14 @@ public class EntityEvents implements Listener {
 
         Player player=event.getPlayer();
 
-        if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
+        if(BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
 
             User user = new User(event.getPlayer());
 
         } else {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
-        if(bitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&bitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
+        if(BitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&BitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
             System.out.println("Generating new address...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -254,8 +254,8 @@ public class EntityEvents implements Listener {
             int x2=event.getTo().getChunk().getX();
             int z2=event.getTo().getChunk().getZ();
 
-            String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-            String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+            String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+            String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
             if(name1==null) name1="the wilderness";
             if(name2==null) name2="the wilderness";
@@ -350,7 +350,7 @@ public class EntityEvents implements Listener {
         event.setKeepLevel(true);
         event.setDeathMessage(null);
         String spawnkey=spawnKey(event.getEntity().getLocation());
-        bitQuest.REDIS.expire(spawnkey,30);
+        BitQuest.REDIS.expire(spawnkey,30);
     }
     @EventHandler
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
@@ -362,13 +362,13 @@ public class EntityEvents implements Listener {
             final String spawnkey = spawnKey(entity.getLocation());
 
             int baselevel;
-            if(bitQuest.REDIS.get(spawnkey)!=null) {
-                baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
+            if(BitQuest.REDIS.get(spawnkey)!=null) {
+                baselevel=Integer.parseInt(BitQuest.REDIS.get(spawnkey));
             } else {
                 baselevel=0;
             }
 
-            bitQuest.REDIS.expire(spawnkey,30000);
+            BitQuest.REDIS.expire(spawnkey,30000);
             System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -486,16 +486,16 @@ public class EntityEvents implements Listener {
             final Location location=e.getLocation();
             String spawnkey=spawnKey(e.getLocation());
             int baselevel;
-            if(bitQuest.REDIS.exists(spawnkey)) {
-                bitQuest.REDIS.expire(spawnkey,300000);
+            if(BitQuest.REDIS.exists(spawnkey)) {
+                BitQuest.REDIS.expire(spawnkey,300000);
                 baselevel=16;
             } else {
                 baselevel=32;
             }
-            int d20 = bitQuest.rand(1, 20);
+            int d20 = BitQuest.rand(1, 20);
 
             if (baselevel < 32 && d20==20) {
-                bitQuest.REDIS.incr(spawnkey);
+                BitQuest.REDIS.incr(spawnkey);
                 baselevel=baselevel+1;
             }
             baselevel=32;
@@ -510,7 +510,7 @@ public class EntityEvents implements Listener {
                     while (x < (chunk.getX() + range)) {
                         String key="chunk" + x + "," + z + "name";
                         // System.out.println(key);
-                        if (bitQuest.REDIS.exists(key) == true) {
+                        if (BitQuest.REDIS.exists(key) == true) {
                             // System.out.println(bitQuest.REDIS.get(key));
                             baselevel = baselevel - 1;
                             // System.out.println(baselevel);

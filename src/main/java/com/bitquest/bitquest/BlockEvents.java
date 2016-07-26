@@ -132,8 +132,8 @@ public class BlockEvents implements Listener {
             Chunk blockChunk = nextBlock.getChunk();
 
             String owner1, owner2;
-            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+            if ((owner2 = BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = BitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
                     if (!owner1.equals(owner2)){
                         event.setCancelled(true);
                     }
@@ -155,8 +155,8 @@ public class BlockEvents implements Listener {
             Chunk blockChunk = nextBlock.getChunk();
 
             String owner1, owner2;
-            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+            if ((owner2 = BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = BitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
                     if (!owner1.equals(owner2)){
                         event.setCancelled(true);
                         piston.getRelative(event.getDirection()).setType(Material.AIR);
