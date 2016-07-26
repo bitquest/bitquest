@@ -143,12 +143,10 @@ public class BitQuest extends JavaPlugin {
 
     public void success(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.GREEN + msg);
-       // recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
     }
 
     public void error(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.RED + msg);
-       // recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
 
     public JsonObject areaForLocation(Location location) {
