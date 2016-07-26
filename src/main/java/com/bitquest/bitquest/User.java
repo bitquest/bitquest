@@ -65,7 +65,7 @@ public class User {
         walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
         int balance;
-        if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())==true) {
+        if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())) {
             balance=Integer.parseInt(BitQuest.REDIS.get("balance"+player.getUniqueId().toString()));
         } else {
             balance=wallet.balance();

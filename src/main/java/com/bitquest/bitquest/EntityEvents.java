@@ -111,7 +111,7 @@ public class EntityEvents implements Listener {
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         
-        if (bitQuest.isModerator(player) == true) {
+        if (bitQuest.isModerator(player)) {
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
@@ -196,14 +196,14 @@ public class EntityEvents implements Listener {
 
         Player player=event.getPlayer();
 
-        if(BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
+        if(!BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
 
             User user = new User(event.getPlayer());
 
         } else {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
-        if(BitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&BitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
+        if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
             System.out.println("Generating new address...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -246,7 +246,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(event.getFrom().getWorld().getName().endsWith("_nether") == false && event.getFrom().getWorld().getName().endsWith("_end") == false && event.getFrom().getChunk()!=event.getTo().getChunk()) {
+        if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end") && event.getFrom().getChunk()!=event.getTo().getChunk()) {
             // announce new area
             int x1=event.getFrom().getChunk().getX();
             int z1=event.getFrom().getChunk().getZ();
@@ -260,7 +260,7 @@ public class EntityEvents implements Listener {
             if(name1==null) name1="the wilderness";
             if(name2==null) name2="the wilderness";
 
-            if(name1.equals(name2) == false) {
+            if(!name1.equals(name2)) {
             	if(name2.equals("the wilderness")){
             		event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
             	}else{
@@ -397,7 +397,7 @@ public class EntityEvents implements Listener {
                             @Override
                             public void run() {
                                 try {
-                                    if (bitQuest.wallet.transaction(money, userWallet) == true) {
+                                    if (bitQuest.wallet.transaction(money, userWallet)) {
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                         if (bitQuest.messageBuilder != null) {
@@ -500,7 +500,7 @@ public class EntityEvents implements Listener {
             }
             baselevel=32;
            System.out.println(e.getLocation().getWorld().getName());
-            if(e.getLocation().getWorld().getName().equals("world") ==true) {
+            if(e.getLocation().getWorld().getName().equals("world")) {
                 Chunk chunk = entity.getLocation().getChunk();
                 int range = 16;
                 int z = chunk.getZ() - range;
@@ -510,7 +510,7 @@ public class EntityEvents implements Listener {
                     while (x < (chunk.getX() + range)) {
                         String key="chunk" + x + "," + z + "name";
                         // System.out.println(key);
-                        if (BitQuest.REDIS.exists(key) == true) {
+                        if (BitQuest.REDIS.exists(key)) {
                             // System.out.println(bitQuest.REDIS.get(key));
                             baselevel = baselevel - 1;
                             // System.out.println(baselevel);
@@ -538,9 +538,9 @@ public class EntityEvents implements Listener {
                 // give a random lvl depending on world
                 int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
 
-                if (world.getName().endsWith("_nether") == true) {
+                if (world.getName().endsWith("_nether")) {
                     level =BitQuest.rand(0, baselevel * 2);
-                } else if (world.getName().endsWith("_end") == true) {
+                } else if (world.getName().endsWith("_end")) {
                     level = BitQuest.rand(0, baselevel * 4);
                 } else {
                     level = BitQuest.rand(0, baselevel);
@@ -842,7 +842,7 @@ public class EntityEvents implements Listener {
     public void useRandomEquipment(LivingEntity entity, int level) {
 
         // give sword
-        if (BitQuest.rand(0, 32) < level && entity instanceof Skeleton==false) {
+        if (BitQuest.rand(0, 32) < level && !(entity instanceof Skeleton)) {
             ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_AXE);
