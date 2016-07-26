@@ -37,14 +37,15 @@ public class Wallet {
     private String privatekey=null;
     int balance() {
         this.updateBalance();
-        return this.balance+this.confirmedBalance;
+        return this.balance;
     }
     void updateBalance() {
         try {
-            // URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance");
-            URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
+            System.out.println("updating balance...");
+            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+            // URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
-            // System.out.println(url.toString());
+            System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
@@ -65,9 +66,11 @@ public class Wallet {
             JSONParser parser = new JSONParser();
             final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
 //        return ((Number) jsonobj.get("final_balance")).intValue();
-            this.balance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
+            this.balance = ((Number) jsonobj.get("final_balance")).intValue();
             this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
         } catch (IOException e) {
+            System.out.println("problem updating balance");
+            System.out.println(e);
             // wallet might be new and it's not listed on the blockchain yet
         } catch (ParseException e) {
             // There is a problem with the balance API

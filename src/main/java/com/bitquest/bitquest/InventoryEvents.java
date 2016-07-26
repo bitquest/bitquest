@@ -38,28 +38,27 @@ import java.util.regex.Pattern;
 public class InventoryEvents implements Listener {
     BitQuest bitQuest;
     ArrayList<Trade> trades;
-    public static Inventory marketInventory;
 
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
-        trades.add(new Trade(new ItemStack(Material.BED,1),10000));
-        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),10000));
-        trades.add(new Trade(new ItemStack(Material.COMPASS,1),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),10000));
-        trades.add(new Trade(new ItemStack(Material.BOAT,1),10000));
-        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),10000));
-        trades.add(new Trade(new ItemStack(Material.FENCE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
-        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
-        trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
-        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
+        trades.add(new Trade(new ItemStack(Material.BED,1),20000));
+        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,64),20000));
+        trades.add(new Trade(new ItemStack(Material.COMPASS,1),20000));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,64),20000));
+        trades.add(new Trade(new ItemStack(Material.BOAT,1),20000));
+        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),20000));
+        trades.add(new Trade(new ItemStack(Material.FENCE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),20000));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),20000));
+        trades.add(new Trade(new ItemStack(Material.LEATHER,64),20000));
+        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,32),20000));
    //     trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),10000)); //cheap price for a faster, AFK railroad development ;)
-        trades.add(new Trade(new ItemStack(Material.RAILS,64),10000)); //we still need these to slow down, you know.
-        trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),10000));
-        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),10000));
-        trades.add(new Trade(new ItemStack(Material.BOW,1),10000));
+        trades.add(new Trade(new ItemStack(Material.RAILS,64),20000)); //we still need these to slow down, you know.
+        trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),20000));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),20000));
+        trades.add(new Trade(new ItemStack(Material.BOW,2),20000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_POWDER,16),20000));
         trades.add(new Trade(new ItemStack(Material.REDSTONE,16),20000));
         trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
@@ -87,23 +86,16 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
-        marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
-        for (int i = 0; i < trades.size(); i++) {
-            ItemStack button = new ItemStack(trades.get(i).itemStack);
-            ItemMeta meta = button.getItemMeta();
-            ArrayList<String> lore = new ArrayList<String>();
-            lore.add("Price: "+trades.get(i).price/100);
-            meta.setLore(lore);
-            button.setItemMeta(meta);
-            marketInventory.setItem(i, button);
-        }
+
     }
     @EventHandler
     void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
+        final User user=new User(player);
+        user.setTotalExperience(user.experience());
         // Merchant inventory
-        if(inventory.equals(marketInventory)) {
+        if(inventory.getName().equalsIgnoreCase("Market")) {
         	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
@@ -113,7 +105,7 @@ public class InventoryEvents implements Listener {
 
                     player.closeInventory();
                     event.setCancelled(true);
-                    final User user = new User(player);
+                    BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
@@ -148,7 +140,7 @@ public class InventoryEvents implements Listener {
                                         }
                                     } else {
                                         user.wallet.updateBalance();
-                                        if (user.wallet.balance > user.wallet.confirmedBalance) {
+                                        if (user.wallet.balance != user.wallet.confirmedBalance) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
                                         } else if(user.wallet.balance()<sat) {
                                             player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
@@ -219,6 +211,16 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
+            Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
+            for (int i = 0; i < trades.size(); i++) {
+                ItemStack button = new ItemStack(trades.get(i).itemStack);
+                ItemMeta meta = button.getItemMeta();
+                ArrayList<String> lore = new ArrayList<String>();
+                lore.add("Price: "+trades.get(i).price/100);
+                meta.setLore(lore);
+                button.setItemMeta(meta);
+                marketInventory.setItem(i, button);
+            }
             event.getPlayer().openInventory(marketInventory);
         } else {
             event.setCancelled(false);

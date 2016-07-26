@@ -22,8 +22,9 @@ public class ChatEvents implements Listener {
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent event) {
 		
-		String message = event.getMessage();
+		String messageUnescaped = event.getMessage();
 		Player sender = event.getPlayer();
+		String message = messageUnescaped.replace("%%", "%%%%"); // escape any % signs to prevent a breakdown in chat script
 
 		if(message.startsWith("@")) {
 			event.setCancelled(true);
@@ -76,6 +77,7 @@ public class ChatEvents implements Listener {
 			
 			if(recipients.size() <= 1) {
 				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Nobody is within earshot! Try shouting.");
+				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Shout by placing a ! before messages.");
 			} else {
 				for(Player recipient : recipients) {
 					recipient.sendMessage(event.getFormat());

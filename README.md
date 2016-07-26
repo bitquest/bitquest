@@ -1,12 +1,15 @@
 # BitQuest
 
-[BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements, as the form of a plugin. 
+[BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements. This repository is the open source code running on the server.
 
 # Play BitQuest
 To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address: 
 ```sh
 play.bitquest.co
 ```
+
+# Important Note
+This server is still under development, and bugs can, and most likely will, happen. Please report any bugs to a moderator promptly, to ensure they are fixed. Also note that your wallet is not guaranteed, and you may experience issues with your balance. For this reason, it is highly recommended that you do not deposit large amounts, or anything you do not wish to place at risk by being tied to the server. In addition, if you are caught breaking rules and are banned, you forfeit your access to your server wallet, and all funds tied to it. With this said, rules are non-negotiable, and will be strictly enforced. This server is a fair server, and anyone abusing any system set in place will be punished. Please play fair, have fun, and enjoy the server
 
 
 # How it works?
@@ -47,97 +50,80 @@ Everybody is welcome to contribute. :D
 
 Here are the instructions to modify, install and run the server as localhost.
 
-# Installation
-### Framework
-You can use [eclipse](https://eclipse.org/downloads/) or [intellij](https://www.jetbrains.com/idea/) to open and modify this project
 
-### Installing Dependencies
-- Be sure you have installed the [last version of java](http://www.java.com/en/download) version 
+# Building BitQuest
 
-Note: if you are running a Debian-based Linux distribution like Ubuntu, you can run the setup script included instead of following the rest of these instructions:
-#### Ubuntu
-```sh
-$ cd setup_scripts
-$ ./ubuntu.sh
-```
-Make sure you are in the setup_scripts directory before running the script. Otherwise, follow the rest of the instructions.
+## Setup Workspace
+There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
 
-## Manual Setup
-
-- Install gradle and redis
-
-#### OSX
-Install [brew](http://brew.sh/), then run
-```sh
-$ brew install gradle redis
-```
-#### Ubuntu
-```sh
-$ sudo apt-get install gradle redis-server
-```
-
-
-### Compile project
-#### OSX and Ubuntu
-To compile project go to the bitquest directory and run
-```sh
-$ ./gradlew shadowJar
 ````
-This will generate a new file at ```bitquest/build/libs/bitquest-all.jar``` that you can use as a plugin in your localhost minecraft server.
+./gradlew setupWorkspace
+````
+(Linux and OSX)
 
-### Run server in localhost
-#### Spigot
-- Make a new directory called ```spigot``` and download there the last [BitQuest's spigot](http://jenkins.bitquest.co/job/spigot/) . If you get an error regarding a missing main manifest attribute, make sure you downloaded the actual spigot jar and not the spigot-api jar.
-- Go to this directory and run spigot
-#### OSX and Ubuntu
-```sh
-$ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
-```
-#### OSX and Ubuntu
-The first time it runs it will generate a bunch of files and directories.
-- Open ```spigot/eula.txt``` and change 
-```sh
-eula=false
-``` 
-to
-```sh
-eula=true
-```
-- Run spigot again
-#### OSX and Ubuntu
-```sh
-$ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
-```
-Now you should have a new directory ```spigot/plugins/```
-- Close the server with ```cmd + C```
-- Copy or move ```bitquest/build/libs/bitquest-all.jar``` to ```spigot/plugins/``` or make a symbolic link:
+````
+gradlew.bat setupWorkspace
+````
+(Windows Powershell)
 
-#### OSX and  Ubuntu
-```sh
-$ ln -s $bitquest/bitquest/build/libs/bitquest-all.jar $spigot/plugins/bitquest-all.jar
-```
-where ```$bitquest``` is your bitquest root directory and ```$spigot``` is the directory containing your spigot jar.
-- Run spigot again to run the server with bitquest plugin
+## Compile BitQuest and generate a JAR file
+After the workspace is set up, we can compile using the gradle shadowJar task that will create a file under build/libs. Since this folder is "synced" with docker, you won't need to restart the server to update changes. (Just use /reload) inside the game
+
+# Linux and OSX
+
+````
+./gradlew shadowJar
+````
+(Linux and OSX)
+
+````
+gradlew.bat shadowJar
+````
+(Windows Powershell)
+
+# Running BitQuest locally with Docker
+
+Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different.
+
+1. Build BitQuest using the instructions above.
+2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
+[Get Docker](http://docs.docker.com/mac/started/)
+3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
+4. Create development.yml file, where your local variables are. A good starting point is:
+````
+spigot:
+  environment:
+    - SPIGOT_ENV=development
+````
+
+To start your test server with docker-compose you can now run:
+
+````
+docker-compose up
+````
+The server will run with a local volume pointing to your latest jar built with Gradle. That means you can /reload inside the server and watch changes without restarting the Spigot container.
+
+# Running a BitQuest server
+To run BitQuest might want to do the same steps as with a local test server, but specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
+
+Here's an example of a development.yml file (please note we use spaces instead of tabs):
+
+````
+spigot:
+  environment:
+    - BITQUEST_ENV=development
+    - BITCOIN_ADDRESS=1ERWGdhjHpmanu2ftScpvM8KM4P8Yrxct2
+    - BITCOIN_PRIVATE_KEY=a2a2f8b8308e699901d60c567a15633a88362c8f67c9f8a2dc02720c2e18d8a2
+    - BLOCKCYPHER_API_KEY=some_api_key
+    - ADMIN_UUID=921baf7a-893b-4249-b6a7-ae010ff75551
+```` 
 
 
-#### OSX and Ubuntu
-```sh
-$ java -jar spigot-1.8.8-R0.1-SNAPSHOT.jar
-```
-
-#### Redis
-In the bitquest directory
-- Run the redis server
 
 
-#### OSX and Ubuntu
-```sh
-$ redis-server
-```
-Now you will be able to enter to your localhost bitquest minecraft server adding ```localhost``` as server
+You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload````command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.
 
-![Adding localhost as server](http://i.imgur.com/4ZPm0d9.png)
-
+# More info
 
 More info about [BitQuest](https://bitquest.co/) at
 https://bitquest.co/

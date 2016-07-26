@@ -11,5 +11,6 @@ public class Trade {
     public Trade(ItemStack itemStack,int price) {
         this.itemStack=itemStack;
         this.price=price;
+
     }
 }

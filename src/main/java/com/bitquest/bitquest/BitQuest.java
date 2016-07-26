@@ -53,6 +53,9 @@ public class BitQuest extends JavaPlugin {
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
+    // FAILS
+    // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
+
 
     // TODO: Find out why this crashes the server
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
@@ -71,7 +74,7 @@ public class BitQuest extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        log("BitQuest starting...");
+        log("BitQuest starting");
 
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
@@ -109,8 +112,8 @@ public class BitQuest extends JavaPlugin {
                     User user= null;
                     try {
                         user = new User(player);
-                        user.createScoreBoard();
-                 //       user.updateScoreboard();
+                       // user.createScoreBoard();
+                        user.updateScoreboard();
 
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -121,7 +124,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 }
             }
-        }, 0, 1000L);
+        }, 0, 120L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -130,6 +133,7 @@ public class BitQuest extends JavaPlugin {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 0, 100000L);
+        REDIS.set("lastloot","nobody");
 
     }
 
@@ -211,6 +215,7 @@ public class BitQuest extends JavaPlugin {
     final int maxNameSize = 16;
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        BitQuest.REDIS.del("balance"+user.player.getUniqueId().toString());
 
         user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
@@ -360,24 +365,22 @@ public class BitQuest extends JavaPlugin {
 									final Wallet finalFromWallet = fromWallet;
 									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                                     final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
-
+                                    REDIS.expire("balance"+player.getUniqueId().toString(),5);
                                     scheduler.runTaskAsynchronously(this, new Runnable() {
 				    					@Override
 				    					public void run() {
 				    						try {
 
-												if(finalFromWallet.transaction(sendAmount, toWallet)) {
-									        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+sendAmount/100+" Bits to "+offlinePlayer.getName()+".");
-									            	new User(player).updateScoreboard();
-												} else {
-									            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-									        	}
-												
-											} catch (ParseException e) {
-												e.printStackTrace();
-											} catch (org.json.simple.parser.ParseException e1) {
-												e1.printStackTrace();
-											} catch (IOException e1) {
+                                                if (finalFromWallet.transaction(sendAmount, toWallet)) {
+                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
+                                                    if (offlinePlayer.isOnline() == true) {
+                                                        offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
+                                                    }
+                                                } else {
+                                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
+                                                }
+
+                                            } catch (IOException e1) {
 												e1.printStackTrace();
 											}
 				    					}
