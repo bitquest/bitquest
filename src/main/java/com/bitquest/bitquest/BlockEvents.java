@@ -75,7 +75,6 @@ public class BlockEvents implements Listener {
 			} else if (event.getBlock().getType() == Material.STANDING_BANNER) {
 
 				if (bitQuest.areaForLocation(event.getBlock().getLocation()) != null) {
-					// Banner banner=(Banner)e.getBlock();
 					Block belowBlock = event.getBlock().getRelative(0, -1, 0);
 					Sign sign = null;
 					if (belowBlock.getRelative(BlockFace.EAST).getType() == Material.WALL_SIGN) {
