@@ -82,13 +82,14 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.ANVIL, 1),30000));
         trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 32),30000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
-        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),40000));//Super demanded
+        trades.add(new Trade(new ItemStack(Material.NETHER_WART,16),40000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
-        trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); //If we have a lot of horses in Satoshi, we want to ride them!
-        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,32),50000)); //Finally we add it.
+        trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); 
+        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,32),50000));
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
-        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,1,(short)6),60000)); //cool
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 6, (short)1),60000)); //notch apples
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
+        //cool diamond sword
 
 
     }
@@ -236,7 +237,7 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
-            Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
+            Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
                 ItemStack button = new ItemStack(trades.get(i).itemStack);
                 ItemMeta meta = button.getItemMeta();
