@@ -143,12 +143,10 @@ public class BitQuest extends JavaPlugin {
 
     public void success(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.GREEN + msg);
-       // recipient.playSound(recipient.getLocation(), Sound.ORB_PICKUP, 20, 1);
     }
 
     public void error(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.RED + msg);
-       // recipient.playSound(recipient.getLocation(), Sound.ANVIL_LAND, 7, 1);
     }
 
     public JsonObject areaForLocation(Location location) {
@@ -169,7 +167,7 @@ public class BitQuest extends JavaPlugin {
     public boolean canBuild(Location location, Player player) {
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
-        if(isModerator(player)==true) {
+        if(isModerator(player)) {
             return true;
         } else if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
         	// If theyre not in the overworld, they cant build
@@ -200,7 +198,7 @@ public class BitQuest extends JavaPlugin {
     }
 
     public boolean isModerator(Player player) {
-            if(REDIS.sismember("moderators",player.getUniqueId().toString())==true) {
+            if(REDIS.sismember("moderators",player.getUniqueId().toString())) {
                 return true;
             } else if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
                 return true;
@@ -236,7 +234,7 @@ public class BitQuest extends JavaPlugin {
                     // TODO: Make sure clan names are alphanumeric
                     if(!args[1].isEmpty()) {
                         if(REDIS.get("clan"+player.getUniqueId().toString())==null) {
-                            if(REDIS.sismember("clans",args[1])==false) {
+                            if(!REDIS.sismember("clans",args[1])) {
                                 REDIS.sadd("clans",args[1]);
                                 REDIS.set("clan"+player.getUniqueId().toString(),args[1]);
                                 player.sendMessage(ChatColor.GREEN+"Congratulations! you are the founder of the "+args[1]+" clan");
@@ -273,7 +271,7 @@ public class BitQuest extends JavaPlugin {
                 if(args[0].equals("join")) {
                     // check that argument is not empty
                     if(!args[1].isEmpty()) {
-                        if(REDIS.sismember("invitations"+args[1],player.getUniqueId().toString())==true) {
+                        if(REDIS.sismember("invitations"+args[1],player.getUniqueId().toString())) {
                             // user is invited to join
                             if(REDIS.get("clan"+player.getUniqueId().toString())==null) {
                                 // user is not part of any clan
@@ -373,7 +371,7 @@ public class BitQuest extends JavaPlugin {
 
                                                 if (finalFromWallet.transaction(sendAmount, toWallet)) {
                                                     player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
-                                                    if (offlinePlayer.isOnline() == true) {
+                                                    if (offlinePlayer.isOnline()) {
                                                         offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
                                                     }
                                                 } else {
@@ -395,7 +393,7 @@ public class BitQuest extends JavaPlugin {
 							String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
 							java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
 							java.util.regex.Matcher m = p.matcher(args[0]);
-							if(m.matches()==true) {
+							if(m.matches()) {
 						    	// TODO: send money through xapo
 						    
 							} else {
@@ -403,7 +401,7 @@ public class BitQuest extends JavaPlugin {
 
 						        	Wallet toWallet = new Wallet(args[1]);
 
-						        	if(fromWallet.transaction(sendAmount,toWallet)==true) {
+						        	if(fromWallet.transaction(sendAmount,toWallet)) {
 						        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
 						            	new User(player).updateScoreboard();
 						        	} else {
@@ -431,7 +429,7 @@ public class BitQuest extends JavaPlugin {
                 return false;
             }
             // MODERATOR COMMANDS
-            if (isModerator(player)==true) {
+            if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
