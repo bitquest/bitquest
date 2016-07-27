@@ -94,7 +94,7 @@ public class InventoryEvents implements Listener {
         user.setTotalExperience(user.experience());
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
-        	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+            if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -108,13 +108,42 @@ public class InventoryEvents implements Listener {
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
                         public void run() {
+                            try {
+                                int sat = 0;
+                                for (int i = 0; i < trades.size(); i++) {
+                                    if (clicked.getType() == trades.get(i).itemStack.getType())
+                                        sat = trades.get(i).price;
 
-                                try {
-                                    int sat = 0;
-                                    for (int i = 0; i < trades.size(); i++) {
-                                        if (clicked.getType() == trades.get(i).itemStack.getType())
-                                            sat = trades.get(i).price;
+                                }
+                                
+                                boolean hasOpenSlots = false;
+                                for (ItemStack item : player.getInventory().getContents()) {
+                                    if (item == null || (item.getType() == clicked.getType() && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
+                                        hasOpenSlots = true;
+                                        break;
+                                    }
+                                }
+                                
+                                if (hasOpenSlots && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    ItemStack item = event.getCurrentItem();
+                                    ItemMeta meta = item.getItemMeta();
+                                    ArrayList<String> Lore = new ArrayList<String>();
+                                    meta.setLore(null);
+                                    item.setItemMeta(meta);
+                                    player.getInventory().addItem(item);
+                                    player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                    
+                                    if (bitQuest.messageBuilder != null) {
 
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+
+
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
+
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
                                     }
                                     if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
                                         ItemStack item = event.getCurrentItem();
@@ -137,28 +166,21 @@ public class InventoryEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     } else {
-                                        user.wallet.updateBalance();
-                                        if (user.wallet.balance != user.wallet.confirmedBalance) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
-                                        } else if(user.wallet.balance()<sat) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
-                                        }
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
                                     }
-                                } catch (IllegalArgumentException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
-
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }
-        		
-        	} else {
-        		event.setCancelled(true);
-        	}
+            
+            } else {
+                event.setCancelled(true);
+            }
 
         } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
