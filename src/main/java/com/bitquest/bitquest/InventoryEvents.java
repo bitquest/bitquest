@@ -53,7 +53,6 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),20000));
         trades.add(new Trade(new ItemStack(Material.LEATHER,64),20000));
         trades.add(new Trade(new ItemStack(Material.OBSIDIAN,32),20000));
-   //     trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),10000)); //cheap price for a faster, AFK railroad development ;)
         trades.add(new Trade(new ItemStack(Material.RAILS,64),20000)); //we still need these to slow down, you know.
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),20000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),20000));
@@ -82,7 +81,6 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
         trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); //If we have a lot of horses in Satoshi, we want to ride them!
-       // trades.add(new Trade(new ItemStack(Material.DIAMOND_HORSE_ARMOUR,1),55000)); //essential
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
 
@@ -118,7 +116,7 @@ public class InventoryEvents implements Listener {
                                             sat = trades.get(i).price;
 
                                     }
-                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
                                         ArrayList<String> Lore = new ArrayList<String>();

@@ -57,7 +57,7 @@ public class BlockEvents implements Listener {
     		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
-    	} else if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+    	} else if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 			event.setCancelled(true);
 			bitQuest.error(event.getPlayer(), "You may not break blocks here!");
         } else {
@@ -69,13 +69,12 @@ public class BlockEvents implements Listener {
 
 		// set clan
 		// first, we check if the player has permission to build
-			if (bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer()) == false) {
+			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 				event.setCancelled(true);
             	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
 			} else if (event.getBlock().getType() == Material.STANDING_BANNER) {
 
 				if (bitQuest.areaForLocation(event.getBlock().getLocation()) != null) {
-					// Banner banner=(Banner)e.getBlock();
 					Block belowBlock = event.getBlock().getRelative(0, -1, 0);
 					Sign sign = null;
 					if (belowBlock.getRelative(BlockFace.EAST).getType() == Material.WALL_SIGN) {
@@ -132,8 +131,8 @@ public class BlockEvents implements Listener {
             Chunk blockChunk = nextBlock.getChunk();
 
             String owner1, owner2;
-            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+            if ((owner2 = BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = BitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
                     if (!owner1.equals(owner2)){
                         event.setCancelled(true);
                     }
@@ -155,8 +154,8 @@ public class BlockEvents implements Listener {
             Chunk blockChunk = nextBlock.getChunk();
 
             String owner1, owner2;
-            if ((owner2 = bitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-                if ((owner1 = bitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
+            if ((owner2 = BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
+                if ((owner1 = BitQuest.REDIS.get("chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) != null) {
                     if (!owner1.equals(owner2)){
                         event.setCancelled(true);
                         piston.getRelative(event.getDirection()).setType(Material.AIR);
