@@ -152,9 +152,8 @@ public class InventoryEvents implements Listener {
                                         mixpanel.deliver(delivery);
                                     }
                                     if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
-                                        ItemStack item = event.getCurrentItem();
-                                        ItemMeta meta = item.getItemMeta();
-                                        ArrayList<String> Lore = new ArrayList<String>();
+                                        item = event.getCurrentItem();
+                                        meta = item.getItemMeta();
                                         meta.setLore(null);
                                         item.setItemMeta(meta);
                                         player.getInventory().addItem(item);
