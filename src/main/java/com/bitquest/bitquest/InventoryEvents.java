@@ -82,7 +82,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.ANVIL, 1),30000));
         trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 32),30000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
-        trades.add(new Trade(new ItemStack(Material.NETHER_WART,16),40000));
+        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),40000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
         trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); 
         trades.add(new Trade(new ItemStack(Material.SLIME_BALL,32),50000));
