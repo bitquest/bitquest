@@ -25,4 +25,5 @@ COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
 COPY build/libs/bitquest-2.0-all.jar /spigot/plugins/
+# HERE WE GO
 CMD java -Xmx8G -Xms8G -jar spigot.jar
