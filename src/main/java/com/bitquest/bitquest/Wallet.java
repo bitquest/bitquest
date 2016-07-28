@@ -43,7 +43,6 @@ public class Wallet {
         try {
             System.out.println("updating balance...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance?token=" + BitQuest.BLOCKCYPHER_API_KEY);
-            // URL url = new URL("https://bitcoin.toshi.io/api/v0/addresses/" + address);
 
             System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -65,7 +64,6 @@ public class Wallet {
 
             JSONParser parser = new JSONParser();
             final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-//        return ((Number) jsonobj.get("final_balance")).intValue();
             this.balance = ((Number) jsonobj.get("final_balance")).intValue();
             this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
         } catch (IOException e) {
@@ -123,10 +121,8 @@ public class Wallet {
                 int data = error.read();
                 while (data != -1) {
                     //do something with data...
-                    //System.out.println(data);
                     inputLine = inputLine + (char)data;
                     data = error.read();
-                    //inputLine = inputLine + (char)data;
                 }
                 error.close();
 
@@ -166,7 +162,6 @@ public class Wallet {
             cipher = Cipher.getInstance("AES/ECB/NoPadding");
             cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
             String epayload = new String(Base64.encodeBase64(cipher.doFinal(data.getBytes())));
-            // log.info("encrypted payload: "+epayload);
 
 
             // post payload
@@ -191,9 +186,6 @@ public class Wallet {
             wr.close();
 
             int responseCode = con.getResponseCode();
-            // System.out.println("\nSending 'POST' request to URL : " + url);
-            // System.out.println("Post parameters : " + urlParameters);
-            // System.out.println("Response Code : " + responseCode);
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
