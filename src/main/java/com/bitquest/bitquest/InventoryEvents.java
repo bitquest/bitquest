@@ -53,7 +53,6 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),20000));
         trades.add(new Trade(new ItemStack(Material.LEATHER,64),20000));
         trades.add(new Trade(new ItemStack(Material.OBSIDIAN,32),20000));
-   //     trades.add(new Trade(new ItemStack(Material.GOLDEN_RAIL,64),10000)); //cheap price for a faster, AFK railroad development ;)
         trades.add(new Trade(new ItemStack(Material.RAILS,64),20000)); //we still need these to slow down, you know.
         trades.add(new Trade(new ItemStack(Material.SANDSTONE,64),20000));
         trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,64),20000));
@@ -71,6 +70,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SPONGE,8),20000));
         trades.add(new Trade(new ItemStack(Material.WOOD,64),20000));
         trades.add(new Trade(new ItemStack(Material.WOOL,64),20000));
+        trades.add(new Trade(new ItemStack(Material.PAPER,32),20000)); //needed
         trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,16),30000));
         trades.add(new Trade(new ItemStack(Material.GOLD_INGOT,64),30000));
         trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,6),30000));
@@ -79,12 +79,17 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,64),30000));
         trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,64),30000));
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,64),30000));
+        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),30000));
+        trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 32),30000));
         trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,32),35000));
+        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,16),40000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,16),40000));
-        trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); //If we have a lot of horses in Satoshi, we want to ride them!
-       // trades.add(new Trade(new ItemStack(Material.DIAMOND_HORSE_ARMOUR,1),55000)); //essential
+        trades.add(new Trade(new ItemStack(Material.SADDLE,1),50000)); 
+        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,32),50000));
         trades.add(new Trade(new ItemStack(Material.SHIELD,1),60000)); //epic
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 6, (short)1),60000)); //notch apples
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
+        //cool diamond sword
 
 
     }
@@ -96,7 +101,7 @@ public class InventoryEvents implements Listener {
         user.setTotalExperience(user.experience());
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
-        	if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+            if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -110,18 +115,46 @@ public class InventoryEvents implements Listener {
                     scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                         @Override
                         public void run() {
+                            try {
+                                int sat = 0;
+                                for (int i = 0; i < trades.size(); i++) {
+                                    if (clicked.getType() == trades.get(i).itemStack.getType())
+                                        sat = trades.get(i).price;
 
-                                try {
-                                    int sat = 0;
-                                    for (int i = 0; i < trades.size(); i++) {
-                                        if (clicked.getType() == trades.get(i).itemStack.getType())
-                                            sat = trades.get(i).price;
-
+                                }
+                                
+                                boolean hasOpenSlots = false;
+                                for (ItemStack item : player.getInventory().getContents()) {
+                                    if (item == null || (item.getType() == clicked.getType() && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
+                                        hasOpenSlots = true;
+                                        break;
                                     }
-                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
-                                        ItemStack item = event.getCurrentItem();
-                                        ItemMeta meta = item.getItemMeta();
-                                        ArrayList<String> Lore = new ArrayList<String>();
+                                }
+                                
+                                if (hasOpenSlots && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    ItemStack item = event.getCurrentItem();
+                                    ItemMeta meta = item.getItemMeta();
+                                    ArrayList<String> Lore = new ArrayList<String>();
+                                    meta.setLore(null);
+                                    item.setItemMeta(meta);
+                                    player.getInventory().addItem(item);
+                                    player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                    
+                                    if (bitQuest.messageBuilder != null) {
+
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+
+
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
+
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
+                                    }
+                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
+                                        item = event.getCurrentItem();
+                                        meta = item.getItemMeta();
                                         meta.setLore(null);
                                         item.setItemMeta(meta);
                                         player.getInventory().addItem(item);
@@ -139,28 +172,21 @@ public class InventoryEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     } else {
-                                        user.wallet.updateBalance();
-                                        if (user.wallet.balance != user.wallet.confirmedBalance) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (You have unconfirmed transactions. Please wait ~10 minutes and try again)");
-                                        } else if(user.wallet.balance()<sat) {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed (Insufficient balance)");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
-                                        }
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
                                     }
-                                } catch (IllegalArgumentException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
                                 }
-
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     });
                 }
-        		
-        	} else {
-        		event.setCancelled(true);
-        	}
+            
+            } else {
+                event.setCancelled(true);
+            }
 
         } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
             final User bp = new User(player);
@@ -211,7 +237,7 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
-            Inventory marketInventory = Bukkit.getServer().createInventory(null,  45, "Market");
+            Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
                 ItemStack button = new ItemStack(trades.get(i).itemStack);
                 ItemMeta meta = button.getItemMeta();

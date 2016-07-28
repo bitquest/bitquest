@@ -49,7 +49,7 @@ public class EntityEvents implements Listener {
     BitQuest bitQuest;
     StringBuilder rawwelcome = new StringBuilder();
 
-    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
+    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
             Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
             Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
             Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE,
@@ -96,7 +96,7 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         final Player player=event.getPlayer();
-        if(bitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(bitQuest.ADMIN_UUID.toString())) {
+        if(BitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(BitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         } else {
             player.setOp(false);
@@ -109,9 +109,9 @@ public class EntityEvents implements Listener {
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
-        bitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
+        BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         
-        if (bitQuest.isModerator(player) == true) {
+        if (bitQuest.isModerator(player)) {
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
@@ -121,16 +121,14 @@ public class EntityEvents implements Listener {
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
         // Updates name-to-UUID database
-        bitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
+        BitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
         // Updates UUID-to-name database
-        bitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+        BitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
         // Prints the user balance
 
         try {
         	// check and set experience
-        	// player.setTotalExperience((Integer) user.experience());
         	user.setTotalExperience((Integer) user.experience());
-        	// user.updateLevels();
         	user.updateScoreboard();
 
 
@@ -196,14 +194,14 @@ public class EntityEvents implements Listener {
 
         Player player=event.getPlayer();
 
-        if(bitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())==false) {
+        if(!BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
 
             User user = new User(event.getPlayer());
 
         } else {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
-        if(bitQuest.REDIS.exists("address"+player.getUniqueId().toString())==false&&bitQuest.REDIS.exists("private"+player.getUniqueId().toString())==false) {
+        if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
             System.out.println("Generating new address...");
             URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -214,11 +212,6 @@ public class EntityEvents implements Listener {
             DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.flush();
             wr.close();
-            
-            /*final int responseCode = con.getResponseCode();
-            System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Post parameters : " + urlParameters);
-            System.out.println("Response Code : " + responseCode);*/
 
             BufferedReader in = new BufferedReader(
                     new InputStreamReader(con.getInputStream()));
@@ -246,7 +239,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) {
-        if(event.getFrom().getWorld().getName().endsWith("_nether") == false && event.getFrom().getWorld().getName().endsWith("_end") == false && event.getFrom().getChunk()!=event.getTo().getChunk()) {
+        if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end") && event.getFrom().getChunk()!=event.getTo().getChunk()) {
             // announce new area
             int x1=event.getFrom().getChunk().getX();
             int z1=event.getFrom().getChunk().getZ();
@@ -254,13 +247,13 @@ public class EntityEvents implements Listener {
             int x2=event.getTo().getChunk().getX();
             int z2=event.getTo().getChunk().getZ();
 
-            String name1=bitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? bitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-            String name2=bitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? bitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+            String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+            String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
             if(name1==null) name1="the wilderness";
             if(name2==null) name2="the wilderness";
 
-            if(name1.equals(name2) == false) {
+            if(!name1.equals(name2)) {
             	if(name2.equals("the wilderness")){
             		event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
             	}else{
@@ -350,7 +343,7 @@ public class EntityEvents implements Listener {
         event.setKeepLevel(true);
         event.setDeathMessage(null);
         String spawnkey=spawnKey(event.getEntity().getLocation());
-        bitQuest.REDIS.expire(spawnkey,30);
+        BitQuest.REDIS.expire(spawnkey,30);
     }
     @EventHandler
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
@@ -362,13 +355,13 @@ public class EntityEvents implements Listener {
             final String spawnkey = spawnKey(entity.getLocation());
 
             int baselevel;
-            if(bitQuest.REDIS.get(spawnkey)!=null) {
-                baselevel=Integer.parseInt(bitQuest.REDIS.get(spawnkey));
+            if(BitQuest.REDIS.get(spawnkey)!=null) {
+                baselevel=Integer.parseInt(BitQuest.REDIS.get(spawnkey));
             } else {
                 baselevel=0;
             }
 
-            bitQuest.REDIS.expire(spawnkey,30000);
+            BitQuest.REDIS.expire(spawnkey,30000);
             System.out.println("death: "+spawnkey+": "+baselevel);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -379,14 +372,14 @@ public class EntityEvents implements Listener {
                     // level 2 = 20 bits maximum
                     // level 100 = 1000 bits maximum
                     final int money = 20000;
-                    final int d128 = bitQuest.rand(1, 128);
+                    final int d128 = BitQuest.rand(1, 128);
 
                     int levelChance = (int) Math.ceil(level/10D);
                     // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
                     // The loot goes out only if d20 is 20, because of lag concerns
 
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(money>10000 && level>=d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
+                    if(money > 10000 && level >= d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
                         BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -397,7 +390,7 @@ public class EntityEvents implements Listener {
                             @Override
                             public void run() {
                                 try {
-                                    if (bitQuest.wallet.transaction(money, userWallet) == true) {
+                                    if (bitQuest.wallet.transaction(money, userWallet)) {
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                         if (bitQuest.messageBuilder != null) {
@@ -486,21 +479,21 @@ public class EntityEvents implements Listener {
             final Location location=e.getLocation();
             String spawnkey=spawnKey(e.getLocation());
             int baselevel;
-            if(bitQuest.REDIS.exists(spawnkey)) {
-                bitQuest.REDIS.expire(spawnkey,300000);
+            if(BitQuest.REDIS.exists(spawnkey)) {
+                BitQuest.REDIS.expire(spawnkey,300000);
                 baselevel=16;
             } else {
                 baselevel=32;
             }
-            int d20 = bitQuest.rand(1, 20);
+            int d20 = BitQuest.rand(1, 20);
 
             if (baselevel < 32 && d20==20) {
-                bitQuest.REDIS.incr(spawnkey);
+                BitQuest.REDIS.incr(spawnkey);
                 baselevel=baselevel+1;
             }
             baselevel=32;
            System.out.println(e.getLocation().getWorld().getName());
-            if(e.getLocation().getWorld().getName().equals("world") ==true) {
+            if(e.getLocation().getWorld().getName().equals("world")) {
                 Chunk chunk = entity.getLocation().getChunk();
                 int range = 16;
                 int z = chunk.getZ() - range;
@@ -509,11 +502,8 @@ public class EntityEvents implements Listener {
 
                     while (x < (chunk.getX() + range)) {
                         String key="chunk" + x + "," + z + "name";
-                        // System.out.println(key);
-                        if (bitQuest.REDIS.exists(key) == true) {
-                            // System.out.println(bitQuest.REDIS.get(key));
+                        if (BitQuest.REDIS.exists(key)) {
                             baselevel = baselevel - 1;
-                            // System.out.println(baselevel);
                         }
                         x = x + 1;
                     }
@@ -521,9 +511,7 @@ public class EntityEvents implements Listener {
                 }
             } else if(e.getLocation().getWorld().getName().equals("world_nether")) {
                 baselevel=baselevel-(int)(e.getLocation().getY()/8);
-                // System.out.println(e.getLocation().getY());
             }
-            // System.out.println("spawn: "+spawnkey+": "+baselevel);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
@@ -538,9 +526,9 @@ public class EntityEvents implements Listener {
                 // give a random lvl depending on world
                 int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
 
-                if (world.getName().endsWith("_nether") == true) {
+                if (world.getName().endsWith("_nether")) {
                     level =BitQuest.rand(0, baselevel * 2);
-                } else if (world.getName().endsWith("_end") == true) {
+                } else if (world.getName().endsWith("_end")) {
                     level = BitQuest.rand(0, baselevel * 4);
                 } else {
                     level = BitQuest.rand(0, baselevel);
@@ -594,7 +582,6 @@ public class EntityEvents implements Listener {
                         if (BitQuest.rand(0, 64) < level) {
                             randomEnchantItem(bow);
                         }
-                        // entity.getEquipment().setItemInHand(bow);
                     }
                 }
             } else {
@@ -629,220 +616,11 @@ public class EntityEvents implements Listener {
         }
     }
 
-//    @EventHandler
-//    void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-//        double rawdamage = event.getDamage();
-//
-//        int damagerlevel = 1;
-//        int damagedlevel = 1;
-//
-//
-//        // damage by entity
-//        if (event instanceof EntityDamageByEntityEvent) {
-//            Entity damager = ((EntityDamageByEntityEvent) event).getDamager();
-//
-//            // damager is player
-//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-//                Player player = (Player) ((EntityDamageByEntityEvent) event).getDamager();
-//                damagerlevel = player.getLevel();
-//
-//                if (event.getEntity() instanceof ItemFrame) {
-//                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
-//                        event.setCancelled(true);
-//                    }
-//                }
-//                // Player vs. Horse
-//                if (event.getEntity() instanceof Horse && player.isOp() == false) {
-//                    Horse horse = (Horse) event.getEntity();
-//                    if (horse.hasMetadata("owner")) {
-//                        if (horse.getMetadata("owner").get(0).asString().equals(player.getUniqueId().toString())) {
-//                            event.setCancelled(false);
-//                        } else {
-//                            event.setCancelled(true);
-//                        }
-//                    }
-//                } else if (event.getEntity() instanceof Animals) {
-//                    if (bitQuest.canBuild(event.getEntity().getLocation(), player) == false) {
-//                        event.setCancelled(true);
-//                    }
-//
-//                }
-//                // Player vs. Villager
-//                if (event.getEntity() instanceof Villager && player.isOp() == false) {
-//                    event.setCancelled(true);
-//                }
-//
-//                // PvP
-//                if (event.getEntity() instanceof Player) {
-//                    // TODO: Define how PvP is going to work (arenas?)
-//                    event.setCancelled(true);
-//                }
-//                // damaged is monster
-//                if (event.getEntity() instanceof Monster) {
-//                    Monster monster = (Monster) event.getEntity();
-//                    damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
-//
-//                    if (monster.hasMetadata("level")) {
-//                        damagedlevel = monster.getMetadata("level").get(0).asInt();
-//                    }
-//
-//                }
-//            }
-//            // damager is monster
-//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Monster) {
-//                Monster monster = (Monster) ((EntityDamageByEntityEvent) event).getDamager();
-//                damagerlevel = new Double(monster.getMaxHealth() / 4).intValue();
-//                if (monster.hasMetadata("level")) {
-//                    damagerlevel = monster.getMetadata("level").get(0).asInt();
-//
-//                }
-//                // monster vs player
-//                if (event.getEntity() instanceof Player) {
-//                    Player damaged = (Player) event.getEntity();
-//                    damagedlevel = damaged.getLevel();
-//                }
-//            }
-//            // damager is projectile
-//            if (((EntityDamageByEntityEvent) event).getDamager() instanceof Projectile) {
-//                final Projectile projectile = (Projectile) ((EntityDamageByEntityEvent) event).getDamager();
-//
-//                // shooter is player
-//                if (projectile.getShooter() instanceof Player) {
-//                    Player shooter = (Player) projectile.getShooter();
-//                    damager = shooter;
-//                    damagerlevel = shooter.getLevel();
-//
-//                    // shoot villagers
-//                    if (event.getEntity() instanceof Villager) {
-//                        event.setCancelled(true);
-//                    }
-//                    // shoot monsters
-//                    if (event.getEntity() instanceof Giant) {
-//                        event.setCancelled(true);
-//                    }
-//                    if (event.getEntity() instanceof Monster) {
-//                        Monster monster = (Monster) event.getEntity();
-//                        damagedlevel = new Double(monster.getMaxHealth() / 4).intValue();
-//
-//                        if (monster.hasMetadata("damage")) {
-//                            int damage = monster.getMetadata("damage").get(0).asInt();
-//                            damage = damage + 1;
-//                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
-//                        } else {
-//                            monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
-//                        }
-//
-//
-//                    }
-//
-//                }
-//                // shooter is monster
-//                if (projectile.getShooter() instanceof Monster) {
-//                    Monster shooter = (Monster) projectile.getShooter();
-//
-//                    damager = shooter;
-//                    damagerlevel = new Double(shooter.getMaxHealth() / 8).intValue();
-//                    if (shooter.hasMetadata("level")) {
-//                        damagerlevel = shooter.getMetadata("level").get(0).asInt();
-//                    }
-//
-//                }
-//                // shooter is ghast
-//                if (projectile.getShooter() instanceof Ghast) {
-//                    damagerlevel = 32;
-//                }
-//                // make love, not war
-//                if (projectile.getShooter() instanceof Player) {
-//                	if(event.getEntity() instanceof Horse || event.getEntity() instanceof Player) {
-//                		event.setCancelled(true);
-//                	}
-//                }
-//            }
-//
-//            // begins to recalculate damage
-//            double attack = 0;
-//            double defense = 0;
-//            boolean miss = false;
-//
-//            // attacker phase
-//            int d20 = bitQuest.rand(1, 20);
-//
-//            if (d20 > 4) {
-//                // hit
-//                attack = damagerlevel;
-//                if (d20 > 18) {
-//                    attack = attack * 2;
-//                }
-//            } else {
-//                // miss
-//                rawdamage = 0;
-//                miss = true;
-//            }
-//
-//
-//            // victim phase
-//            d20 = bitQuest.rand(1, 20);
-//            if (d20 > 4) {
-//                // hit
-//                defense = damagedlevel;
-//            } else {
-//                // miss
-//                defense = 0;
-//            }
-//
-//
-//            double finaldamage = attack + rawdamage - defense;
-//
-//            if (finaldamage < 0) {
-//                finaldamage = 0;
-//            }
-//            if (miss == true) {
-//                event.setCancelled(true);
-//            }
-//            event.setDamage(finaldamage);
-//
-//            Player player = null;
-//
-//            // damage notification if is op
-//            if (event.getEntity() instanceof Player) {
-//                player = (Player) event.getEntity();
-//
-//            }
-//            if (damager instanceof Player) {
-//                // adds experience per damage
-//                player = (Player) damager;
-//                int factor = 0;
-//                if (event.getEntity() instanceof Monster) {
-//                    factor = 2;
-//                }
-//
-//
-//
-//
-//            }
-//        } else {
-//            // damage is not done between entities
-//            if (event.getEntity() instanceof Monster) {
-//                Monster monster = (Monster) event.getEntity();
-//                if (monster.hasMetadata("damage")) {
-//                    int damage = monster.getMetadata("damage").get(0).asInt();
-//                    damage = damage + 1;
-//                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, damage));
-//                } else {
-//                    monster.setMetadata("damage", new FixedMetadataValue(bitQuest, 1));
-//                }
-//
-//            }
-//        }
-//
-//
-//    }
-
 
     public void useRandomEquipment(LivingEntity entity, int level) {
 
         // give sword
-        if (BitQuest.rand(0, 32) < level && entity instanceof Skeleton==false) {
+        if (BitQuest.rand(0, 32) < level && !(entity instanceof Skeleton)) {
             ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_AXE);
@@ -861,7 +639,7 @@ public class EntityEvents implements Listener {
         // give helmet
         if (BitQuest.rand(0, 32) < level) {
             ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
+            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.IRON_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.DIAMOND_HELMET);
             if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
