@@ -66,6 +66,8 @@ gradlew.bat setupWorkspace
 ````
 (Windows Powershell)
 
+If you encounter problems using gradlew.bat in Windows, try building using the linux command on the Docker command line (see Docker installation below).
+
 ## Compile BitQuest and generate a JAR file
 After the workspace is set up, we can compile using the gradle shadowJar task that will create a file under build/libs. Since this folder is "synced" with docker, you won't need to restart the server to update changes. (Just use /reload) inside the game
 
