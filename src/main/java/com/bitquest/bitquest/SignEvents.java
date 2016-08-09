@@ -100,7 +100,7 @@ public class SignEvents implements Listener {
     					}
     				});
 
-    			}else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString())) {
+    			}else if (bitQuest.REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (bitQuest.isModerator(player)==true)) {
 					if (name.equals("abandon")) {
                         // Abandon land
                         bitQuest.REDIS.del("chunk" + x + "," + z + "owner");
