@@ -7,11 +7,8 @@ import org.bukkit.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -20,7 +17,6 @@ import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-
 import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -227,13 +223,5 @@ public class InventoryEvents implements Listener {
         }
 
     }
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onInventoryOpen(InventoryOpenEvent event)
-    {
-        event.setCancelled(false);
-    }
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onInventoryInteract(InventoryInteractEvent event) {
-        event.setCancelled(false);
-    }
+
 }
