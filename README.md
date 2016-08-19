@@ -51,7 +51,7 @@ Everybody is welcome to contribute. :D
 Here are the instructions to modify, install and run the server as localhost.
 
 
-# Building BitQuest
+# Building & Contributing to BitQuest
 
 ## Setup Workspace
 There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
@@ -59,35 +59,20 @@ There is a gradle task that will download and compile the latest Spigot API and 
 ````
 ./gradlew setupWorkspace
 ````
-(Linux and OSX)
-
-````
-gradlew.bat setupWorkspace
-````
-(Windows Powershell)
-
-If you encounter problems using gradlew.bat in Windows, try building using the linux command on the Docker command line (see Docker installation below).
+Note for Windows users: please use git-bash, not the command prompt. You can get it by installing git from the [git-scm](https://git-scm.com/) website. You can also try building using the linux command on the Docker command line (see Docker installation below)
 
 ## Compile BitQuest and generate a JAR file
-After the workspace is set up, we can compile using the gradle shadowJar task that will create a file under build/libs. Since this folder is "synced" with docker, you won't need to restart the server to update changes. (Just use /reload) inside the game
-
-# Linux and OSX
+After the workspace is set up, we can compile using the shadowJar task that will create a file under build/libs. This should be dropped on the plugins folder of your Spigot server, but you can automate the process for testing using Docker (instructions below)
 
 ````
 ./gradlew shadowJar
 ````
-(Linux and OSX)
-
-````
-gradlew.bat shadowJar
-````
-(Windows Powershell)
 
 # Running BitQuest locally with Docker
 
-Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different.
+Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different. Docker works by creating a "container" that runs your code that is very similar in concept to a Virtual machine. The file docker-compose.yml can be used to create this image and run a local server "synced" with your builds, so you won't need to restart the server to update changes.
 
-1. Build BitQuest using the instructions above.
+1. Build BitQuest using the instructions above (./gradlew shadowJar).
 2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
 [Get Docker](http://docs.docker.com/mac/started/)
 3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
