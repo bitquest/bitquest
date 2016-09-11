@@ -1,7 +1,7 @@
 spigot:
   container_name: bitquest
   environment:
-    - SPIGOT_ENV=development
+    - BITQUEST_ENV=development
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"

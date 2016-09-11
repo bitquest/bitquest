@@ -2,18 +2,17 @@ package com.bitquest.bitquest;
 
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import com.mixpanel.mixpanelapi.MessageBuilder;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Villager;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -36,7 +35,7 @@ import redis.clients.jedis.JedisPoolConfig;
 public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
-
+    public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "production";
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
     public final static String BITCOIN_ADDRESS = System.getenv("BITCOIN_ADDRESS") != null ? System.getenv("BITCOIN_ADDRESS") : null;
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
@@ -105,6 +104,7 @@ public class BitQuest extends JavaPlugin {
             System.out.println("Mixpanel support is on");
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        killAllHippies();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -136,7 +136,16 @@ public class BitQuest extends JavaPlugin {
         REDIS.set("lastloot","nobody");
 
     }
-
+    public void killAllHippies() {
+        System.out.println("Killing all villagers...");
+        World w=Bukkit.getWorld("world");
+        List<Entity> entities = w.getEntities();
+        for ( Entity entity : entities){
+            if ((entity instanceof Villager)) {
+             ((Villager)entity).damage(99999.0D);
+          }
+        }
+    }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
@@ -198,7 +207,9 @@ public class BitQuest extends JavaPlugin {
     }
 
     public boolean isModerator(Player player) {
-            if(REDIS.sismember("moderators",player.getUniqueId().toString())) {
+            if(BITQUEST_ENV.equals("development")) {
+                return true;
+            } else if(REDIS.sismember("moderators",player.getUniqueId().toString())) {
                 return true;
             } else if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
                 return true;
