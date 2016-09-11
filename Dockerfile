@@ -29,5 +29,5 @@ COPY . /bitquest/
 CMD ls /bitquest/
 CMD cd /bitquest/
 CMD ./gradle setupWorkspace
-CMD cp /bitquest/libs/*.jar /spigot/plugins/
+CMD cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
 CMD java -Xmx8G -Xms8G -jar spigot.jar
