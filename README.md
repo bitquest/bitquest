@@ -53,13 +53,17 @@ Here are the instructions to modify, install and run the server as localhost.
 
 # Building & Contributing to BitQuest
 
+## Install bash (Windows only)
+To setup the workspace you need to run a gradle script that only runs on bash. You can get a distribution of bash by installing git from the [git-scm](https://git-scm.com/) website.
+
+Warning: building BitQuest is not currently supoported on Windows 10 Anniversary edition bash. If you have that feature installed, your build will fail. Please uninstall Windows Subsystem for Linux before building BitQuest.
+
 ## Setup Workspace
 There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
 
 ````
 ./gradlew setupWorkspace
 ````
-Note for Windows users: please use git-bash, not the command prompt. You can get it by installing git from the [git-scm](https://git-scm.com/) website. You can also try building using the linux command on the Docker command line (see Docker installation below)
 
 ## Compile BitQuest and generate a JAR file
 After the workspace is set up, we can compile using the shadowJar task that will create a file under build/libs. This should be dropped on the plugins folder of your Spigot server, but you can automate the process for testing using Docker (instructions below)
