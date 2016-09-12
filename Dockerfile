@@ -28,6 +28,7 @@ COPY spigot.yml /spigot/
 COPY . /bitquest/
 CMD ls /bitquest/
 CMD cd /bitquest/
-CMD ./gradle setupWorkspace
+CMD ./gradlew setupWorkspace
+CMD ./gradlew shadowJar
 CMD cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
 CMD java -Xmx8G -Xms8G -jar spigot.jar
