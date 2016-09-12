@@ -26,7 +26,7 @@ COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
 COPY . /bitquest/
-CMD cd /bitquest/ && ./gradlew setupWorkspace
-CMD cd /bitquest/ && ./gradlew shadowJar
-CMD cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
+RUN cd /bitquest/ && ./gradlew setupWorkspace
+RUN cd /bitquest/ && ./gradlew shadowJar
+RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
 CMD java -Xmx8G -Xms8G -jar spigot.jar
