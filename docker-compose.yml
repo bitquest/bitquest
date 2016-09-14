@@ -1,10 +1,11 @@
 spigot:
-  extends:
-    file: development.yml
-    service: spigot
+  container_name: bitquest
+  environment:
+    - BITQUEST_ENV=development
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"
+    - ".:/bitquest"
   ports:
     - "25565:25565"
   links:

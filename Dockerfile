@@ -7,7 +7,8 @@ RUN apt-get update
 RUN apt-get install -y oracle-java8-installer
 RUN apt-get install -y oracle-java8-set-default
 RUN apt-get install -y git
-RUN mkdir /spigot
+RUN mkdir /bitquest
+RUN mkdir /spigot/
 RUN mkdir /spigot/plugins
 WORKDIR /spigot
 RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar
@@ -24,5 +25,8 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-COPY build/libs/bitquest-2.0-all.jar /spigot/plugins/
+COPY . /bitquest/
+RUN cd /bitquest/ && ./gradlew setupWorkspace
+RUN cd /bitquest/ && ./gradlew shadowJar
+RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
 CMD java -Xmx8G -Xms8G -jar spigot.jar
