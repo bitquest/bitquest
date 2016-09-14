@@ -112,6 +112,9 @@ public class EntityEvents implements Listener {
         BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         
         if (bitQuest.isModerator(player)) {
+            if (bitQuest.BITQUEST_ENV.equals("development")==true) {
+                player.setOp(true);
+            }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
@@ -127,6 +130,7 @@ public class EntityEvents implements Listener {
         // Prints the user balance
 
         try {
+
         	// check and set experience
         	user.setTotalExperience((Integer) user.experience());
         	user.updateScoreboard();
