@@ -229,7 +229,7 @@ public class BitQuest extends JavaPlugin {
         user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
         user.player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
-        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
+        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "https://live.blockcypher.com/btc/address/" + user.wallet.address);
 
     };
 
