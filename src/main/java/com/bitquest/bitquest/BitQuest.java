@@ -20,6 +20,14 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+//import org.json.simple.parser.ParseException;
+import java.io.*;
+import javax.net.ssl.HttpsURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -224,12 +232,15 @@ public class BitQuest extends JavaPlugin {
     final int maxNameSize = 16;
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        int chainHeight = user.wallet.getBlockchainHeight();
+        
         BitQuest.REDIS.del("balance"+user.player.getUniqueId().toString());
 
         user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
         user.player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
         user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "https://live.blockcypher.com/btc/address/" + user.wallet.address);
+        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
 
     };
 
