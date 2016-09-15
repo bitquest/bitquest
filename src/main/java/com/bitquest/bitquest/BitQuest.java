@@ -231,7 +231,12 @@ public class BitQuest extends JavaPlugin {
         user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
         user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
         user.player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
-        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "https://live.blockcypher.com/btc/address/" + user.wallet.address);
+        user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
+        user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
+        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
+        user.player.sendMessage(ChatColor.YELLOW + " ");
+        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+        user.player.sendMessage(ChatColor.YELLOW + " ");
         user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
 
     };
