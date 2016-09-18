@@ -39,6 +39,51 @@ public class Wallet {
         this.updateBalance();
         return this.balance;
     }
+    
+    public int getBlockchainHeight() {
+        JSONObject jsonobj = this.makeBlockCypherCall("https://api.blockcypher.com/v1/btc/main");
+        return ((Number) jsonobj.get("height")).intValue();
+    }
+    
+    // @todo: make this just accept the endpoint name and (optional) parameters
+    public JSONObject makeBlockCypherCall(String requestedURL) {
+        JSONParser parser = new JSONParser();
+        
+        try {
+            System.out.println("Making Blockcypher API call...");
+            // @todo: add support for some extra params in this method (allow passing in an optional hash/dictionary/whatever Java calls it)?
+            URL url = new URL(requestedURL + "?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+
+            System.out.println(url.toString());
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+            int responseCode = con.getResponseCode();
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            
+            return (JSONObject) parser.parse(response.toString());
+        } catch (IOException e) {
+            System.out.println("problem making API call");
+            System.out.println(e);
+            // Unable to call API?
+        } catch (ParseException e) {
+            // Bad JSON?
+        }
+        
+        return new JSONObject(); // just give them an empty object
+    }
+    
     void updateBalance() {
         try {
             System.out.println("updating balance...");
