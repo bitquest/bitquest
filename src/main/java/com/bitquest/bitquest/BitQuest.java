@@ -453,6 +453,9 @@ public class BitQuest extends JavaPlugin {
             // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
+                if (cmd.getName().equalsIgnoreCase("killAllHippies")) {
+                    killAllHippies();
+                }
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
                     if(args[0].equals("add")) {
