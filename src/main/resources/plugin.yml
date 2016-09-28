@@ -37,3 +37,4 @@ commands:
   killAllHippies:
     description: "Kills all the villagers"
     usage: "/killAllHippies"
+    aliases: killAllVillagers
