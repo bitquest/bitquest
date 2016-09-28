@@ -110,7 +110,7 @@ public class SignEvents implements Listener {
                         BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
                         BitQuest.REDIS.del("chunk" + x + "," + z + "name");
                     }else if (name.startsWith("transfer ") && name.length() > 9) {
-                        // If the name starts with "trasnfer " and have at lest one more character,
+                        // If the name starts with "transfer " and has at least one more character,
                         // transfer land
                         final String newOwner = name.substring(9);
                         player.sendMessage(ChatColor.YELLOW+"Transfering land to " + newOwner + "...");
