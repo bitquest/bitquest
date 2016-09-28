@@ -372,18 +372,13 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
-                    // maximum loot in SAT is level*10000
-                    // level 2 = 20 bits maximum
-                    // level 100 = 1000 bits maximum
                     final int money = 20000;
                     final int d128 = BitQuest.rand(1, 128);
-
                     int levelChance = (int) Math.ceil(level/10D);
-                    // the minumum bitcoin transaction via blockcypher is 10000 SAT or 100 bits.
-                    // The loot goes out only if d20 is 20, because of lag concerns
-
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
                     if(money > 10000 && level >= d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
+                        // Gives loot if MaxHP / 4 is bigger than a random number between 1 - 128
+                        // The loot is 200 bits (20000 Satoshi)
                         BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -424,7 +419,7 @@ public class EntityEvents implements Listener {
                         });
 
                     }
-                    // calculate and add experience
+                    // Add EXP
                     user.addExperience(level*2);
                     if(bitQuest.messageBuilder!=null) {
 
@@ -623,7 +618,7 @@ public class EntityEvents implements Listener {
 
     public void useRandomEquipment(LivingEntity entity, int level) {
 
-        // give sword
+        // Gives random SWORD
         if (BitQuest.rand(0, 32) < level && !(entity instanceof Skeleton)) {
             ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
             if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
@@ -640,7 +635,7 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setItemInHand(sword);
         }
 
-        // give helmet
+        // Gives random HELMET
         if (BitQuest.rand(0, 32) < level) {
             ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
             if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_HELMET);
@@ -654,7 +649,7 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setHelmet(helmet);
         }
 
-        // give chestplate
+        // Gives random CHESTPLATE
         if (BitQuest.rand(0, 32) < level) {
             ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE);
             if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
@@ -668,7 +663,7 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setChestplate(chest);
         }
 
-        // give leggings
+        // Gives random Leggings
         if (BitQuest.rand(0, 128) < level) {
             ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
             if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
@@ -682,7 +677,7 @@ public class EntityEvents implements Listener {
             entity.getEquipment().setLeggings(leggings);
         }
 
-        // give boots
+        // Gives Random BOOTS
         if (BitQuest.rand(0, 128) < level) {
             ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
             if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.CHAINMAIL_BOOTS);
@@ -697,7 +692,7 @@ public class EntityEvents implements Listener {
         }
     }
 
-    // enchant an item
+    // Random Enchantment
     public static void randomEnchantItem(ItemStack item) {
         ItemMeta meta = item.getItemMeta();
         Enchantment enchantment = null;
