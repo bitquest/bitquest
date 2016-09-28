@@ -124,7 +124,7 @@ public class SignEvents implements Listener {
                                     BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
                                     player.sendMessage(ChatColor.GREEN + "This land now belongs to "+newOwner);
                                 } catch (Exception e) {
-                                    player.sendMessage(ChatColor.RED + "Could not get uuid of "+ newOwner);
+                                    player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
                                 }
                             }
                         });
