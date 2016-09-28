@@ -131,54 +131,38 @@ public class InventoryEvents implements Listener {
                                     }
                                 }
                                 
-                                if (hasOpenSlots && sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
-                                    ItemStack item = event.getCurrentItem();
-                                    ItemMeta meta = item.getItemMeta();
-                                    ArrayList<String> Lore = new ArrayList<String>();
-                                    meta.setLore(null);
-                                    item.setItemMeta(meta);
-                                    player.getInventory().addItem(item);
-                                    player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
-                                    
-                                    if (bitQuest.messageBuilder != null) {
-
-                                        // Create an event
-                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
-
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
-                                    }
-                                    if (sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet)) {
-                                        item = event.getCurrentItem();
-                                        meta = item.getItemMeta();
+                                if (hasOpenSlots) {
+                                    if(sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                        ItemStack item = event.getCurrentItem();
+                                        ItemMeta meta = item.getItemMeta();
+                                        ArrayList<String> Lore = new ArrayList<String>();
                                         meta.setLore(null);
                                         item.setItemMeta(meta);
                                         player.getInventory().addItem(item);
                                         player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                        
                                         if (bitQuest.messageBuilder != null) {
-
+    
                                             // Create an event
                                             org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
-
-
+    
+    
                                             ClientDelivery delivery = new ClientDelivery();
                                             delivery.addMessage(sentEvent);
-
+    
                                             MixpanelAPI mixpanel = new MixpanelAPI();
                                             mixpanel.deliver(delivery);
                                         }
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
                                     }
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "You don't have space in your inventory");
                                 }
                             } catch (IllegalArgumentException e) {
                                 e.printStackTrace();
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
                             } catch (IOException e) {
                                 e.printStackTrace();
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
                             }
                         }
                     });
