@@ -137,14 +137,17 @@ public class BitQuest extends JavaPlugin {
 
     }
     public void killAllHippies() {
-        System.out.println("Killing all villagers...");
         World w=Bukkit.getWorld("world");
         List<Entity> entities = w.getEntities();
+        int villagerskilled=0;
         for ( Entity entity : entities){
             if ((entity instanceof Villager)) {
+            villagerskilled=villagerskilled+1;
              ((Villager)entity).damage(99999.0D);
           }
         }
+        System.out.println("Killed "+villagerskilled+" villagers");
+
     }
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
