@@ -207,7 +207,7 @@ public class EntityEvents implements Listener {
         }
         if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
             System.out.println("Generating new address...");
-            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs");
+            URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("POST");
             con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
@@ -491,7 +491,6 @@ public class EntityEvents implements Listener {
                 baselevel=baselevel+1;
             }
             baselevel=32;
-           System.out.println(e.getLocation().getWorld().getName());
             if(e.getLocation().getWorld().getName().equals("world")) {
                 Chunk chunk = entity.getLocation().getChunk();
                 int range = 16;

@@ -41,7 +41,7 @@ public class Wallet {
     }
     
     public int getBlockchainHeight() {
-        JSONObject jsonobj = this.makeBlockCypherCall("https://api.blockcypher.com/v1/btc/main");
+        JSONObject jsonobj = this.makeBlockCypherCall("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN);
         return ((Number) jsonobj.get("height")).intValue();
     }
     
@@ -52,7 +52,14 @@ public class Wallet {
         try {
             System.out.println("Making Blockcypher API call...");
             // @todo: add support for some extra params in this method (allow passing in an optional hash/dictionary/whatever Java calls it)?
-            URL url = new URL(requestedURL + "?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+            URL url;
+            if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
+                url = new URL(requestedURL + "?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+
+            } else {
+                url = new URL(requestedURL);
+
+            }
 
             System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
@@ -87,8 +94,13 @@ public class Wallet {
     void updateBalance() {
         try {
             System.out.println("updating balance...");
-            URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+address+"/balance?token=" + BitQuest.BLOCKCYPHER_API_KEY);
 
+            URL url;
+            if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
+                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+            } else {
+                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+            }
             System.out.println(url.toString());
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setRequestMethod("GET");
@@ -125,7 +137,7 @@ public class Wallet {
         payload.addProperty("from_private",this.privatekey);
         payload.addProperty("to_address",wallet.address);
         payload.addProperty("value_satoshis",sat);
-        URL url = new URL("https://api.blockcypher.com/v1/btc/main/txs/micro?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+        URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/txs/micro?token=" + BitQuest.BLOCKCYPHER_API_KEY);
         String inputLine = "";
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 

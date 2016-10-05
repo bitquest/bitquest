@@ -1,6 +1,12 @@
 package com.bitquest.bitquest;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 
@@ -24,9 +30,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by explodi on 11/1/15.
@@ -35,12 +45,15 @@ import redis.clients.jedis.JedisPoolConfig;
 public class BitQuest extends JavaPlugin {
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
-    public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "production";
+    public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
     public final static String BITCOIN_ADDRESS = System.getenv("BITCOIN_ADDRESS") != null ? System.getenv("BITCOIN_ADDRESS") : null;
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
+    // if BLOCKCHAIN is set, users can choose a blockchain supported by BlockCypher (very useful for development on testnet, or maybe DogeQuest?)
+    public final static String BLOCKCHAIN = System.getenv("BLOCKCHAIN") != null ? System.getenv("BLOCKCHAIN") : "btc/main";
+
     // Support for statsd is planned but not implemented
     public final static String STATSD_HOST = System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
     public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : null;
@@ -70,14 +83,14 @@ public class BitQuest extends JavaPlugin {
     }
 
     public Wallet wallet=null;
-
     @Override
     public void onEnable() {
         log("BitQuest starting");
-
+        log("Using the "+BitQuest.BLOCKCHAIN+" blockchain");
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
+
         // registers listener classes
         getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -92,11 +105,82 @@ public class BitQuest extends JavaPlugin {
         if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
+
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
             System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
         } else {
-            System.out.println("Warning: world wallet address not defined in environment");
+            System.out.println("Warning: world wallet address not defined in environment. A new one will be generated but it will cease to exists once the server stops. This is probably fine if you are running for development/testing purposes");
+            System.out.println("Generating new address...");
+            URL url = null;
+            try {
+                url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            HttpsURLConnection con = null;
+            try {
+                con = (HttpsURLConnection) url.openConnection();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                con.setRequestMethod("POST");
+            } catch (ProtocolException e) {
+                e.printStackTrace();
+            }
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setDoOutput(true);
+            DataOutputStream wr = null;
+            try {
+                wr = new DataOutputStream(con.getOutputStream());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                wr.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                wr.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            try {
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                in.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            JSONParser parser = new JSONParser();
+            final JSONObject jsonobj;
+            try {
+                jsonobj = (JSONObject) parser.parse(response.toString());
+                wallet=new Wallet((String) jsonobj.get("address"),(String) jsonobj.get("private"));
+
+            } catch (org.json.simple.parser.ParseException e) {
+                e.printStackTrace();
+            }
         }
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
         if(MIXPANEL_TOKEN!=null) {

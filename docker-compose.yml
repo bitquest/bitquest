@@ -2,6 +2,7 @@ spigot:
   container_name: bitquest
   environment:
     - BITQUEST_ENV=development
+    - BLOCKCHAIN=bcy/test
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"

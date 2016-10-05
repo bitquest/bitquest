@@ -110,7 +110,7 @@ public class User {
 
     public int bitcoinBalance() throws IOException, org.json.simple.parser.ParseException {
 
-        URL url = new URL("https://api.blockcypher.com/v1/btc/main/addrs/"+getAddress()+"/balance");
+        URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+getAddress()+"/balance");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
