@@ -189,7 +189,8 @@ public class BitQuest extends JavaPlugin {
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
-        removeAllEntities();
+   //     removeAllEntities();
+        killAllVillagers();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
