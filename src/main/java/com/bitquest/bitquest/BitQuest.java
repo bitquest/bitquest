@@ -58,8 +58,8 @@ public class BitQuest extends JavaPlugin {
 
     // Support for statsd is optional but really cool
     public final static String STATSD_HOST = System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
-    public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : null;
-    public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : null;
+    public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : "bitquest";
+    public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : 8125;
     // Support for mixpanel analytics
     public final static String MIXPANEL_TOKEN = System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
     public MessageBuilder messageBuilder;
@@ -92,8 +92,8 @@ public class BitQuest extends JavaPlugin {
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
-        if(STATSD_HOST!=null && STATSD_PORT!=null) {
-            statsd = new NonBlockingStatsDClient("bitquest", System.getenv("STATSD_HOST") , Integer.parseInt(System.getenv("STATSD_PORT")));
+        if(STATSD_HOST!=null && STATSD_PORT!=null && STATSD_PREFIX!=null) {
+            statsd = new NonBlockingStatsDClient(STATSD_PREFIX, System.getenv("STATSD_HOST") , Integer.parseInt(System.getenv("STATSD_PORT")));
             System.out.println("StatsD support is on.");
         }
         // registers listener classes
@@ -228,15 +228,19 @@ public class BitQuest extends JavaPlugin {
             @Override
             public void run() {
                 if(statsd!=null) {
-                    statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
-                    statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
-                    statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
-                    statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+                    sendWorldMetrics();
                 }
             }
         }, 0, 30L);
         REDIS.set("lastloot","nobody");
 
+    }
+    public void sendWorldMetrics() {
+        statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
+        statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
+        statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
+        statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+        statsd.gauge("wallet_balance",wallet.balance());
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
