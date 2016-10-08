@@ -11,6 +11,8 @@ import java.text.ParseException;
 import java.util.*;
 
 import com.mixpanel.mixpanelapi.MessageBuilder;
+import com.timgroup.statsd.NonBlockingStatsDClient;
+import com.timgroup.statsd.StatsDClient;
 import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
@@ -54,7 +56,7 @@ public class BitQuest extends JavaPlugin {
     // if BLOCKCHAIN is set, users can choose a blockchain supported by BlockCypher (very useful for development on testnet, or maybe DogeQuest?)
     public final static String BLOCKCHAIN = System.getenv("BLOCKCHAIN") != null ? System.getenv("BLOCKCHAIN") : "btc/main";
 
-    // Support for statsd is planned but not implemented
+    // Support for statsd is optional but really cool
     public final static String STATSD_HOST = System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
     public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : null;
     public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : null;
@@ -81,7 +83,7 @@ public class BitQuest extends JavaPlugin {
     public static int rand(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
-
+    public StatsDClient statsd;
     public Wallet wallet=null;
     @Override
     public void onEnable() {
@@ -90,7 +92,10 @@ public class BitQuest extends JavaPlugin {
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
-
+        if(STATSD_HOST!=null && STATSD_PORT!=null) {
+            statsd = new NonBlockingStatsDClient("bitquest", System.getenv("STATSD_HOST") , Integer.parseInt(System.getenv("STATSD_PORT")));
+            System.out.println("StatsD support is on.");
+        }
         // registers listener classes
         getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
         getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -219,6 +224,17 @@ public class BitQuest extends JavaPlugin {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 0, 100000L);
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                if(statsd!=null) {
+                    statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
+                    statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
+                    statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
+                    statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+                }
+            }
+        }, 0, 30L);
         REDIS.set("lastloot","nobody");
 
     }
