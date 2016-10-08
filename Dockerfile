@@ -16,7 +16,6 @@ WORKDIR /spigot
 RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar
 # DOWNLOAD AND BUILD DOWNER
 RUN export SHELL=/bin/bash
-RUN printenv
 RUN cd /tmp && git clone https://github.com/bitquest/downer.git
 RUN export SHELL=/bin/bash && cd /tmp/downer && ./gradlew setupWorkspace && ./gradlew build
 RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
