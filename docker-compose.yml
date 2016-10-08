@@ -1,4 +1,7 @@
 spigot:
+  extends:
+    file: development.yml
+    service: spigot
   container_name: bitquest
   environment:
     - BITQUEST_ENV=development
