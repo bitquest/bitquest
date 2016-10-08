@@ -34,7 +34,6 @@ commands:
   emergencystop:
     description: "Stops the server cleanly in case of emergency"
     usage: "/emergencystop [reason]"
-  killAllHippies:
+  killAllVillagers:
     description: "Kills all the villagers"
-    usage: "/killAllHippies"
-    aliases: killAllVillagers
+    usage: "/killAllVillagers"
