@@ -31,8 +31,8 @@ chunk-gc:
   load-threshold: 300
 ticks-per:
   animal-spawns: 400
-  monster-spawns: 5
-  autosave: 3000
+  monster-spawns: 50
+  autosave: 30000
 aliases: now-in-commands.yml
 database:
   username: bukkit
