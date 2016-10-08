@@ -225,7 +225,7 @@ public class BitQuest extends JavaPlugin {
                 World world=Bukkit.getWorld("world");
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
-        }, 0, 100000L);
+        }, 0, 72000L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -233,7 +233,7 @@ public class BitQuest extends JavaPlugin {
                     sendWorldMetrics();
                 }
             }
-        }, 0, 60L);
+        }, 0, 1200L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -241,7 +241,7 @@ public class BitQuest extends JavaPlugin {
                     sendWalletMetrics();
                 }
             }
-        }, 0, 3600L);
+        }, 0, 12000L);
         REDIS.set("lastloot","nobody");
 
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -251,7 +251,7 @@ public class BitQuest extends JavaPlugin {
                     wallet.getTestnetCoins();
                 }
             }
-        }, 0, 1000L);
+        }, 0, 72000L);
     }
     public void sendWorldMetrics() {
         statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
