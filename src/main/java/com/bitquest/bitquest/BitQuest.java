@@ -647,7 +647,7 @@ public class BitQuest extends JavaPlugin {
                 }           
             
             } else {
-		sender.sendMessage("§4You don't have enough permissions to execute this command!");
+		sender.sendMessage("You don't have enough permissions to execute this command!");
             }
         }
         return true;
