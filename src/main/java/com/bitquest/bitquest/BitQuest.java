@@ -188,7 +188,8 @@ public class BitQuest extends JavaPlugin {
             System.out.println("Mixpanel support is on");
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        killAllHippies();
+        // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
+        removeAllEntities();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -220,14 +221,25 @@ public class BitQuest extends JavaPlugin {
         REDIS.set("lastloot","nobody");
 
     }
-    public void killAllHippies() {
+    public void removeAllEntities() {
+        World w=Bukkit.getWorld("world");
+        List<Entity> entities = w.getEntities();
+        int entitiesremoved=0;
+        for ( Entity entity : entities){
+            entity.remove();
+            entitiesremoved=entitiesremoved+1;
+
+        }
+        System.out.println("Killed "+entitiesremoved+" entities");
+    }
+    public void killAllVillagers() {
         World w=Bukkit.getWorld("world");
         List<Entity> entities = w.getEntities();
         int villagerskilled=0;
         for ( Entity entity : entities){
             if ((entity instanceof Villager)) {
             villagerskilled=villagerskilled+1;
-             ((Villager)entity).damage(99999.0D);
+             ((Villager)entity).remove();
           }
         }
         System.out.println("Killed "+villagerskilled+" villagers");
@@ -537,8 +549,8 @@ public class BitQuest extends JavaPlugin {
             // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
-                if (cmd.getName().equalsIgnoreCase("killAllHippies")) {
-                    killAllHippies();
+                if (cmd.getName().equalsIgnoreCase("killAllVillagers")) {
+                    killAllVillagers();
                 }
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
