@@ -234,6 +234,14 @@ public class BitQuest extends JavaPlugin {
                 }
             }
         }, 0, 60L);
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                if(statsd!=null) {
+                    sendWalletMetrics();
+                }
+            }
+        }, 0, 3600L);
         REDIS.set("lastloot","nobody");
 
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
@@ -250,7 +258,10 @@ public class BitQuest extends JavaPlugin {
         statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
         statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
         statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+    }
+    public  void sendWalletMetrics() {
         statsd.gauge("wallet_balance",wallet.balance());
+
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
