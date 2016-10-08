@@ -233,11 +233,17 @@ public class BitQuest extends JavaPlugin {
                     sendWorldMetrics();
                 }
             }
-        }, 0, 30L);
+        }, 0, 60L);
         REDIS.set("lastloot","nobody");
-        if(BitQuest.BLOCKCHAIN.equals("bcy/test")) {
-            wallet.getTestnetCoins();
-        }
+
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                if(BitQuest.BLOCKCHAIN.equals("bcy/test")) {
+                    wallet.getTestnetCoins();
+                }
+            }
+        }, 0, 1000L);
     }
     public void sendWorldMetrics() {
         statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
