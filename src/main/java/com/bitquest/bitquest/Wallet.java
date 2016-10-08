@@ -14,6 +14,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
@@ -261,5 +262,87 @@ public class Wallet {
             Bukkit.getLogger().info("---------- XAPO TRANSACTION END ------------");
         return true;
     }
+    public void getTestnetCoins() {
 
+//
+//        # Fund prior address with faucet
+//        curl -d '{"address": "CFqoZmZ3ePwK5wnkhxJjJAQKJ82C7RJdmd", "amount": 100000}' https://api.blockcypher.com/v1/bcy/test/faucet?token=$YOURTOKEN
+//        {
+//            "tx_ref": "02dbf5585d438a1cba82a9041dd815635a6b0df684225cb5271e11397a759479"
+//        }
+
+        System.out.println("Getting testnet coins from faucet...");
+        JsonObject payload=new JsonObject();
+        payload.addProperty("address",address);
+        payload.addProperty("amount",100000);
+        URL url = null;
+        try {
+            url = new URL("https://api.blockcypher.com/v1/bcy/test/faucet?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        String inputLine = "";
+        HttpsURLConnection con = null;
+        try {
+            con = (HttpsURLConnection) url.openConnection();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            System.out.println("\nSending 'POST' request to URL : " + url);
+            System.out.println("Payload : " + payload.toString());
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+            out.write(payload.toString());
+            out.close();
+            int responseCode = con.getResponseCode();
+
+            System.out.println("Response Code : " + responseCode);
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+        } catch(IOException ioe) {
+            System.err.println("IOException: " + ioe);
+
+            InputStream error = con.getErrorStream();
+
+            int data = 0;
+            try {
+                data = error.read();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            while (data != -1) {
+                //do something with data...
+                inputLine = inputLine + (char)data;
+                try {
+                    data = error.read();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            try {
+                error.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            System.out.println(inputLine);
+
+
+        }
+    }
 }

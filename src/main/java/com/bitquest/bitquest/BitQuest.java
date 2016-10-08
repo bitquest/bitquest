@@ -1,9 +1,6 @@
 package com.bitquest.bitquest;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -53,13 +50,16 @@ public class BitQuest extends JavaPlugin {
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
+
+    public final static String MINER_FEE_ADDRESS = System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
+
     // if BLOCKCHAIN is set, users can choose a blockchain supported by BlockCypher (very useful for development on testnet, or maybe DogeQuest?)
     public final static String BLOCKCHAIN = System.getenv("BLOCKCHAIN") != null ? System.getenv("BLOCKCHAIN") : "btc/main";
 
     // Support for statsd is optional but really cool
     public final static String STATSD_HOST = System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
     public final static String STATSD_PREFIX = System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : "bitquest";
-    public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : 8125;
+    public final static String STATSD_PORT = System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : "8125";
     // Support for mixpanel analytics
     public final static String MIXPANEL_TOKEN = System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
     public MessageBuilder messageBuilder;
@@ -85,10 +85,12 @@ public class BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
+    public Wallet miner_wallet=null;
     @Override
     public void onEnable() {
         log("BitQuest starting");
         log("Using the "+BitQuest.BLOCKCHAIN+" blockchain");
+
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
@@ -233,7 +235,9 @@ public class BitQuest extends JavaPlugin {
             }
         }, 0, 30L);
         REDIS.set("lastloot","nobody");
-
+        if(BitQuest.BLOCKCHAIN.equals("bcy/test")) {
+            wallet.getTestnetCoins();
+        }
     }
     public void sendWorldMetrics() {
         statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
