@@ -84,10 +84,6 @@ public class User {
         if(level>0) {
             prevlevel=(int) Math.pow(level,2)*factor;
         }
-        System.out.println("level: "+level);
-        System.out.println("rawxp:"+rawxp);
-        System.out.println("prevlevel: "+prevlevel);
-        System.out.println("nextlevel: "+nextlevel);
         player.setLevel(level);
         float progress=(((float)rawxp-prevlevel)/(float)nextlevel);
         player.setExp(progress);
