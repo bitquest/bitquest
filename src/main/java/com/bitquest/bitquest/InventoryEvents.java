@@ -154,16 +154,18 @@ public class InventoryEvents implements Listener {
                                             MixpanelAPI mixpanel = new MixpanelAPI();
                                             mixpanel.deliver(delivery);
                                         }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
                                     }
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You don't have space in your inventory");
                                 }
                             } catch (IllegalArgumentException e) {
                                 e.printStackTrace();
-                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
                             } catch (IOException e) {
                                 e.printStackTrace();
-                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments");
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
                             }
                         }
                     });
