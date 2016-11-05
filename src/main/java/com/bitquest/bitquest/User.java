@@ -131,7 +131,7 @@ public class User {
     }
 
     public int getLevel(int exp) {
-        return (int) Math.round(Math.sqrt(exp / expFactor));
+        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
     }
 
     public int getExpForLevel(int level) {
@@ -145,7 +145,8 @@ public class User {
         if(level > 0) {
             prevlevel = getExpForLevel(level);
         }
-        float progress = (((float) exp - prevlevel) / (float) nextlevel);
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        System.out.println("Progress: " + Float.toString(progress) + ", Exp: " + Integer.toString(exp) + ", PrevLevel: " + Integer.toString(prevlevel) + ", NextLevel: " + Integer.toString(nextlevel));
         return progress;
     }
 
