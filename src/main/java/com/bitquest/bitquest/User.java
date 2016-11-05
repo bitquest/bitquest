@@ -146,7 +146,6 @@ public class User {
             prevlevel = getExpForLevel(level);
         }
         float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
-        System.out.println("Progress: " + Float.toString(progress) + ", Exp: " + Integer.toString(exp) + ", PrevLevel: " + Integer.toString(prevlevel) + ", NextLevel: " + Integer.toString(nextlevel));
         return progress;
     }
 
