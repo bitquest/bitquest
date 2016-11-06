@@ -37,3 +37,6 @@ commands:
   killAllVillagers:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
+  filter:
+    description: "Add a word to filter on the chat"
+    usage: "/filter <add|remove> <word to filter> [word to replace with]"

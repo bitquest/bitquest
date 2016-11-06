@@ -2,6 +2,7 @@ package com.bitquest.bitquest;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
@@ -50,7 +51,7 @@ public class ChatEvents implements Listener {
 					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You have no online clanmates!");
 				} else {
 					for(Player teammate : teammates) {
-						teammate.sendMessage(event.getFormat());
+						teammate.sendMessage(filterWordsForPlayer(event.getFormat(), teammate));
 					}
 					System.out.println(ChatColor.stripColor(event.getFormat()));
 				}
@@ -63,7 +64,7 @@ public class ChatEvents implements Listener {
 				event.setCancelled(true);
 			}
 		} else {
-			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message);
+			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + event.getMessage());
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
@@ -80,13 +81,26 @@ public class ChatEvents implements Listener {
 				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Shout by placing a ! before messages.");
 			} else {
 				for(Player recipient : recipients) {
-					recipient.sendMessage(event.getFormat());
+					recipient.sendMessage(filterWordsForPlayer(event.getFormat(), recipient));
 				}
 				System.out.println(ChatColor.stripColor(event.getFormat()));
 			}
 			
 		}
 		
+	}
+
+	private String filterWordsForPlayer(String msg, Player player) {
+		String newMsg = msg;
+		Set<String> words = BitQuest.REDIS.smembers("filter" + player.getUniqueId().toString());
+
+		for(String word : words) {
+			String[] split = word.split("\\|");
+			// Case insensitive replace
+			newMsg = newMsg.replaceAll("(?i)" + Pattern.quote(split[0]), split[1]);
+		}
+
+		return newMsg;
 	}
 	
 }
