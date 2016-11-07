@@ -38,5 +38,5 @@ commands:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
   filter:
-    description: "Add a word to filter on the chat"
+    description: "Add a filter to the chat. To include spaces use '_' instead.\nFor example: filter_this = filter this"
     usage: "/filter <add|remove> <word to filter> [word to replace with]"
