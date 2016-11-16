@@ -30,7 +30,7 @@ You can send Bitcoin to an outside wallet or other players using the Minecraft c
 ```
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
 ![Player notification](http://i.imgur.com/PHmomoS.png)
-![Player's public transaction](http://i.imgur.com/JPO4AXt.png)
+![Player's public transaction](http://i.imgur.com/JPO4AXt.png)  
 Players can also send money using email instead of a bitcoin address using:
 ```sh
 /transfer <amount> <recipient-email>
