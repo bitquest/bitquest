@@ -33,7 +33,11 @@ You can send Bitcoin to an outside wallet or other players using the Minecraft c
 ![Player's public transaction](http://i.imgur.com/JPO4AXt.png)
 Players can also send money using email instead of a bitcoin address using:
 ```sh
-/transfer <recipient-email>
+/transfer <amount> <recipient-email>
+```
+And also by username using:
+```sh
+/transfer <amount> <username>
 ```
 
 With this method the recipient will receive an email notifying that a bitcoin transaction has been made to a [XAPO wallet](https://xapo.com/wallet/) linked to his email.
