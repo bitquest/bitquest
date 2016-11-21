@@ -1,0 +1,39 @@
+name: BitQuest
+version: 2.0
+author: The BitQuest Dev Team
+main: com.bitquest.bitquest.BitQuest
+description: The BitQuest Open Source Project
+commands:
+  clan:
+    description: "used for creating, joining, operating clans"
+    usage: "/clan <new|invite|kick|join|leave>"
+  wallet:
+    description: "Displays your BitQuest wallet info"
+    usage: "/wallet"
+  transfer:
+    description: "Sends your BitQuest wallet balance to an external address of your own"
+    usage: "/transfer <amount> <bitcoin address or e-mail>"
+  ban:
+    description: "Adds player to the ban list"
+    usage: "/ban <player>"
+  unban:
+    description: "Removes player from the ban list"
+    usage: "/unban <player>"
+  banlist:
+    description: "Prints the list of banned players"
+    usage: "/banlist"
+  spectate:
+    description: "Allows moderators to spectate players' actions"
+    usage: "/spectate <player>"
+  mod:
+    description: "Utility to add/remove/list moderators"
+    usage: "/mod <add|remove|list>"
+  claim:
+    description: "Purchase land in the location where you stand"
+    usage: "/claim"
+  emergencystop:
+    description: "Stops the server cleanly in case of emergency"
+    usage: "/emergencystop [reason]"
+  killAllVillagers:
+    description: "Kills all the villagers"
+    usage: "/killAllVillagers"

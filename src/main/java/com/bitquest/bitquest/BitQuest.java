@@ -588,6 +588,7 @@ public class  BitQuest extends JavaPlugin {
                 }
                 return false;
             }
+
             // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
@@ -689,7 +690,21 @@ public class  BitQuest extends JavaPlugin {
                 }           
             
             } else {
-		sender.sendMessage("You don't have enough permissions to execute this command!");
+		        sender.sendMessage("You don't have enough permissions to execute this command!");
+            }
+            if (cmd.getName().equalsIgnoreCase("faucet")) {
+                User user= null;
+                try {
+                    user = new User(player);
+                    user.wallet.getTestnetCoins();
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
         return true;
