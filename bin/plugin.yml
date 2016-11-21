@@ -25,3 +25,6 @@ commands:
   mod:
     description: "Utility to add/remove/list moderators"
     usage: /mod <add|remove|list>
+  faucet:
+    description: "Get testnet coins (available only on development mode)"
+    usage: /faucet
