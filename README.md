@@ -80,7 +80,7 @@ Running locally via Docker is the fastest way to develop and test code. Docker i
 2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
 [Get Docker](http://docs.docker.com/mac/started/)
 3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
-4. Create development.yml file, where your local variables are. A good starting point is:
+4. Create development.yml file, where your local variables will be. This is done to protect API and private keys you might want to use to test. (development.yml is in .gitignore so it won't be uploaded to github) A good starting point is:
 ````
 spigot:
   environment:

@@ -41,7 +41,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by explodi on 11/1/15.
  */
 
-public class BitQuest extends JavaPlugin {
+public class  BitQuest extends JavaPlugin {
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
     public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
