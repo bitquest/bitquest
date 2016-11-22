@@ -262,7 +262,7 @@ public class Wallet {
             Bukkit.getLogger().info("---------- XAPO TRANSACTION END ------------");
         return true;
     }
-    public void getTestnetCoins() {
+    public boolean getTestnetCoins() {
 
 //
 //        # Fund prior address with faucet
@@ -312,6 +312,11 @@ public class Wallet {
                 response.append(inputLine);
             }
             in.close();
+            if(responseCode==200) {
+                return true;
+            } else {
+                return false;
+            }
 
         } catch(IOException ioe) {
             System.err.println("IOException: " + ioe);

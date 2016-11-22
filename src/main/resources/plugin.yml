@@ -37,3 +37,6 @@ commands:
   killAllVillagers:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
+  faucet:
+    description: "Get testnet coins (development mode only)"
+    usage: "/faucet"
