@@ -35,13 +35,15 @@ public class User {
 
     // scoreboard objectives and teams
     public ScoreboardManager scoreboardManager;
-    public Scoreboard walletScoreboard;
-    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
-    public Objective walletScoreboardObjective;
+    public Scoreboard scoreboard;
+    public Objective scoreboardObjective;
+
+    private int expFactor = 256;
+
     public void createScoreBoard() {
         scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+        scoreboard = scoreboardManager.getNewScoreboard();
+        scoreboardObjective = scoreboard.registerNewObjective("wallet","dummy");
 
     }
 
@@ -50,6 +52,7 @@ public class User {
         setTotalExperience(experience());
         System.out.println(exp);
     }
+
     public int experience() {
         if(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString())==null) {
             return 0;
@@ -57,13 +60,8 @@ public class User {
             return Integer.parseInt(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString()));
         }
     }
-    public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if (walletScoreboardObjective == null) {
-            createScoreBoard();
-        }
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+
+    public int getBalance() {
         int balance;
         if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())) {
             balance=Integer.parseInt(BitQuest.REDIS.get("balance"+player.getUniqueId().toString()));
@@ -72,23 +70,105 @@ public class User {
             BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(balance));
             BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
         }
-        score.setScore(balance/100);
-        player.setScoreboard(walletScoreboard);
+        return balance;
     }
+
+    public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
+        if (scoreboardObjective == null) {
+            createScoreBoard();
+        }
+        int exp = experience();
+        String level = Integer.toString(getLevel(exp));
+        String nextLevel = Integer.toString(getLevel(exp) + 1);
+        String expToLevel = Integer.toString(getRemainingExpToLevel(exp, getLevel(exp) + 1));
+
+        scoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        scoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        Score balanceTitleScore = scoreboardObjective.getScore(ChatColor.GOLD + ChatColor.BOLD.toString() + "Balance");
+        Score balanceScore = scoreboardObjective.getScore(Integer.toString(getBalance()/100) + ChatColor.GREEN + " bits");
+        Score spaceScore = scoreboardObjective.getScore("                    ");
+        Score levelTitleScore = scoreboardObjective.getScore(ChatColor.DARK_GREEN + ChatColor.BOLD.toString() + "Level");
+        Score xpToNextLvl = scoreboardObjective.getScore(ChatColor.GRAY + expToLevel+ "xp to next level");
+        Score xpScore = scoreboardObjective.getScore(ChatColor.WHITE + level + " [" + progresBarForPercentage(getExpProgress(experience()), 25) + ChatColor.WHITE + "] " + nextLevel);
+        balanceTitleScore.setScore(6);
+        balanceScore.setScore(5);
+        spaceScore.setScore(4);
+        levelTitleScore.setScore(3);
+        xpToNextLvl.setScore(2);
+        xpScore.setScore(1);
+        player.setScoreboard(scoreboard);
+    }
+
+    private String progresBarForPercentage(float percentage, int numOfBlocks) {
+        String bar = "";
+        float percentageOfBlock = 1.0f / numOfBlocks;
+        ChatColor color;
+        if (percentage < percentageOfBlock) {
+            color = ChatColor.GRAY;
+        } else {
+            color = ChatColor.GREEN;
+        }
+        bar += color;
+        for (int i = 1; i < numOfBlocks + 1; i++) {
+            float currentPercentage = i * percentageOfBlock;
+
+            if (currentPercentage > percentage && color == ChatColor.GREEN) {
+                bar += ChatColor.GRAY;
+                color = ChatColor.GRAY;
+            }
+
+            bar += "▎";
+        }
+
+        return bar;
+
+    }
+
+    public int getRemainingExpToLevel(int exp, int level) {
+        int levelExp = getExpForLevel(level);
+
+        return levelExp - exp;
+    }
+
+    public int getLevel(int exp) {
+        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
+    }
+
+    public int getExpForLevel(int level) {
+        return (int) Math.pow(level,2)*expFactor;
+    }
+
+    public float getExpProgress(int exp) {
+        int level = getLevel(exp);
+        int nextlevel = getExpForLevel(level + 1);
+        int prevlevel = 0;
+        if(level > 0) {
+            prevlevel = getExpForLevel(level);
+        }
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        return progress;
+    }
+
     public void setTotalExperience(int rawxp) {
         // lower factor, experience is easier to get. you can increase to get the opposite effect
-        int factor=256;
-        int level= (int) Math.round(Math.sqrt(rawxp/factor));
-        int nextlevel=(int) Math.pow(level+1,2)*factor;
-        int prevlevel=0;
-        if(level>0) {
-            prevlevel=(int) Math.pow(level,2)*factor;
-        }
+        int level = getLevel(rawxp);
+        float progress = getExpProgress(rawxp);
+
         player.setLevel(level);
-        float progress=(((float)rawxp-prevlevel)/(float)nextlevel);
         player.setExp(progress);
         setPlayerMaxHealth();
+
+        try {
+            updateScoreboard();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
     private float round(float d, int decimalPlace) {
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_DOWN);
