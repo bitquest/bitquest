@@ -43,6 +43,7 @@ dependencies {
     compile group: 'com.mixpanel', name: 'mixpanel-java', version: '1.4.4'
     compile group: 'org.spigotmc', name: 'spigot-api', version: project.property("apiversion"), { ext { fatJarExclude = true } }
     compile group: 'org.spigotmc', name: 'spigot', version: project.property("apiversion"), { ext { fatJarExclude = true } }
+    compile group: 'org.java-websocket', name: 'Java-WebSocket', version: '1.3.0'
 }
 jar {
     actions = []

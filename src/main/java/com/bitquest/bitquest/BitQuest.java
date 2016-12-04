@@ -1,9 +1,7 @@
 package com.bitquest.bitquest;
 
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.*;
 import java.text.ParseException;
 import java.util.*;
 
@@ -29,6 +27,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.java_websocket.drafts.Draft_10;
+import org.java_websocket.drafts.Draft_17;
+import org.java_websocket.drafts.Draft_75;
+import org.java_websocket.drafts.Draft_76;
+import org.java_websocket.handshake.ServerHandshake;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
@@ -36,6 +39,9 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 import javax.net.ssl.HttpsURLConnection;
+
+
+import org.java_websocket.client.WebSocketClient;
 
 /**
  * Created by explodi on 11/1/15.
@@ -198,6 +204,7 @@ public class  BitQuest extends JavaPlugin {
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
    //     removeAllEntities();
         killAllVillagers();
+        connectWebsocket();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -252,6 +259,45 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
         }, 0, 72000L);
+    }
+    public void connectWebsocket() {
+        System.out.println( "[ws] opening connection..." );
+        WebSocketClient mWs = null;
+        try {
+            mWs = new WebSocketClient( new URI( "wss://socket.blockcypher.com/v1/btc/main" ), new Draft_75() )
+            {
+                @Override
+                public void onMessage( String message ) {
+                   // JSONObject obj = new JSONObject(message);
+                    // String channel = obj.getString("channel");
+                    System.out.println(message);
+
+                }
+
+                @Override
+                public void onOpen( ServerHandshake handshake ) {
+
+                    System.out.println( "[ws] opened connection" );
+
+                    // mWs.send("{event: \"unconfirmed-tx\"}");
+                }
+
+                @Override
+                public void onClose( int code, String reason, boolean remote ) {
+                    System.out.println( "[ws] closed connection: "+reason+" ("+code+")" );
+                }
+
+                @Override
+                public void onError( Exception ex ) {
+                    ex.printStackTrace();
+                }
+
+            };
+            mWs.connect();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
     }
     public void sendWorldMetrics() {
         statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
