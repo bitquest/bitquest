@@ -12,7 +12,7 @@ commands:
     usage: "/wallet"
   transfer:
     description: "Sends your BitQuest wallet balance to an external address of your own"
-    usage: "/transfer <amount> <bitcoin address or e-mail>"
+    usage: "/transfer <amount> <bitcoin address, e-mail or username>"
   ban:
     description: "Adds player to the ban list"
     usage: "/ban <player>"
