@@ -325,7 +325,10 @@ public class  BitQuest extends JavaPlugin {
         } else if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")!=null) {
             if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner").equals(player.getUniqueId().toString())) {
                 return true;
-            } else {
+            } else if (REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"name").endsWith("*P")) {
+                //is public shared
+               return true;    
+	    } else {
                 return false;
             }
         } else {
