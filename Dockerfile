@@ -21,15 +21,19 @@ RUN export SHELL=/bin/bash && cd /tmp/downer && ./gradlew setupWorkspace && ./gr
 RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
-RUN export SHELL=/bin/bash && cd /tmp && java -jar BuildTools.jar --rev 1.11
+RUN export SHELL=/bin/bash && cd /tmp && java -jar BuildTools.jar --rev 1.11.1
 RUN cp /tmp/Spigot/Spigot-Server/target/spigot-1.11-R0.1-SNAPSHOT.jar /spigot/spigot.jar
 RUN cd /spigot && echo "eula=true" > eula.txt
 # COPY server-icon.png /spigot/
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
+# Include region fixer in /utils/ to fix corrupted worlds
+RUN mkdir /utils/
+RUN cd /utils/ && git clone https://github.com/Fenixin/Minecraft-Region-Fixer
 COPY . /bitquest/
 RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
 RUN cd /bitquest/ && ./gradlew shadowJar
 RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
+
 CMD java -Xmx8G -Xms8G -jar spigot.jar
