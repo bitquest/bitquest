@@ -38,6 +38,9 @@ public class User {
     public Scoreboard walletScoreboard;
     // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
     public Objective walletScoreboardObjective;
+
+    private int expFactor = 256;
+
     public void createScoreBoard() {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
@@ -75,17 +78,32 @@ public class User {
         score.setScore(balance/100);
         player.setScoreboard(walletScoreboard);
     }
+
+    public int getLevel(int exp) {
+        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
+    }
+
+    public int getExpForLevel(int level) {
+        return (int) Math.pow(level,2)*expFactor;
+    }
+
+    public float getExpProgress(int exp) {
+        int level = getLevel(exp);
+        int nextlevel = getExpForLevel(level + 1);
+        int prevlevel = 0;
+        if(level > 0) {
+            prevlevel = getExpForLevel(level);
+        }
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        return progress;
+    }
+
     public void setTotalExperience(int rawxp) {
         // lower factor, experience is easier to get. you can increase to get the opposite effect
-        int factor=256;
-        int level= (int) Math.round(Math.sqrt(rawxp/factor));
-        int nextlevel=(int) Math.pow(level+1,2)*factor;
-        int prevlevel=0;
-        if(level>0) {
-            prevlevel=(int) Math.pow(level,2)*factor;
-        }
+        int level = getLevel(rawxp);
+        float progress = getExpProgress(rawxp);
+
         player.setLevel(level);
-        float progress=(((float)rawxp-prevlevel)/(float)nextlevel);
         player.setExp(progress);
         setPlayerMaxHealth();
     }
