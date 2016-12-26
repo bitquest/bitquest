@@ -479,41 +479,15 @@ public class EntityEvents implements Listener {
 
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
-            // Makes monsters appear in different chunks to prevent mob farming
-            final Location location=e.getLocation();
+
             String spawnkey=spawnKey(e.getLocation());
-            int baselevel;
-            if(BitQuest.REDIS.exists(spawnkey)) {
-                BitQuest.REDIS.expire(spawnkey,300000);
-                baselevel=16;
-            } else {
-                baselevel=32;
-            }
+            int baselevel=16;
+
             int d20 = BitQuest.rand(1, 20);
-
-            if (baselevel < 32 && d20==20) {
-                BitQuest.REDIS.incr(spawnkey);
-                baselevel=baselevel+1;
-            }
-            baselevel=32;
-            if(e.getLocation().getWorld().getName().equals("world")) {
-                Chunk chunk = entity.getLocation().getChunk();
-                int range = 16;
-                int z = chunk.getZ() - range;
-                while (z < (chunk.getZ() + range)) {
-                    int x = chunk.getX() - range;
-
-                    while (x < (chunk.getX() + range)) {
-                        String key="chunk" + x + "," + z + "name";
-                        if (BitQuest.REDIS.exists(key)) {
-                            baselevel = baselevel - 1;
-                        }
-                        x = x + 1;
-                    }
-                    z = z + 1;
-                }
-            } else if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=baselevel-(int)(e.getLocation().getY()/8);
+            if(e.getLocation().getWorld().getName().equals("world_nether")) {
+                baselevel=32;
+            } else if(e.getLocation().getWorld().getName().equals("world_end")) {
+                baselevel=64;
             }
 
             // Disable mob spawners. Keep mob farmers away
@@ -523,21 +497,7 @@ public class EntityEvents implements Listener {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
-
-
-                int level = 1;
-                // give a random lvl depending on world
-                int distanceLevel = (int) Math.ceil(e.getLocation().distance(world.getSpawnLocation()) / 128);
-
-                if (world.getName().endsWith("_nether")) {
-                    level =BitQuest.rand(0, baselevel * 2);
-                } else if (world.getName().endsWith("_end")) {
-                    level = BitQuest.rand(0, baselevel * 4);
-                } else {
-                    level = BitQuest.rand(0, baselevel);
-                }
-                if (level < 1) level = 1;
-
+                int level=BitQuest.rand(0, baselevel * 2);
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
@@ -578,15 +538,12 @@ public class EntityEvents implements Listener {
                 // some skeletons are black
                 if (entity instanceof Skeleton) {
                     Skeleton skeleton = (Skeleton) entity;
-                    if (BitQuest.rand(0, 256) < level) {
-                        skeleton.setSkeletonType(Skeleton.SkeletonType.WITHER);
-                    } else {
-                        ItemStack bow = new ItemStack(Material.BOW);
-                        if (BitQuest.rand(0, 64) < level) {
-                            randomEnchantItem(bow);
-                        }
+                    ItemStack bow = new ItemStack(Material.BOW);
+                    if (BitQuest.rand(0, 64) < level) {
+                        randomEnchantItem(bow);
                     }
                 }
+                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level);
             } else {
                 e.setCancelled(true);
             }

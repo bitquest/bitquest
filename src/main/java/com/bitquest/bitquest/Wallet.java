@@ -101,7 +101,6 @@ public class Wallet {
             url=new URL("http://"+host+"/insight-api/addr/"+address+"/unconfirmedBalance");
         }
 
-        System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
@@ -124,7 +123,6 @@ public class Wallet {
     
     void updateBalance() {
         try {
-            System.out.println("updating balance...");
             if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
                 this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
                 this.unconfirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
