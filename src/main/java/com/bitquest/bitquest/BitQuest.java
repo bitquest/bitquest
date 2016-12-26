@@ -331,7 +331,7 @@ public class  BitQuest extends JavaPlugin {
             // player is the owner of the chunk
             return true;
         } else if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions")) {
-            if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions").equals("p")) {
+            if(REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions").equals("p")) {
                 // land is public
                 return true;
             } else {
