@@ -358,24 +358,17 @@ public class EntityEvents implements Listener {
         if (entity instanceof Monster) {
             final String spawnkey = spawnKey(entity.getLocation());
 
-            int baselevel;
-            if(BitQuest.REDIS.get(spawnkey)!=null) {
-                baselevel=Integer.parseInt(BitQuest.REDIS.get(spawnkey));
-            } else {
-                baselevel=0;
-            }
-
             BitQuest.REDIS.expire(spawnkey,30000);
-            System.out.println("death: "+spawnkey+": "+baselevel);
+            System.out.println("death: "+spawnkey+": "+level);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
                     final int money = 20000;
-                    final int d20 = BitQuest.rand(1, 20);
+                    final int d128 = BitQuest.rand(1, level);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(d20==20) {
+                    if(d128<level) {
                         // Gives loot if MaxHP / 4 is bigger than a random number between 1 - 128
                         // The loot is 200 bits (20000 Satoshi)
 //                        BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
