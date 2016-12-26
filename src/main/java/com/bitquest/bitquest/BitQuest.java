@@ -306,22 +306,9 @@ public class  BitQuest extends JavaPlugin {
         recipient.sendMessage(ChatColor.RED + msg);
     }
 
-    public JsonObject areaForLocation(Location location) {
-        List<String> areas = REDIS.lrange("areas", 0, -1);
-        for (String areaJSON : areas) {
-            JsonObject area = new JsonParser().parse(areaJSON).getAsJsonObject();
-            int x = area.get("x").getAsInt();
-            int z = area.get("z").getAsInt();
-            int size = area.get("size").getAsInt();
-            if (location.getX() > (x - size) && location.getX() < (x + size) && location.getZ() > (z - size) && location.getZ() < (z + size)) {
-                return area;
-            }
 
-        }
-        return null;
-    }
     public boolean isOwner(Location location, Player player) {
-        if (REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")) {
+        if (landIsClaimed(location)) {
             if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
                 // player is the owner of the chunk
                 return true;
@@ -379,10 +366,6 @@ public class  BitQuest extends JavaPlugin {
 
     }
 
-    final int minLandSize = 1;
-    final int maxLandSize = 512;
-    final int minNameSize = 3;
-    final int maxNameSize = 16;
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         int chainHeight = user.wallet.getBlockchainHeight();
@@ -401,6 +384,9 @@ public class  BitQuest extends JavaPlugin {
         user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
 
     };
+    public boolean landIsClaimed(Location location) {
+        return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
+    }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

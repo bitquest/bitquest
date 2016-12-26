@@ -480,10 +480,8 @@ public class EntityEvents implements Listener {
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
 
-            String spawnkey=spawnKey(e.getLocation());
             int baselevel=16;
 
-            int d20 = BitQuest.rand(1, 20);
             if(e.getLocation().getWorld().getName().equals("world_nether")) {
                 baselevel=32;
             } else if(e.getLocation().getWorld().getName().equals("world_end")) {
@@ -493,7 +491,7 @@ public class EntityEvents implements Listener {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                 e.setCancelled(true);
-            } else if(baselevel>0) {
+            } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();

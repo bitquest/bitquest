@@ -84,6 +84,7 @@ public class User {
         player.setScoreboard(walletScoreboard);
     }
 
+
     public int getLevel(int exp) {
         return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
     }
