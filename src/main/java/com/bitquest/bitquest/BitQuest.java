@@ -119,6 +119,10 @@ public class  BitQuest extends JavaPlugin {
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
             System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
+            wallet.updateBalance();
+            System.out.println("Balance: "+wallet.balance);
+            System.out.println("Unconfirmed: "+wallet.unconfirmedBalance);
+            System.out.println("Final Balance: "+wallet.final_balance());
         } else {
             System.out.println("Warning: world wallet address not defined in environment. A new one will be generated but it will cease to exists once the server stops. This is probably fine if you are running for development/testing purposes");
             System.out.println("Generating new address...");

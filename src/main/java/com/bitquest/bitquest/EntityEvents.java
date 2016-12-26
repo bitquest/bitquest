@@ -373,13 +373,15 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
                     final int money = 20000;
-                    final int d128 = BitQuest.rand(1, 128);
-                    int levelChance = (int) Math.ceil(level/10D);
+                    final int d20 = BitQuest.rand(1, 20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(money > 10000 && level >= d128 && !BitQuest.REDIS.get("lastloot").equals(player.getUniqueId().toString())) {
+                    if(d20==20) {
                         // Gives loot if MaxHP / 4 is bigger than a random number between 1 - 128
                         // The loot is 200 bits (20000 Satoshi)
-                        BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
+//                        BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
+//                        if(BitQuest.BITQUEST_ENV.equals("development")) {
+//                            BitQuest.REDIS.expire("lastloot",60);
+//                        }
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
@@ -389,7 +391,10 @@ public class EntityEvents implements Listener {
                             @Override
                             public void run() {
                                 try {
-                                    if (bitQuest.wallet.transaction(money, userWallet)) {
+                                    bitQuest.wallet.updateBalance();
+                                    if(bitQuest.wallet.balance<money) {
+                                        System.out.println("[loot] cannot be awarded because world wallet is empty");
+                                    } else if (bitQuest.wallet.transaction(money, userWallet)) {
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                         if (bitQuest.messageBuilder != null) {

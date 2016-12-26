@@ -24,7 +24,7 @@ import java.util.Random;
  */
 public class Wallet {
     public int balance;
-    public int confirmedBalance;
+    public int unconfirmedBalance;
     public Wallet(String address,String privatekey) {
         this.address=address;
         this.privatekey=privatekey;
@@ -37,6 +37,10 @@ public class Wallet {
     int balance() {
         this.updateBalance();
         return this.balance;
+    }
+    int final_balance() {
+        int final_balance=this.balance+this.unconfirmedBalance;
+        return final_balance;
     }
     
     public int getBlockchainHeight() {
@@ -122,8 +126,8 @@ public class Wallet {
         try {
             System.out.println("updating balance...");
             if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
-                this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
-                this.confirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
+                this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
+                this.unconfirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
             } else {
                 URL url;
                 if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
@@ -151,8 +155,8 @@ public class Wallet {
 
                 JSONParser parser = new JSONParser();
                 final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-                this.balance = ((Number) jsonobj.get("final_balance")).intValue();
-                this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
+                this.balance = ((Number) jsonobj.get("balance")).intValue();
+                this.unconfirmedBalance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
             }
 
         } catch (IOException e) {
