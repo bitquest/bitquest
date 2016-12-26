@@ -67,15 +67,20 @@ public class User {
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
         walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        int balance;
-        if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())) {
-            balance=Integer.parseInt(BitQuest.REDIS.get("balance"+player.getUniqueId().toString()));
+        int final_balance;
+        if(BitQuest.REDIS.exists("final_balance"+player.getUniqueId().toString())) {
+            final_balance=Integer.parseInt(BitQuest.REDIS.get("final_balance"+player.getUniqueId().toString()));
         } else {
-            balance=wallet.balance();
-            BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(balance));
-            BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
+            wallet.updateBalance();
+            final_balance=wallet.final_balance();
+            BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(final_balance));
+            if(BitQuest.BITCORE_HOST!=null) {
+                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),10);
+            } else {
+                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
+            }
         }
-        score.setScore(balance/100);
+        score.setScore(final_balance/100);
         player.setScoreboard(walletScoreboard);
     }
 
