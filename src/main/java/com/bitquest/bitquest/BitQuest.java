@@ -368,20 +368,25 @@ public class  BitQuest extends JavaPlugin {
 
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        int chainHeight = user.wallet.getBlockchainHeight();
-        
+        // int chainHeight = user.wallet.getBlockchainHeight();
+        user.wallet.updateBalance();
         BitQuest.REDIS.del("balance"+user.player.getUniqueId().toString());
-
-        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Wallet:");
-        user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
-        user.player.sendMessage(ChatColor.GREEN + "Balance " + user.wallet.balance() + "SAT");
-        user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
-        user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
+        if(this.BLOCKCHAIN.equals("btc/main")) {
+            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.getAddress());
+        } else {
+            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Testnet Address: "+ChatColor.WHITE+user.getAddress());
+        }
+        // user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
+        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
+        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
+        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
+        // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
+      //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
-        user.player.sendMessage(ChatColor.YELLOW + " ");
-        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
-        user.player.sendMessage(ChatColor.YELLOW + " ");
-        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
+    //    user.player.sendMessage(ChatColor.YELLOW + " ");
+  //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+  //      user.player.sendMessage(ChatColor.YELLOW + " ");
+//        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
 
     };
     public boolean landIsClaimed(Location location) {
