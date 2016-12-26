@@ -106,7 +106,7 @@ public class InventoryEvents implements Listener {
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
+                    System.out.println("[purchase] "+player.getName()+" <- "+clicked.getType());
                     player.sendMessage(ChatColor.YELLOW + "Purchasing " + clicked.getType() + "...");
 
                     player.closeInventory();
@@ -131,8 +131,12 @@ public class InventoryEvents implements Listener {
                                         break;
                                     }
                                 }
-                                
-                                if (hasOpenSlots) {
+                                boolean hasBalance=false;
+                                user.wallet.updateBalance();
+                                if(user.wallet.final_balance()<sat) {
+                                    player.sendMessage(ChatColor.RED + "You don't have enough balance to purchase this item.");
+
+                                } else if (hasOpenSlots) {
                                     if(sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
