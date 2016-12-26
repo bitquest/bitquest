@@ -14,9 +14,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -91,39 +89,72 @@ public class Wallet {
         
         return new JSONObject(); // just give them an empty object
     }
+    int bitcore_balance(String host, String address, boolean confirmed) throws IOException {
+        URL url;
+        if(confirmed==true) {
+            url=new URL("http://"+host+"/insight-api/addr/"+address+"/balance");
+        } else {
+            url=new URL("http://"+host+"/insight-api/addr/"+address+"/unconfirmedBalance");
+        }
+
+        System.out.println(url.toString());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return Integer.parseInt(response.toString());
+
+    }
     
     void updateBalance() {
         try {
             System.out.println("updating balance...");
-
-            URL url;
-            if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
-                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+            if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
+                this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
+                this.confirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
             } else {
-                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+                URL url;
+                if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
+                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+                } else {
+                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+                }
+                System.out.println(url.toString());
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+                int responseCode = con.getResponseCode();
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                JSONParser parser = new JSONParser();
+                final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+                this.balance = ((Number) jsonobj.get("final_balance")).intValue();
+                this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
             }
-            System.out.println(url.toString());
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-            int responseCode = con.getResponseCode();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-            this.balance = ((Number) jsonobj.get("final_balance")).intValue();
-            this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
         } catch (IOException e) {
             System.out.println("problem updating balance");
             System.out.println(e);
