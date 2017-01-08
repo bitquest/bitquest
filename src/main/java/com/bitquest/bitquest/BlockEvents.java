@@ -69,15 +69,15 @@ public class BlockEvents implements Listener {
 
 		// set clan
 		// first, we check if the player has permission to build
-			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
-				event.setCancelled(true);
-            	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
-			} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
-				bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
-    			event.setCancelled(true);
-			} else {
-				event.setCancelled(false);
-			}
+		if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+			event.setCancelled(true);
+			bitQuest.error(event.getPlayer(), "You may not place blocks here!");
+		} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
+			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
+			event.setCancelled(true);
+		} else {
+			event.setCancelled(false);
+		}
 
         
 	}

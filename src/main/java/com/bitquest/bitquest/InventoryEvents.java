@@ -103,6 +103,7 @@ public class InventoryEvents implements Listener {
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
             if(event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+                // player buys
                 final ItemStack clicked = event.getCurrentItem();
                 if(clicked!=null && clicked.getType()!=Material.AIR) {
                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -176,6 +177,68 @@ public class InventoryEvents implements Listener {
                 }
             
             } else {
+                // player sells (experimental)
+                final ItemStack clicked = event.getCurrentItem();
+                if(clicked!=null && clicked.getType()!=Material.AIR) {
+                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                    System.out.println("[sell] " + player.getName() + " <- " + clicked.getType());
+                    player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+                    player.closeInventory();
+                    scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                int sat = 0;
+                                for (int i = 0; i < trades.size(); i++) {
+                                    if (clicked.getType() == trades.get(i).itemStack.getType())
+                                        sat = trades.get(i).price;
+
+                                }
+
+                                bitQuest.wallet.updateBalance();
+
+                                if(bitQuest.wallet.final_balance()<sat) {
+                                    player.sendMessage(ChatColor.RED + "I'm not buying anything right now. Try later.");
+
+                                } else if(sat<10000) {
+                                    player.sendMessage(ChatColor.RED + "I'm not buying "+clicked.getType().name());
+                                } else {
+                                    if(sat > 10000 && bitQuest.wallet.transaction(sat, user.wallet) == true) {
+                                        ItemStack item = event.getCurrentItem();
+                                        ItemMeta meta = item.getItemMeta();
+                                        ArrayList<String> Lore = new ArrayList<String>();
+                                        meta.setLore(null);
+                                        item.setItemMeta(meta);
+                                        player.getInventory().remove(item);
+                                        player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " sold");
+
+                                        if (bitQuest.messageBuilder != null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Sell", null);
+
+
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
+
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                                    }
+                                }
+                            } catch (IllegalArgumentException e) {
+                                e.printStackTrace();
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
+                            }
+                        }
+                    });
+
+                }
                 event.setCancelled(true);
             }
 
