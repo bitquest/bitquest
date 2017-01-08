@@ -92,6 +92,12 @@ public class  BitQuest extends JavaPlugin {
     public StatsDClient statsd;
     public Wallet wallet=null;
     public Wallet miner_wallet=null;
+    // scoreboard objectives and teams
+    private ScoreboardManager scoreboardManager;
+    private Scoreboard walletScoreboard;
+    public Objective walletScoreboardObjective;
+
+
     @Override
     public void onEnable() {
         log("BitQuest starting");
@@ -118,7 +124,7 @@ public class  BitQuest extends JavaPlugin {
         if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
-
+        // loads/creates world wallet
         if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
             System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
@@ -204,19 +210,39 @@ public class  BitQuest extends JavaPlugin {
             messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
             System.out.println("Mixpanel support is on");
         }
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
         //     removeAllEntities();
         killAllVillagers();
+        createScheduledTimers();
+
+        // create scoreboards
+        scoreboardManager = Bukkit.getScoreboardManager();
+        walletScoreboard= scoreboardManager.getNewScoreboard();
+        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+    }
+    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        User user=new User(player);
+        user.wallet.updateBalance();
+        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
+
+        int final_balance=user.wallet.final_balance();
+
+        score.setScore(final_balance/100);
+        player.setScoreboard(walletScoreboard);
+    }
+    public void createScheduledTimers() {
+        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 for (Player player : Bukkit.getServer().getOnlinePlayers()){
                     User user= null;
                     try {
-                        user = new User(player);
                         // user.createScoreBoard();
-                        user.updateScoreboard();
+                        updateScoreboard(player);
 
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -475,7 +501,9 @@ public class  BitQuest extends JavaPlugin {
         return false;
 
     }
+    public void updatePlayerTeam(Player player) {
 
+    }
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
@@ -751,9 +779,8 @@ public class  BitQuest extends JavaPlugin {
                                             }
                                         }
                                     });
-                                    User user=new User(player);
-                                    user.createScoreBoard();
-                                    user.updateScoreboard();
+
+                                    updateScoreboard(player);
                                     return true;
                                 }
                             }
@@ -771,7 +798,7 @@ public class  BitQuest extends JavaPlugin {
 
                                     if(fromWallet.transaction(sendAmount,toWallet)) {
                                         player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
-                                        new User(player).updateScoreboard();
+                                        updateScoreboard(player);
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
                                     }

@@ -158,7 +158,7 @@ public class Wallet {
             }
 
         } catch (IOException e) {
-            System.out.println("problem updating balance");
+            System.out.println("[balance] problem updating balance for address "+address);
             System.out.println(e);
             // wallet might be new and it's not listed on the blockchain yet
         } catch (ParseException e) {
