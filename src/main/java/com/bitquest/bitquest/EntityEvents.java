@@ -484,11 +484,12 @@ public class EntityEvents implements Listener {
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
-                int spawn_distance= (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int nerf_level=baselevel+(spawn_distance%128);
-                if(nerf_level>baselevel) nerf_level=baselevel;
-                if(nerf_level<0) nerf_level=0;
-                int level=BitQuest.rand(1, ((baselevel * 2)-nerf_level));
+                int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+                int buff_level=(spawn_distance/128);
+                if(buff_level>baselevel) buff_level=baselevel;
+
+                // max level is baselevel * 2 minus nerf level
+                int level=BitQuest.rand(1, (buff_level+baselevel));
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
@@ -535,7 +536,7 @@ public class EntityEvents implements Listener {
                         randomEnchantItem(bow);
                     }
                 }
-                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance+" nerf level: "+nerf_level);
+                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance+" buff level: "+buff_level);
             } else {
                 e.setCancelled(true);
             }
