@@ -104,8 +104,7 @@ public class EntityEvents implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
 
-        user.createScoreBoard();
-
+        bitQuest.updateScoreboard(player);
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
@@ -134,7 +133,7 @@ public class EntityEvents implements Listener {
 
         	// check and set experience
         	user.setTotalExperience((Integer) user.experience());
-        	user.updateScoreboard();
+        	bitQuest.updateScoreboard(player);
 
 
         	bitQuest.sendWalletInfo(user);
@@ -399,7 +398,7 @@ public class EntityEvents implements Listener {
                                         }
                                     }
                                     try {
-                                        user.updateScoreboard();
+                                        bitQuest.updateScoreboard(player);
                                     } catch (ParseException e) {
                                        // e.printStackTrace();
                                     }

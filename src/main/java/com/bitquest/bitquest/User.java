@@ -33,20 +33,12 @@ public class User {
         }
     }
 
-    // scoreboard objectives and teams
-    public ScoreboardManager scoreboardManager;
-    public Scoreboard walletScoreboard;
+
     // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
-    public Objective walletScoreboardObjective;
 
     private int expFactor = 256;
 
-    public void createScoreBoard() {
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
 
-    }
 
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("experience.raw."+this.player.getUniqueId().toString(),exp);
@@ -60,29 +52,7 @@ public class User {
             return Integer.parseInt(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString()));
         }
     }
-    public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if (walletScoreboardObjective == null) {
-            createScoreBoard();
-        }
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        int final_balance;
-        if(BitQuest.REDIS.exists("final_balance"+player.getUniqueId().toString())) {
-            final_balance=Integer.parseInt(BitQuest.REDIS.get("final_balance"+player.getUniqueId().toString()));
-        } else {
-            wallet.updateBalance();
-            final_balance=wallet.final_balance();
-            BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(final_balance));
-            if(BitQuest.BITCORE_HOST!=null) {
-                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),10);
-            } else {
-                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),60);
-            }
-        }
-        score.setScore(final_balance/100);
-        player.setScoreboard(walletScoreboard);
-    }
+
 
 
     public int getLevel(int exp) {
