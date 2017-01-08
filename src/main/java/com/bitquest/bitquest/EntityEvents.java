@@ -359,7 +359,7 @@ public class EntityEvents implements Listener {
             final String spawnkey = spawnKey(entity.getLocation());
 
             BitQuest.REDIS.expire(spawnkey,30000);
-            System.out.println("death: "+spawnkey+": "+level);
+            System.out.println("[death] "+spawnkey+", "+level);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
