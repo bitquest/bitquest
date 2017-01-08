@@ -336,102 +336,120 @@ public class  BitQuest extends JavaPlugin {
     }
 
     public void claimLand(String name, Chunk chunk, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        final int x=chunk.getX();
-        final int z=chunk.getZ();
+        // check that land actually has a name
+        final int x = chunk.getX();
+        final int z = chunk.getZ();
+        System.out.println("[claim] "+player.getDisplayName()+" wants to claim "+x+","+z+" with name "+name);
 
-        if (name.equalsIgnoreCase("the wilderness")) {
-            player.sendMessage(ChatColor.RED + "You cannot name your land that.");
-            return;
-        }
-        if (REDIS.get("chunk" + x + "," + z + "owner") == null) {
-            final User user = new User(player);
-            player.sendMessage(ChatColor.YELLOW + "Claiming land...");
-            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            BitQuest bitQuest=this;
-            scheduler.runTask(this, new Runnable() {
-                @Override
-                public void run() {
-                    // A villager is born
-                    try {
-                        Wallet paymentWallet;
-                        if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
-                            paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
+        if (!name.isEmpty()) {
+            // check that desired area name is alphanumeric
+            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
+            if (!hasNonAlpha) {
+                // 16 characters max
+                if (name.length() <= 16) {
+
+
+                    if (name.equalsIgnoreCase("the wilderness")) {
+                        player.sendMessage(ChatColor.RED + "You cannot name your land that.");
+                        return;
+                    }
+                    if (REDIS.get("chunk" + x + "," + z + "owner") == null) {
+                        final User user = new User(player);
+                        player.sendMessage(ChatColor.YELLOW + "Claiming land...");
+                        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                        BitQuest bitQuest = this;
+                        scheduler.runTask(this, new Runnable() {
+                            @Override
+                            public void run() {
+                                // A villager is born
+                                try {
+                                    Wallet paymentWallet;
+                                    if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
+                                        paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
+                                    } else {
+                                        paymentWallet = bitQuest.wallet;
+                                    }
+                                    if (user.wallet.transaction(BitQuest.LAND_PRICE, paymentWallet)) {
+
+                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                        BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                        player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                        if (bitQuest.messageBuilder != null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                            org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
+
+
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
+                                            delivery.addMessage(sentCharge);
+
+
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
+                                    } else {
+                                        int balance = new User(player).wallet.balance();
+                                        if (balance < BitQuest.LAND_PRICE) {
+                                            player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                                    ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                        }
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                ;
+                            }
+                        });
+
+                    } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (isModerator(player) == true)) {
+                        if (name.equals("abandon")) {
+                            // Abandon land
+                            BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
+                            BitQuest.REDIS.del("chunk" + x + "," + z + "name");
+                        } else if (name.startsWith("transfer ") && name.length() > 9) {
+                            // If the name starts with "transfer " and has at least one more character,
+                            // transfer land
+                            final String newOwner = name.substring(9);
+                            player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
+
+                            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                            scheduler.runTaskAsynchronously(this, new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
+                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                                        player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
+                                    } catch (Exception e) {
+                                        player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
+                                    }
+                                }
+                            });
+
+                        } else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
+                            player.sendMessage(ChatColor.RED + "You already own this land!");
                         } else {
-                            paymentWallet = bitQuest.wallet;
-                        }
-                        if (user.wallet.transaction(BitQuest.LAND_PRICE, paymentWallet)) {
-
-                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                            // Rename land
+                            player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
                             BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                            player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-                            if(bitQuest.messageBuilder!=null) {
-
-                                // Create an event
-                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE/100,null);
-
-
-                                ClientDelivery delivery = new ClientDelivery();
-                                delivery.addMessage(sentEvent);
-                                delivery.addMessage(sentCharge);
-
-
-
-                                MixpanelAPI mixpanel = new MixpanelAPI();
-                                mixpanel.deliver(delivery);
-                            }
-                        } else {
-                            int balance = new User(player).wallet.balance();
-                            if (balance < BitQuest.LAND_PRICE) {
-                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                        ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE-balance)/100) + ChatColor.RED + " more Bits.");
-                            } else {
-                                player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-                            }
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                        e.printStackTrace();
                     }
-                    ;
+                } else {
+                    player.sendMessage(ChatColor.RED+"Your land name must be 16 characters max");
                 }
-            });
-
-        }else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (isModerator(player)==true)) {
-            if (name.equals("abandon")) {
-                // Abandon land
-                BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
-                BitQuest.REDIS.del("chunk" + x + "," + z + "name");
-            }else if (name.startsWith("transfer ") && name.length() > 9) {
-                // If the name starts with "transfer " and has at least one more character,
-                // transfer land
-                final String newOwner = name.substring(9);
-                player.sendMessage(ChatColor.YELLOW+"Transfering land to " + newOwner + "...");
-
-                BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                scheduler.runTaskAsynchronously(this, new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
-                            player.sendMessage(ChatColor.GREEN + "This land now belongs to "+newOwner);
-                        } catch (Exception e) {
-                            player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
-                        }
-                    }
-                });
-
-            }else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
-                player.sendMessage(ChatColor.RED + "You already own this land!");
             } else {
-                // Rename land
-                player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
-                BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                player.sendMessage(ChatColor.RED+"Your land name must contain only letters and numbers");
             }
+        } else {
+            player.sendMessage(ChatColor.RED+"Your land must have a name");
         }
     }
     public boolean isOwner(Location location, Player player) {
@@ -539,8 +557,22 @@ public class  BitQuest extends JavaPlugin {
             // PLAYER COMMANDS
             if(cmd.getName().equalsIgnoreCase("land")) {
                 if(args[0].equalsIgnoreCase("claim")) {
-                    // Todo: claim land via command
-                    player.sendMessage(ChatColor.RED+"this command is not implemented yet");
+                    Location location=player.getLocation();
+                    try {
+                        claimLand(args[1],location.getChunk(),player);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+"Land claim failed. Please try again later.");
+                        return true;
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+"Land claim failed. Please try again later.");
+                        return true;
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+"Land claim failed. Please try again later.");
+                        return true;
+                    }
                     return true;
                 } else if(args[0].equalsIgnoreCase("permissions")) {
                     Location location=player.getLocation();
