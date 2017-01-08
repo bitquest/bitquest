@@ -7,7 +7,10 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 
+import com.evilmidget38.UUIDFetcher;
+import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MessageBuilder;
+import com.mixpanel.mixpanelapi.MixpanelAPI;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 import org.bukkit.*;
@@ -203,7 +206,7 @@ public class  BitQuest extends JavaPlugin {
         }
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
-   //     removeAllEntities();
+        //     removeAllEntities();
         killAllVillagers();
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -212,7 +215,7 @@ public class  BitQuest extends JavaPlugin {
                     User user= null;
                     try {
                         user = new User(player);
-                       // user.createScoreBoard();
+                        // user.createScoreBoard();
                         user.updateScoreboard();
 
                     } catch (ParseException e) {
@@ -287,9 +290,9 @@ public class  BitQuest extends JavaPlugin {
         int villagerskilled=0;
         for ( Entity entity : entities){
             if ((entity instanceof Villager)) {
-            villagerskilled=villagerskilled+1;
-             ((Villager)entity).remove();
-          }
+                villagerskilled=villagerskilled+1;
+                ((Villager)entity).remove();
+            }
         }
         System.out.println("Killed "+villagerskilled+" villagers");
 
@@ -306,7 +309,105 @@ public class  BitQuest extends JavaPlugin {
         recipient.sendMessage(ChatColor.RED + msg);
     }
 
+    public void claimLand(String name, Chunk chunk, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        final int x=chunk.getX();
+        final int z=chunk.getZ();
 
+        if (name.equalsIgnoreCase("the wilderness")) {
+            player.sendMessage(ChatColor.RED + "You cannot name your land that.");
+            return;
+        }
+        if (REDIS.get("chunk" + x + "," + z + "owner") == null) {
+            final User user = new User(player);
+            player.sendMessage(ChatColor.YELLOW + "Claiming land...");
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+            BitQuest bitQuest=this;
+            scheduler.runTask(this, new Runnable() {
+                @Override
+                public void run() {
+                    // A villager is born
+                    try {
+                        Wallet paymentWallet;
+                        if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
+                            paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
+                        } else {
+                            paymentWallet = bitQuest.wallet;
+                        }
+                        if (user.wallet.transaction(BitQuest.LAND_PRICE, paymentWallet)) {
+
+                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                            BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                            player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                            if(bitQuest.messageBuilder!=null) {
+
+                                // Create an event
+                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE/100,null);
+
+
+                                ClientDelivery delivery = new ClientDelivery();
+                                delivery.addMessage(sentEvent);
+                                delivery.addMessage(sentCharge);
+
+
+
+                                MixpanelAPI mixpanel = new MixpanelAPI();
+                                mixpanel.deliver(delivery);
+                            }
+                        } else {
+                            int balance = new User(player).wallet.balance();
+                            if (balance < BitQuest.LAND_PRICE) {
+                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                        ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE-balance)/100) + ChatColor.RED + " more Bits.");
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                    }
+                    ;
+                }
+            });
+
+        }else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (isModerator(player)==true)) {
+            if (name.equals("abandon")) {
+                // Abandon land
+                BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
+                BitQuest.REDIS.del("chunk" + x + "," + z + "name");
+            }else if (name.startsWith("transfer ") && name.length() > 9) {
+                // If the name starts with "transfer " and has at least one more character,
+                // transfer land
+                final String newOwner = name.substring(9);
+                player.sendMessage(ChatColor.YELLOW+"Transfering land to " + newOwner + "...");
+
+                BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                scheduler.runTaskAsynchronously(this, new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
+                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                            player.sendMessage(ChatColor.GREEN + "This land now belongs to "+newOwner);
+                        } catch (Exception e) {
+                            player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
+                        }
+                    }
+                });
+
+            }else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
+                player.sendMessage(ChatColor.RED + "You already own this land!");
+            } else {
+                // Rename land
+                player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
+                BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+            }
+        }
+    }
     public boolean isOwner(Location location, Player player) {
         if (landIsClaimed(location)) {
             if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
@@ -325,20 +426,29 @@ public class  BitQuest extends JavaPlugin {
         if(isModerator(player)) {
             return true;
         } else if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
-        	// If theyre not in the overworld, they cant build
-        	return false;
-        } else if (isOwner(location,player)) {
-            // player is the owner of the chunk
-            return true;
-        } else if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions")) {
-            if(REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions").equals("p")) {
-                // land is public
+            // If theyre not in the overworld, they cant build
+            return false;
+        } else if (landIsClaimed(location)) {
+            if(isOwner(location,player)) {
+                return true;
+            } else if(landPermissionCode(location).equals("p")==true) {
                 return true;
             } else {
                 return false;
             }
         } else {
-            return true;
+            return false;
+        }
+    }
+    public String landPermissionCode(Location location) {
+        // permission codes:
+        // p = public
+        // c = clan
+        // n = no permissions (private)
+        if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions")) {
+            return REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions");
+        } else {
+            return "n";
         }
     }
 
@@ -357,12 +467,12 @@ public class  BitQuest extends JavaPlugin {
     }
 
     public boolean isModerator(Player player) {
-            if(REDIS.sismember("moderators",player.getUniqueId().toString())) {
-                return true;
-            } else if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
-                return true;
-            }
-            return false;
+        if(REDIS.sismember("moderators",player.getUniqueId().toString())) {
+            return true;
+        } else if(ADMIN_UUID!=null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+            return true;
+        }
+        return false;
 
     }
 
@@ -381,11 +491,11 @@ public class  BitQuest extends JavaPlugin {
         user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
-      //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
+        //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
-    //    user.player.sendMessage(ChatColor.YELLOW + " ");
-  //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
-  //      user.player.sendMessage(ChatColor.YELLOW + " ");
+        //    user.player.sendMessage(ChatColor.YELLOW + " ");
+        //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+        //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
 
     };
@@ -540,31 +650,31 @@ public class  BitQuest extends JavaPlugin {
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args.length == 2) {
-                	final int sendAmount = Integer.valueOf(args[0])*100;
+                    final int sendAmount = Integer.valueOf(args[0])*100;
                     Wallet fromWallet = null;
                     try {
-						fromWallet = new User(player).wallet;
-					} catch (ParseException e1) {
-						e1.printStackTrace();
-					} catch (org.json.simple.parser.ParseException e1) {
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-                	try {
-						if(fromWallet != null && fromWallet.balance() >= sendAmount) {
-							player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
-							for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
+                        fromWallet = new User(player).wallet;
+                    } catch (ParseException e1) {
+                        e1.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e1) {
+                        e1.printStackTrace();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                    try {
+                        if(fromWallet != null && fromWallet.balance() >= sendAmount) {
+                            player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
+                            for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 System.out.println(offlinePlayer);
-								if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
-									final Wallet finalFromWallet = fromWallet;
-									BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                                if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
+                                    final Wallet finalFromWallet = fromWallet;
+                                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                                     final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
                                     REDIS.expire("balance"+player.getUniqueId().toString(),5);
                                     scheduler.runTaskAsynchronously(this, new Runnable() {
-				    					@Override
-				    					public void run() {
-				    						try {
+                                        @Override
+                                        public void run() {
+                                            try {
 
                                                 if (finalFromWallet.transaction(sendAmount, toWallet)) {
                                                     player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
@@ -576,50 +686,50 @@ public class  BitQuest extends JavaPlugin {
                                                 }
 
                                             } catch (IOException e1) {
-												e1.printStackTrace();
-											}
-				    					}
-				    				});
+                                                e1.printStackTrace();
+                                            }
+                                        }
+                                    });
                                     User user=new User(player);
                                     user.createScoreBoard();
                                     user.updateScoreboard();
-					            	return true;
-								}
-							}
-							// validate e-mail address
-							String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-							java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-							java.util.regex.Matcher m = p.matcher(args[0]);
-							if(m.matches()) {
-						    	// TODO: send money through xapo
-						    
-							} else {
-						    	try {
+                                    return true;
+                                }
+                            }
+                            // validate e-mail address
+                            String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+                            java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+                            java.util.regex.Matcher m = p.matcher(args[0]);
+                            if(m.matches()) {
+                                // TODO: send money through xapo
 
-						        	Wallet toWallet = new Wallet(args[1]);
+                            } else {
+                                try {
 
-						        	if(fromWallet.transaction(sendAmount,toWallet)) {
-						        		player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
-						            	new User(player).updateScoreboard();
-						        	} else {
-						            	player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-						        	}
-						    	} catch (IOException e) {
-						    		e.printStackTrace();
-						    	} catch (org.json.simple.parser.ParseException e) {
-						        	e.printStackTrace();
-						    	} catch (ParseException e) {
-						    		e.printStackTrace();
-						    	}
+                                    Wallet toWallet = new Wallet(args[1]);
 
-							}
-							return true;
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					} catch (org.json.simple.parser.ParseException e) {
-						e.printStackTrace();
-					} catch (ParseException e) {
+                                    if(fromWallet.transaction(sendAmount,toWallet)) {
+                                        player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
+                                        new User(player).updateScoreboard();
+                                    } else {
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    }
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                            return true;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
@@ -697,21 +807,21 @@ public class  BitQuest extends JavaPlugin {
 
                 }
                 if (cmd.getName().equalsIgnoreCase("spectate") && args.length == 1) {
-                	
-                	if(Bukkit.getPlayer(args[0]) != null) {
-                		((Player) sender).setGameMode(GameMode.SPECTATOR);
-                    	((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
-                    	success(((Player) sender), "You're now spectating " + args[0] + ".");
-                	} else {
-                		error(((Player) sender), "Player " + args[0] + " isn't online.");
-                	}
-                	return true;
+
+                    if(Bukkit.getPlayer(args[0]) != null) {
+                        ((Player) sender).setGameMode(GameMode.SPECTATOR);
+                        ((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
+                        success(((Player) sender), "You're now spectating " + args[0] + ".");
+                    } else {
+                        error(((Player) sender), "Player " + args[0] + " isn't online.");
+                    }
+                    return true;
                 }
                 if (cmd.getName().equalsIgnoreCase("emergencystop")) {
                     StringBuilder message = new StringBuilder();
                     message.append(sender.getName())
                             .append(" has shut down the server for emergency reasons");
-                    
+
                     if (args.length > 0) {
                         message.append(": ");
                         for (String word : args) {
@@ -721,13 +831,13 @@ public class  BitQuest extends JavaPlugin {
                     for (Player currentPlayer : Bukkit.getOnlinePlayers()) {
                         currentPlayer.kickPlayer(message.toString());
                     }
-                    
-                    Bukkit.shutdown();               
+
+                    Bukkit.shutdown();
                     return true;
-                }           
-            
+                }
+
             } else {
-		        sender.sendMessage("You don't have enough permissions to execute this command!");
+                sender.sendMessage("You don't have enough permissions to execute this command!");
             }
             if (cmd.getName().equalsIgnoreCase("faucet")) {
                 User user= null;
