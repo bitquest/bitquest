@@ -437,7 +437,7 @@ public class  BitQuest extends JavaPlugin {
                 return false;
             }
         } else {
-            return false;
+            return true;
         }
     }
     public String landPermissionCode(Location location) {
