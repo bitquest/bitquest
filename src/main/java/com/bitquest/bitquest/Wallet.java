@@ -306,7 +306,7 @@ public class Wallet {
 
         System.out.println("Getting testnet coins from faucet...");
         JsonObject payload=new JsonObject();
-        payload.addProperty("address",address);
+        payload.addProperty("address",this.address);
         payload.addProperty("amount",100000);
         URL url = null;
         try {

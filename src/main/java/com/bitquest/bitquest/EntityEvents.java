@@ -488,7 +488,7 @@ public class EntityEvents implements Listener {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
-                int level=BitQuest.rand(0, baselevel * 2);
+                int level=BitQuest.rand(1, baselevel * 2);
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
