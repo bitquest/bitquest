@@ -77,7 +77,7 @@ public class User {
             if(BitQuest.BITCORE_HOST!=null) {
                 BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),10);
             } else {
-                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
+                BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),60);
             }
         }
         score.setScore(final_balance/100);
