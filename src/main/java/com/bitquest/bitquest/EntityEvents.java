@@ -110,7 +110,8 @@ public class EntityEvents implements Listener {
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
-        
+        BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
+        BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
         if (bitQuest.isModerator(player)) {
             if (bitQuest.BITQUEST_ENV.equals("development")==true) {
                 player.setOp(true);
@@ -368,13 +369,9 @@ public class EntityEvents implements Listener {
                     final int money = 20000;
                     final int d128 = BitQuest.rand(1, level);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(d128<level) {
-                        // Gives loot if MaxHP / 4 is bigger than a random number between 1 - 128
-                        // The loot is 200 bits (20000 Satoshi)
-//                        BitQuest.REDIS.set("lastloot",player.getUniqueId().toString());
-//                        if(BitQuest.BITQUEST_ENV.equals("development")) {
-//                            BitQuest.REDIS.expire("lastloot",60);
-//                        }
+                    bitQuest.wallet.updateBalance();
+                    if(bitQuest.wallet.balance>money) {
+
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
@@ -384,10 +381,8 @@ public class EntityEvents implements Listener {
                             @Override
                             public void run() {
                                 try {
-                                    bitQuest.wallet.updateBalance();
-                                    if(bitQuest.wallet.balance<money) {
-                                        System.out.println("[loot] cannot be awarded because world wallet is empty");
-                                    } else if (bitQuest.wallet.transaction(money, userWallet)) {
+                                    if (bitQuest.wallet.transaction(money, userWallet)) {
+                                        System.out.println("[loot] "+player.getDisplayName()+": "+money);
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
                                         if (bitQuest.messageBuilder != null) {
