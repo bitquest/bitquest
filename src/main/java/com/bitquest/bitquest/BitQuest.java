@@ -92,10 +92,7 @@ public class  BitQuest extends JavaPlugin {
     public StatsDClient statsd;
     public Wallet wallet=null;
     public Wallet miner_wallet=null;
-    // scoreboard objectives and teams
-    private ScoreboardManager scoreboardManager;
-    private Scoreboard walletScoreboard;
-    public Objective walletScoreboardObjective;
+
 
 
     @Override
@@ -217,11 +214,15 @@ public class  BitQuest extends JavaPlugin {
         createScheduledTimers();
 
         // create scoreboards
+
+    }
+    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        ScoreboardManager scoreboardManager;
+        Scoreboard walletScoreboard;
+        Objective walletScoreboardObjective;
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
-    }
-    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         User user=new User(player);
         user.wallet.updateBalance();
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
