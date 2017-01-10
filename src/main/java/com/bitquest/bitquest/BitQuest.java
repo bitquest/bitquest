@@ -223,13 +223,18 @@ public class  BitQuest extends JavaPlugin {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
-        User user=new User(player);
-        user.wallet.updateBalance();
+        if(REDIS.exists("final_balance:"+player.getUniqueId().toString())==false) {
+            User user=new User(player);
+            user.wallet.updateBalance();
+            REDIS.set("final_balance:"+player.getUniqueId().toString(),String.valueOf(user.wallet.final_balance()));
+            REDIS.expire("final_balance:"+player.getUniqueId().toString(),30);
+        }
+
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
         walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
-        int final_balance=user.wallet.final_balance();
+        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId().toString()));
 
         score.setScore(final_balance/100);
         player.setScoreboard(walletScoreboard);
@@ -529,13 +534,12 @@ public class  BitQuest extends JavaPlugin {
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
         user.wallet.updateBalance();
-        BitQuest.REDIS.del("balance"+user.player.getUniqueId().toString());
+        // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
         if(this.BLOCKCHAIN.equals("btc/main")) {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.getAddress());
+            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.wallet.address);
         } else {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Testnet Address: "+ChatColor.WHITE+user.getAddress());
+            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Testnet Address: "+ChatColor.WHITE+user.wallet.address);
         }
-        // user.player.sendMessage(ChatColor.GREEN + "Address " + user.getAddress());
         user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
@@ -765,23 +769,21 @@ public class  BitQuest extends JavaPlugin {
             if(cmd.getName().equalsIgnoreCase("wallet")) {
                 try {
                     User user=new User(player);
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                } catch (org.json.simple.parser.ParseException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                try {
-                    User user=new User(player);
                     sendWalletInfo(user);
+
                 } catch (ParseException e) {
                     e.printStackTrace();
+                    player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
                 } catch (org.json.simple.parser.ParseException e) {
                     e.printStackTrace();
+                    player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
+
                 } catch (IOException e) {
                     e.printStackTrace();
+                    player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
+
                 }
+
                 return true;
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
