@@ -479,6 +479,7 @@ public class  BitQuest extends JavaPlugin {
                 return true;
             } else if(landPermissionCode(location).equals("p")==true) {
                 return true;
+            
             } else {
                 return false;
             }
@@ -576,16 +577,24 @@ public class  BitQuest extends JavaPlugin {
                         return true;
                     }
                     return true;
-                } else if(args[0].equalsIgnoreCase("permissions")) {
+                } else if(args[0].equalsIgnoreCase("permission")) {
                     Location location=player.getLocation();
-
+                    int x=location.getChunk().getX();
+                    int z=location.getChunk().getZ();
                     if(isOwner(location,player)) {
+                        String landname= REDIS.get("chunk"+x+","+z+"name");
 
                         if(args[1].equalsIgnoreCase("public")) {
                             REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions","p");
+                            player.sendMessage(ChatColor.GREEN+"the land "+landname+" is now public");
                             return true;
                         } else if(args[1].equalsIgnoreCase("clan")) {
-                            REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions","c");
+                            REDIS.set("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "c");
+                            player.sendMessage(ChatColor.GREEN + "the land " + landname + " is now clan-owned");
+                            return true;
+                        } else if(args[1].equalsIgnoreCase("private")) {
+                            REDIS.del("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions");
+                            player.sendMessage(ChatColor.GREEN + "the land " + landname + " is now private");
                             return true;
                         } else {
                             return false;
@@ -646,14 +655,18 @@ public class  BitQuest extends JavaPlugin {
                         if(REDIS.exists("clan:"+player.getUniqueId().toString())) {
                             String clan=REDIS.get("clan:"+player.getUniqueId().toString());
                             // check if user is in the uuid database
-                            if (REDIS.exists("uuid:" + args[1]) == false) {
+                            if (REDIS.exists("uuid:" + args[1]) == true) {
                                 // check if player already belongs to a clan
                                 String uuid=REDIS.get("uuid:"+args[1]);
                                 if (REDIS.exists("clan:" + uuid) == false) {
                                     // check if player is already invited to the clan
                                     if (REDIS.sismember("invitations:"+clan,uuid)==false) {
                                         REDIS.sadd("invitations:" + clan, uuid);
-                                        player.sendMessage("You invited " +args[1]+ " to the "+clan+" clan.");
+                                        player.sendMessage(ChatColor.GREEN+"You invited " +args[1]+ " to the "+clan+" clan.");
+                                        if(Bukkit.getPlayerExact(args[1])!=null) {
+                                            Player invitedplayer = Bukkit.getPlayerExact(args[1]);
+                                            invitedplayer.sendMessage(ChatColor.GREEN+player.getDisplayName()+" invited you to the "+clan+" clan");
+                                        }
                                         return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Player "+args[1]+" is already invited to the clan and must accept the invitation");
