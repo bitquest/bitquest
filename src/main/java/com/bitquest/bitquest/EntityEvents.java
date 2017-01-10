@@ -20,6 +20,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitScheduler;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.permissions.BroadcastPermissions;
 
 import java.io.BufferedReader;
@@ -123,10 +126,14 @@ public class EntityEvents implements Listener {
         String welcome = rawwelcome.toString();
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
-        // Updates name-to-UUID database
-        BitQuest.REDIS.set("uuid" + player.getName(), player.getUniqueId().toString());
-        // Updates UUID-to-name database
-        BitQuest.REDIS.set("name" + player.getUniqueId().toString(), player.getName());
+        if(BitQuest.REDIS.exists("clan:"+player.getUniqueId().toString())) {
+            String clan=BitQuest.REDIS.get("clan:"+player.getUniqueId().toString());
+            System.out.println(clan);
+            ScoreboardManager manager = Bukkit.getScoreboardManager();
+            Scoreboard board = manager.getNewScoreboard();
+            player.setDisplayName("["+clan+"] "+player.getDisplayName());
+        }
+
         // Prints the user balance
 
         try {
@@ -197,7 +204,8 @@ public class EntityEvents implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
 
         Player player=event.getPlayer();
-
+        BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
+        BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
         if(!BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
 
             User user = new User(event.getPlayer());
@@ -486,9 +494,10 @@ public class EntityEvents implements Listener {
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
                 int buff_level=(spawn_distance/128);
                 if(buff_level>baselevel) buff_level=baselevel;
+                if(buff_level<1) buff_level=1;
 
                 // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(1, (buff_level+baselevel));
+                int level=BitQuest.rand(1, buff_level*2);
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
