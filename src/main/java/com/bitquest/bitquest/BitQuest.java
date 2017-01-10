@@ -117,6 +117,7 @@ public class  BitQuest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
         getServer().getPluginManager().registerEvents(new SignEvents(this), this);
         getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
 
         // loads config file. If it doesn't exist, creates it.
         // get plugin config
