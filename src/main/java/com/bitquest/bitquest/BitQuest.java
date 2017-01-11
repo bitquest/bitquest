@@ -484,10 +484,13 @@ public class  BitQuest extends JavaPlugin {
                 return true;
             } else if(landPermissionCode(location).equals("p")==true) {
                 return true;
-            } else if(landPermissionCode(location).equals("p")==true) {
+            } else if(landPermissionCode(location).equals("c")==true) {
                 String owner_uuid=REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner");
+                System.out.println(owner_uuid);
                 String owner_clan=REDIS.get("clan:"+owner_uuid);
+                System.out.println(owner_clan);
                 String player_clan=REDIS.get("clan:"+player.getUniqueId().toString());
+                System.out.println(player_clan);
                 if(owner_clan.equals(player_clan)==true) {
                     return true;
                 } else {
