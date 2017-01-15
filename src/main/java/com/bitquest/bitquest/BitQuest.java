@@ -99,7 +99,8 @@ public class  BitQuest extends JavaPlugin {
     public void onEnable() {
         log("BitQuest starting");
         log("Using the "+BitQuest.BLOCKCHAIN+" blockchain");
-
+        REDIS.set("STARTUP","1");
+        REDIS.expire("STARTUP",300);
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
