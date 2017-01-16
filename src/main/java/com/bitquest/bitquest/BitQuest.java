@@ -592,6 +592,21 @@ public class  BitQuest extends JavaPlugin {
             // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
+                if (cmd.getName().equalsIgnoreCase("butcher")) {
+                    for(World w:Bukkit.getWorlds()) {
+                        List<Entity> entities = w.getEntities();
+                        int villagerskilled=0;
+                        for ( Entity entity : entities){
+                            if ((entity instanceof Villager)) {
+                                villagerskilled=villagerskilled+1;
+                                ((Villager)entity).remove();
+                                System.out.println("[butcher] removed "+entity.getName());
+
+                            }
+                        }
+                    }
+
+                }
                 if (cmd.getName().equalsIgnoreCase("killAllVillagers")) {
                     killAllVillagers();
                 }
