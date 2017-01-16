@@ -33,17 +33,12 @@ public class User {
         }
     }
 
-    // scoreboard objectives and teams
-    public ScoreboardManager scoreboardManager;
-    public Scoreboard walletScoreboard;
-    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
-    public Objective walletScoreboardObjective;
-    public void createScoreBoard() {
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
 
-    }
+    // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
+
+    private int expFactor = 256;
+
+
 
     public void addExperience(int exp) {
         BitQuest.REDIS.incrBy("experience.raw."+this.player.getUniqueId().toString(),exp);
@@ -57,35 +52,34 @@ public class User {
             return Integer.parseInt(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString()));
         }
     }
-    public void updateScoreboard() throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if (walletScoreboardObjective == null) {
-            createScoreBoard();
-        }
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        int balance;
-        if(BitQuest.REDIS.exists("balance"+player.getUniqueId().toString())) {
-            balance=Integer.parseInt(BitQuest.REDIS.get("balance"+player.getUniqueId().toString()));
-        } else {
-            balance=wallet.balance();
-            BitQuest.REDIS.set("balance"+player.getUniqueId().toString(),Integer.toString(balance));
-            BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),6000);
-        }
-        score.setScore(balance/100);
-        player.setScoreboard(walletScoreboard);
+
+
+
+    public int getLevel(int exp) {
+        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
     }
+
+    public int getExpForLevel(int level) {
+        return (int) Math.pow(level,2)*expFactor;
+    }
+
+    public float getExpProgress(int exp) {
+        int level = getLevel(exp);
+        int nextlevel = getExpForLevel(level + 1);
+        int prevlevel = 0;
+        if(level > 0) {
+            prevlevel = getExpForLevel(level);
+        }
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        return progress;
+    }
+
     public void setTotalExperience(int rawxp) {
         // lower factor, experience is easier to get. you can increase to get the opposite effect
-        int factor=256;
-        int level= (int) Math.round(Math.sqrt(rawxp/factor));
-        int nextlevel=(int) Math.pow(level+1,2)*factor;
-        int prevlevel=0;
-        if(level>0) {
-            prevlevel=(int) Math.pow(level,2)*factor;
-        }
+        int level = getLevel(rawxp);
+        float progress = getExpProgress(rawxp);
+
         player.setLevel(level);
-        float progress=(((float)rawxp-prevlevel)/(float)nextlevel);
         player.setExp(progress);
         setPlayerMaxHealth();
     }

@@ -7,12 +7,12 @@ commands:
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
-  wallet:
-    description: "Displays your BitQuest wallet info"
-    usage: "/wallet"
+  land:
+    description: "Manage permissions for the land you're standing on"
+    usage: "/land <claim|transfer|permissions>"
   transfer:
     description: "Sends your BitQuest wallet balance to an external address of your own"
-    usage: "/transfer <amount> <bitcoin address or e-mail>"
+    usage: "/transfer <amount> <bitcoin address, e-mail or username>"
   ban:
     description: "Adds player to the ban list"
     usage: "/ban <player>"
@@ -37,3 +37,9 @@ commands:
   killAllVillagers:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
+  faucet:
+    description: "Get testnet coins (development mode only)"
+    usage: "/faucet"
+  wallet:
+    description: "Displays your BitQuest wallet info"
+    usage: "/wallet"
