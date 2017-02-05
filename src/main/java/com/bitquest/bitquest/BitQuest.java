@@ -891,6 +891,9 @@ public class  BitQuest extends JavaPlugin {
                 if (cmd.getName().equalsIgnoreCase("killAllVillagers")) {
                     killAllVillagers();
                 }
+                if(cmd.getName().equalsIgnoreCase("crashtest")) {
+                    this.setEnabled(false);
+                }
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     Set<String> allplayers=REDIS.smembers("players");
                     if(args[0].equals("add")) {

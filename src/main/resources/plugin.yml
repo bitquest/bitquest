@@ -43,3 +43,6 @@ commands:
   wallet:
     description: "Displays your BitQuest wallet info"
     usage: "/wallet"
+  crashtest:
+    description: "Crashes the plugin on purpose, hell breaks loose. Don't try this at home"
+    usage: "/crashtest"
