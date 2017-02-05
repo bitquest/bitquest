@@ -69,50 +69,15 @@ public class BlockEvents implements Listener {
 
 		// set clan
 		// first, we check if the player has permission to build
-			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
-				event.setCancelled(true);
-            	bitQuest.error(event.getPlayer(), "You may not place blocks here!");
-			} else if (event.getBlock().getType() == Material.STANDING_BANNER) {
-
-				if (bitQuest.areaForLocation(event.getBlock().getLocation()) != null) {
-					Block belowBlock = event.getBlock().getRelative(0, -1, 0);
-					Sign sign = null;
-					if (belowBlock.getRelative(BlockFace.EAST).getType() == Material.WALL_SIGN) {
-						sign = (Sign) belowBlock.getRelative(BlockFace.EAST).getState();
-					}
-					if (belowBlock.getRelative(BlockFace.WEST).getType().equals(Material.WALL_SIGN)) {
-						sign = (Sign) belowBlock.getRelative(BlockFace.WEST).getState();
-					}
-					if (belowBlock.getRelative(BlockFace.NORTH).getType().equals(Material.WALL_SIGN)) {
-						sign = (Sign) belowBlock.getRelative(BlockFace.NORTH).getState();
-					}
-					if (belowBlock.getRelative(BlockFace.SOUTH).getType().equals(Material.WALL_SIGN)) {
-						sign = (Sign) belowBlock.getRelative(BlockFace.SOUTH).getState();
-					}
-					if (sign != null) {
-						String tag = sign.getLine(0).toLowerCase();
-						if (tag.length() > 12) {
-							bitQuest.error(event.getPlayer(), "Clan names are limited to a maximum of 12 characters.");
-						} else if (tag.length() > 0) {
-							// TODO: Find out if the clan name already exists and check player is invited
-							// TODO: Add a clan property to area key
-							// TODO: Add a clan property to user data
-						} else {
-							bitQuest.error(event.getPlayer(), "Please write the name of the clan on the first line of the sign.");
-						}
-
-
-					}
-				} else {
-					bitQuest.error(event.getPlayer(), "You can only place banners in your home land.");
-					event.setCancelled(true);
-				}
-			} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
-				bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
-    			event.setCancelled(true);
-			} else {
-				event.setCancelled(false);
-			}
+		if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+			event.setCancelled(true);
+			bitQuest.error(event.getPlayer(), "You may not place blocks here!");
+		} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
+			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
+			event.setCancelled(true);
+		} else {
+			event.setCancelled(false);
+		}
 
         
 	}

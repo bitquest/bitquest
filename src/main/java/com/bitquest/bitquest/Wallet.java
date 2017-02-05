@@ -14,9 +14,7 @@ import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.*;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -26,7 +24,7 @@ import java.util.Random;
  */
 public class Wallet {
     public int balance;
-    public int confirmedBalance;
+    public int unconfirmedBalance;
     public Wallet(String address,String privatekey) {
         this.address=address;
         this.privatekey=privatekey;
@@ -39,6 +37,10 @@ public class Wallet {
     int balance() {
         this.updateBalance();
         return this.balance;
+    }
+    int final_balance() {
+        int final_balance=this.balance+this.unconfirmedBalance;
+        return final_balance;
     }
     
     public int getBlockchainHeight() {
@@ -91,41 +93,72 @@ public class Wallet {
         
         return new JSONObject(); // just give them an empty object
     }
+    int bitcore_balance(String host, String address, boolean confirmed) throws IOException {
+        URL url;
+        if(confirmed==true) {
+            url=new URL("http://"+host+"/insight-api/addr/"+address+"/balance");
+        } else {
+            url=new URL("http://"+host+"/insight-api/addr/"+address+"/unconfirmedBalance");
+        }
+
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        return Integer.parseInt(response.toString());
+
+    }
     
     void updateBalance() {
         try {
-            System.out.println("updating balance...");
-
-            URL url;
-            if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
-                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+            if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
+                this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
+                this.unconfirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
             } else {
-                url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+                URL url;
+                if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
+                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+                } else {
+                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+                }
+                System.out.println(url.toString());
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setRequestMethod("GET");
+                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+                int responseCode = con.getResponseCode();
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                JSONParser parser = new JSONParser();
+                final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+                this.balance = ((Number) jsonobj.get("balance")).intValue();
+                this.unconfirmedBalance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
             }
-            System.out.println(url.toString());
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-            int responseCode = con.getResponseCode();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-            this.balance = ((Number) jsonobj.get("final_balance")).intValue();
-            this.confirmedBalance = ((Number) jsonobj.get("balance")).intValue();
         } catch (IOException e) {
-            System.out.println("problem updating balance");
+            System.out.println("[balance] problem updating balance for address "+address);
             System.out.println(e);
             // wallet might be new and it's not listed on the blockchain yet
         } catch (ParseException e) {
@@ -262,7 +295,7 @@ public class Wallet {
             Bukkit.getLogger().info("---------- XAPO TRANSACTION END ------------");
         return true;
     }
-    public void getTestnetCoins() {
+    public boolean getTestnetCoins() {
 
 //
 //        # Fund prior address with faucet
@@ -273,7 +306,7 @@ public class Wallet {
 
         System.out.println("Getting testnet coins from faucet...");
         JsonObject payload=new JsonObject();
-        payload.addProperty("address",address);
+        payload.addProperty("address",this.address);
         payload.addProperty("amount",100000);
         URL url = null;
         try {
@@ -312,6 +345,11 @@ public class Wallet {
                 response.append(inputLine);
             }
             in.close();
+            if(responseCode==200) {
+                return true;
+            } else {
+                return false;
+            }
 
         } catch(IOException ioe) {
             System.err.println("IOException: " + ioe);
@@ -341,7 +379,7 @@ public class Wallet {
 
 
             System.out.println(inputLine);
-
+            return false;
 
         }
     }

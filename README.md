@@ -30,10 +30,14 @@ You can send Bitcoin to an outside wallet or other players using the Minecraft c
 ```
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
 ![Player notification](http://i.imgur.com/PHmomoS.png)
-![Player's public transaction](http://i.imgur.com/JPO4AXt.png)
+![Player's public transaction](http://i.imgur.com/JPO4AXt.png)  
 Players can also send money using email instead of a bitcoin address using:
 ```sh
-/transfer <recipient-email>
+/transfer <amount> <recipient-email>
+```
+And also by username using:
+```sh
+/transfer <amount> <username>
 ```
 
 With this method the recipient will receive an email notifying that a bitcoin transaction has been made to a [XAPO wallet](https://xapo.com/wallet/) linked to his email.
@@ -80,7 +84,7 @@ Running locally via Docker is the fastest way to develop and test code. Docker i
 2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
 [Get Docker](http://docs.docker.com/mac/started/)
 3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
-4. Create development.yml file, where your local variables are. A good starting point is:
+4. Create development.yml file, where your local variables will be. This is done to protect API and private keys you might want to use to test. (development.yml is in .gitignore so it won't be uploaded to github) A good starting point is:
 ````
 spigot:
   environment:
