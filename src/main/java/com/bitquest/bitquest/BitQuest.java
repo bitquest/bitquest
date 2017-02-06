@@ -720,6 +720,7 @@ public class  BitQuest extends JavaPlugin {
                                 // user is invited to join
                                 if (REDIS.get("clan:" + player.getUniqueId().toString()) == null) {
                                     // user is not part of any clan
+                                    REDIS.srem("invitations:"+ args[1], player.getUniqueId().toString());
                                     REDIS.set("clan:" + player.getUniqueId().toString(), args[1]);
                                     player.sendMessage(ChatColor.GREEN + "You are now part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan!");
                                     return true;
