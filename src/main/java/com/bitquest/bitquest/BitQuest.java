@@ -643,7 +643,7 @@ public class  BitQuest extends JavaPlugin {
                                             return true;
                                         }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan" + player.getUniqueId().toString()));
+                                        player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
                                         return true;
                                     }
                                 } else {
