@@ -224,7 +224,7 @@ public class  BitQuest extends JavaPlugin {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
-        if(REDIS.exists("final_balance:"+player.getUniqueId().toString())==false) {
+        if(!REDIS.exists("final_balance:"+player.getUniqueId().toString())) {
             User user=new User(player);
             user.wallet.updateBalance();
             REDIS.set("final_balance:"+player.getUniqueId().toString(),String.valueOf(user.wallet.final_balance()));
@@ -417,7 +417,7 @@ public class  BitQuest extends JavaPlugin {
                             }
                         });
 
-                    } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (isModerator(player) == true)) {
+                    } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || isModerator(player)) {
                         if (name.equals("abandon")) {
                             // Abandon land
                             BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
@@ -483,16 +483,16 @@ public class  BitQuest extends JavaPlugin {
         } else if (landIsClaimed(location)) {
             if(isOwner(location,player)) {
                 return true;
-            } else if(landPermissionCode(location).equals("p")==true) {
+            } else if(landPermissionCode(location).equals("p")) {
                 return true;
-            } else if(landPermissionCode(location).equals("c")==true) {
+            } else if(landPermissionCode(location).equals("c")) {
                 String owner_uuid=REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner");
                 System.out.println(owner_uuid);
                 String owner_clan=REDIS.get("clan:"+owner_uuid);
                 System.out.println(owner_clan);
                 String player_clan=REDIS.get("clan:"+player.getUniqueId().toString());
                 System.out.println(player_clan);
-                if(owner_clan.equals(player_clan)==true) {
+                if(owner_clan.equals(player_clan)) {
                     return true;
                 } else {
                     return false;
@@ -671,12 +671,12 @@ public class  BitQuest extends JavaPlugin {
                         if(REDIS.exists("clan:"+player.getUniqueId().toString())) {
                             String clan=REDIS.get("clan:"+player.getUniqueId().toString());
                             // check if user is in the uuid database
-                            if (REDIS.exists("uuid:" + args[1]) == true) {
+                            if (REDIS.exists("uuid:" + args[1])) {
                                 // check if player already belongs to a clan
                                 String uuid=REDIS.get("uuid:"+args[1]);
-                                if (REDIS.exists("clan:" + uuid) == false) {
+                                if (!REDIS.exists("clan:" + uuid)) {
                                     // check if player is already invited to the clan
-                                    if (REDIS.sismember("invitations:"+clan,uuid)==false) {
+                                    if (!REDIS.sismember("invitations:"+clan,uuid)) {
                                         REDIS.sadd("invitations:" + clan, uuid);
                                         player.sendMessage(ChatColor.GREEN+"You invited " +args[1]+ " to the "+clan+" clan.");
                                         if(Bukkit.getPlayerExact(args[1])!=null) {
@@ -690,7 +690,7 @@ public class  BitQuest extends JavaPlugin {
                                     }
 
                                 } else {
-                                    if(REDIS.get("clan:"+uuid).equals(clan)==true) {
+                                    if(REDIS.get("clan:"+uuid).equals(clan)) {
                                         player.sendMessage(ChatColor.RED + "Player " + args[1] + " already belongs to the clan "+clan);
 
                                     } else {
@@ -740,10 +740,10 @@ public class  BitQuest extends JavaPlugin {
                     if(!args[1].isEmpty()) {
                         // check if player is in the uuid database
 
-                        if(REDIS.exists("uuid:"+args[1])==true) {
+                        if(REDIS.exists("uuid:"+args[1])) {
                             String uuid=REDIS.get("uuid:"+args[1]);
                             // check if player belongs to a clan
-                            if(REDIS.exists("clan:"+player.getUniqueId().toString())==true) {
+                            if(REDIS.exists("clan:"+player.getUniqueId().toString())) {
                                 String clan=REDIS.get("clan:"+player.getUniqueId().toString());
                                 // check that kicker and player are in the same clan
                                 if(REDIS.get("clan:"+uuid).equals(clan)) {
@@ -766,7 +766,7 @@ public class  BitQuest extends JavaPlugin {
                     }
                 }
                 if(args[0].equals("leave")) {
-                    if(REDIS.exists("clan:"+player.getUniqueId().toString())==true) {
+                    if(REDIS.exists("clan:"+player.getUniqueId().toString())) {
                         // TODO: when a clan gets emptied, should be removed from the "clans" set
                         player.sendMessage(ChatColor.GREEN+"You are no longer part of the "+REDIS.get("clan:"+player.getUniqueId().toString())+" clan");
                         REDIS.del("clan:"+player.getUniqueId().toString());
@@ -1010,7 +1010,7 @@ public class  BitQuest extends JavaPlugin {
                 User user= null;
                 try {
                     user = new User(player);
-                    if(user.wallet.getTestnetCoins()==true) {
+                    if(user.wallet.getTestnetCoins()) {
                         player.sendMessage(ChatColor.GREEN+"Some testnet coins were delivered to your wallet.");
                     } else {
                         player.sendMessage(ChatColor.RED+"There was an error getting testnet coins.");
