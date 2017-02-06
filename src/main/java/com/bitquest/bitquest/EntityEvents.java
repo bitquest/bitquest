@@ -203,7 +203,8 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if(BitQuest.REDIS.exists("STARTUP")&&!bitQuest.isModerator(event.getPlayer())) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
+            long timeLeft = BitQuest.REDIS.ttl("STARTUP");
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Server is starting. Please come back in " + String.valueOf(timeLeft) + "sec.");
         }
         Player player=event.getPlayer();
         BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
