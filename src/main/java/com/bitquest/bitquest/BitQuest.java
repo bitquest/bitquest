@@ -747,7 +747,7 @@ public class  BitQuest extends JavaPlugin {
                                     String clan = REDIS.get("clan:" + player.getUniqueId().toString());
                                     // check that kicker and player are in the same clan
                                     if (REDIS.get("clan:" + uuid).equals(clan)) {
-                                        REDIS.del("clan:" + REDIS.get("uuid" + args[1]));
+                                        REDIS.del("clan:" + uuid);
                                         player.sendMessage(ChatColor.GREEN + "Player " + args[1] + " was kicked from the " + clan + " clan.");
                                         return true;
                                     } else {
@@ -763,6 +763,9 @@ public class  BitQuest extends JavaPlugin {
                                 player.sendMessage(ChatColor.RED + "Player " + args[1] + " does not play on this server.");
                                 return true;
                             }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Usage: /clan kick <player nickname>");
+                            return true;
                         }
                     }
                     if (args[0].equals("leave")) {
