@@ -115,7 +115,7 @@ public class EntityEvents implements Listener {
         BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
         BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
         if (bitQuest.isModerator(player)) {
-            if (bitQuest.BITQUEST_ENV.equals("development")==true) {
+            if (bitQuest.BITQUEST_ENV.equals("development")) {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
@@ -202,7 +202,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if(BitQuest.REDIS.exists("STARTUP")==true&&bitQuest.isModerator(event.getPlayer())==false) {
+        if(BitQuest.REDIS.exists("STARTUP")&&!bitQuest.isModerator(event.getPlayer())) {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
         }
         Player player=event.getPlayer();
@@ -488,7 +488,7 @@ public class EntityEvents implements Listener {
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                 e.setCancelled(true);
-            } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
+            } else if(!bitQuest.landIsClaimed(e.getLocation())) {
                 e.setCancelled(false);
                 World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
