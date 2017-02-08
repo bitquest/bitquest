@@ -46,3 +46,6 @@ commands:
   crashtest:
     description: "Crashes the plugin on purpose, hell breaks loose. Don't try this at home"
     usage: "/crashtest"
+  report:
+    description: "Sends a report message to the moderators"
+    usage: "/report <player> <reason>"

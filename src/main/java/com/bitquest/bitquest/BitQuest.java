@@ -27,6 +27,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
+import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -69,6 +72,10 @@ public class  BitQuest extends JavaPlugin {
     // Support for mixpanel analytics
     public final static String MIXPANEL_TOKEN = System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
     public MessageBuilder messageBuilder;
+    // Support for slack bot
+    public final static String SLACK_BOT_AUTH_TOKEN = System.getenv("SLACK_BOT_AUTH_TOKEN") != null ? System.getenv("SLACK_BOT_AUTH_TOKEN") : null;
+    public final static String SLACK_BOT_REPORTS_CHANNEL = System.getenv("SLACK_BOT_REPORTS_CHANNEL") != null ? System.getenv("SLACK_BOT_REPORTS_CHANNEL") : "reports";
+    public SlackSession slackBotSession;
     // REDIS: Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
@@ -208,6 +215,14 @@ public class  BitQuest extends JavaPlugin {
         if(MIXPANEL_TOKEN!=null) {
             messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
             System.out.println("Mixpanel support is on");
+        }
+        if (SLACK_BOT_AUTH_TOKEN != null) {
+            slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
+            try {
+                slackBotSession.connect();
+            } catch (IOException e) {
+                System.out.println("Slack bot connection failed with error: " + e.getMessage());
+            }
         }
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
         //     removeAllEntities();
@@ -883,6 +898,44 @@ public class  BitQuest extends JavaPlugin {
                     }
                 }
                 return false;
+            }
+            if (cmd.getName().equalsIgnoreCase("report")) {
+                if (slackBotSession != null && slackBotSession.isConnected()) {
+                    if (args.length >= 2) {
+                        String badPlayer = args[0];
+                        String message = args[1];
+                        for (int i = 2; i < args.length; i++) {
+                            message += " ";
+                            message += args[i];
+                        }
+
+                        if (REDIS.exists("uuid:" + badPlayer)) {
+                            String uuid = REDIS.get("uuid:" + badPlayer);
+                            String slackMessage = "Player " + player.getName() + " reports " + badPlayer + " (" + uuid + ") because: " + message;
+                            SlackChannel channel = slackBotSession.findChannelByName(SLACK_BOT_REPORTS_CHANNEL);
+                            if (channel != null) {
+                                slackBotSession.sendMessage(channel, slackMessage);
+                                String playerMessage = ChatColor.GREEN + "The report has been send to a moderator. Thanks for making " +
+                                        ChatColor.GOLD + ChatColor.BOLD +"Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" +
+                                        ChatColor.RESET + ChatColor.GREEN + " a better place.";
+                                player.sendMessage(playerMessage);
+                                return true;
+                            } else {
+                                player.sendMessage(ChatColor.RED + "There was a problem sending the report. Please try again later.");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Player " + badPlayer + " does not play on this server.");
+                            return true;
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Usage: /report <player> <reason>");
+                        return true;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "The /report command is not active.");
+                    return true;
+                }
             }
 
             // MODERATOR COMMANDS
