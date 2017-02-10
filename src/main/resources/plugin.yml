@@ -7,6 +7,9 @@ commands:
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
+  butcher:
+      description: "kills all entities in the current chunk"
+      usage: "/butcher"
   land:
     description: "Manage permissions for the land you're standing on"
     usage: "/land <claim|transfer|permissions>"
