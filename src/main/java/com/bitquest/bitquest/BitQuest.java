@@ -889,17 +889,21 @@ public class  BitQuest extends JavaPlugin {
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
+                    Chunk c=player.getLocation().getChunk();
                     for(World w:Bukkit.getWorlds()) {
                         List<Entity> entities = w.getEntities();
-                        int villagerskilled=0;
+                        int killed=0;
                         for ( Entity entity : entities){
-                            if ((entity instanceof Villager)) {
-                                villagerskilled=villagerskilled+1;
-                                ((Villager)entity).remove();
-                                System.out.println("[butcher] removed "+entity.getName());
+                            if(entity instanceof Player) {
 
+                            } else if (entity.getLocation().getChunk().getX()==c.getX()&&entity.getLocation().getChunk().getZ()==c.getZ()) {
+                                killed=killed+1;
+                                entity.remove();
+                                System.out.println("[butcher] removed "+entity.getName());
                             }
                         }
+                        player.sendMessage(ChatColor.GREEN+"Killed "+killed+" entities");
+
                     }
 
                 }
