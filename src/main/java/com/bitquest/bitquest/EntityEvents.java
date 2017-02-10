@@ -248,6 +248,7 @@ public class EntityEvents implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later. If this problem persists, please write to bitquest@bitquest.co");
         }
 
+        bitQuest.updateScoreboard(player);
 
     }
 

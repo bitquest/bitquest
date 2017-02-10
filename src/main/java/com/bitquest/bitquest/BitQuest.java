@@ -243,25 +243,25 @@ public class  BitQuest extends JavaPlugin {
     public void createScheduledTimers() {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getServer().getOnlinePlayers()){
-                    User user= null;
-                    try {
-                        // user.createScoreBoard();
-                        updateScoreboard(player);
-
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        // TODO: Handle rate limiting
-                    }
-                }
-            }
-        }, 0, 120L);
+//        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+//            @Override
+//            public void run() {
+//                for (Player player : Bukkit.getServer().getOnlinePlayers()){
+//                    User user= null;
+//                    try {
+//                        // user.createScoreBoard();
+//                        updateScoreboard(player);
+//
+//                    } catch (ParseException e) {
+//                        e.printStackTrace();
+//                    } catch (org.json.simple.parser.ParseException e) {
+//                        e.printStackTrace();
+//                    } catch (IOException e) {
+//                        // TODO: Handle rate limiting
+//                    }
+//                }
+//            }
+//        }, 0, 120L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
