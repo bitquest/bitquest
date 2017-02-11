@@ -253,29 +253,33 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end") && event.getFrom().getChunk()!=event.getTo().getChunk()) {
-            // announce new area
-            int x1=event.getFrom().getChunk().getX();
-            int z1=event.getFrom().getChunk().getZ();
+    public void onPlayerMove(PlayerMoveEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
+            bitQuest.updateScoreboard(event.geter());
+            if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end")) {
+                // announce new area
+                int x1=event.getFrom().getChunk().getX();
+                int z1=event.getFrom().getChunk().getZ();
 
-            int x2=event.getTo().getChunk().getX();
-            int z2=event.getTo().getChunk().getZ();
+                int x2=event.getTo().getChunk().getX();
+                int z2=event.getTo().getChunk().getZ();
 
-            String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-            String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+                String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+                String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-            if(name1==null) name1="the wilderness";
-            if(name2==null) name2="the wilderness";
+                if(name1==null) name1="the wilderness";
+                if(name2==null) name2="the wilderness";
 
-            if(!name1.equals(name2)) {
-            	if(name2.equals("the wilderness")){
-            		event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
-            	}else{
-            		event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
-            	}
+                if(!name1.equals(name2)) {
+                    if(name2.equals("the wilderness")){
+                        event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
+                    }else{
+                        event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+                    }
+                }
             }
         }
+
 
     }
 
