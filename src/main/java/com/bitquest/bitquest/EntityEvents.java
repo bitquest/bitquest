@@ -501,12 +501,12 @@ public class EntityEvents implements Listener {
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int buff_level=(spawn_distance/128);
-                if(buff_level>64) buff_level=64;
+                int buff_level=(spawn_distance/64);
+                if(buff_level>baselevel) buff_level=baselevel;
                 if(buff_level<1) buff_level=1;
 
                 // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(baselevel, baselevel+buff_level);
+                int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
