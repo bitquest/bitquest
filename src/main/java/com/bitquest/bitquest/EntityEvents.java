@@ -284,7 +284,9 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onClick(PlayerInteractEvent event) {
+    public void onClick(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        bitQuest.updateScoreboard(event.getPlayer());
+
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
                 if (event.getItem().getType() == Material.EYE_OF_ENDER) {
@@ -347,8 +349,10 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onAttack(EntityDamageByEntityEvent event) {
+    public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if (event.getDamager() instanceof Player) {
+            bitQuest.updateScoreboard((Player) event.getDamager());
+
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
@@ -577,7 +581,8 @@ public class EntityEvents implements Listener {
     		// PvP is always off
     		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
     			event.setCancelled(true);
-    		}
+
+            }
 
 
 
@@ -699,7 +704,9 @@ public class EntityEvents implements Listener {
     }
     
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event){
+    public void onPlayerInteract(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        bitQuest.updateScoreboard(event.getPlayer());
+
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
         if(b!=null && PROTECTED_BLOCKS.contains(b.getType())) {
