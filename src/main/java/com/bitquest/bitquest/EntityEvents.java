@@ -352,7 +352,6 @@ public class EntityEvents implements Listener {
     public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if (event.getDamager() instanceof Player) {
             bitQuest.updateScoreboard((Player) event.getDamager());
-
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
@@ -499,16 +498,15 @@ public class EntityEvents implements Listener {
                 e.setCancelled(true);
             } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
                 e.setCancelled(false);
-                World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
                 int buff_level=(spawn_distance/128);
-                if(buff_level>baselevel) buff_level=baselevel;
+                if(buff_level>64) buff_level=64;
                 if(buff_level<1) buff_level=1;
 
                 // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(1, buff_level*2);
+                int level=BitQuest.rand(baselevel, baselevel+buff_level);
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
