@@ -255,7 +255,7 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
-            bitQuest.updateScoreboard(event.geter());
+            bitQuest.updateScoreboard(event.getPlayer());
             if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end")) {
                 // announce new area
                 int x1=event.getFrom().getChunk().getX();
