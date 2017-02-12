@@ -130,6 +130,7 @@ public class  BitQuest extends JavaPlugin {
             wallet.updateBalance();
             System.out.println("Balance: "+wallet.balance);
             System.out.println("Unconfirmed: "+wallet.unconfirmedBalance);
+            System.out.println("Payments: "+wallet.paymentBalance);
             System.out.println("Final Balance: "+wallet.final_balance());
         } else {
             System.out.println("Warning: world wallet address not defined in environment. A new one will be generated but it will cease to exists once the server stops. This is probably fine if you are running for development/testing purposes");
@@ -238,6 +239,7 @@ public class  BitQuest extends JavaPlugin {
         int final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId().toString()));
 
         score.setScore(final_balance/100);
+
         player.setScoreboard(walletScoreboard);
     }
     public void createScheduledTimers() {
@@ -554,7 +556,9 @@ public class  BitQuest extends JavaPlugin {
         }
         user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
+        user.player.sendMessage(ChatColor.GREEN + "Payment Balance: "+ChatColor.WHITE + user.wallet.paymentBalance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
+
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
@@ -812,7 +816,26 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if(fromWallet != null && fromWallet.balance() >= sendAmount) {
+                        if(REDIS.exists("payments:"+fromWallet.address)) {
+                            System.out.println("wallet needs to be settled!");
+                            fromWallet.updateBalance();
+                            System.out.println("payment balance: "+fromWallet.paymentBalance);
+                            if(fromWallet.paymentBalance>0) {
+                                if(wallet.transaction(fromWallet.paymentBalance,fromWallet)==true) {
+                                    REDIS.del("payments:"+fromWallet.address);
+                                } else {
+                                    player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    return true;
+                                }
+                            } else if(fromWallet.paymentBalance<0) {
+                                if(wallet.transaction(Math.abs(fromWallet.paymentBalance),wallet)==true){
+                                    REDIS.del("payments:"+fromWallet.address);
+                                } else {
+                                    player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    return true;
+                                }
+                            }
+                        } else if(fromWallet != null && fromWallet.balance() >= sendAmount) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
                             for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 System.out.println(offlinePlayer);

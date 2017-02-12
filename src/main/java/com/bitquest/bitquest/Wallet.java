@@ -25,6 +25,7 @@ import java.util.Random;
 public class Wallet {
     public int balance;
     public int unconfirmedBalance;
+    public int paymentBalance;
     public Wallet(String address,String privatekey) {
         this.address=address;
         this.privatekey=privatekey;
@@ -39,7 +40,7 @@ public class Wallet {
         return this.balance;
     }
     int final_balance() {
-        int final_balance=this.balance+this.unconfirmedBalance;
+        int final_balance=this.balance+this.unconfirmedBalance+this.paymentBalance;
         return final_balance;
     }
     
@@ -120,8 +121,14 @@ public class Wallet {
         return Integer.parseInt(response.toString());
 
     }
+
     
     void updateBalance() {
+        if(BitQuest.REDIS.exists("payments:"+this.address)) {
+            this.paymentBalance=Integer.parseInt(BitQuest.REDIS.get("payments:"+this.address));
+        } else {
+            this.paymentBalance=0;
+        }
         try {
             if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
                 this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
@@ -164,6 +171,28 @@ public class Wallet {
         } catch (ParseException e) {
             // There is a problem with the balance API
         }
+
+    }
+    boolean payment(int sat, Wallet wallet) {
+        System.out.println("=== starting payment ===");
+        System.out.println("from: "+this.address);
+        System.out.println("to: "+wallet.address);
+        this.updateBalance();
+        System.out.println("on-chain balance: "+this.balance);
+        System.out.println("on-chain unconfirmed balance: "+this.unconfirmedBalance);
+        System.out.println("payment balance: "+this.paymentBalance);
+        if(this.final_balance()>=sat) {
+            BitQuest.REDIS.decrBy("payments:"+this.address,sat);
+            BitQuest.REDIS.incrBy("payments:"+wallet.address,sat);
+            System.out.println("Payment is succesful.");
+            System.out.println("=== payment ends ===");
+            return true;
+        } else {
+            System.out.println("Payment fails (not enough on-chain balance)");
+            System.out.println("=== payment ends ===");
+            return false;
+        }
+
 
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {

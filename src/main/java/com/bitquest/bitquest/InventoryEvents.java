@@ -138,7 +138,7 @@ public class InventoryEvents implements Listener {
                                     player.sendMessage(ChatColor.RED + "You don't have enough balance to purchase this item.");
 
                                 } else if (hasOpenSlots) {
-                                    if(sat > 10000 && user.wallet.transaction(sat, bitQuest.wallet) == true) {
+                                    if(sat > 10000 && user.wallet.payment(sat, bitQuest.wallet) == true) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
                                         ArrayList<String> Lore = new ArrayList<String>();

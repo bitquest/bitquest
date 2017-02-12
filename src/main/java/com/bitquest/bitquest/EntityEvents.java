@@ -118,8 +118,10 @@ public class EntityEvents implements Listener {
             if (bitQuest.BITQUEST_ENV.equals("development")==true) {
                 player.setOp(true);
             }
+            bitQuest.wallet.updateBalance();
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
+            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.final_balance() / 100 + " bits");
+            player.sendMessage(ChatColor.YELLOW + "The world wallet payment balance is: " + bitQuest.wallet.paymentBalance / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
         
@@ -387,7 +389,7 @@ public class EntityEvents implements Listener {
                     final int d128 = BitQuest.rand(1, level);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
                     bitQuest.wallet.updateBalance();
-                    if(bitQuest.wallet.balance>money) {
+                    if(bitQuest.wallet.final_balance()>money) {
 
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -398,7 +400,7 @@ public class EntityEvents implements Listener {
                             @Override
                             public void run() {
                                 try {
-                                    if (bitQuest.wallet.transaction(money, userWallet)) {
+                                    if (bitQuest.wallet.payment(money, userWallet)) {
                                         System.out.println("[loot] "+player.getDisplayName()+": "+money);
                                         player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
                                         // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
@@ -415,14 +417,8 @@ public class EntityEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     }
-                                    try {
-                                        bitQuest.updateScoreboard(player);
-                                    } catch (ParseException e) {
-                                       // e.printStackTrace();
-                                    }
+
                                 } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e1) {
                                     e1.printStackTrace();
                                 }
                             }
@@ -484,13 +480,15 @@ public class EntityEvents implements Listener {
 
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
-
-            int baselevel=16;
+            int min_level=1;
+            int max_level=16;
 
             if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=32;
+                min_level=32;
+                max_level=64;
             } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=64;
+                min_level=64;
+                max_level=128;
             }
 
             // Disable mob spawners. Keep mob farmers away
@@ -501,12 +499,11 @@ public class EntityEvents implements Listener {
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int buff_level=(spawn_distance/128);
-                if(buff_level>baselevel) buff_level=baselevel;
+                int buff_level=(spawn_distance/64);
+                if(buff_level>max_level) buff_level=max_level;
                 if(buff_level<1) buff_level=1;
 
-                // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
+                int level=BitQuest.rand(1, Math.min(min_level,buff_level));
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
@@ -563,23 +560,33 @@ public class EntityEvents implements Listener {
     }
     @EventHandler
     void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-
     	// damage by entity
     	if (event instanceof EntityDamageByEntityEvent) {
-    		// Player vs. Animal in claimed location
+            int d20=BitQuest.rand(1, 20);
+
+            // Player vs. Animal in claimed location
     		if (event.getEntity() instanceof Animals && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player){
     			if(!bitQuest.canBuild(event.getEntity().getLocation(), (Player)((EntityDamageByEntityEvent) event).getDamager())){
     				event.setCancelled(true);
     			}
-    		}
-    		// Player vs. Villager
-    		if (event.getEntity() instanceof Villager) {
+    		} else if (event.getEntity() instanceof Villager) {
     			event.setCancelled(true);
-    		}
-    		// PvP is always off
-    		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+    		} else if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+    		    // PvP is off
     			event.setCancelled(true);
+            }  else if (event.getEntity() instanceof Monster && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
+                // player vs. monster
+                Player damager=(Player) ((EntityDamageByEntityEvent) event).getDamager();
+                Monster damaged=(Monster) ((EntityDamageByEntityEvent) event).getEntity();
 
+                int damager_level = new Double(damager.getMaxHealth() / 4).intValue();
+                damager.sendMessage(damager_level+" -> "+event.getDamage());
+            } else if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Monster) {
+                // monster vs. player
+                Monster damager=(Monster) ((EntityDamageByEntityEvent) event).getDamager();
+                Player damaged=(Player) ((EntityDamageByEntityEvent) event).getEntity();
+
+                int damager_level = new Double(damager.getMaxHealth() / 4).intValue();
             }
 
 
