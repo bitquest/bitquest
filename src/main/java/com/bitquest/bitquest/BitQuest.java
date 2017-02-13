@@ -812,7 +812,7 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if(fromWallet != null && fromWallet.balance() >= sendAmount) {
+                        if(fromWallet != null && fromWallet.balance() >= sendAmount && sendAmount >= 20000) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
                             for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 System.out.println(offlinePlayer);
