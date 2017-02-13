@@ -81,6 +81,7 @@ public class  BitQuest extends JavaPlugin {
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
     // public static Scoreboard scoreboard = manager.getNewScoreboard();
     public final static int LAND_PRICE=20000;
+    public final static int MIN_TRANS=20000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
@@ -812,7 +813,7 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if(fromWallet != null && fromWallet.balance() >= sendAmount && sendAmount >= LAND_PRICE) {
+                        if(fromWallet != null && fromWallet.balance() >= sendAmount && sendAmount >= MIN_TRANS) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
                             for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
                                 System.out.println(offlinePlayer);
