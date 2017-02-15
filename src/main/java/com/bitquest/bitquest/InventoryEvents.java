@@ -57,7 +57,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,64),20000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,8),20000));
         trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,8),20000));
-        trades.add(new Trade(new ItemStack(Material.DIAMOND,32),20000));//honestly needed more than 8
+        trades.add(new Trade(new ItemStack(Material.DIAMOND,48),20000));//honestly needed more than 8
         trades.add(new Trade(new ItemStack(Material.ENDER_STONE,16),20000));
         trades.add(new Trade(new ItemStack(Material.IRON_BLOCK,32),100000));
         trades.add(new Trade(new ItemStack(Material.IRON_INGOT,64),20000));
@@ -69,7 +69,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.WOOL,64),20000));
         trades.add(new Trade(new ItemStack(Material.PAPER,64),20000)); //needed
         trades.add(new Trade(new ItemStack(Material.PACKED_ICE,64),20000));
-        trades.add(new Trade(new ItemStack(Material.GOLD_INGOT,64),30000));
+        trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK,16),20000));
         trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,6),30000));
         trades.add(new Trade(new ItemStack(Material.ARROW,64),30000));
         trades.add(new Trade(new ItemStack(Material.PRISMARINE,64),30000));
@@ -86,7 +86,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 6, (short)1),60000)); //notch apples
         trades.add(new Trade(new ItemStack(Material.APPLE,64),20000)); //normal apples :P
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
-        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,1),60000)); //insane
+        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,2),100000)); //insane
         trades.add(new Trade(new ItemStack(Material.SKULL,1, (short)1),80000)); //wither skull
         trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8,20000));
         trades.add(new Trade(new ItemStack(Material.CAKE,8,40000));
