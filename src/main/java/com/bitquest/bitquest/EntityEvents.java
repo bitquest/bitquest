@@ -415,11 +415,7 @@ public class EntityEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     }
-                                    try {
-                                        bitQuest.updateScoreboard(player);
-                                    } catch (ParseException e) {
-                                       // e.printStackTrace();
-                                    }
+                                  
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 } catch (org.json.simple.parser.ParseException e1) {
