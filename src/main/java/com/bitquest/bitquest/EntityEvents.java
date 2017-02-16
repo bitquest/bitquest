@@ -411,9 +411,7 @@ public class EntityEvents implements Listener {
                                    
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e1) {
-                                    e1.printStackTrace();
-                                }
+                                } 
                             }
                         });
 
