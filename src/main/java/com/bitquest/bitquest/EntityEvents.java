@@ -417,10 +417,17 @@ public class EntityEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     }
+<<<<<<< HEAD
 
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
                                 }
+=======
+                                   
+                                } catch (IOException e1) {
+                                    e1.printStackTrace();
+                                } 
+>>>>>>> 519daf4c3a97680a6f0714e01a7241e39d5457ba
                             }
                         });
 
