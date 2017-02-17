@@ -253,34 +253,40 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerMove(PlayerMoveEvent event) {
-        if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end") && event.getFrom().getChunk()!=event.getTo().getChunk()) {
-            // announce new area
-            int x1=event.getFrom().getChunk().getX();
-            int z1=event.getFrom().getChunk().getZ();
+    public void onPlayerMove(PlayerMoveEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
+            bitQuest.updateScoreboard(event.getPlayer());
+            if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end")) {
+                // announce new area
+                int x1=event.getFrom().getChunk().getX();
+                int z1=event.getFrom().getChunk().getZ();
 
-            int x2=event.getTo().getChunk().getX();
-            int z2=event.getTo().getChunk().getZ();
+                int x2=event.getTo().getChunk().getX();
+                int z2=event.getTo().getChunk().getZ();
 
-            String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-            String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
+                String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+                String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-            if(name1==null) name1="the wilderness";
-            if(name2==null) name2="the wilderness";
+                if(name1==null) name1="the wilderness";
+                if(name2==null) name2="the wilderness";
 
-            if(!name1.equals(name2)) {
-            	if(name2.equals("the wilderness")){
-            		event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
-            	}else{
-            		event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
-            	}
+                if(!name1.equals(name2)) {
+                    if(name2.equals("the wilderness")){
+                        event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
+                    }else{
+                        event.getPlayer().sendMessage(ChatColor.YELLOW+"[ "+name2+" ]");
+                    }
+                }
             }
         }
+
 
     }
 
     @EventHandler
-    public void onClick(PlayerInteractEvent event) {
+    public void onClick(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        bitQuest.updateScoreboard(event.getPlayer());
+
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
                 if (event.getItem().getType() == Material.EYE_OF_ENDER) {
@@ -343,8 +349,9 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onAttack(EntityDamageByEntityEvent event) {
+    public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if (event.getDamager() instanceof Player) {
+            bitQuest.updateScoreboard((Player) event.getDamager());
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
@@ -408,12 +415,10 @@ public class EntityEvents implements Listener {
                                             mixpanel.deliver(delivery);
                                         }
                                     }
-                                   
+
                                 } catch (IOException e1) {
                                     e1.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e1) {
-                                    e1.printStackTrace();
-                                }
+                                } 
                             }
                         });
 
@@ -487,7 +492,6 @@ public class EntityEvents implements Listener {
                 e.setCancelled(true);
             } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
                 e.setCancelled(false);
-                World world = e.getLocation().getWorld();
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
@@ -496,7 +500,7 @@ public class EntityEvents implements Listener {
                 if(buff_level<1) buff_level=1;
 
                 // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(1, buff_level*2);
+                int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
@@ -569,7 +573,8 @@ public class EntityEvents implements Listener {
     		// PvP is always off
     		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
     			event.setCancelled(true);
-    		}
+
+            }
 
 
 
@@ -691,7 +696,9 @@ public class EntityEvents implements Listener {
     }
     
     @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event){
+    public void onPlayerInteract(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        bitQuest.updateScoreboard(event.getPlayer());
+
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
         if(b!=null && PROTECTED_BLOCKS.contains(b.getType())) {
