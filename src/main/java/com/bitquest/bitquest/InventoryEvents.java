@@ -88,8 +88,8 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
         trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,2),100000)); //insane
         trades.add(new Trade(new ItemStack(Material.SKULL,1, (short)1),80000)); //wither skull
-        trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8,20000));
-        trades.add(new Trade(new ItemStack(Material.CAKE,8,40000));
+        trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8),20000));
+        trades.add(new Trade(new ItemStack(Material.CAKE,8),40000));
         //cool diamond sword
 
 
