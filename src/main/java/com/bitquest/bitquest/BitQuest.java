@@ -811,6 +811,8 @@ public class  BitQuest extends JavaPlugin {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+                    if (sendAmount >= 20000)
+                    {
                     try {
                         if(fromWallet != null && fromWallet.balance() >= sendAmount) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
@@ -845,6 +847,7 @@ public class  BitQuest extends JavaPlugin {
                                     return true;
                                 }
                             }
+                        }
                             // validate e-mail address
                             String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
                             java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
