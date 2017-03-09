@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
@@ -167,31 +168,34 @@ public class Wallet {
 
     }
     boolean transaction(int sat, Wallet wallet) throws IOException {
-        JsonObject payload=new JsonObject();
-        payload.addProperty("from_private",this.privatekey);
-        payload.addProperty("to_address",wallet.address);
-        payload.addProperty("value_satoshis",sat);
-        URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/txs/micro?token=" + BitQuest.BLOCKCYPHER_API_KEY);
-        String inputLine = "";
+        System.out.println("------------- tx "+this.address+" --> "+wallet.address+" -----------");
+        // get xapo token
+        URL url = new URL("https://v2.api.xapo.com/oauth2/token");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
+        String inputLine="";
         try {
             System.out.println("\nSending 'POST' request to URL : " + url);
-            System.out.println("Payload : " + payload.toString());
+            String key_secret=BitQuest.XAPO_API_KEY+":"+BitQuest.XAPO_SECRET;
+            String urlParameters  = "grant_type=client_credentials&redirect_uri=http://bitquest.co/xapo";
+
+            byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+            int    postDataLength = postData.length;
+
             con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setRequestProperty("Authorization", Base64.encodeBase64String(key_secret.getBytes()));
+            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+            con.setRequestProperty("charset", "utf-8");
+            con.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+
             con.setDoOutput(true);
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-            out.write(payload.toString());
+            out.write(urlParameters);
             out.close();
             int responseCode = con.getResponseCode();
 
             System.out.println("Response Code : " + responseCode);
 
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
             StringBuffer response = new StringBuffer();
 
             while ((inputLine = in.readLine()) != null) {
