@@ -2,8 +2,8 @@ package com.bitquest.bitquest;
 
 import com.google.gson.JsonObject;
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.SystemUtils;
 import org.bukkit.Bukkit;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -18,7 +18,6 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 
 /**
  * Created by cristian on 12/15/15.
@@ -167,22 +166,24 @@ public class Wallet {
         }
 
     }
-    boolean transaction(int sat, Wallet wallet) throws IOException {
-        System.out.println("------------- tx "+this.address+" --> "+wallet.address+" -----------");
-        // get xapo token
+    String get_xapo_token() throws IOException {
         URL url = new URL("https://v2.api.xapo.com/oauth2/token");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         String inputLine="";
         try {
             System.out.println("\nSending 'POST' request to URL : " + url);
             String key_secret=BitQuest.XAPO_API_KEY+":"+BitQuest.XAPO_SECRET;
+            System.out.println(" key_secret: "+key_secret);
+            String base64_key_secret=Base64.encodeBase64String(key_secret.getBytes());
+            System.out.println(" base64_key_secret: "+base64_key_secret);
+
             String urlParameters  = "grant_type=client_credentials&redirect_uri=http://bitquest.co/xapo";
 
             byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
             int    postDataLength = postData.length;
 
             con.setRequestMethod("POST");
-            con.setRequestProperty("Authorization", Base64.encodeBase64String(key_secret.getBytes()));
+            con.setRequestProperty("Authorization", "Basic "+base64_key_secret);
             con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             con.setRequestProperty("charset", "utf-8");
             con.setRequestProperty("Content-Length", Integer.toString(postDataLength));
@@ -204,14 +205,95 @@ public class Wallet {
             in.close();
 
             if (responseCode == 200||responseCode==201) {
-                return true;
+                JSONParser parser = new JSONParser();
+
+                final JSONObject jsonobj;
+                try {
+                    jsonobj = (JSONObject) parser.parse(response.toString());
+                    String access_token=(String) jsonobj.get("access_token");
+                    System.out.println(" access_token: "+access_token);
+                    return access_token;
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+                // return true;
             } else {
-                return false;
+                return null;
             }
         } catch(IOException ioe) {
             System.err.println("IOException: " + ioe);
 
             InputStream error = con.getErrorStream();
+
+            int data = error.read();
+            while (data != -1) {
+                //do something with data...
+                inputLine = inputLine + (char)data;
+                data = error.read();
+            }
+            error.close();
+
+
+            System.out.println(inputLine);
+
+
+            return null;
+        }
+    }
+    boolean xapo_transaction(String token, String address, int sat) throws IOException {
+            URL url = new URL("https://v2.api.xapo.com/accounts/"+this.get_xapo_primary_account_id(token)+"/transactions?to="+address+"&amount="+sat+"&currency=SAT&notes=&type=pay");
+            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+            String inputLine="";
+            try {
+                System.out.println("\nSending 'POST' request to URL : " + url);
+                String urlParameters  = "grant_type=client_credentials&redirect_uri=http://bitquest.co/xapo";
+
+                byte[] postData       = urlParameters.getBytes( StandardCharsets.UTF_8 );
+                int    postDataLength = postData.length;
+
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Authorization", "Bearer "+token);
+                con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                con.setRequestProperty("charset", "utf-8");
+                con.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+
+                con.setDoOutput(true);
+                OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+                out.write(urlParameters);
+                out.close();
+                int responseCode = con.getResponseCode();
+
+                System.out.println("Response Code : " + responseCode);
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                if (responseCode == 200||responseCode==201) {
+                    JSONParser parser = new JSONParser();
+
+                    final JSONObject jsonobj;
+                    try {
+                        jsonobj = (JSONObject) parser.parse(response.toString());
+                        System.out.println(jsonobj);
+                        return false;
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                        return false;
+                    }
+                    // return true;
+                } else {
+                    return false;
+                }
+            } catch(IOException ioe) {
+                System.err.println("IOException: " + ioe);
+
+                InputStream error = con.getErrorStream();
 
                 int data = error.read();
                 while (data != -1) {
@@ -222,9 +304,92 @@ public class Wallet {
                 error.close();
 
 
+                System.out.println(inputLine);
+
+
+                return false;
+            }
+
+
+    }
+    int get_xapo_primary_account_id(String token) throws IOException {
+        JSONArray accounts=get_xapo_accounts(token);
+        int account_id=0;
+        for(int i=0;i<accounts.size();i++) {
+            JSONObject account= (JSONObject) accounts.get(i);
+            System.out.println(account);
+            boolean is_primary=(boolean) account.get("is_primary");
+            if(is_primary==true) {
+                account_id=((Long) account.get("id")).intValue();
+            }
+        }
+        return account_id;
+    }
+    JSONArray get_xapo_accounts(String token) throws IOException {
+        URL url = new URL("https://v2.api.xapo.com/accounts");
+        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+        String inputLine="";
+        try {
+            System.out.println(" url : " + url);
+
+            con.setRequestProperty("Authorization", "Bearer "+token);
+            int responseCode = con.getResponseCode();
+
+            System.out.println(" response code: " + responseCode);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            if (responseCode == 200||responseCode==201) {
+                JSONParser parser = new JSONParser();
+
+                final JSONArray jsonarray;
+                try {
+                    // String access_token=(String) jsonobj.get("access_token");
+                    return (JSONArray) parser.parse(response.toString());
+                } catch (org.json.simple.parser.ParseException e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch(IOException ioe) {
+            System.err.println("IOException: " + ioe);
+
+            InputStream error = con.getErrorStream();
+
+            int data = error.read();
+            while (data != -1) {
+                //do something with data...
+                inputLine = inputLine + (char)data;
+                data = error.read();
+            }
+            error.close();
+
+
             System.out.println(inputLine);
 
-
+            return null;
+        }
+    }
+    boolean transaction(int sat, Wallet wallet) throws IOException {
+        System.out.println("------------- tx "+this.address+" --> "+wallet.address+" -----------");
+        // get xapo token
+        String token=this.get_xapo_token();
+        if(token!=null) {
+            // get xapo accounts
+            this.xapo_transaction(token,wallet.address,sat);
+            return false;
+        } else {
+            System.out.println(" error: failed to get xapo token");
+            System.out.println(" success: false");
+            System.out.println("-------------------------------------------------------------");
             return false;
         }
         
