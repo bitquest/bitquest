@@ -25,6 +25,12 @@ import java.security.NoSuchAlgorithmException;
 public class Wallet {
     public int balance;
     public int unconfirmedBalance;
+    public String path;
+    public String public_key;
+    public Wallet(String address, String path, String public_key) {
+        this.address=address; this.path=path; this.public_key=public_key;
+    }
+
     public Wallet(String address,String privatekey) {
         this.address=address;
         this.privatekey=privatekey;

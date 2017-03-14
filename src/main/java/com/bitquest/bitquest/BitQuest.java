@@ -106,8 +106,8 @@ public class  BitQuest extends JavaPlugin {
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
-        if(STATSD_HOST!=null && STATSD_PORT!=null && STATSD_PREFIX!=null) {
-            statsd = new NonBlockingStatsDClient(STATSD_PREFIX, System.getenv("STATSD_HOST") , Integer.parseInt(System.getenv("STATSD_PORT")));
+        if(STATSD_HOST!=null && STATSD_PORT!=null) {
+            statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST , new Integer(STATSD_PORT));
             System.out.println("StatsD support is on.");
         }
         // registers listener classes

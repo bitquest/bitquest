@@ -31,6 +31,14 @@ public class User {
         if(BitQuest.REDIS.get("private"+this.player.getUniqueId().toString())!=null&&BitQuest.REDIS.get("address"+this.player.getUniqueId().toString())!=null) {
             this.wallet=new Wallet(BitQuest.REDIS.get("address"+this.player.getUniqueId().toString()),BitQuest.REDIS.get("private"+this.player.getUniqueId().toString()));
         }
+        if(BitQuest.REDIS.exists("hd:address:"+this.player.getUniqueId().toString())&&BitQuest.REDIS.exists("hd:path:"+this.player.getUniqueId().toString())&&BitQuest.REDIS.exists("hd:public:"+this.player.getUniqueId().toString())) {
+            this.wallet=new Wallet(
+                    BitQuest.REDIS.get("hd:address:"+this.player.getUniqueId().toString()),
+                    BitQuest.REDIS.get("hd:path:"+this.player.getUniqueId().toString()),
+                    BitQuest.REDIS.get("hd:public:"+this.player.getUniqueId().toString()));
+
+        }
+
     }
 
 

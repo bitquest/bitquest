@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.enchantment.EnchantItemEvent;
 import org.json.JSONException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -51,6 +52,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class EntityEvents implements Listener {
     BitQuest bitQuest;
     StringBuilder rawwelcome = new StringBuilder();
+    String PROBLEM_MESSAGE="Can't join right now. Come back later";
+
 
     private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
             Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
@@ -79,22 +82,118 @@ public class EntityEvents implements Listener {
         }
     }
 
-    
+
     @EventHandler
-    public void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {    
-        event.setAmount(0);
+    public void onPlayerLogin(PlayerLoginEvent event) {
+        try {
+            if(BitQuest.REDIS.exists("STARTUP")==true&&bitQuest.isModerator(event.getPlayer())==false) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, PROBLEM_MESSAGE);
+            }
+            Player player=event.getPlayer();
+            User user = new User(event.getPlayer());
+
+            BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
+            BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
+            if(BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+            }
+            // TODO: Remove legacy wallet generation method in favour of HD wallets
+            if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
+                System.out.println("Generating new address...");
+                URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.flush();
+                wr.close();
+
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                JSONParser parser = new JSONParser();
+                final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+                System.out.println(response.toString());
+                BitQuest.REDIS.set("private"+player.getUniqueId().toString(), (String) jsonobj.get("private"));
+                BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
+                BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
+            }
+            // new, HD wallet generation method
+            if(!BitQuest.REDIS.exists("hd:address:"+player.getUniqueId().toString())) {
+                System.out.println("Generating new HD address...");
+                URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/wallets/hd/bitquest/addresses/derive?token="+BitQuest.BLOCKCYPHER_API_KEY+"&subchain_index=0");
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                con.setDoOutput(true);
+                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                wr.flush();
+                wr.close();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+
+                JSONParser parser = new JSONParser();
+                final JSONObject responseobject = (JSONObject) parser.parse(response.toString());
+                System.out.println(response.toString());
+                final JSONArray chains=(JSONArray) responseobject.get("chains");
+                System.out.println(chains);
+                final JSONObject chain=(JSONObject) chains.get(0);
+                System.out.println(chain);
+                final JSONArray chain_addresses=(JSONArray) chain.get("chain_addresses");
+                System.out.println(chain_addresses);
+                final JSONObject wallet=(JSONObject) chain_addresses.get(0);
+                System.out.println(wallet);
+                final String address=(String) wallet.get("address");
+                final String path=(String) wallet.get("path");
+                final String public_key=(String) wallet.get("public");
+                BitQuest.REDIS.set("hd:address:"+player.getUniqueId().toString(), address);
+                BitQuest.REDIS.set("hd:path:"+player.getUniqueId().toString(), path);
+                BitQuest.REDIS.set("hd:public:"+player.getUniqueId().toString(), public_key);
+                user = new User(event.getPlayer());
+                System.out.println(" ------------- new hd wallet for player "+player.getDisplayName()+" ----------");
+                System.out.println(" hd address: "+user.wallet.address);
+                System.out.println(" hd path: "+user.wallet.path);
+                System.out.println(" hd public key: "+user.wallet.public_key);
+                System.out.println(" --------------------------------------------------------------------");
+            }
+
+            // somehow, wallet was not generated and we kick the user
+            if(BitQuest.REDIS.get("address:hd:"+event.getPlayer().getUniqueId().toString())==null) {
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+            }
+
+            bitQuest.updateScoreboard(player);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+        } catch (IOException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+
+        }
+
     }
-    
-    @EventHandler
-    public void onEnchantItemEvent(EnchantItemEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        // Simply setting the cost to zero does not work. there are probably
-        // checks downstream for this. Instead cancel out the cost.
-        // None of this actually changes the bitquest xp anyway, so just make
-        // things look correct for the user. This only works for the enchantment table,
-        // not the anvil.
-        event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.whichButton() + 1);
-        
-    }
+
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
@@ -122,7 +221,7 @@ public class EntityEvents implements Listener {
             player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
-        
+
         String welcome = rawwelcome.toString();
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
@@ -138,29 +237,29 @@ public class EntityEvents implements Listener {
 
         try {
 
-        	// check and set experience
-        	user.setTotalExperience((Integer) user.experience());
-        	bitQuest.updateScoreboard(player);
+            // check and set experience
+            user.setTotalExperience((Integer) user.experience());
+            bitQuest.updateScoreboard(player);
 
 
-        	bitQuest.sendWalletInfo(user);
+            bitQuest.sendWalletInfo(user);
 
-        	player.sendMessage("");
-        	player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
-        	player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
-        	player.sendMessage("");
-        	player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
-        	player.sendMessage("");
+            player.sendMessage("");
+            player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
+            player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
+            player.sendMessage("");
+            player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
+            player.sendMessage("");
         } catch (ParseException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         } catch (org.json.simple.parser.ParseException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         } catch (IOException e) {
-        	e.printStackTrace();
+            e.printStackTrace();
         }
 
         if(bitQuest.messageBuilder != null) {
-        	final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+            final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
             scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
                 @Override
@@ -200,57 +299,23 @@ public class EntityEvents implements Listener {
 
     }
 
+
     @EventHandler
-    public void onPlayerLogin(PlayerLoginEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if(BitQuest.REDIS.exists("STARTUP")==true&&bitQuest.isModerator(event.getPlayer())==false) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
-        }
-        Player player=event.getPlayer();
-        BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
-        BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
-        if(!BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
-
-            User user = new User(event.getPlayer());
-
-        } else {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Can't join right now. Come back later");
-        }
-        if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
-            System.out.println("Generating new address...");
-            URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.flush();
-            wr.close();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-            System.out.println(response.toString());
-            BitQuest.REDIS.set("private"+player.getUniqueId().toString(), (String) jsonobj.get("private"));
-            BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
-            BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
-        }
-        if(BitQuest.REDIS.get("private"+event.getPlayer().getUniqueId().toString())==null||BitQuest.REDIS.get("address"+event.getPlayer().getUniqueId().toString())==null) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"There was a problem loading your Bitcoin wallet. Try Again Later. If this problem persists, please write to bitquest@bitquest.co");
-        }
-
-        bitQuest.updateScoreboard(player);
-
+    public void onExperienceChange(PlayerExpChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {    
+        event.setAmount(0);
     }
+    
+    @EventHandler
+    public void onEnchantItemEvent(EnchantItemEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        // Simply setting the cost to zero does not work. there are probably
+        // checks downstream for this. Instead cancel out the cost.
+        // None of this actually changes the bitquest xp anyway, so just make
+        // things look correct for the user. This only works for the enchantment table,
+        // not the anvil.
+        event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.whichButton() + 1);
+        
+    }
+
 
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
