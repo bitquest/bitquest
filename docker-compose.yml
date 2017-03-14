@@ -7,6 +7,7 @@ spigot:
     - BITQUEST_ENV=development
     - BLOCKCHAIN=btc/test3
     - BITCOIN_PUBLIC_KEY=tpubD6NzVbkrYhZ4Wwu2zXR4r2LAD87nLwqdKWBsH8qa2EkSbD5RSJARhCEKoBjuJAbig7aowS6gGJz9S6R77Yqf6DLE7qTFuT3ZV6ZZeKQGRs7
+    - BITCOIN_ADDRESS=moe1iAfYzsBedzG1ymMRNvK6YBi9SpNRWQ
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"

@@ -45,6 +45,7 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 public class  BitQuest extends JavaPlugin {
+    // TODO: remove env variables not being used anymore
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
     public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
@@ -82,7 +83,6 @@ public class  BitQuest extends JavaPlugin {
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
 
 
-    // TODO: Find out why this crashes the server
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
     // public static Scoreboard scoreboard = manager.getNewScoreboard();
     public final static int LAND_PRICE=20000;
@@ -96,9 +96,6 @@ public class  BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
-    public Wallet miner_wallet=null;
-
-
 
     @Override
     public void onEnable() {
@@ -120,106 +117,38 @@ public class  BitQuest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
         getServer().getPluginManager().registerEvents(new SignEvents(this), this);
         getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+
+        // player does not lose inventory on death
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
 
         // loads config file. If it doesn't exist, creates it.
-        // get plugin config
         getDataFolder().mkdir();
         if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
-        // loads/creates world wallet
-        if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
-            wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
-            System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
+
+        // loads world wallet
+        if(BITCOIN_ADDRESS!=null) {
+            wallet=new Wallet(BITCOIN_ADDRESS);
+            System.out.println("World wallet address is: "+wallet.address);
             wallet.updateBalance();
             System.out.println("Balance: "+wallet.balance);
             System.out.println("Unconfirmed: "+wallet.unconfirmedBalance);
             System.out.println("Final Balance: "+wallet.final_balance());
         } else {
-            System.out.println("Warning: world wallet address not defined in environment. A new one will be generated but it will cease to exists once the server stops. This is probably fine if you are running for development/testing purposes");
-            System.out.println("Generating new address...");
-            URL url = null;
-            try {
-                url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            HttpsURLConnection con = null;
-            try {
-                con = (HttpsURLConnection) url.openConnection();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                con.setRequestMethod("POST");
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            }
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setDoOutput(true);
-            DataOutputStream wr = null;
-            try {
-                wr = new DataOutputStream(con.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                wr.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                wr.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            try {
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj;
-            try {
-                jsonobj = (JSONObject) parser.parse(response.toString());
-                wallet=new Wallet((String) jsonobj.get("address"),(String) jsonobj.get("private"));
-
-            } catch (org.json.simple.parser.ParseException e) {
-                e.printStackTrace();
-            }
+            Bukkit.shutdown();
         }
+        // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
+
+        // initialize mixpanel (optional)
         if(MIXPANEL_TOKEN!=null) {
             messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
             System.out.println("Mixpanel support is on");
         }
-        // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
-        //     removeAllEntities();
-        killAllVillagers();
-        createScheduledTimers();
 
-        // create scoreboards
+        // creates scheduled timers (update balances, etc)
+        createScheduledTimers();
 
     }
     public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -303,14 +232,13 @@ public class  BitQuest extends JavaPlugin {
         }, 0, 72000L);
     }
     public void sendWorldMetrics() {
-        statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
-        statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
-        statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
-        statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".players",Bukkit.getServer().getOnlinePlayers().size());
+        statsd.gauge(BITQUEST_ENV+".entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
     }
     public  void sendWalletMetrics() {
         statsd.gauge("wallet_balance",wallet.balance());
-
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
