@@ -29,6 +29,7 @@ public class Wallet {
         this.address=address;
         this.privatekey=privatekey;
     }
+
     public Wallet(String address) {
         this.address=address;
     }
