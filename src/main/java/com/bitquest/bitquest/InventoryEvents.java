@@ -134,10 +134,8 @@ public class InventoryEvents implements Listener {
                                 }
                                 boolean hasBalance=false;
                                 user.wallet.updateBalance();
-                                if(user.wallet.final_balance()<sat) {
-                                    player.sendMessage(ChatColor.RED + "You don't have enough balance to purchase this item.");
 
-                                } else if (hasOpenSlots) {
+                                if (hasOpenSlots) {
                                     if(sat > 10000 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
                                         ItemStack item = event.getCurrentItem();
                                         ItemMeta meta = item.getItemMeta();
@@ -171,10 +169,6 @@ public class InventoryEvents implements Listener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
-                            } catch (org.json.simple.parser.ParseException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
-
                             }
                         }
                     });

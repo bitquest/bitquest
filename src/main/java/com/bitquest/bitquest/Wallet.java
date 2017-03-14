@@ -54,6 +54,8 @@ public class Wallet {
         if(unconfirmed_balance>0) {
             final_balance=final_balance+unconfirmed_balance;
         }
+        final_balance=final_balance+this.payment_balance();
+
         BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
         return final_balance;
     }
