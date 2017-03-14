@@ -171,11 +171,8 @@ public class EntityEvents implements Listener {
                 System.out.println(" hd public key: "+user.wallet.public_key);
                 System.out.println(" --------------------------------------------------------------------");
             }
-
-            // somehow, wallet was not generated and we kick the user
-            if(BitQuest.REDIS.get("address:hd:"+event.getPlayer().getUniqueId().toString())==null) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
-            }
+            // test player wallet. kick if it's not working
+            System.out.println("player balance is: "+user.wallet.final_balance());
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -195,14 +192,14 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         final Player player=event.getPlayer();
-        if(BitQuest.ADMIN_UUID!=null && player.getUniqueId().toString().equals(BitQuest.ADMIN_UUID.toString())) {
+        // On dev environment, admin gets op. In production, nobody gets op.
+        if(BitQuest.BITQUEST_ENV=="development" && player.getUniqueId().toString().equals(BitQuest.ADMIN_UUID.toString())) {
             player.setOp(true);
         } else {
             player.setOp(false);
         }
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
-
         bitQuest.updateScoreboard(player);
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];

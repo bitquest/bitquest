@@ -171,6 +171,10 @@ public class InventoryEvents implements Listener {
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
+                            } catch (org.json.simple.parser.ParseException e) {
+                                e.printStackTrace();
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
+
                             }
                         }
                     });

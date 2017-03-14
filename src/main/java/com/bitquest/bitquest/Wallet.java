@@ -45,9 +45,10 @@ public class Wallet {
         this.updateBalance();
         return this.balance;
     }
-    int final_balance() {
-        int final_balance=this.balance+this.unconfirmedBalance;
-        return final_balance;
+    int final_balance() throws IOException, ParseException {
+        JSONObject blockcypher_balance=this.get_blockcypher_balance();
+        int total_received=((Number)blockcypher_balance.get("total_received")).intValue();
+        return total_received;
     }
     
     public int getBlockchainHeight() {
@@ -127,7 +128,35 @@ public class Wallet {
         return Integer.parseInt(response.toString());
 
     }
-    
+    JSONObject get_blockcypher_balance() throws IOException, ParseException {
+        URL url;
+        if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
+            url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
+        } else {
+            url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+        }
+        System.out.println(url.toString());
+        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        JSONParser parser = new JSONParser();
+        return (JSONObject) parser.parse(response.toString());
+    }
+    // TODO: this method is deprecated in favour of get_blockcypher_balance
     void updateBalance() {
         try {
             if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
