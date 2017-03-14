@@ -86,9 +86,7 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
         try {
-            if(BitQuest.REDIS.exists("STARTUP")==true&&bitQuest.isModerator(event.getPlayer())==false) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, PROBLEM_MESSAGE);
-            }
+
             Player player=event.getPlayer();
             User user = new User(event.getPlayer());
 
@@ -179,7 +177,6 @@ public class EntityEvents implements Listener {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             }
 
-            bitQuest.updateScoreboard(player);
         } catch (ParseException e) {
             e.printStackTrace();
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
