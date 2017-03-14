@@ -131,10 +131,6 @@ public class  BitQuest extends JavaPlugin {
         if(BITCOIN_ADDRESS!=null) {
             wallet=new Wallet(BITCOIN_ADDRESS);
             System.out.println("World wallet address is: "+wallet.address);
-            wallet.updateBalance();
-            System.out.println("Balance: "+wallet.balance);
-            System.out.println("Unconfirmed: "+wallet.unconfirmedBalance);
-            System.out.println("Final Balance: "+wallet.final_balance());
         } else {
             Bukkit.shutdown();
         }
