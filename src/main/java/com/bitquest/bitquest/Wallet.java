@@ -46,9 +46,23 @@ public class Wallet {
         return this.balance;
     }
     int final_balance() throws IOException, ParseException {
+
         JSONObject blockcypher_balance=this.get_blockcypher_balance();
         int total_received=((Number)blockcypher_balance.get("total_received")).intValue();
-        return total_received;
+        int final_balance=total_received;
+        int unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+        if(unconfirmed_balance>0) {
+            final_balance=final_balance+unconfirmed_balance;
+        }
+        BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
+        return final_balance;
+    }
+    int payment_balance() {
+        if(BitQuest.REDIS.exists("payment_balance:"+this.address)) {
+            return Integer.parseInt(BitQuest.REDIS.get("payment_balance:"+this.address));
+        } else {
+            return 0;
+        }
     }
     
     public int getBlockchainHeight() {
@@ -414,6 +428,24 @@ public class Wallet {
             return null;
         }
     }
+    boolean payment(int sat, String address) {
+        try {
+            if(this.final_balance()>=sat) {
+                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.address,sat));
+                System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
+                return true;
+            } else {
+                return false;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     boolean transaction(int sat, Wallet wallet) throws IOException {
         System.out.println("------------- tx "+this.address+" --> "+wallet.address+" -----------");
         // get xapo token

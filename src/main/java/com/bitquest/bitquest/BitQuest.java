@@ -154,18 +154,14 @@ public class  BitQuest extends JavaPlugin {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
-        if(REDIS.exists("final_balance:"+player.getUniqueId().toString())==false) {
-            User user=new User(player);
-            user.wallet.updateBalance();
-            REDIS.set("final_balance:"+player.getUniqueId().toString(),String.valueOf(user.wallet.final_balance()));
-            REDIS.expire("final_balance:"+player.getUniqueId().toString(),30);
-        }
+        User user=new User(player);
+
 
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
         walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
-        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId().toString()));
+        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
 
         score.setScore(final_balance/100);
         player.setScoreboard(walletScoreboard);
@@ -491,7 +487,9 @@ public class  BitQuest extends JavaPlugin {
         //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
-
+        if(BITQUEST_ENV.equalsIgnoreCase("development")) {
+            user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
+        }
     };
     public boolean landIsClaimed(Location location) {
         return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
