@@ -896,7 +896,7 @@ public class  BitQuest extends JavaPlugin {
                             int transaction_balance=Math.min(4000000,confirmed_balance);
                             try {
                                 User user=new User(player);
-                                player.sendMessage(ChatColor.YELLOW+"Sending "+confirmed_balance/100+" bits to "+user.wallet.address);
+                                player.sendMessage(ChatColor.YELLOW+"Sending "+transaction_balance/100+" bits to "+user.wallet.address);
 
                                 if(old_wallet.blockcypher_microtransaction(transaction_balance,user.wallet.address)==true) {
                                     player.sendMessage(ChatColor.GREEN+"Transaction successful.");
