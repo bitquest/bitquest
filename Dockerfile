@@ -17,7 +17,8 @@ RUN cd /spigot/plugins/ && wget http://ci.md-5.net/job/NoCheatPlus/lastSuccessfu
 # DOWNLOAD AND BUILD DOWNER
 RUN export SHELL=/bin/bash
 RUN cd /tmp && git clone https://github.com/bitquest/downer.git
-RUN export SHELL=/bin/bash && cd /tmp/downer && ./gradlew setupWorkspace && ./gradlew build
+RUN export SHELL=/bin/bash && cd /tmp/downer && ./gradlew setupWorkspace
+RUN export SHELL=/bin/bash && cd /tmp/downer && ./gradlew build
 RUN cp -rv /tmp/downer/build/libs/*.jar /spigot/plugins
 # DOWNLOAD AND BUILD SPIGOT
 RUN cd /tmp && wget https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
@@ -35,5 +36,4 @@ COPY . /bitquest/
 RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
 RUN cd /bitquest/ && ./gradlew shadowJar
 RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
-
-CMD java -Xmx8G -Xms8G -jar spigot.jar
+CMD java -jar spigot.jar
