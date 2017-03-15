@@ -236,14 +236,7 @@ public class  BitQuest extends JavaPlugin {
         }, 0, 12000L);
         REDIS.set("lastloot","nobody");
 
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(BitQuest.BLOCKCHAIN.equals("bcy/test")) {
-                    wallet.getTestnetCoins();
-                }
-            }
-        }, 0, 72000L);
+
     }
     public void sendMetric(String name,int value) {
         statsd.gauge(BITQUEST_ENV+"."+name,value);
