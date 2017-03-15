@@ -40,6 +40,9 @@ commands:
   killAllVillagers:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
+  upgradewallet:
+    description: "Transfer funds from an old (BQ2.0) wallet"
+    usage: "/upgradewallet"
   faucet:
     description: "Get testnet coins (development mode only)"
     usage: "/faucet"
