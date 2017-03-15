@@ -59,6 +59,9 @@ public class  BitQuest extends JavaPlugin {
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
     public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
+    public final static String CASHOUT_ADDRESS = System.getenv("CASHOUT_ADDRESS") != null ? System.getenv("CASHOUT_ADDRESS") : null;
+    public final static String CASHOUT_PRIVATE_KEY = System.getenv("CASHOUT_PRIVATE_KEY") != null ? System.getenv("CASHOUT_PRIVATE_KEY") : null;
+    public final static String CASHOUT_PUBLIC_KEY = System.getenv("CASHOUT_PUBLIC_KEY") != null ? System.getenv("CASHOUT_PUBLIC_KEY") : null;
 
 
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
@@ -807,7 +810,7 @@ public class  BitQuest extends JavaPlugin {
 
                                     Wallet toWallet = new Wallet(args[1]);
 
-                                    if(fromWallet.transaction(sendAmount,toWallet)) {
+                                    if(fromWallet.create_blockcypher_transaction(sendAmount,toWallet.address)) {
                                         player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
                                         updateScoreboard(player);
                                     } else {

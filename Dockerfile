@@ -29,9 +29,15 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-# Include region fixer in /utils/ to fix corrupted worlds
-RUN mkdir /utils/
-RUN cd /utils/ && git clone https://github.com/Fenixin/Minecraft-Region-Fixer
+# Include blockcypher's bcutils
+ENV DEBIAN_FRONTEND noninteractive
+RUN mkdir /go/
+ENV GOPATH /go/
+RUN apt-get -y install golang
+RUN cd / && git clone https://github.com/blockcypher/btcutils.git
+RUN cd / && go get github.com/btcsuite/btcd/btcec
+RUN cd /btcutils/signer && go build
+RUN chmod +x /btcutils/signer/signer
 COPY . /bitquest/
 RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
 RUN cd /bitquest/ && ./gradlew shadowJar
