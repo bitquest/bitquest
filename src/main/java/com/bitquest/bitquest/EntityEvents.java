@@ -212,7 +212,7 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.balance() / 100 + " bits");
+            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.final_balance() / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
 
@@ -228,11 +228,11 @@ public class EntityEvents implements Listener {
         }
 
         // Prints the user balance
+        user.setTotalExperience((Integer) user.experience());
 
         try {
 
             // check and set experience
-            user.setTotalExperience((Integer) user.experience());
             bitQuest.updateScoreboard(player);
 
 
