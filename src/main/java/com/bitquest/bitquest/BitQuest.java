@@ -490,6 +490,10 @@ public class  BitQuest extends JavaPlugin {
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
         if(BITQUEST_ENV.equalsIgnoreCase("development")) {
             user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
+            if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
+                user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
+                user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + REDIS.get("address"+user.player.getUniqueId().toString()));
+            }
         }
     };
     public boolean landIsClaimed(Location location) {
@@ -812,8 +816,65 @@ public class  BitQuest extends JavaPlugin {
                 }
                 return false;
             }
+            /***********************************************************
+                /upgradewallet
+                attempts to transfer funds from old (BQ2.0) wallet to
+                the new HD (BQ2.1) wallet via BlockCypher's
+                microtransaction endpoint
+             ***********************************************************/
+            if(cmd.getName().equalsIgnoreCase("upgradewallet")) {
+                String fail_message="Cannot make transaction at this moment. Please try again later...";
+                player.sendMessage(ChatColor.YELLOW+"Searching for lost wallet...");
+                if(REDIS.exists("address"+player.getUniqueId().toString())&&REDIS.exists("private"+player.getUniqueId().toString())) {
+                    Wallet old_wallet=new Wallet(
+                            REDIS.get("address"+player.getUniqueId().toString()),
+                            REDIS.get("private"+player.getUniqueId().toString()));
+                    player.sendMessage(ChatColor.YELLOW+"Found wallet "+wallet.address+"! looking for bits...");
+                    try {
+                        JSONObject balance=wallet.get_blockcypher_balance();
+                        int confirmed_balance=((Number)balance.get("confirmed_balance")).intValue();
+                        player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance);
 
-            // MODERATOR COMMANDS
+                        if(confirmed_balance>0) {
+                            int transaction_balance=Math.min(7000000,confirmed_balance);
+                            try {
+                                User user=new User(player);
+                                player.sendMessage(ChatColor.YELLOW+"Sending "+confirmed_balance/100+" bits to "+user.wallet.address);
+
+                                if(old_wallet.blockcypher_microtransaction(transaction_balance,user.wallet.address)==true) {
+                                    player.sendMessage(ChatColor.RED+fail_message);
+                                    return true;
+                                } else {
+                                    player.sendMessage(ChatColor.GREEN+"Transaction successful.");
+                                    return true;
+                                }
+                            } catch (ParseException e) {
+                                player.sendMessage(ChatColor.RED+"Error loading new wallet.");
+                                e.printStackTrace();
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED+"Not enough balance for recovery. If you think this is an error e-mail bitquest@bitquest.co");
+
+                            return true;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+fail_message);
+                        return true;
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+fail_message);
+                        return true;
+                    }
+
+
+                } else {
+                    player.sendRawMessage(ChatColor.RED+"Old wallet not found. If you think this is an error please contact bitquest@bitquest.co");
+                }
+            }
+
+                // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
