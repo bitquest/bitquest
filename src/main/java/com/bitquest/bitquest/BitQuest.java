@@ -889,7 +889,7 @@ public class  BitQuest extends JavaPlugin {
                     player.sendMessage(ChatColor.YELLOW+"Found wallet "+wallet.address+"! looking for bits...");
                     try {
                         JSONObject balance=wallet.get_blockcypher_balance();
-                        int confirmed_balance=((Number)balance.get("confirmed_balance")).intValue();
+                        int confirmed_balance=((Number)balance.get("balance")).intValue();
                         player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance);
 
                         if(confirmed_balance>0) {
