@@ -983,7 +983,8 @@ public class  BitQuest extends JavaPlugin {
                 if (cmd.getName().equalsIgnoreCase("mod")) {
                     if(args[0].equals("add")) {
                         // Sub-command: /mod add
-                        if(REDIS.get("uuid:"+args[1])!=null) {
+
+                        if(REDIS.exists("uuid:"+args[1])) {
                             UUID uuid=UUID.fromString(REDIS.get("uuid:"+args[1]));
                             REDIS.sadd("moderators",uuid.toString());
                             return true;
@@ -991,9 +992,9 @@ public class  BitQuest extends JavaPlugin {
                             sender.sendMessage(ChatColor.RED+"Cannot find player "+args[1]);
                             return true;
                         }
-                    } else if(args[0].equals("del")) {
+                    } else if(args[0].equals("remove")) {
                         // Sub-command: /mod del
-                        if(REDIS.get("uuid:"+args[1])!=null) {
+                        if(REDIS.exists("uuid:"+args[1])) {
                             UUID uuid=UUID.fromString(REDIS.get("uuid:"+args[1]));
                             REDIS.srem("moderators",uuid.toString());
                             return true;
@@ -1003,7 +1004,7 @@ public class  BitQuest extends JavaPlugin {
                         // Sub-command: /mod list
                         Set<String> moderators=REDIS.smembers("moderators");
                         for(String uuid:moderators) {
-                            sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
+                            sender.sendMessage(ChatColor.YELLOW+REDIS.get("name:"+uuid));
                         }
                         return true;
                     } else {
