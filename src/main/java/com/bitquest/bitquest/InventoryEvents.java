@@ -155,6 +155,7 @@ public class InventoryEvents implements Listener {
                                     MixpanelAPI mixpanel = new MixpanelAPI();
                                     mixpanel.deliver(delivery);
                                 }
+                                
                             } else {
                                 player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
                             }

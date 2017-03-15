@@ -437,6 +437,7 @@ public class Wallet {
                 System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.address,sat));
                 System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
                 System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
+
                 return true;
             } else {
                 return false;

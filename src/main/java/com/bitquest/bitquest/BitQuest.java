@@ -245,6 +245,10 @@ public class  BitQuest extends JavaPlugin {
             }
         }, 0, 72000L);
     }
+    public void sendMetric(String name,int value) {
+        statsd.gauge(BITQUEST_ENV+"."+name,value);
+
+    }
     public void sendWorldMetrics() {
         statsd.gauge(BITQUEST_ENV+".players",Bukkit.getServer().getOnlinePlayers().size());
         statsd.gauge(BITQUEST_ENV+".entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
@@ -252,7 +256,7 @@ public class  BitQuest extends JavaPlugin {
         statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
     }
     public  void sendWalletMetrics() {
-        statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.balance());
+        statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.final_balance());
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
