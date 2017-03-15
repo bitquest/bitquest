@@ -890,19 +890,21 @@ public class  BitQuest extends JavaPlugin {
                     try {
                         JSONObject balance=wallet.get_blockcypher_balance();
                         int confirmed_balance=((Number)balance.get("balance")).intValue();
-                        player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance);
+                        player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance+" sat");
 
-                        if(confirmed_balance>0) {
-                            int transaction_balance=Math.min(7000000,confirmed_balance);
+                        if(confirmed_balance>100) {
+                            int transaction_balance=Math.min(4000000,confirmed_balance);
                             try {
                                 User user=new User(player);
                                 player.sendMessage(ChatColor.YELLOW+"Sending "+confirmed_balance/100+" bits to "+user.wallet.address);
 
                                 if(old_wallet.blockcypher_microtransaction(transaction_balance,user.wallet.address)==true) {
-                                    player.sendMessage(ChatColor.RED+fail_message);
+                                    player.sendMessage(ChatColor.GREEN+"Transaction successful.");
+
                                     return true;
                                 } else {
-                                    player.sendMessage(ChatColor.GREEN+"Transaction successful.");
+                                    player.sendMessage(ChatColor.RED+fail_message);
+
                                     return true;
                                 }
                             } catch (ParseException e) {
