@@ -380,19 +380,14 @@ public class  BitQuest extends JavaPlugin {
                             final String newOwner = name.substring(9);
                             player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
 
-                            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                            scheduler.runTaskAsynchronously(this, new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
-                                        player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
-                                    } catch (Exception e) {
-                                        player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
-                                    }
-                                }
-                            });
+
+                            try {
+                                UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                                player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
+                            } catch (Exception e) {
+                                player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
+                            }
 
                         } else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
                             player.sendMessage(ChatColor.RED + "You already own this land!");
