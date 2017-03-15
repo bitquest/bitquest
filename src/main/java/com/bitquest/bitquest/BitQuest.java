@@ -256,7 +256,13 @@ public class  BitQuest extends JavaPlugin {
         statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
     }
     public  void sendWalletMetrics() {
-        statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.final_balance());
+        try {
+            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.final_balance());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+        }
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
