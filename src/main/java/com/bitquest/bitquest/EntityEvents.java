@@ -448,37 +448,33 @@ public class EntityEvents implements Listener {
                     if(bitQuest.wallet.final_balance()>money) {
 
 
-                        final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         final Wallet userWallet=user.wallet;
                         BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
-                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    if (bitQuest.wallet.payment(money, userWallet.address)) {
-                                        System.out.println("[loot] "+player.getDisplayName()+": "+money);
-                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                        // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
-                                        if (bitQuest.messageBuilder != null) {
 
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+                        try {
+                            if (bitQuest.wallet.payment(money, userWallet.address)) {
+                                System.out.println("[loot] "+player.getDisplayName()+": "+money);
+                                player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                if (bitQuest.messageBuilder != null) {
+
+                                    // Create an event
+                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
+                                    ClientDelivery delivery = new ClientDelivery();
+                                    delivery.addMessage(sentEvent);
 
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    }
-                                  
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                } 
+                                    MixpanelAPI mixpanel = new MixpanelAPI();
+                                    mixpanel.deliver(delivery);
+                                }
                             }
-                        });
+
+                        } catch (IOException e1) {
+                            e1.printStackTrace();
+                        }
+
 
                     }
                     // Add EXP
