@@ -114,64 +114,61 @@ public class InventoryEvents implements Listener {
                     event.setCancelled(true);
                     BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
 
-                    scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                int sat = 0;
-                                for (int i = 0; i < trades.size(); i++) {
-                                    if (clicked.getType() == trades.get(i).itemStack.getType())
-                                        sat = trades.get(i).price;
 
-                                }
-                                
-                                boolean hasOpenSlots = false;
-                                for (ItemStack item : player.getInventory().getContents()) {
-                                    if (item == null || (item.getType() == clicked.getType() && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
-                                        hasOpenSlots = true;
-                                        break;
-                                    }
-                                }
-                                boolean hasBalance=false;
-                                user.wallet.updateBalance();
+                    try {
+                        int sat = 0;
+                        for (int i = 0; i < trades.size(); i++) {
+                            if (clicked.getType() == trades.get(i).itemStack.getType())
+                                sat = trades.get(i).price;
 
-                                if (hasOpenSlots) {
-                                    if(sat > 10000 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
-                                        ItemStack item = event.getCurrentItem();
-                                        ItemMeta meta = item.getItemMeta();
-                                        ArrayList<String> Lore = new ArrayList<String>();
-                                        meta.setLore(null);
-                                        item.setItemMeta(meta);
-                                        player.getInventory().addItem(item);
-                                        player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
-                                        
-                                        if (bitQuest.messageBuilder != null) {
-    
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
-    
-    
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-    
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
-                                    }
-                                } else {
-                                    player.sendMessage(ChatColor.RED + "You don't have space in your inventory");
-                                }
-                            } catch (IllegalArgumentException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
+                        }
+
+                        boolean hasOpenSlots = false;
+                        for (ItemStack item : player.getInventory().getContents()) {
+                            if (item == null || (item.getType() == clicked.getType() && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
+                                hasOpenSlots = true;
+                                break;
                             }
                         }
-                    });
+                        boolean hasBalance=false;
+                        user.wallet.updateBalance();
+
+                        if (hasOpenSlots) {
+                            if(sat > 10000 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
+                                ItemStack item = event.getCurrentItem();
+                                ItemMeta meta = item.getItemMeta();
+                                ArrayList<String> Lore = new ArrayList<String>();
+                                meta.setLore(null);
+                                item.setItemMeta(meta);
+                                player.getInventory().addItem(item);
+                                player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                bitQuest.updateScoreboard(player);
+                                if (bitQuest.messageBuilder != null) {
+
+                                    // Create an event
+                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+
+
+                                    ClientDelivery delivery = new ClientDelivery();
+                                    delivery.addMessage(sentEvent);
+
+                                    MixpanelAPI mixpanel = new MixpanelAPI();
+                                    mixpanel.deliver(delivery);
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You don't have space in your inventory");
+                        }
+                    } catch (IllegalArgumentException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
+                    }
+
                 }
             
             } else {

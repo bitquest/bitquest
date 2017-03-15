@@ -432,8 +432,11 @@ public class Wallet {
     boolean payment(int sat, String address) {
         try {
             if(this.final_balance()>=sat) {
+                System.out.println("[payment] "+this.address+" -- "+sat+" -> "+address);
                 System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.address,sat));
+                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.address,sat));
                 System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
+                System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
                 return true;
             } else {
                 return false;
