@@ -71,7 +71,7 @@ world-settings:
     max-tick-time:
       tile: 8
       entity: 16
-    mob-spawn-range: 3
+    mob-spawn-range: 6
     nerf-spawner-mobs: false
     growth:
       cactus-modifier: 100
@@ -84,12 +84,12 @@ world-settings:
       netherwart-modifier: 100
     entity-activation-range:
       animals: 8
-      monsters: 10
-      misc: 2
+      monsters: 12
+      misc: 4
     entity-tracking-range:
       players: 32
       animals: 32
-      monsters: 32
+      monsters: 64
       misc: 24
       other: 24
     ticks-per:
