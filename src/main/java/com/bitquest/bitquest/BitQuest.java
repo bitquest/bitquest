@@ -987,6 +987,8 @@ public class  BitQuest extends JavaPlugin {
                         if(REDIS.exists("uuid:"+args[1])) {
                             UUID uuid=UUID.fromString(REDIS.get("uuid:"+args[1]));
                             REDIS.sadd("moderators",uuid.toString());
+                            sender.sendMessage(ChatColor.GREEN+REDIS.get("name:"+uuid)+" added to moderators group");
+
                             return true;
                         } else {
                             sender.sendMessage(ChatColor.RED+"Cannot find player "+args[1]);
