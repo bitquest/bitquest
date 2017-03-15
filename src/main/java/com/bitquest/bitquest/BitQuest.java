@@ -774,26 +774,22 @@ public class  BitQuest extends JavaPlugin {
                                     final Wallet finalFromWallet = fromWallet;
                                     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                                     final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
-                                    REDIS.expire("balance"+player.getUniqueId().toString(),5);
-                                    scheduler.runTaskAsynchronously(this, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
 
-                                                if (finalFromWallet.transaction(sendAmount, toWallet)) {
-                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
-                                                    if (offlinePlayer.isOnline()) {
-                                                        offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
-                                                    }
-                                                } else {
-                                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
-                                                }
+                                    try {
 
-                                            } catch (IOException e1) {
-                                                e1.printStackTrace();
+                                        if (finalFromWallet.transaction(sendAmount, toWallet)) {
+                                            player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
+                                            if (offlinePlayer.isOnline()) {
+                                                offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
                                             }
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
                                         }
-                                    });
+
+                                    } catch (IOException e1) {
+                                        e1.printStackTrace();
+                                    }
+
 
                                     updateScoreboard(player);
                                     return true;
