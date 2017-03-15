@@ -323,56 +323,51 @@ public class  BitQuest extends JavaPlugin {
                         player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         BitQuest bitQuest = this;
-                        scheduler.runTask(this, new Runnable() {
-                            @Override
-                            public void run() {
-                                // A villager is born
-                                try {
-                                    Wallet paymentWallet;
-                                    if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
-                                        paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
-                                    } else {
-                                        paymentWallet = bitQuest.wallet;
-                                    }
-                                    if (user.wallet.payment(BitQuest.LAND_PRICE, paymentWallet.address)) {
 
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                                        player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-                                        if (bitQuest.messageBuilder != null) {
-
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                            org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
-
-
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-                                            delivery.addMessage(sentCharge);
-
-
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    } else {
-                                        int balance = new User(player).wallet.balance();
-                                        if (balance < BitQuest.LAND_PRICE) {
-                                            player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                                    ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-                                        }
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
-                                }
-                                ;
+                        try {
+                            Wallet paymentWallet;
+                            if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
+                                paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
+                            } else {
+                                paymentWallet = bitQuest.wallet;
                             }
-                        });
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, paymentWallet.address)) {
+
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                if (bitQuest.messageBuilder != null) {
+
+                                    // Create an event
+                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
+
+
+                                    ClientDelivery delivery = new ClientDelivery();
+                                    delivery.addMessage(sentEvent);
+                                    delivery.addMessage(sentCharge);
+
+
+                                    MixpanelAPI mixpanel = new MixpanelAPI();
+                                    mixpanel.deliver(delivery);
+                                }
+                            } else {
+                                int balance = new User(player).wallet.balance();
+                                if (balance < BitQuest.LAND_PRICE) {
+                                    player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                            ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                }
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        } catch (org.json.simple.parser.ParseException e) {
+                            e.printStackTrace();
+                        }
+
 
                     } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || isModerator(player)) {
                         if (name.equals("abandon")) {
