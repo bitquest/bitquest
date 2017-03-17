@@ -594,7 +594,7 @@ public class Wallet {
             payload.put("outputs", outputs);
             System.out.println("Payload : " + payload.toString());
 
-            URL url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCHAIN + "/txs/new?token=" + BitQuest.BLOCKCYPHER_API_KEY);
+            URL url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCHAIN + "/txs/new");
             String inputLine = "";
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
