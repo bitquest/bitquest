@@ -321,13 +321,8 @@ public class  BitQuest extends JavaPlugin {
                         BitQuest bitQuest = this;
 
                         try {
-                            Wallet paymentWallet;
-                            if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
-                                paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
-                            } else {
-                                paymentWallet = bitQuest.wallet;
-                            }
-                            if (user.wallet.payment(BitQuest.LAND_PRICE, paymentWallet.address)) {
+
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_BITCOIN_ADDRESS)) {
 
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
