@@ -134,7 +134,7 @@ public class InventoryEvents implements Listener {
                         user.wallet.updateBalance();
 
                         if (hasOpenSlots) {
-                            if(sat > 10000 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
+                            if(sat > 100 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
                                 ItemStack item = event.getCurrentItem();
                                 ItemMeta meta = item.getItemMeta();
                                 ArrayList<String> Lore = new ArrayList<String>();
