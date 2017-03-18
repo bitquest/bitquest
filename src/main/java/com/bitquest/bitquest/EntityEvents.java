@@ -78,10 +78,26 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
+        User user = null;
+        try {
+            user = new User(event.getPlayer());
+        } catch (ParseException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
+
+        }
+
         try {
 
             Player player=event.getPlayer();
-            User user = new User(event.getPlayer());
 
             BitQuest.REDIS.set("name:"+player.getUniqueId().toString(),player.getDisplayName());
             BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
@@ -165,7 +181,6 @@ public class EntityEvents implements Listener {
                 System.out.println(" --------------------------------------------------------------------");
             }
             // test player wallet. kick if it's not working
-            System.out.println("player balance is: "+user.wallet.final_balance());
 
         } catch (ParseException e) {
             e.printStackTrace();
@@ -177,6 +192,13 @@ public class EntityEvents implements Listener {
             e.printStackTrace();
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
 
+        }
+        try {
+            System.out.println("player balance is: "+user.wallet.final_balance());
+        } catch (IOException e) {
+            System.out.println("[login] wallet balance update fails");
+        } catch (org.json.simple.parser.ParseException e) {
+            System.out.println("[login] wallet balance update fails");
         }
 
     }

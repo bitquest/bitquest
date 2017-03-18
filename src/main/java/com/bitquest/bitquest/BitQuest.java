@@ -497,7 +497,7 @@ public class  BitQuest extends JavaPlugin {
         }
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
+        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.address) + " Bits");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
@@ -738,6 +738,7 @@ public class  BitQuest extends JavaPlugin {
             if(cmd.getName().equalsIgnoreCase("wallet")) {
                 try {
                     User user=new User(player);
+                    System.out.println("[/wallet] final balance: "+user.wallet.final_balance());
                     sendWalletInfo(user);
                     updateScoreboard(player);
                 } catch (ParseException e) {
