@@ -889,9 +889,9 @@ public class  BitQuest extends JavaPlugin {
                     Wallet old_wallet=new Wallet(
                             REDIS.get("address"+player.getUniqueId().toString()),
                             REDIS.get("private"+player.getUniqueId().toString()));
-                    player.sendMessage(ChatColor.YELLOW+"Found wallet "+wallet.address+"! looking for bits...");
+                    player.sendMessage(ChatColor.YELLOW+"Found wallet "+old_wallet.address+"! looking for bits...");
                     try {
-                        JSONObject balance=wallet.get_blockcypher_balance();
+                        JSONObject balance=old_wallet.get_blockcypher_balance();
                         int confirmed_balance=((Number)balance.get("balance")).intValue();
                         player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance+" sat");
 
