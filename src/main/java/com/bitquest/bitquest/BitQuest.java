@@ -739,7 +739,7 @@ public class  BitQuest extends JavaPlugin {
                 try {
                     User user=new User(player);
                     sendWalletInfo(user);
-
+                    updateScoreboard(player);
                 } catch (ParseException e) {
                     e.printStackTrace();
                     player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
