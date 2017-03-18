@@ -476,27 +476,27 @@ public class EntityEvents implements Listener {
 
                         final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-
-
-                            @Override
-                            public void run() {
-                                // Create an event
-                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
-
-
-                                ClientDelivery delivery = new ClientDelivery();
-                                delivery.addMessage(sentEvent);
-
-                                MixpanelAPI mixpanel = new MixpanelAPI();
-                                try {
-                                    mixpanel.deliver(delivery);
-                                } catch (IOException e1) {
-                                    e1.printStackTrace();
-                                }
-                            }
-
-                        });
+//                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+//
+//
+//                            @Override
+//                            public void run() {
+//                                // Create an event
+//                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
+//
+//
+//                                ClientDelivery delivery = new ClientDelivery();
+//                                delivery.addMessage(sentEvent);
+//
+//                                MixpanelAPI mixpanel = new MixpanelAPI();
+//                                try {
+//                                    mixpanel.deliver(delivery);
+//                                } catch (IOException e1) {
+//                                    e1.printStackTrace();
+//                                }
+//                            }
+//
+//                        });
 
                     }
                 }
