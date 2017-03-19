@@ -41,6 +41,7 @@ dependencies {
     compile group: 'com.timgroup', name: 'java-statsd-client', version: '3.0.1'
     compile group: 'in.ashwanthkumar', name: 'slack-java-webhook', version: '0.0.7'
     compile group: 'com.mixpanel', name: 'mixpanel-java', version: '1.4.4'
+    compile group: 'com.ullink.slack', name: 'simpleslackapi', version: '0.6.0'
     compile group: 'org.spigotmc', name: 'spigot-api', version: project.property("apiversion"), { ext { fatJarExclude = true } }
     compile group: 'org.spigotmc', name: 'spigot', version: project.property("apiversion"), { ext { fatJarExclude = true } }
 }
@@ -71,7 +72,7 @@ task buildSpigot(type: JavaExec) {
         dependsOn = ['cleanSpigotBuild', 'downloadBuildTool']
     }
     main = '-jar'
-    args new File(spigotBuildDir, "BuildTools.jar").getAbsolutePath(),"--rev","1.11.2"
+    args new File(spigotBuildDir, "BuildTools.jar").getAbsolutePath(),"--rev",project.property("apibuildtoolversion")
     workingDir = spigotBuildDir
 }
 

@@ -7,6 +7,9 @@ commands:
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
+  butcher:
+      description: "kills all entities in the current chunk"
+      usage: "/butcher"
   land:
     description: "Manage permissions for the land you're standing on"
     usage: "/land <claim|transfer|permissions>"
@@ -40,6 +43,9 @@ commands:
   filter:
     description: "Add a filter to the chat. To include spaces use '_' instead.\nFor example: filter_this = filter this"
     usage: "/filter <add|remove> <word to filter> [word to replace with]"
+  upgradewallet:
+    description: "Transfer funds from an old (BQ2.0) wallet"
+    usage: "/upgradewallet"
   faucet:
     description: "Get testnet coins (development mode only)"
     usage: "/faucet"
@@ -49,3 +55,6 @@ commands:
   crashtest:
     description: "Crashes the plugin on purpose, hell breaks loose. Don't try this at home"
     usage: "/crashtest"
+  report:
+    description: "Sends a report message to the moderators"
+    usage: "/report <player> <reason>"
