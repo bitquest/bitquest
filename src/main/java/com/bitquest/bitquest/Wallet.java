@@ -292,8 +292,8 @@ public class Wallet {
             return null;
         }
     }
-    boolean xapo_transaction(String token, String address, int sat) throws IOException {
-            URL url = new URL("https://v2.api.xapo.com/accounts/"+this.get_xapo_primary_account_id(token)+"/transactions?to="+address+"&amount="+sat+"&currency=SAT&notes=&type=pay");
+    boolean xapo_transaction(String token, String email, int sat) throws IOException {
+            URL url = new URL("https://v2.api.xapo.com/accounts/"+this.get_xapo_primary_account_id(token)+"/transactions?to="+email+"&amount="+sat+"&currency=SAT&notes=&type=pay");
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             String inputLine="";
             try {
@@ -304,7 +304,9 @@ public class Wallet {
                 int    postDataLength = postData.length;
 
                 con.setRequestMethod("POST");
-                con.setRequestProperty("Authorization", "Bearer "+token);
+                String authorization_header="Bearer "+token;
+                System.out.println("Authorization: "+authorization_header);
+                con.setRequestProperty("Authorization", authorization_header);
                 con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                 con.setRequestProperty("charset", "utf-8");
                 con.setRequestProperty("Content-Length", Integer.toString(postDataLength));
@@ -715,14 +717,13 @@ public class Wallet {
             return false;
         }
     }
-    boolean transaction(int sat, Wallet wallet) throws IOException {
-        System.out.println("------------- tx "+this.address+" --> "+wallet.address+" -----------");
+    boolean email_transaction(int sat, String email) throws IOException {
+        System.out.println("------------- tx "+this.address+" --> "+email+" -----------");
         // get xapo token
         String token=this.get_xapo_token();
         if(token!=null) {
             // get xapo accounts
-            this.xapo_transaction(token,wallet.address,sat);
-            return false;
+            return this.xapo_transaction(token,email,sat);
         } else {
             System.out.println(" error: failed to get xapo token");
             System.out.println(" success: false");
@@ -731,76 +732,76 @@ public class Wallet {
         }
         
     }
-    boolean emailTransaction(int sat,String email) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, ParseException {
-        // create payload
-        JSONObject obj = new JSONObject();
-        obj.put("to", email);
-        obj.put("currency", "SAT");
-        obj.put("amount", sat);
-        obj.put("subject", "BitQuest Withdrawal");
-        obj.put("timestamp", System.currentTimeMillis() / 1000L);
-        obj.put("unique_request_id", "BITQUEST" + System.currentTimeMillis());
-        String data = obj.toString();
-        int blocksize = 16;
-        Bukkit.getLogger().info("blocksize: " + blocksize);
-        int pad = blocksize - (data.length() % blocksize);
-        Bukkit.getLogger().info("pad: " + pad);
-
-        for (int i = 0; i < pad; i++) {
-            data = data + "\0";
-        }
-
-        Bukkit.getLogger().info("payload: " + data);
-        // encrypt payload
-        String key = System.getenv("XAPO_APP_KEY");
-        SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes(), "AES");
-        Cipher cipher = null;
-
-            cipher = Cipher.getInstance("AES/ECB/NoPadding");
-            cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
-            String epayload = new String(Base64.encodeBase64(cipher.doFinal(data.getBytes())));
-
-
-            // post payload
-            String urlstring = "https://api.xapo.com/v1/credit/";
-            String query = "hash=" + URLEncoder.encode(epayload, "UTF-8") + "&appID=" + System.getenv("XAPO_APP_ID");
-
-            URL url = new URL(urlstring);
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
-            //add reuqest header
-            con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-            String urlParameters = query;
-
-            // Send post request
-            con.setDoOutput(true);
-            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-            wr.writeBytes(urlParameters);
-            wr.flush();
-            wr.close();
-
-            int responseCode = con.getResponseCode();
-
-            BufferedReader in = new BufferedReader(
-                    new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-                response.append(inputLine);
-            }
-            in.close();
-
-            //print result
-            Bukkit.getLogger().info(response.toString());
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-            Bukkit.getLogger().info("---------- XAPO TRANSACTION END ------------");
-        return true;
-    }
+//    boolean emailTransaction(int sat,String email) throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, IOException, ParseException {
+//        // create payload
+//        JSONObject obj = new JSONObject();
+//        obj.put("to", email);
+//        obj.put("currency", "SAT");
+//        obj.put("amount", sat);
+//        obj.put("subject", "BitQuest Withdrawal");
+//        obj.put("timestamp", System.currentTimeMillis() / 1000L);
+//        obj.put("unique_request_id", "BITQUEST" + System.currentTimeMillis());
+//        String data = obj.toString();
+//        int blocksize = 16;
+//        Bukkit.getLogger().info("blocksize: " + blocksize);
+//        int pad = blocksize - (data.length() % blocksize);
+//        Bukkit.getLogger().info("pad: " + pad);
+//
+//        for (int i = 0; i < pad; i++) {
+//            data = data + "\0";
+//        }
+//
+//        Bukkit.getLogger().info("payload: " + data);
+//        // encrypt payload
+//        String key = System.getenv("XAPO_APP_KEY");
+//        SecretKeySpec skeySpec = new SecretKeySpec(key.getBytes(), "AES");
+//        Cipher cipher = null;
+//
+//            cipher = Cipher.getInstance("AES/ECB/NoPadding");
+//            cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
+//            String epayload = new String(Base64.encodeBase64(cipher.doFinal(data.getBytes())));
+//
+//
+//            // post payload
+//            String urlstring = "https://api.xapo.com/v1/credit/";
+//            String query = "hash=" + URLEncoder.encode(epayload, "UTF-8") + "&appID=" + System.getenv("XAPO_APP_ID");
+//
+//            URL url = new URL(urlstring);
+//            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+//
+//            //add reuqest header
+//            con.setRequestMethod("POST");
+//            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+//            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+//
+//            String urlParameters = query;
+//
+//            // Send post request
+//            con.setDoOutput(true);
+//            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+//            wr.writeBytes(urlParameters);
+//            wr.flush();
+//            wr.close();
+//
+//            int responseCode = con.getResponseCode();
+//
+//            BufferedReader in = new BufferedReader(
+//                    new InputStreamReader(con.getInputStream()));
+//            String inputLine;
+//            StringBuffer response = new StringBuffer();
+//
+//            while ((inputLine = in.readLine()) != null) {
+//                response.append(inputLine);
+//            }
+//            in.close();
+//
+//            //print result
+//            Bukkit.getLogger().info(response.toString());
+//            JSONParser parser = new JSONParser();
+//            final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+//            Bukkit.getLogger().info("---------- XAPO TRANSACTION END ------------");
+//        return true;
+//    }
     public boolean getTestnetCoins() {
 
 //
