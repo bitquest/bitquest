@@ -96,7 +96,7 @@ public class  BitQuest extends JavaPlugin {
     // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
     // public static Scoreboard scoreboard = manager.getNewScoreboard();
     public final static int LAND_PRICE=20000;
-    public final static int MIN_TRANS=20000;
+    public final static int MIN_TRANS=200000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
@@ -763,42 +763,28 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if(fromWallet != null && fromWallet.balance() >= sendAmount && sendAmount >= MIN_TRANS) {
+                        if( sendAmount >= MIN_TRANS) {
+                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
+                            return true;
+                        }
+                        if(fromWallet.balance()<sendAmount) {
+                            player.sendMessage(ChatColor.RED+"You don't have enough balance.");
+                            return true;
+                        } else if(fromWallet != null) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
-                            for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-                                System.out.println(offlinePlayer);
-                                if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
-                                    final Wallet finalFromWallet = fromWallet;
-                                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                                    final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
 
-                                    try {
-
-                                        if (finalFromWallet.transaction(sendAmount, toWallet)) {
-                                            player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
-                                            if (offlinePlayer.isOnline()) {
-                                                offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
-                                            }
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
-                                        }
-
-                                    } catch (IOException e1) {
-                                        e1.printStackTrace();
-                                    }
-
-
-                                    updateScoreboard(player);
-                                    return true;
-                                }
-                            }
                             // validate e-mail address
                             String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
                             java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-                            java.util.regex.Matcher m = p.matcher(args[0]);
+                            java.util.regex.Matcher m = p.matcher(args[1]);
                             if(m.matches()) {
-                                // TODO: send money through xapo
-
+                                if(fromWallet.email_transaction(sendAmount,args[1])) {
+                                    player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to "+args[1]);
+                                    return true;
+                                } else {
+                                    player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    return true;
+                                }
                             } else {
                                 try {
 
@@ -822,10 +808,6 @@ public class  BitQuest extends JavaPlugin {
                             return true;
                         }
                     } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
                         e.printStackTrace();
                     }
                 }
