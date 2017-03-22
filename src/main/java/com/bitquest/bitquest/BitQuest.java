@@ -495,7 +495,6 @@ public class  BitQuest extends JavaPlugin {
         user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.address) + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
-        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
         //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
@@ -504,7 +503,6 @@ public class  BitQuest extends JavaPlugin {
             user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
             if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
                 user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
-                user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + REDIS.get("address"+user.player.getUniqueId().toString()));
             }
         }
     };
