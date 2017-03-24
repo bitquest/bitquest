@@ -776,45 +776,52 @@ public class  BitQuest extends JavaPlugin {
                         if( sendAmount < MIN_TRANS) {
                             player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
                             return true;
-                        } else if(fromWallet.balance()<sendAmount) {
-                            player.sendMessage(ChatColor.RED+"You don't have enough balance.");
-                            System.out.println("not enough balance: "+fromWallet.balance()+" vs. "+sendAmount);
-                            return true;
-                        } else if(fromWallet != null) {
-                            player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
+                        } else try {
+                            if(fromWallet.final_balance()<sendAmount) {
+                                player.sendMessage(ChatColor.RED+"You don't have enough balance.");
+                                System.out.println("not enough balance: "+fromWallet.balance()+" vs. "+sendAmount);
+                                return true;
+                            } else if(fromWallet != null) {
+                                player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 
-                            // validate e-mail address
-                            String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-                            java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-                            java.util.regex.Matcher m = p.matcher(args[1]);
-                            if(m.matches()) {
-                                if(fromWallet.email_transaction(sendAmount,args[1])) {
-                                    player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to "+args[1]);
-                                    return true;
-                                } else {
-                                    player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
-                                    return true;
-                                }
-                            } else {
-                                try {
-
-                                    Wallet toWallet = new Wallet(args[1]);
-
-                                    if(fromWallet.create_blockcypher_transaction(sendAmount,toWallet.address)) {
-                                        player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
-                                        updateScoreboard(player);
+                                // validate e-mail address
+                                String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+                                java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+                                java.util.regex.Matcher m = p.matcher(args[1]);
+                                if(m.matches()) {
+                                    if(fromWallet.email_transaction(sendAmount,args[1])) {
+                                        player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to "+args[1]);
+                                        return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                        return true;
                                     }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
+                                } else {
+                                    try {
 
+                                        Wallet toWallet = new Wallet(args[1]);
+
+                                        if(fromWallet.create_blockcypher_transaction(sendAmount,toWallet.address)) {
+                                            player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
+                                            updateScoreboard(player);
+                                        } else {
+                                            player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    } catch (org.json.simple.parser.ParseException e) {
+                                        e.printStackTrace();
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                }
+                                return true;
                             }
+                        } catch (org.json.simple.parser.ParseException e) {
+                            player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+
+                            e.printStackTrace();
                             return true;
                         }
                         return true;
