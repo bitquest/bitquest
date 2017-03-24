@@ -763,7 +763,7 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if( sendAmount >= MIN_TRANS) {
+                        if( sendAmount < MIN_TRANS) {
                             player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
                             return true;
                         }
