@@ -751,7 +751,17 @@ public class  BitQuest extends JavaPlugin {
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args.length == 2) {
-                    final int sendAmount = Integer.valueOf(args[0])*100;
+                    for(char c : args[0].toCharArray()) {
+                        if(!Character.isDigit(c))
+                            return false;
+                    }
+                    int sendAmount=0;
+                    try {
+                        sendAmount = Integer.valueOf(args[0])*100;
+                    } catch(NumberFormatException e) {
+                        return false;
+                    }
+                    System.out.println(sendAmount);
                     Wallet fromWallet = null;
                     try {
                         fromWallet = new User(player).wallet;
@@ -766,8 +776,7 @@ public class  BitQuest extends JavaPlugin {
                         if( sendAmount < MIN_TRANS) {
                             player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
                             return true;
-                        }
-                        if(fromWallet.balance()<sendAmount) {
+                        } else if(fromWallet.balance()<sendAmount) {
                             player.sendMessage(ChatColor.RED+"You don't have enough balance.");
                             return true;
                         } else if(fromWallet != null) {
@@ -807,6 +816,7 @@ public class  BitQuest extends JavaPlugin {
                             }
                             return true;
                         }
+                        return true;
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
