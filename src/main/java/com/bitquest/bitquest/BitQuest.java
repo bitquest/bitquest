@@ -53,7 +53,7 @@ public class  BitQuest extends JavaPlugin {
     // Links to the administration account via Environment Variables
     public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
-    public final static String BITCOIN_ADDRESS = System.getenv("BITCOIN_ADDRESS") != null ? System.getenv("BITCOIN_ADDRESS") : null;
+    public final static String WORLD_ADDRESS = System.getenv("WORLD_ADDRESS") != null ? System.getenv("WORLD_ADDRESS") : null;
     public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
     public final static String BITCOIN_PUBLIC_KEY = System.getenv("BITCOIN_PUBLIC_KEY") != null ? System.getenv("BITCOIN_PUBLIC_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
@@ -139,8 +139,8 @@ public class  BitQuest extends JavaPlugin {
         }
 
         // loads world wallet
-        if(BITCOIN_ADDRESS!=null) {
-            wallet=new Wallet(BITCOIN_ADDRESS);
+        if(WORLD_ADDRESS!=null) {
+            wallet=new Wallet(WORLD_ADDRESS);
             System.out.println("World wallet address is: "+wallet.address);
         } else {
             System.out.println("Server is shutting down because BITCOIN_ADDRESS is not set");
