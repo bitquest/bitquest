@@ -778,6 +778,7 @@ public class  BitQuest extends JavaPlugin {
                             return true;
                         } else if(fromWallet.balance()<sendAmount) {
                             player.sendMessage(ChatColor.RED+"You don't have enough balance.");
+                            System.out.println("not enough balance: "+fromWallet.balance()+" vs. "+sendAmount);
                             return true;
                         } else if(fromWallet != null) {
                             player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
