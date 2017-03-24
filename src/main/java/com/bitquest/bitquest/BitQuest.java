@@ -143,7 +143,7 @@ public class  BitQuest extends JavaPlugin {
             wallet=new Wallet(WORLD_ADDRESS);
             System.out.println("World wallet address is: "+wallet.address);
         } else {
-            System.out.println("Server is shutting down because BITCOIN_ADDRESS is not set");
+            System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
             Bukkit.shutdown();
         }
         // sets the redis save intervals
