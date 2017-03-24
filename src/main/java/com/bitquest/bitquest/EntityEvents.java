@@ -461,7 +461,7 @@ public class EntityEvents implements Listener {
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
                     bitQuest.wallet.updateBalance();
-                    if(bitQuest.wallet.final_balance()>money && d20==20) {
+                    if(bitQuest.wallet.final_balance()>money && d20>18) {
 
 
                         final Wallet userWallet=user.wallet;
