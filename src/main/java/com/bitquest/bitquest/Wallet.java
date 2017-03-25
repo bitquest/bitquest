@@ -456,7 +456,7 @@ public class Wallet {
         // Get runtime
         java.lang.Runtime rt = java.lang.Runtime.getRuntime();
         // Start a new process: UNIX command ls
-        java.lang.Process p = rt.exec("/btcutils/signer/signer "+tosign+" "+BitQuest.CASHOUT_PRIVATE_KEY);
+        java.lang.Process p = rt.exec("/btcutils/signer/signer "+tosign+" "+BitQuest.WORLD_PRIVATE_KEY);
         // You can or maybe should wait for the process to complete
         p.waitFor();
         // System.out.println("Process exited with code = " + rt.exitValue());
@@ -497,7 +497,7 @@ public class Wallet {
             for(int i=0;i<tosign.size();i++) {
                 String signature=sign_transaction((String)tosign.get(i));
                 signatures.add(signature);
-                pubkeys.add(BitQuest.CASHOUT_PUBLIC_KEY);
+                pubkeys.add(BitQuest.WORLD_PUBLIC_KEY);
 
             }
         } catch (InterruptedException e) {
@@ -576,7 +576,7 @@ public class Wallet {
 
             // inputs
             JSONArray input_addresses = new JSONArray();
-            input_addresses.add(BitQuest.CASHOUT_ADDRESS);
+            input_addresses.add(BitQuest.WORLD_ADDRESS);
             JSONObject input = new JSONObject();
             input.put("addresses", input_addresses);
             JSONArray inputs = new JSONArray();
