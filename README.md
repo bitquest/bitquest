@@ -111,6 +111,26 @@ To run BitQuest might want to do the same steps as with a local test server, but
 
 You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload````command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.
 
+# Environment variables reference
+
+## BLOCKCYPHER_API_KEY
+Your API key obtained by blockcypher. This is not optional
+
+## BLOCKCHAIN
+The Blockhain the server will run in. Options are btc/main for Bitcoin, btc/test3 for Testnet, doge/main for Dogecoin
+
+## WORLD_ADDRESS
+The address of the world wallet. World wallet is where purchases are going to, and where loot comes from.
+
+## HD_TRANSFER_ADDRESS
+if defined, the world will use HD wallets for users and only one private key (WORLD_PRIVATE_KEY) will be used for /transfer. Otherwise /transfer (and fees) will occur on each player's wallet.
+
+## WORLD_PRIVATE_KEY
+Private key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the private key of HD_TRANSFER_ADDRESS
+
+## WORLD_PUBLIC_KEY
+Public key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the public key of HD_TRANSFER_ADDRESS
+
 # More info
 
 More info about [BitQuest](https://bitquest.co/) at

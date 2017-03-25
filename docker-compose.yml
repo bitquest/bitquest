@@ -5,11 +5,6 @@ spigot:
   container_name: bitquest
   environment:
     - BITQUEST_ENV=development
-    - BLOCKCHAIN=btc/test3
-    - BITCOIN_PUBLIC_KEY=tpubD6NzVbkrYhZ4Wwu2zXR4r2LAD87nLwqdKWBsH8qa2EkSbD5RSJARhCEKoBjuJAbig7aowS6gGJz9S6R77Yqf6DLE7qTFuT3ZV6ZZeKQGRs7
-    - CASHOUT_ADDRESS=mxYLANT8imdHq3BeE6rndruL8vpyBS5KfP
-    - CASHOUT_PUBLIC_KEY=03b3599771f9599d5eba66ec43d03d6da91d994e21885adf2c9ed95bd0e8ce861c
-    - CASHOUT_PRIVATE_KEY=083f8a41933da3cd16f29875b60857feac3e7741c6353a9cdfaed136d75e92c2
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"
