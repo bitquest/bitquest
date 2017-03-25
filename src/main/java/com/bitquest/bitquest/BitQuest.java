@@ -53,15 +53,13 @@ public class  BitQuest extends JavaPlugin {
     // Links to the administration account via Environment Variables
     public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
+    public final static String HD_ROOT_ADDRESS = System.getenv("HD_ROOT_ADDRESS") != null ? System.getenv("HD_ROOT_ADDRESS") : null;
     public final static String WORLD_ADDRESS = System.getenv("WORLD_ADDRESS") != null ? System.getenv("WORLD_ADDRESS") : null;
-    public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
-    public final static String BITCOIN_PUBLIC_KEY = System.getenv("BITCOIN_PUBLIC_KEY") != null ? System.getenv("BITCOIN_PUBLIC_KEY") : null;
+    public final static String WORLD_PRIVATE_KEY = System.getenv("WORLD_PRIVATE_KEY") != null ? System.getenv("WORLD_PRIVATE_KEY") : null;
+    public final static String WORLD_PUBLIC_KEY = System.getenv("WORLD_PUBLIC_KEY") != null ? System.getenv("WORLD_PUBLIC_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
     public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
-    public final static String CASHOUT_ADDRESS = System.getenv("CASHOUT_ADDRESS") != null ? System.getenv("CASHOUT_ADDRESS") : null;
-    public final static String CASHOUT_PRIVATE_KEY = System.getenv("CASHOUT_PRIVATE_KEY") != null ? System.getenv("CASHOUT_PRIVATE_KEY") : null;
-    public final static String CASHOUT_PUBLIC_KEY = System.getenv("CASHOUT_PUBLIC_KEY") != null ? System.getenv("CASHOUT_PUBLIC_KEY") : null;
 
 
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
@@ -139,13 +137,17 @@ public class  BitQuest extends JavaPlugin {
         }
 
         // loads world wallet
-        if(WORLD_ADDRESS!=null) {
-            wallet=new Wallet(WORLD_ADDRESS);
-            System.out.println("World wallet address is: "+wallet.address);
+        if(HD_ROOT_ADDRESS!=null) {
+            System.out.println("HD Wallets enabled.");
+            wallet=new Wallet(HD_ROOT_ADDRESS);
+        } else if(WORLD_ADDRESS!=null&&WORLD_PRIVATE_KEY!=null) {
+            wallet=new Wallet(WORLD_ADDRESS,WORLD_PRIVATE_KEY);
         } else {
-            System.out.println("Server is shutting down because BITCOIN_ADDRESS is not set");
+            System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
             Bukkit.shutdown();
         }
+        System.out.println("World wallet address is: "+wallet.address);
+
         // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
 
