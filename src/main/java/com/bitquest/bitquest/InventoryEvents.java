@@ -130,8 +130,6 @@ public class InventoryEvents implements Listener {
                                 break;
                             }
                         }
-                        boolean hasBalance=false;
-                        user.wallet.updateBalance();
 
                         if (hasOpenSlots) {
                             if(sat > 100 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {

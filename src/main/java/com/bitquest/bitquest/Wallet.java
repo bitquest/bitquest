@@ -41,10 +41,7 @@ public class Wallet {
     }
     public String address=null;
     private String privatekey=null;
-    int balance() {
-        this.updateBalance();
-        return this.balance;
-    }
+
     int final_balance() throws IOException, ParseException {
 
         JSONObject blockcypher_balance=this.get_blockcypher_balance();
@@ -144,12 +141,9 @@ public class Wallet {
 
     }
     JSONObject get_blockcypher_balance() throws IOException, ParseException {
+        System.out.println("[balance] "+this.address);
         URL url;
-        if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
-            url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
-        } else {
-            url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
-        }
+        url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
         System.out.println(url.toString());
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -171,52 +165,7 @@ public class Wallet {
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(response.toString());
     }
-    // TODO: this method is deprecated in favour of get_blockcypher_balance
-    void updateBalance() {
-        try {
-            if(BitQuest.BLOCKCHAIN.equals("btc/main")==true && BitQuest.BITCORE_HOST!=null) {
-                this.balance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,true);
-                this.unconfirmedBalance=bitcore_balance(BitQuest.BITCORE_HOST,this.address,false);
-            } else {
-                URL url;
-                if(BitQuest.BLOCKCYPHER_API_KEY!=null) {
-                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance?token="+BitQuest.BLOCKCYPHER_API_KEY);
-                } else {
-                    url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
-                }
-                System.out.println(url.toString());
-                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
 
-                int responseCode = con.getResponseCode();
-
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-                in.close();
-
-                JSONParser parser = new JSONParser();
-                final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-                this.balance = ((Number) jsonobj.get("balance")).intValue();
-                this.unconfirmedBalance = ((Number) jsonobj.get("unconfirmed_balance")).intValue();
-            }
-
-        } catch (IOException e) {
-            System.out.println("[balance] problem updating balance for address "+address);
-            System.out.println(e);
-            // wallet might be new and it's not listed on the blockchain yet
-        } catch (ParseException e) {
-            // There is a problem with the balance API
-        }
-
-    }
     String get_xapo_token() throws IOException {
         URL url = new URL("https://v2.api.xapo.com/oauth2/token");
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
