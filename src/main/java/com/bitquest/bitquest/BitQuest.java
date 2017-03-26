@@ -900,11 +900,14 @@ public class  BitQuest extends JavaPlugin {
                                 try {
                                     User user=new User(player);
                                     User user_tip=new User(onlinePlayer);
-                                    user.wallet.payment(sat,user_tip.wallet.address);
-                                    updateScoreboard(onlinePlayer);
-                                    updateScoreboard(player);
-                                    player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
-                                    player.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                    if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
+                                        updateScoreboard(onlinePlayer);
+                                        updateScoreboard(player);
+                                        player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
+                                        player.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                    } else {
+                                        player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    }
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 } catch (org.json.simple.parser.ParseException e) {
