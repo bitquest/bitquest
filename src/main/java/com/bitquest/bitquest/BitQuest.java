@@ -497,10 +497,10 @@ public class  BitQuest extends JavaPlugin {
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
-        if(BLOCKCHAIN=="btc/main") {
+        if(BLOCKCHAIN.equals("btc/main")) {
             user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
         }
-        if(BLOCKCHAIN=="btc/test") {
+        if(BLOCKCHAIN.equals("btc/test3")) {
             user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc-testnet/address/" + user.wallet.address);
         }
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
@@ -882,13 +882,59 @@ public class  BitQuest extends JavaPlugin {
                     return true;
                 }
             }
-
             /***********************************************************
-                /upgradewallet
-                attempts to transfer funds from old (BQ2.0) wallet to
-                the new HD (BQ2.1) wallet via BlockCypher's
-                microtransaction endpoint
+             /tip
+             a player-to-player-transaction
              ***********************************************************/
+            if(cmd.getName().equalsIgnoreCase("tip")) {
+                if(args.length==2) {
+                    for(char c : args[0].toCharArray()) {
+                        if(!Character.isDigit(c))
+                            return false;
+                    }
+                    int bits=Integer.valueOf(args[0]);
+                    if(bits>0&&bits<10000) {
+                        int sat=bits*100;
+                        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                            if(onlinePlayer.getDisplayName().equalsIgnoreCase(args[1])) {
+                                try {
+                                    User user=new User(player);
+                                    User user_tip=new User(onlinePlayer);
+                                    user.wallet.payment(sat,user_tip.wallet.address);
+                                    updateScoreboard(onlinePlayer);
+                                    updateScoreboard(player);
+                                    player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
+                                    player.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+                                return true;
+                            }
+                            player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
+                        }
+                        return true;
+                    } else {
+                        player.sendMessage("Minimum tip is 1 bit. Maximum is 10000");
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+
+
+            }
+
+                /***********************************************************
+                    /upgradewallet
+                    attempts to transfer funds from old (BQ2.0) wallet to
+                    the new HD (BQ2.1) wallet via BlockCypher's
+                    microtransaction endpoint
+                 ***********************************************************/
             if(cmd.getName().equalsIgnoreCase("upgradewallet")) {
                 String fail_message="Cannot make transaction at this moment. Please try again later...";
                 player.sendMessage(ChatColor.YELLOW+"Searching for lost wallet...");
