@@ -345,7 +345,7 @@ public class  BitQuest extends JavaPlugin {
                                     mixpanel.deliver(delivery);
                                 }
                             } else {
-                                int balance = new User(player).wallet.balance();
+                                int balance = new User(player).wallet.final_balance();
                                 if (balance < BitQuest.LAND_PRICE) {
                                     player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
                                             ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
@@ -485,7 +485,6 @@ public class  BitQuest extends JavaPlugin {
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
-        user.wallet.updateBalance();
         // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
         if(this.BLOCKCHAIN.equals("btc/main")) {
             user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.wallet.address);
@@ -498,7 +497,12 @@ public class  BitQuest extends JavaPlugin {
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
-        //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+        if(BLOCKCHAIN=="btc/main") {
+            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+        }
+        if(BLOCKCHAIN=="btc/test") {
+            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc-testnet/address/" + user.wallet.address);
+        }
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
         if(BITQUEST_ENV.equalsIgnoreCase("development")) {
@@ -781,7 +785,7 @@ public class  BitQuest extends JavaPlugin {
                         } else try {
                             if(fromWallet.final_balance()<sendAmount) {
                                 player.sendMessage(ChatColor.RED+"You don't have enough balance.");
-                                System.out.println("not enough balance: "+fromWallet.balance()+" vs. "+sendAmount);
+                                System.out.println("not enough balance: "+fromWallet.final_balance()+" vs. "+sendAmount);
                                 return true;
                             } else if(fromWallet != null) {
                                 player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
@@ -811,10 +815,13 @@ public class  BitQuest extends JavaPlugin {
                                         }
                                     } catch (IOException e) {
                                         e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
                                     } catch (org.json.simple.parser.ParseException e) {
                                         e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
                                     } catch (ParseException e) {
                                         e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
                                     }
 
                                 }
@@ -828,7 +835,11 @@ public class  BitQuest extends JavaPlugin {
                         }
                         return true;
                     } catch (IOException e) {
+                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+
                         e.printStackTrace();
+                        return true;
+
                     }
                 }
                 return false;
