@@ -905,7 +905,7 @@ public class  BitQuest extends JavaPlugin {
                                         updateScoreboard(onlinePlayer);
                                         updateScoreboard(player);
                                         player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
-                                        player.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                        onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Tip failed.");
                                     }
