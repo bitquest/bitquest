@@ -239,7 +239,7 @@ public class EntityEvents implements Listener {
             System.out.println(clan);
             ScoreboardManager manager = Bukkit.getScoreboardManager();
             Scoreboard board = manager.getNewScoreboard();
-            player.setDisplayName("["+clan+"] "+player.getDisplayName());
+           // player.setDisplayName("["+clan+"] "+player.getDisplayName());
         }
 
         // Prints the user balance

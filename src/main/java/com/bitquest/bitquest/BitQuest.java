@@ -883,10 +883,10 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
             /***********************************************************
-             /tip
+             /send
              a player-to-player-transaction
              ***********************************************************/
-            if(cmd.getName().equalsIgnoreCase("tip")) {
+            if(cmd.getName().equalsIgnoreCase("send")) {
                 if(args.length==2) {
                     for(char c : args[0].toCharArray()) {
                         if(!Character.isDigit(c))

@@ -12,7 +12,7 @@ commands:
     usage: "/clan <new|invite|kick|join|leave>"
   tip:
     description: "sends bits to other player"
-    usage: "/tip <amount> <player>"
+    usage: "/send <amount> <player>"
   land:
     description: "Manage permissions for the land you're standing on"
     usage: "/land <claim|transfer|permissions>"
