@@ -10,7 +10,7 @@ commands:
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
-  tip:
+  send:
     description: "sends bits to other player"
     usage: "/send <amount> <player>"
   land:
