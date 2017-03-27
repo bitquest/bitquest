@@ -493,8 +493,14 @@ public class Wallet {
             in.close();
 
             if (responseCode == 200||responseCode==201) {
-                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.address,fees));
-                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.address,fees));
+                if(BitQuest.HD_ROOT_ADDRESS!=null) {
+                    System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
+                    System.out.println(BitQuest.REDIS.decrBy("final_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
+                } else {
+                    System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+BitQuest.WORLD_ADDRESS,fees));
+                    System.out.println(BitQuest.REDIS.decrBy("final_balance:"+BitQuest.WORLD_ADDRESS,fees));
+                }
+
                 return true;
             } else {
                 return false;
