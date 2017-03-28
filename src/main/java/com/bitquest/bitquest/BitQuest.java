@@ -894,7 +894,7 @@ public class  BitQuest extends JavaPlugin {
                             return false;
                     }
                     int bits=Integer.valueOf(args[0]);
-                    if(bits>0&&bits<10000) {
+                    if(bits>0&&bits<=10000) {
                         int sat=bits*100;
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if(onlinePlayer.getDisplayName().equalsIgnoreCase(args[1])) {
