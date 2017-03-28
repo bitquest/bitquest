@@ -925,7 +925,6 @@ public class  BitQuest extends JavaPlugin {
                                     return true;
                                 }
 
-                                return true;
                             }
                         }
                         player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
