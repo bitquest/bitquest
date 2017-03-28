@@ -906,21 +906,30 @@ public class  BitQuest extends JavaPlugin {
                                         updateScoreboard(player);
                                         player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
                                         onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                        return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Tip failed.");
+                                        return true;
                                     }
                                 } catch (ParseException e) {
                                     e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
                                 } catch (org.json.simple.parser.ParseException e) {
                                     e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
                                 } catch (IOException e) {
                                     e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
                                 }
 
                                 return true;
                             }
-                            player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
                         }
+                        player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
+
                         return true;
                     } else {
                         player.sendMessage("Minimum tip is 1 bit. Maximum is 10000");
