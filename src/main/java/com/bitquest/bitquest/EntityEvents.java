@@ -429,8 +429,7 @@ public class EntityEvents implements Listener {
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
             String name = event.getEntity().getName();
-            // TODO: Show damage message
-        }
+            // TODO: Show damage message        }
     }
 
     @EventHandler
@@ -457,10 +456,10 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
-                    final int money = BitQuest.rand(100, Math.min(128000,Math.max(1000,level*1000)));
+                    final int money = BitQuest.rand(100, Math.min(128000,Math.max(50,level*50)));
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(bitQuest.wallet.final_balance()>money && d20>16) {
+                    if(bitQuest.wallet.final_balance()>money && d20>15) {
 
 
                         final Wallet userWallet=user.wallet;
