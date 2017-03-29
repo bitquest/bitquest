@@ -90,7 +90,6 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8),20000));
         trades.add(new Trade(new ItemStack(Material.CAKE,8),40000));
         trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,4),20000)); //magical
-        trades.add(new Trade(new ItemStack(Material.EXP_BOTTLE,16),20000));
         trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,3),20000));
         //cool diamond sword
 
