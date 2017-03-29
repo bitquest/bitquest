@@ -28,7 +28,7 @@ public class ChatEvents implements Listener {
 
 		if(message.startsWith("@")) {
 			event.setCancelled(true);
-			if(message.length() > 1 && message.substring(1, message.length()).matches(".*\\w.*")) {
+			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(event.getMessage().substring(1, message.length()));
 				String clan = sender.getScoreboard().getPlayerTeam(sender).getPrefix();
 				clan = clan.trim();
@@ -56,7 +56,7 @@ public class ChatEvents implements Listener {
 				}
 			}
 		} else if(message.startsWith("!")) {
-			if(message.length() > 1 && message.substring(1, message.length()).matches(".*\\w.*")) {
+			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(message.substring(1, message.length()));
 				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + event.getMessage());
 			} else {
