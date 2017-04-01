@@ -189,7 +189,10 @@ public class  BitQuest extends JavaPlugin {
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
         int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
-        statsd.gauge(BITQUEST_ENV+".balance."+user.player.getDisplayName(),final_balance);
+        if(statsd!=null) {
+            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getDisplayName(),final_balance);
+
+        }
 
         score.setScore(final_balance/100);
         player.setScoreboard(walletScoreboard);
