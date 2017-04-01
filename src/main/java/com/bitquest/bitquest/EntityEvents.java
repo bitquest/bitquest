@@ -13,6 +13,8 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -48,11 +50,16 @@ public class EntityEvents implements Listener {
     String PROBLEM_MESSAGE="Can't join right now. Come back later";
 
 
-    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR,
-            Material.JUNGLE_DOOR, Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR,
-            Material.FURNACE, Material.BURNING_FURNACE, Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE,
-            Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE, Material.JUNGLE_FENCE_GATE,
-            Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER);
+    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST,
+            Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR,
+            Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.FURNACE, Material.BURNING_FURNACE,
+            Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE,
+            Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER,
+            Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX, Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX,
+            Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX, Material.LIGHT_BLUE_SHULKER_BOX,
+            Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
+            Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.SILVER_SHULKER_BOX,
+            Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX);
     
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -771,9 +778,17 @@ public class EntityEvents implements Listener {
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();
         if(b!=null && PROTECTED_BLOCKS.contains(b.getType())) {
+            // If block's inventory has "public" in it, allow the player to interact with it.
+            if(b.getState() instanceof InventoryHolder) {
+                Inventory blockInventory = ((InventoryHolder) b.getState()).getInventory();
+                if(blockInventory.getName().toLowerCase().contains("public")) {
+                    return;
+                }
+            }
+            // If player doesn't have permission, disallow the player to interact with it.
             if(!bitQuest.canBuild(b.getLocation(),event.getPlayer())) {
                 event.setCancelled(true);
-                p.sendMessage(ChatColor.RED+"You don't have permission to do that");
+                p.sendMessage(ChatColor.RED+"You don't have permission to do that!");
             }
         }
 
@@ -783,7 +798,7 @@ public class EntityEvents implements Listener {
     void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player p = event.getPlayer();
         if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
-            p.sendMessage(ChatColor.RED+"You don't have permission to do that");
+            p.sendMessage(ChatColor.RED+"You don't have permission to do that!");
             event.setCancelled(true);
         }
     }
@@ -792,7 +807,7 @@ public class EntityEvents implements Listener {
     void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player p = event.getPlayer();
         if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
-            p.sendMessage(ChatColor.RED+"You don't have permission to do that");
+            p.sendMessage(ChatColor.RED+"You don't have permission to do that!");
             event.setCancelled(true);
         }
     }
