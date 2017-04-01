@@ -133,11 +133,8 @@ public class InventoryEvents implements Listener {
                         }
 
                         if (hasOpenSlots) {
-<<<<<<< HEAD
-                            if(sat >= 100 && user.wallet.payment(sat, bitQuest.wallet.address) == true) {
-=======
+
                             if(user.wallet.payment(sat, bitQuest.wallet.address) == true) {
->>>>>>> 6e8de4886f9c915845dfbf0bc6bf700621b1cee4
                                 ItemStack item = event.getCurrentItem();
                                 ItemMeta meta = item.getItemMeta();
                                 ArrayList<String> Lore = new ArrayList<String>();
