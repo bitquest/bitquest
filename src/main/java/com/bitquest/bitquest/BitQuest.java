@@ -90,9 +90,6 @@ public class  BitQuest extends JavaPlugin {
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
 
-
-    // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
-    // public static Scoreboard scoreboard = manager.getNewScoreboard();
     public final static int LAND_PRICE=20000;
     public final static int MIN_TRANS=200000;
     // utilities: distance and rand
@@ -309,7 +306,7 @@ public class  BitQuest extends JavaPlugin {
         System.out.println("[claim] "+player.getDisplayName()+" wants to claim "+x+","+z+" with name "+name);
 
         if (!name.isEmpty()) {
-            // check that desired area name is alphanumeric
+            // check that desired area name doesn't have non-alphanumeric characters
             boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
             if (!hasNonAlpha) {
                 // 16 characters max
@@ -349,19 +346,15 @@ public class  BitQuest extends JavaPlugin {
                                     mixpanel.deliver(delivery);
                                 }
                             } else {
-                                int balance = new User(player).wallet.final_balance();
+                                int balance = user.wallet.final_balance();
                                 if (balance < BitQuest.LAND_PRICE) {
                                     player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                            ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                            ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
                                 } else {
                                     player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
                                 }
                             }
                         } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        } catch (org.json.simple.parser.ParseException e) {
                             e.printStackTrace();
                         }
 
