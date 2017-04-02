@@ -22,7 +22,10 @@ public class Trade {
         this.has_stock=has_stock;
     }
     public int price_for_stock(Jedis REDIS) {
-        int stock =Integer.valueOf(REDIS.get("stock:"+itemStack.getType()));
+        int stock=0;
+        if(REDIS.exists("stock:"+itemStack.getType())) {
+            stock =Integer.valueOf(REDIS.get("stock:"+itemStack.getType()));
+        }
         if(stock>MAX_STOCK) {
             return 100;
         } else if(stock<1) {
