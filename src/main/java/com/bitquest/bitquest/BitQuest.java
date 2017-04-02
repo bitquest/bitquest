@@ -569,23 +569,24 @@ public class  BitQuest extends JavaPlugin {
             }
             if(cmd.getName().equalsIgnoreCase("clan")) {
                 if (args.length > 0) {
-                    if (args[0].equals("new")) {
+                    String subCommand = args[0];
+                    if (subCommand.equals("new")) {
                         if (args.length > 1) {
+                            String clanName = args[1];
                             // check that desired clan name is alphanumeric
-                            boolean hasNonAlpha = args[1].matches("^.*[^a-zA-Z0-9 ].*$");
+                            boolean hasNonAlpha = clanName.matches("^.*[^a-zA-Z0-9 ].*$");
                             if (!hasNonAlpha) {
                                 // 16 characters max
-                                if (args[1].length() <= 16) {
-
-                                    if (REDIS.get("clan:" + player.getUniqueId().toString()) == null) {
-                                        if (!REDIS.sismember("clans", args[1])) {
-                                            REDIS.sadd("clans", args[1]);
-                                            REDIS.set("clan:" + player.getUniqueId().toString(), args[1]);
-                                            player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + args[1] + " clan");
-                                            player.setPlayerListName(ChatColor.GOLD + "[" + args[1] + "] " + ChatColor.WHITE + player.getDisplayName());
+                                if (clanName.length() <= 16) {
+                                    if (!REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                                        if (!REDIS.sismember("clans", clanName)) {
+                                            REDIS.sadd("clans", clanName);
+                                            REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                                            player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + clanName + " clan");
+                                            player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getDisplayName());
                                             return true;
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "A clan with the name '" + args[1] + "' already exists.");
+                                            player.sendMessage(ChatColor.RED + "A clan with the name '" + clanName + "' already exists.");
                                             return true;
                                         }
                                     } else {
@@ -607,46 +608,47 @@ public class  BitQuest extends JavaPlugin {
                         }
 
                     }
-                    if (args[0].equals("invite")) {
-                        // check that argument is not empty
-
-
+                    if (subCommand.equals("invite")) {
                         if (args.length > 1) {
-                            // TODO: you shouldn't be able to invite yourself
+                            String invitedName = args[1];
+                            if (invitedName.equals(player.getDisplayName())) {
+                                player.sendMessage(ChatColor.RED + "You can not invite yourself");
+                                return true;
+                            }
                             // check that player is in a clan
                             if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
                                 String clan = REDIS.get("clan:" + player.getUniqueId().toString());
                                 // check if user is in the uuid database
-                                if (REDIS.exists("uuid:" + args[1])) {
+                                if (REDIS.exists("uuid:" + invitedName)) {
                                     // check if player already belongs to a clan
-                                    String uuid = REDIS.get("uuid:" + args[1]);
+                                    String uuid = REDIS.get("uuid:" + invitedName);
                                     if (!REDIS.exists("clan:" + uuid)) {
                                         // check if player is already invited to the clan
                                         if (!REDIS.sismember("invitations:" + clan, uuid)) {
                                             REDIS.sadd("invitations:" + clan, uuid);
-                                            player.sendMessage(ChatColor.GREEN + "You invited " + args[1] + " to the " + clan + " clan.");
-                                            if (Bukkit.getPlayerExact(args[1]) != null) {
-                                                Player invitedplayer = Bukkit.getPlayerExact(args[1]);
+                                            player.sendMessage(ChatColor.GREEN + "You invited " + invitedName + " to the " + clan + " clan.");
+                                            if (Bukkit.getPlayerExact(invitedName) != null) {
+                                                Player invitedplayer = Bukkit.getPlayerExact(invitedName);
                                                 invitedplayer.sendMessage(ChatColor.GREEN + player.getDisplayName() + " invited you to the " + clan + " clan");
                                             }
                                             return true;
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "Player " + args[1] + " is already invited to the clan and must accept the invitation");
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " is already invited to the clan and must accept the invitation");
                                             return true;
                                         }
 
                                     } else {
                                         if (REDIS.get("clan:" + uuid).equals(clan)) {
-                                            player.sendMessage(ChatColor.RED + "Player " + args[1] + " already belongs to the clan " + clan);
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " already belongs to the clan " + clan);
 
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "Player " + args[1] + " already belongs to a clan.");
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " already belongs to a clan.");
 
                                         }
                                         return true;
                                     }
                                 } else {
-                                    player.sendMessage(ChatColor.RED + "User " + args[1] + " does not play on this server");
+                                    player.sendMessage(ChatColor.RED + "User " + invitedName + " does not play on this server");
                                     return true;
                                 }
                             } else {
@@ -658,25 +660,26 @@ public class  BitQuest extends JavaPlugin {
                             return true;
                         }
                     }
-                    if (args[0].equals("join")) {
+                    if (subCommand.equals("join")) {
                         // check that argument is not empty
                         if (args.length > 1) {
+                            String clanName = args[1];
                             // check that player is invited to the clan he wants to join
-                            if (REDIS.sismember("invitations:" + args[1], player.getUniqueId().toString())) {
+                            if (REDIS.sismember("invitations:" + clanName, player.getUniqueId().toString())) {
                                 // user is invited to join
-                                if (REDIS.get("clan:" + player.getUniqueId().toString()) == null) {
+                                if (!REDIS.exists("clan:" + player.getUniqueId().toString())) {
                                     // user is not part of any clan
-                                    REDIS.srem("invitations:"+ args[1], player.getUniqueId().toString());
-                                    REDIS.set("clan:" + player.getUniqueId().toString(), args[1]);
-                                    player.sendMessage(ChatColor.GREEN + "You are now part of the " + args[1] + " clan!");
-                                    player.setPlayerListName(ChatColor.GOLD + "[" + args[1] + "] " + ChatColor.WHITE + player.getDisplayName());
+                                    REDIS.srem("invitations:"+ clanName, player.getUniqueId().toString());
+                                    REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                                    player.sendMessage(ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
+                                    player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getDisplayName());
                                     return true;
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
                                     return true;
                                 }
                             } else {
-                                player.sendMessage(ChatColor.RED + "You are not invited to join the " + args[1] + " clan.");
+                                player.sendMessage(ChatColor.RED + "You are not invited to join the " + clanName + " clan.");
                                 return true;
                             }
                         } else {
@@ -686,25 +689,25 @@ public class  BitQuest extends JavaPlugin {
                     }
                     if (args[0].equals("kick")) {
                         if (args.length > 1) {
+                            String toKick = args[1];
                             // check if player is in the uuid database
-
-                            if (REDIS.exists("uuid:" + args[1])) {
-                                String uuid = REDIS.get("uuid:" + args[1]);
+                            if (REDIS.exists("uuid:" + toKick)) {
+                                String uuid = REDIS.get("uuid:" + toKick);
                                 // check if player belongs to a clan
                                 if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
                                     String clan = REDIS.get("clan:" + player.getUniqueId().toString());
                                     // check that kicker and player are in the same clan
                                     if (REDIS.get("clan:" + uuid).equals(clan)) {
                                         REDIS.del("clan:" + uuid);
-                                        player.sendMessage(ChatColor.GREEN + "Player " + args[1] + " was kicked from the " + clan + " clan.");
-                                        if (Bukkit.getPlayerExact(args[1]) != null) {
-                                            Player invitedPlayer = Bukkit.getPlayerExact(args[1]);
+                                        player.sendMessage(ChatColor.GREEN + "Player " + toKick + " was kicked from the " + clan + " clan.");
+                                        if (Bukkit.getPlayerExact(toKick) != null) {
+                                            Player invitedPlayer = Bukkit.getPlayerExact(toKick);
                                             invitedPlayer.sendMessage(ChatColor.RED + player.getDisplayName() + " kick you from the " + clan + " clan");
                                             invitedPlayer.setPlayerListName(invitedPlayer.getDisplayName());
                                         }
                                         return true;
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "Player " + args[1] + " is not a member of the clan " + clan);
+                                        player.sendMessage(ChatColor.RED + "Player " + toKick + " is not a member of the clan " + clan);
                                         return true;
                                     }
                                 } else {
@@ -713,7 +716,7 @@ public class  BitQuest extends JavaPlugin {
                                 }
 
                             } else {
-                                player.sendMessage(ChatColor.RED + "Player " + args[1] + " does not play on this server.");
+                                player.sendMessage(ChatColor.RED + "Player " + toKick + " does not play on this server.");
                                 return true;
                             }
                         } else {
@@ -721,7 +724,7 @@ public class  BitQuest extends JavaPlugin {
                             return true;
                         }
                     }
-                    if (args[0].equals("leave")) {
+                    if (subCommand.equals("leave")) {
                         if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
                             // TODO: when a clan gets emptied, should be removed from the "clans" set
                             player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
