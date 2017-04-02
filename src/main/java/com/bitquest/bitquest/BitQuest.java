@@ -187,7 +187,7 @@ public class  BitQuest extends JavaPlugin {
 
         int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
         if(statsd!=null) {
-            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getDisplayName(),final_balance);
+            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
 
         }
 
@@ -583,7 +583,7 @@ public class  BitQuest extends JavaPlugin {
                                             REDIS.sadd("clans", clanName);
                                             REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
                                             player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + clanName + " clan");
-                                            player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getDisplayName());
+                                            player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
                                             return true;
                                         } else {
                                             player.sendMessage(ChatColor.RED + "A clan with the name '" + clanName + "' already exists.");
@@ -611,7 +611,7 @@ public class  BitQuest extends JavaPlugin {
                     if (subCommand.equals("invite")) {
                         if (args.length > 1) {
                             String invitedName = args[1];
-                            if (invitedName.equals(player.getDisplayName())) {
+                            if (invitedName.equals(player.getName())) {
                                 player.sendMessage(ChatColor.RED + "You can not invite yourself");
                                 return true;
                             }
@@ -629,7 +629,7 @@ public class  BitQuest extends JavaPlugin {
                                             player.sendMessage(ChatColor.GREEN + "You invited " + invitedName + " to the " + clan + " clan.");
                                             if (Bukkit.getPlayerExact(invitedName) != null) {
                                                 Player invitedplayer = Bukkit.getPlayerExact(invitedName);
-                                                invitedplayer.sendMessage(ChatColor.GREEN + player.getDisplayName() + " invited you to the " + clan + " clan");
+                                                invitedplayer.sendMessage(ChatColor.GREEN + player.getName() + " invited you to the " + clan + " clan");
                                             }
                                             return true;
                                         } else {
@@ -672,7 +672,7 @@ public class  BitQuest extends JavaPlugin {
                                     REDIS.srem("invitations:"+ clanName, player.getUniqueId().toString());
                                     REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
                                     player.sendMessage(ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
-                                    player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getDisplayName());
+                                    player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
                                     return true;
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
@@ -702,8 +702,8 @@ public class  BitQuest extends JavaPlugin {
                                         player.sendMessage(ChatColor.GREEN + "Player " + toKick + " was kicked from the " + clan + " clan.");
                                         if (Bukkit.getPlayerExact(toKick) != null) {
                                             Player invitedPlayer = Bukkit.getPlayerExact(toKick);
-                                            invitedPlayer.sendMessage(ChatColor.RED + player.getDisplayName() + " kick you from the " + clan + " clan");
-                                            invitedPlayer.setPlayerListName(invitedPlayer.getDisplayName());
+                                            invitedPlayer.sendMessage(ChatColor.RED + player.getName() + " kick you from the " + clan + " clan");
+                                            invitedPlayer.setPlayerListName(invitedPlayer.getName());
                                         }
                                         return true;
                                     } else {
@@ -730,7 +730,7 @@ public class  BitQuest extends JavaPlugin {
                             player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
                             REDIS.del("clan:" + player.getUniqueId().toString());
 
-                            player.setPlayerListName(player.getDisplayName());
+                            player.setPlayerListName(player.getName());
                             return true;
                         } else {
                             player.sendMessage(ChatColor.RED + "You don't belong to a clan.");
@@ -905,15 +905,15 @@ public class  BitQuest extends JavaPlugin {
                     if(bits>0&&bits<=10000) {
                         int sat=bits*100;
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                            if(onlinePlayer.getDisplayName().equalsIgnoreCase(args[1])) {
+                            if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                                 try {
                                     User user=new User(player);
                                     User user_tip=new User(onlinePlayer);
                                     if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
                                         updateScoreboard(onlinePlayer);
                                         updateScoreboard(player);
-                                        player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getDisplayName());
-                                        onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getDisplayName());
+                                        player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
+                                        onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
                                         return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Tip failed.");
