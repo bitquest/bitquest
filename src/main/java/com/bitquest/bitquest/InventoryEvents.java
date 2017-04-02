@@ -116,10 +116,15 @@ public class InventoryEvents implements Listener {
 
                     try {
                         int sat = 0;
+                        Trade trade=null;
                         for (int i = 0; i < trades.size(); i++) {
                             if (clicked.getType() == trades.get(i).itemStack.getType()) {
                                 sat = trades.get(i).price;
-                                if(trades.get(i).has_stock) sat=sat*2;
+                                trade=trades.get(i);
+
+                                if(trades.get(i).has_stock) {
+                                    sat=trades.get(i).price_for_stock(bitQuest.REDIS)*2;
+                                }
                             }
 
                         }
@@ -134,6 +139,7 @@ public class InventoryEvents implements Listener {
 
                         if (hasOpenSlots) {
 
+
                             if(user.wallet.payment(sat, bitQuest.wallet.address) == true) {
                                 ItemStack item = event.getCurrentItem();
                                 ItemMeta meta = item.getItemMeta();
@@ -141,7 +147,12 @@ public class InventoryEvents implements Listener {
                                 meta.setLore(null);
                                 item.setItemMeta(meta);
                                 player.getInventory().addItem(item);
-                                player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " purchased");
+                                player.sendMessage(ChatColor.GREEN + "You bought " + clicked.getType() + " for "+sat/100);
+
+                                if(trade.has_stock==true) {
+                                    bitQuest.REDIS.decr("stock:"+trade.itemStack.getType());
+                                    System.out.println("[buy] stock: "+ bitQuest.REDIS.get("stock:"+trade.itemStack.getType()));
+                                }
                                 bitQuest.updateScoreboard(player);
                                 if (bitQuest.messageBuilder != null) {
 
@@ -183,18 +194,33 @@ public class InventoryEvents implements Listener {
                          if (clicked.getType() == trades.get(i).itemStack.getType()&&trades.get(i).has_stock==true){
                              sat = trades.get(i).price;
                              trade=trades.get(i);
+                             if(trades.get(i).has_stock==true) {
+
+                                 sat=trades.get(i).price_for_stock(bitQuest.REDIS);
+                             }
                          }
 
                      }
-                     if(sat>=100&&trade!=null) {
-                         player.closeInventory();
 
-                         System.out.println("[sell] "+player.getName()+" -> "+clicked.getType());
-                         player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
-                         player.getInventory().removeItem(trade.itemStack);
-                         if(bitQuest.wallet.payment(trade.price,user.wallet.address)) {
-                             player.sendMessage(ChatColor.GREEN + "" + clicked.getType() + " sold");
-                             bitQuest.updateScoreboard(player);
+                     if(sat>=100&&trade!=null) {
+                         if(trade.has_stock==true&&trade.will_buy(bitQuest.REDIS)) {
+                             player.closeInventory();
+
+                             System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
+                             player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+                             player.getInventory().removeItem(trade.itemStack);
+                             if (bitQuest.wallet.payment(trade.price, user.wallet.address)) {
+                                 player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
+                                 bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
+                                 System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
+                                 bitQuest.updateScoreboard(player);
+                             }
+                         } else {
+                             event.setCancelled(true);
+                             player.closeInventory();
+                             player.updateInventory();
+                             player.sendMessage(ChatColor.RED + "I have too much " + clicked.getType() + "...");
+
                          }
                      } else {
                          event.setCancelled(true);
@@ -258,16 +284,29 @@ public class InventoryEvents implements Listener {
             // open menu
             Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
-                ItemStack button = new ItemStack(trades.get(i).itemStack);
-                ItemMeta meta = button.getItemMeta();
-                ArrayList<String> lore = new ArrayList<String>();
-                int bits_price;
-                bits_price=trades.get(i).price/100;
-                if(trades.get(i).has_stock==true) bits_price=bits_price*2;
-                lore.add("Price: "+bits_price);
-                meta.setLore(lore);
-                button.setItemMeta(meta);
-                marketInventory.setItem(i, button);
+                int inventory_stock=bitQuest.MAX_STOCK;
+                if(trades.get(i).has_stock==true) {
+                    if(bitQuest.REDIS.exists("stock:"+trades.get(i).itemStack.getType())) {
+                        inventory_stock=Integer.valueOf(bitQuest.REDIS.get("stock:"+trades.get(i).itemStack.getType()));
+                    } else {
+                        inventory_stock=0;
+                    }
+                }
+                if(inventory_stock>0) {
+                    ItemStack button = new ItemStack(trades.get(i).itemStack);
+                    ItemMeta meta = button.getItemMeta();
+                    ArrayList<String> lore = new ArrayList<String>();
+                    int bits_price;
+                    bits_price=trades.get(i).price/100;
+                    if(trades.get(i).has_stock==true) {
+                        bits_price=(trades.get(i).price_for_stock(bitQuest.REDIS)*2)/100;
+                    }
+                    lore.add("Price: "+bits_price);
+                    meta.setLore(lore);
+                    button.setItemMeta(meta);
+                    marketInventory.setItem(i, button);
+                }
+
             }
             event.getPlayer().openInventory(marketInventory);
         } else {
