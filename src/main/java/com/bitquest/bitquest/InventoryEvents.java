@@ -47,8 +47,8 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,1),100,true));
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),5000));
         trades.add(new Trade(new ItemStack(Material.FENCE,32),10000));
-        trades.add(new Trade(new ItemStack(Material.GLASS,32),10000));
-        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),10000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),10000)); // kinda cheap
         trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
         trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
         trades.add(new Trade(new ItemStack(Material.RAILS,32),10000)); //we still need these to slow down, you know.
@@ -78,7 +78,7 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,32),15000));
         trades.add(new Trade(new ItemStack(Material.ANVIL, 1),10000));
         trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 1),1000));
-        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,20),20000)); //more
+        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,22),20000)); // 1 emerald : 1 bit + 20b profit
         trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,8),10000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,8),10000));
         trades.add(new Trade(new ItemStack(Material.SADDLE,1),1500));
@@ -87,9 +87,10 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.APPLE,32),10000)); //normal apples :P
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
         trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,2),100000)); //insane
-        trades.add(new Trade(new ItemStack(Material.SKULL,1, (short)1),80000)); //wither skull
         trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8),20000));
         trades.add(new Trade(new ItemStack(Material.CAKE,8),40000));
+        trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,4),20000)); //magical
+        trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,3),20000));
         //cool diamond sword
 
 
