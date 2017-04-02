@@ -63,7 +63,7 @@ public class ChatEvents implements Listener {
 				event.setCancelled(true);
 			}
 		} else {
-			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
+			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message);
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
