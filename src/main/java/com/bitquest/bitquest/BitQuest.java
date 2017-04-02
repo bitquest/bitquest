@@ -582,6 +582,7 @@ public class  BitQuest extends JavaPlugin {
                                             REDIS.sadd("clans", args[1]);
                                             REDIS.set("clan:" + player.getUniqueId().toString(), args[1]);
                                             player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + args[1] + " clan");
+                                            player.setPlayerListName(ChatColor.GOLD + "[" + args[1] + "] " + ChatColor.WHITE + player.getDisplayName());
                                             return true;
                                         } else {
                                             player.sendMessage(ChatColor.RED + "A clan with the name '" + args[1] + "' already exists.");
@@ -667,7 +668,8 @@ public class  BitQuest extends JavaPlugin {
                                     // user is not part of any clan
                                     REDIS.srem("invitations:"+ args[1], player.getUniqueId().toString());
                                     REDIS.set("clan:" + player.getUniqueId().toString(), args[1]);
-                                    player.sendMessage(ChatColor.GREEN + "You are now part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan!");
+                                    player.sendMessage(ChatColor.GREEN + "You are now part of the " + args[1] + " clan!");
+                                    player.setPlayerListName(ChatColor.GOLD + "[" + args[1] + "] " + ChatColor.WHITE + player.getDisplayName());
                                     return true;
                                 } else {
                                     player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
@@ -695,6 +697,11 @@ public class  BitQuest extends JavaPlugin {
                                     if (REDIS.get("clan:" + uuid).equals(clan)) {
                                         REDIS.del("clan:" + uuid);
                                         player.sendMessage(ChatColor.GREEN + "Player " + args[1] + " was kicked from the " + clan + " clan.");
+                                        if (Bukkit.getPlayerExact(args[1]) != null) {
+                                            Player invitedPlayer = Bukkit.getPlayerExact(args[1]);
+                                            invitedPlayer.sendMessage(ChatColor.RED + player.getDisplayName() + " kick you from the " + clan + " clan");
+                                            invitedPlayer.setPlayerListName(invitedPlayer.getDisplayName());
+                                        }
                                         return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED + "Player " + args[1] + " is not a member of the clan " + clan);
@@ -719,6 +726,8 @@ public class  BitQuest extends JavaPlugin {
                             // TODO: when a clan gets emptied, should be removed from the "clans" set
                             player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
                             REDIS.del("clan:" + player.getUniqueId().toString());
+
+                            player.setPlayerListName(player.getDisplayName());
                             return true;
                         } else {
                             player.sendMessage(ChatColor.RED + "You don't belong to a clan.");

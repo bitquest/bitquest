@@ -242,11 +242,8 @@ public class EntityEvents implements Listener {
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
         if(BitQuest.REDIS.exists("clan:"+player.getUniqueId().toString())) {
-            String clan=BitQuest.REDIS.get("clan:"+player.getUniqueId().toString());
-            System.out.println(clan);
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            Scoreboard board = manager.getNewScoreboard();
-           // player.setDisplayName("["+clan+"] "+player.getDisplayName());
+            String clan = BitQuest.REDIS.get("clan:"+player.getUniqueId().toString());
+            player.setPlayerListName(ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getDisplayName());
         }
 
         // Prints the user balance
