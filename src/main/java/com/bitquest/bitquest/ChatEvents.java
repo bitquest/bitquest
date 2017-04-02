@@ -25,6 +25,13 @@ public class ChatEvents implements Listener {
 		String messageUnescaped = event.getMessage();
 		Player sender = event.getPlayer();
 		String message = messageUnescaped.replace("%", ""); // escape any % signs to prevent a breakdown in chat script
+		String playerName = sender.getName();
+
+		if (BitQuest.REDIS.get("clan:" + sender.getUniqueId().toString()) != null) {
+			String clan = BitQuest.REDIS.get("clan:" + sender.getUniqueId().toString());
+
+			playerName = ChatColor.GOLD + "[" + clan + "] " + ChatColor.YELLOW + playerName;
+		}
 
 		if(message.startsWith("@")) {
 			event.setCancelled(true);
@@ -58,12 +65,12 @@ public class ChatEvents implements Listener {
 		} else if(message.startsWith("!")) {
 			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(message.substring(1, message.length()));
-				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + event.getMessage());
+				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + playerName + " " + ChatColor.WHITE + event.getMessage());
 			} else {
 				event.setCancelled(true);
 			}
 		} else {
-			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message);
+			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + playerName + " " + ChatColor.WHITE + message);
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
