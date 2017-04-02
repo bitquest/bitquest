@@ -306,6 +306,7 @@ public class InventoryEvents implements Listener {
                         bits_price=(trades.get(i).price_for_stock(bitQuest.REDIS)*2)/100;
                     }
                     lore.add("Price: "+bits_price);
+                    lore.add("In stock: "+inventory_stock+" of "+Trade.MAX_STOCK);
                     meta.setLore(lore);
                     button.setItemMeta(meta);
                     marketInventory.setItem(i, button);
