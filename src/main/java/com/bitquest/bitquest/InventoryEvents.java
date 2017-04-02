@@ -209,7 +209,7 @@ public class InventoryEvents implements Listener {
                              System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
                              player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
                              player.getInventory().removeItem(trade.itemStack);
-                             if (bitQuest.wallet.payment(trade.price, user.wallet.address)) {
+                             if (bitQuest.wallet.payment(sat, user.wallet.address)) {
                                  player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
                                  bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
                                  System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
