@@ -35,11 +35,20 @@ public class Trade {
         }
     }
     public boolean will_buy(Jedis REDIS) {
-        int stock =Integer.valueOf(REDIS.get("stock:"+itemStack.getType()));
-        if(stock>MAX_STOCK) {
-            return false;
+        if(REDIS.exists("stock:"+itemStack.getType())) {
+            int stock = Integer.valueOf(REDIS.get("stock:" + itemStack.getType()));
+            if (stock > MAX_STOCK) {
+                return false;
+            } else {
+                return true;
+            }
         } else {
-            return true;
+            // assume is 0
+            if(this.has_stock==true) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
