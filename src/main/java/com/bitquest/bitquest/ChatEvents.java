@@ -22,9 +22,9 @@ public class ChatEvents implements Listener {
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent event) {
 		
-		String messageUnescaped = event.getMessage();
+		// Spigot replaces "%2$s" with the original message.
+		String message = event.getMessage();
 		Player sender = event.getPlayer();
-		String message = messageUnescaped.replace("%", "\uFF05"); // escape any % signs to prevent a breakdown in chat script
 
 		if(message.startsWith("@")) {
 			event.setCancelled(true);
@@ -33,7 +33,7 @@ public class ChatEvents implements Listener {
 				String clan = sender.getScoreboard().getPlayerTeam(sender).getPrefix();
 				clan = clan.trim();
 				clan = clan.substring(1, clan.length() - 1);
-				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + event.getMessage());
+				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
 				Set<Player> teammates = new HashSet<Player>();
 				if(sender.getScoreboard().getPlayerTeam(sender) != null) {
 					for(OfflinePlayer player : sender.getScoreboard().getPlayerTeam(sender).getPlayers()) {
@@ -58,12 +58,12 @@ public class ChatEvents implements Listener {
 		} else if(message.startsWith("!")) {
 			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(message.substring(1, message.length()));
-				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + event.getMessage());
+				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
 			} else {
 				event.setCancelled(true);
 			}
 		} else {
-			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message);
+			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
