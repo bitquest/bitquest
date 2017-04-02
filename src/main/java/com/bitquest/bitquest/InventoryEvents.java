@@ -152,6 +152,8 @@ public class InventoryEvents implements Listener {
                                 if(trade.has_stock==true) {
                                     bitQuest.REDIS.decr("stock:"+trade.itemStack.getType());
                                     System.out.println("[buy] stock: "+ bitQuest.REDIS.get("stock:"+trade.itemStack.getType()));
+                                    bitQuest.sendMetric("price."+clicked.getType(),trade.price_for_stock(bitQuest.REDIS));
+
                                 }
                                 bitQuest.updateScoreboard(player);
                                 if (bitQuest.messageBuilder != null) {
@@ -214,6 +216,7 @@ public class InventoryEvents implements Listener {
                                  bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
                                  System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
                                  bitQuest.updateScoreboard(player);
+                                 bitQuest.sendMetric("price."+clicked.getType(),trade.price_for_stock(bitQuest.REDIS));
                              }
                          } else {
                              event.setCancelled(true);
