@@ -50,9 +50,9 @@ public class EntityEvents implements Listener {
     String PROBLEM_MESSAGE="Can't join right now. Come back later";
 
 
-    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST,
-            Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR,
-            Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.FURNACE, Material.BURNING_FURNACE,
+    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR,
+	    Material.BIRCH_DOOR,Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,
+	    Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.FURNACE, Material.BURNING_FURNACE,
             Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE,
             Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER,
             Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX, Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX,
