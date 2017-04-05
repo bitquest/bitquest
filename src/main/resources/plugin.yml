@@ -43,6 +43,9 @@ commands:
   killAllVillagers:
     description: "Kills all the villagers"
     usage: "/killAllVillagers"
+  filter:
+    description: "Add a filter to the chat. To include spaces use '_' instead.\nFor example: filter_this = filter this"
+    usage: "/filter <add|remove> <word to filter> [word to replace with]"
   upgradewallet:
     description: "Transfer funds from an old (BQ2.0) wallet"
     usage: "/upgradewallet"

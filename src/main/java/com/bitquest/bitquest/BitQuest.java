@@ -853,6 +853,60 @@ public class  BitQuest extends JavaPlugin {
                 }
                 return false;
             }
+            if (cmd.getName().equalsIgnoreCase("filter")){
+                if (args.length == 0) {
+                    Set<String> filters = BitQuest.REDIS.smembers("filter"+player.getUniqueId().toString());
+
+                    if (filters.size() > 0) {
+                        player.sendMessage("Your filters are:");
+                        for(String filter : filters) {
+                            String[] split = filter.split("\\|");
+                            player.sendMessage("  " + ChatColor.GOLD + split[0] + "  =>  " + split[1]);
+                        }
+                    } else {
+                        player.sendMessage("You haven't added any filters");
+                    }
+
+                    return true;
+                }
+                if (args.length >= 2) {
+                    if (args[0].equalsIgnoreCase("add")) {
+                        String badWord = args[1].replace("_" , " ");
+                        String goodWord = "";
+
+                        if (args.length >= 3) {
+                            goodWord = args[2].replace("_" , " ");
+                        } else {
+                            for(int i = 0; i < badWord.length(); i ++) {
+                                if (badWord.charAt(i) != ' ') {
+                                    goodWord += "*";
+                                } else {
+                                    goodWord += " ";
+                                }
+                            }
+                        }
+
+                        String filter = badWord + "|" + goodWord;
+                        BitQuest.REDIS.sadd("filter" + player.getUniqueId().toString(), filter);
+                        sender.sendMessage(ChatColor.GREEN + "Filter for " + args[1] + " added.");
+                        return true;
+                    } else if (args[0].equalsIgnoreCase("remove")) {
+                        String badWord = args[1].replace("_" , " ");
+                        Set<String> filters = BitQuest.REDIS.smembers("filter"+player.getUniqueId().toString());
+
+                        for (String filter : filters) {
+                            String[] split = filter.split("\\|");
+                            if (split[0].equals(badWord)) {
+                                BitQuest.REDIS.srem("filter" + player.getUniqueId().toString(), filter);
+                                player.sendMessage(ChatColor.GREEN + badWord + " is not longer filtered.");
+                            }
+                        }
+
+                        return true;
+                    }
+                }
+                return false;
+            }
             if (cmd.getName().equalsIgnoreCase("report")) {
                 if (slackBotSession != null && slackBotSession.isConnected()) {
                     if (args.length >= 2) {
@@ -1009,7 +1063,7 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
 
-                // MODERATOR COMMANDS
+            // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
