@@ -1071,7 +1071,7 @@ public class  BitQuest extends JavaPlugin {
                     }
                 }
                 if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
-                    if(REDIS.get("uuid"+args[0])!=null) {
+                    if(REDIS.get("uuid:"+args[0])!=null) {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.sadd("banlist",uuid.toString());
                         Player kickedout=Bukkit.getPlayer(args[0]);
@@ -1086,7 +1086,7 @@ public class  BitQuest extends JavaPlugin {
 
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
-                    if(REDIS.get("uuid"+args[0])!=null) {
+                    if(REDIS.get("uuid:"+args[0])!=null) {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.srem("banlist",uuid.toString());
 
@@ -1100,7 +1100,7 @@ public class  BitQuest extends JavaPlugin {
                 if (cmd.getName().equalsIgnoreCase("banlist")) {
                     Set<String> banlist=REDIS.smembers("banlist");
                     for(String uuid:banlist) {
-                        sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
+                        sender.sendMessage(ChatColor.YELLOW+REDIS.get("name:"+uuid));
                     }
                     return true;
 
