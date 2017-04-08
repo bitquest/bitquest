@@ -521,9 +521,15 @@ public class  BitQuest extends JavaPlugin {
             // PLAYER COMMANDS
             if(cmd.getName().equalsIgnoreCase("land")) {
                 if(args[0].equalsIgnoreCase("claim")) {
+                    StringBuilder sb = new StringBuilder(args[2]);
+                    for (int i = 3; i < args.length; i++){
+                        sb.append(" " + args[i]);
+                    }
+                    String claimName = sb.toString().trim();
+                    
                     Location location=player.getLocation();
                     try {
-                        claimLand(args[1],location.getChunk(),player);
+                        claimLand(claimName,location.getChunk(),player);
                     } catch (ParseException e) {
                         e.printStackTrace();
                         player.sendMessage(ChatColor.RED+"Land claim failed. Please try again later.");
