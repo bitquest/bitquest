@@ -10,7 +10,7 @@ public class Trade {
     public int price;
     public ItemStack itemStack;
     public boolean has_stock;
-    static int MAX_STOCK=10;
+    static int MAX_STOCK=10;  // TODO: This is different from bitQuest.MAX_STOCK, these should be reconciled.
     public Trade(ItemStack itemStack,int price) {
         this.itemStack=itemStack;
         this.price=price;
@@ -26,7 +26,7 @@ public class Trade {
         if(REDIS.exists("stock:"+itemStack.getType())) {
             stock =Integer.valueOf(REDIS.get("stock:"+itemStack.getType()));
         }
-        if(stock>MAX_STOCK) {
+        if(stock>=MAX_STOCK) {
             return 100;
         } else if(stock<1) {
             return MAX_STOCK*100;
@@ -37,7 +37,7 @@ public class Trade {
     public boolean will_buy(Jedis REDIS) {
         if(REDIS.exists("stock:"+itemStack.getType())) {
             int stock = Integer.valueOf(REDIS.get("stock:" + itemStack.getType()));
-            if (stock > MAX_STOCK) {
+            if (stock >= MAX_STOCK) {
                 return false;
             } else {
                 return true;

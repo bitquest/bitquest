@@ -109,9 +109,10 @@ The server will run with a local volume pointing to your latest jar built with G
 # Running your local BitQuest server
 To run BitQuest might want to do the same steps as with a local test server, but specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
 
-You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload````command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.
+You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload```` command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.  In order to shut down the server and save the state of the world use the ````/emergencystop```` command from inside the game before exiting the docker process.
 
 # Environment variables reference
+These environment variables are added as needed to your development.yml file in the same style as the BLOCKCYPHER_API_KEY shown in the example file above.
 
 ## BLOCKCYPHER_API_KEY
 Your API key obtained by blockcypher. This is not optional
@@ -126,10 +127,13 @@ The address of the world wallet. World wallet is where purchases are going to, a
 if defined, the world will use HD wallets for users and only one private key (WORLD_PRIVATE_KEY) will be used for /transfer. Otherwise /transfer (and fees) will occur on each player's wallet.
 
 ## WORLD_PRIVATE_KEY
-Private key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the private key of HD_TRANSFER_ADDRESS
+Private key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the private key of HD_TRANSFER_ADDRESS.  To get the private key for a given address in bitcoin-qt open the console in your wallet and run the 'dumpprivkey' command with the address as the argument.
 
 ## WORLD_PUBLIC_KEY
-Public key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the public key of HD_TRANSFER_ADDRESS
+Public key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the public key of HD_TRANSFER_ADDRESS.  To get the public key for a given address in bitcoin-qt open the console in your wallet and run the 'validateaddress' command with the address as the argument.
+
+## ADMIN_UUID
+The UUID of the user to be granted admin rights over the server.  Currently if this is not set you may get a java exception when bringing up the server.
 
 # More info
 
