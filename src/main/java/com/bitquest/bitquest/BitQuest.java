@@ -89,8 +89,8 @@ public class  BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
+    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 20000;
 
-    public final static int LAND_PRICE=20000;
     public final static int MIN_TRANS=200000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
@@ -185,7 +185,13 @@ public class  BitQuest extends JavaPlugin {
         User user=new User(player);
 
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        if(BLOCKCHAIN.equals("doge/main")) {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Doge" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        } else {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        }
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
         int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
