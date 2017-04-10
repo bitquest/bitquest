@@ -24,20 +24,20 @@ Every time a player kills an enemy (mob) there is a chance to get loot. If that 
 ![A player got loot](http://i.imgur.com/cxqXmt2.png)
 
 ## Everyone can send money anywhere
-You can send Bitcoin to an outside wallet or other players using the Minecraft console command:
+You can send Bitcoin to an external wallet with /transfer:
 ```sh
 /transfer <amount> <recipient-bitcoin-address>
 ```
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
 ![Player notification](http://i.imgur.com/PHmomoS.png)
 ![Player's public transaction](http://i.imgur.com/JPO4AXt.png)  
-Players can also send money using email instead of a bitcoin address using:
+Players can also send Bitcoin using email instead of a Bitcoin address using:
 ```sh
 /transfer <amount> <recipient-email>
 ```
-And also by username using:
+Additionally, players can send Bitcoin to other players via /send:
 ```sh
-/transfer <amount> <username>
+/send <amount> <username>
 ```
 
 With this method the recipient will receive an email notifying that a bitcoin transaction has been made to a [XAPO wallet](https://xapo.com/wallet/) linked to his email.

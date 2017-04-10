@@ -50,9 +50,9 @@ public class EntityEvents implements Listener {
     String PROBLEM_MESSAGE="Can't join right now. Come back later";
 
 
-    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.TRAPPED_CHEST,
-            Material.ACACIA_DOOR, Material.BIRCH_DOOR,Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR,
-            Material.SPRUCE_DOOR, Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.FURNACE, Material.BURNING_FURNACE,
+    private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR,
+	    Material.BIRCH_DOOR,Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,
+	    Material.WOOD_DOOR, Material.WOODEN_DOOR, Material.FURNACE, Material.BURNING_FURNACE,
             Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.FENCE_GATE,
             Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER,
             Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX, Material.BROWN_SHULKER_BOX, Material.CYAN_SHULKER_BOX,
@@ -106,8 +106,8 @@ public class EntityEvents implements Listener {
 
             Player player=event.getPlayer();
 
-            BitQuest.REDIS.set("name:"+player.getUniqueId().toString(),player.getDisplayName());
-            BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
+            BitQuest.REDIS.set("name:"+player.getUniqueId().toString(),player.getName());
+            BitQuest.REDIS.set("uuid:"+player.getName().toString(),player.getUniqueId().toString());
             if(BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             }
@@ -228,7 +228,7 @@ public class EntityEvents implements Listener {
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
         BitQuest.REDIS.set("displayname:"+player.getUniqueId().toString(),player.getDisplayName());
-        BitQuest.REDIS.set("uuid:"+player.getDisplayName().toString(),player.getUniqueId().toString());
+        BitQuest.REDIS.set("uuid:"+player.getName().toString(),player.getUniqueId().toString());
         if (bitQuest.isModerator(player)) {
             if (bitQuest.BITQUEST_ENV.equals("development")==true) {
                 player.setOp(true);
@@ -242,11 +242,8 @@ public class EntityEvents implements Listener {
         welcome = welcome.replace("<name>", player.getName());
         player.sendMessage(welcome);
         if(BitQuest.REDIS.exists("clan:"+player.getUniqueId().toString())) {
-            String clan=BitQuest.REDIS.get("clan:"+player.getUniqueId().toString());
-            System.out.println(clan);
-            ScoreboardManager manager = Bukkit.getScoreboardManager();
-            Scoreboard board = manager.getNewScoreboard();
-           // player.setDisplayName("["+clan+"] "+player.getDisplayName());
+            String clan = BitQuest.REDIS.get("clan:"+player.getUniqueId().toString());
+            player.setPlayerListName(ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
         }
 
         // Prints the user balance
