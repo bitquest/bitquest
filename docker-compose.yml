@@ -5,6 +5,8 @@ spigot:
   container_name: bitquest
   environment:
     - BITQUEST_ENV=development
+    - WORLD_ADDRESS=DLmU4E3qtGd74ku7hgCXZQ91RpvLdAVn4e
+    - WORLD_PRIVATE_KEY=8c7ff7dfccf57d1b3f461725d609de77747d870e92f736eac7678724bb5db6da
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"
