@@ -111,81 +111,84 @@ public class EntityEvents implements Listener {
             if(BitQuest.REDIS.sismember("banlist",event.getPlayer().getUniqueId().toString())) {
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             }
-            // TODO: Remove legacy wallet generation method in favour of HD wallets
-            if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
-                System.out.println("Generating new address...");
-                URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
-                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setRequestMethod("POST");
-                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-                con.setDoOutput(true);
-                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                wr.flush();
-                wr.close();
+            if(BitQuest.HD_ROOT_ADDRESS==null) {
+                // use regular addresses with private keys stored on redis
+                if(!BitQuest.REDIS.exists("address"+player.getUniqueId().toString())&&!BitQuest.REDIS.exists("private"+player.getUniqueId().toString())) {
+                    System.out.println("Generating new address...");
+                    URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
+                    HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                    con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                    con.setDoOutput(true);
+                    DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                    wr.flush();
+                    wr.close();
 
-                BufferedReader in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
+                    BufferedReader in = new BufferedReader(
+                            new InputStreamReader(con.getInputStream()));
+                    String inputLine;
+                    StringBuffer response = new StringBuffer();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    in.close();
+
+                    JSONParser parser = new JSONParser();
+                    final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
+                    System.out.println(response.toString());
+                    BitQuest.REDIS.set("private"+player.getUniqueId().toString(), (String) jsonobj.get("private"));
+                    BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
+                    BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
                 }
-                in.close();
+            } else {
+                // use HD address derived from HD_ROOT_ADDRESS
+                if(!BitQuest.REDIS.exists("hd:address:"+player.getUniqueId().toString())) {
+                    System.out.println("Generating new HD address...");
+                    URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/wallets/hd/bitquest/addresses/derive?token="+BitQuest.BLOCKCYPHER_API_KEY+"&subchain_index=0");
+                    HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                    con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                    con.setDoOutput(true);
+                    DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+                    wr.flush();
+                    wr.close();
 
-                JSONParser parser = new JSONParser();
-                final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-                System.out.println(response.toString());
-                BitQuest.REDIS.set("private"+player.getUniqueId().toString(), (String) jsonobj.get("private"));
-                BitQuest.REDIS.set("public"+player.getUniqueId().toString(), (String) jsonobj.get("public"));
-                BitQuest.REDIS.set("address"+player.getUniqueId().toString(), (String) jsonobj.get("address"));
-            }
-            // new, HD wallet generation method
-            if(!BitQuest.REDIS.exists("hd:address:"+player.getUniqueId().toString())) {
-                System.out.println("Generating new HD address...");
-                URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/wallets/hd/bitquest/addresses/derive?token="+BitQuest.BLOCKCYPHER_API_KEY+"&subchain_index=0");
-                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setRequestMethod("POST");
-                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-                con.setDoOutput(true);
-                DataOutputStream wr = new DataOutputStream(con.getOutputStream());
-                wr.flush();
-                wr.close();
+                    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String inputLine;
+                    StringBuffer response = new StringBuffer();
 
-                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                String inputLine;
-                StringBuffer response = new StringBuffer();
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+                    in.close();
 
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
+                    JSONParser parser = new JSONParser();
+                    final JSONObject responseobject = (JSONObject) parser.parse(response.toString());
+                    System.out.println(response.toString());
+                    final JSONArray chains=(JSONArray) responseobject.get("chains");
+                    System.out.println(chains);
+                    final JSONObject chain=(JSONObject) chains.get(0);
+                    System.out.println(chain);
+                    final JSONArray chain_addresses=(JSONArray) chain.get("chain_addresses");
+                    System.out.println(chain_addresses);
+                    final JSONObject wallet=(JSONObject) chain_addresses.get(0);
+                    System.out.println(wallet);
+                    final String address=(String) wallet.get("address");
+                    final String path=(String) wallet.get("path");
+                    final String public_key=(String) wallet.get("public");
+                    BitQuest.REDIS.set("hd:address:"+player.getUniqueId().toString(), address);
+                    BitQuest.REDIS.set("hd:path:"+player.getUniqueId().toString(), path);
+                    BitQuest.REDIS.set("hd:public:"+player.getUniqueId().toString(), public_key);
+                    user = new User(event.getPlayer());
+                    System.out.println(" ------------- new hd wallet for player "+player.getDisplayName()+" ----------");
+                    System.out.println(" hd address: "+user.wallet.address);
+                    System.out.println(" hd path: "+user.wallet.path);
+                    System.out.println(" hd public key: "+user.wallet.public_key);
+                    System.out.println(" --------------------------------------------------------------------");
                 }
-                in.close();
-
-                JSONParser parser = new JSONParser();
-                final JSONObject responseobject = (JSONObject) parser.parse(response.toString());
-                System.out.println(response.toString());
-                final JSONArray chains=(JSONArray) responseobject.get("chains");
-                System.out.println(chains);
-                final JSONObject chain=(JSONObject) chains.get(0);
-                System.out.println(chain);
-                final JSONArray chain_addresses=(JSONArray) chain.get("chain_addresses");
-                System.out.println(chain_addresses);
-                final JSONObject wallet=(JSONObject) chain_addresses.get(0);
-                System.out.println(wallet);
-                final String address=(String) wallet.get("address");
-                final String path=(String) wallet.get("path");
-                final String public_key=(String) wallet.get("public");
-                BitQuest.REDIS.set("hd:address:"+player.getUniqueId().toString(), address);
-                BitQuest.REDIS.set("hd:path:"+player.getUniqueId().toString(), path);
-                BitQuest.REDIS.set("hd:public:"+player.getUniqueId().toString(), public_key);
-                user = new User(event.getPlayer());
-                System.out.println(" ------------- new hd wallet for player "+player.getDisplayName()+" ----------");
-                System.out.println(" hd address: "+user.wallet.address);
-                System.out.println(" hd path: "+user.wallet.path);
-                System.out.println(" hd public key: "+user.wallet.public_key);
-                System.out.println(" --------------------------------------------------------------------");
             }
             // test player wallet. kick if it's not working
 

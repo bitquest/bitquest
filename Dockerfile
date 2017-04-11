@@ -10,6 +10,7 @@ RUN apt-get install -y oracle-java8-installer
 RUN apt-get install -y oracle-java8-set-default
 RUN apt-get install -y git
 RUN mkdir /bitquest
+COPY . /bitquest/
 RUN mkdir /spigot/
 RUN mkdir /spigot/plugins
 WORKDIR /spigot
@@ -38,7 +39,6 @@ RUN cd / && git clone https://github.com/blockcypher/btcutils.git
 RUN cd / && go get github.com/btcsuite/btcd/btcec
 RUN cd /btcutils/signer && go build
 RUN chmod +x /btcutils/signer/signer
-COPY . /bitquest/
 RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
 RUN cd /bitquest/ && ./gradlew shadowJar
 RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
