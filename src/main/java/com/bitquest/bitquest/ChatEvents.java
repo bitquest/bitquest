@@ -21,8 +21,7 @@ public class ChatEvents implements Listener {
 	
 	@EventHandler
 	public void onChat(AsyncPlayerChatEvent event) {
-		
-		// Spigot replaces "%2$s" with the original message.
+
 		String message = event.getMessage();
 		Player sender = event.getPlayer();
 
@@ -33,7 +32,9 @@ public class ChatEvents implements Listener {
 				String clan = sender.getScoreboard().getPlayerTeam(sender).getPrefix();
 				clan = clan.trim();
 				clan = clan.substring(1, clan.length() - 1);
-				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
+
+				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
+				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + "%1$s " + ChatColor.WHITE + "%2$s");
 				Set<Player> teammates = new HashSet<Player>();
 				if(sender.getScoreboard().getPlayerTeam(sender) != null) {
 					for(OfflinePlayer player : sender.getScoreboard().getPlayerTeam(sender).getPlayers()) {
@@ -58,12 +59,14 @@ public class ChatEvents implements Listener {
 		} else if(message.startsWith("!")) {
 			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(message.substring(1, message.length()));
+
+				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
 				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
 			} else {
 				event.setCancelled(true);
 			}
 		} else {
-			event.setFormat(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message);
+			String message = ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message;
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
@@ -80,7 +83,7 @@ public class ChatEvents implements Listener {
 				sender.sendMessage(ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.RED + "Shout by placing a ! before messages.");
 			} else {
 				for(Player recipient : recipients) {
-					recipient.sendMessage(event.getFormat());
+					recipient.sendMessage(message);
 				}
 				System.out.println(ChatColor.stripColor(event.getFormat()));
 			}
