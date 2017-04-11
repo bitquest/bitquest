@@ -89,8 +89,8 @@ public class  BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
+    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 20000;
 
-    public final static int LAND_PRICE=20000;
     public final static int MIN_TRANS=200000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
@@ -137,13 +137,16 @@ public class  BitQuest extends JavaPlugin {
         if(HD_ROOT_ADDRESS!=null) {
             System.out.println("HD Wallets enabled.");
             wallet=new Wallet(HD_ROOT_ADDRESS);
+            System.out.println("HD Root address is: "+wallet.address);
+
         } else if(WORLD_ADDRESS!=null&&WORLD_PRIVATE_KEY!=null) {
             wallet=new Wallet(WORLD_ADDRESS,WORLD_PRIVATE_KEY);
+            System.out.println("World wallet address is: "+wallet.address);
+
         } else {
             System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
             Bukkit.shutdown();
         }
-        System.out.println("World wallet address is: "+wallet.address);
 
         // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
@@ -182,7 +185,13 @@ public class  BitQuest extends JavaPlugin {
         User user=new User(player);
 
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        if(BLOCKCHAIN.equals("doge/main")) {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Doge" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        } else {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        }
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
         int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
@@ -479,27 +488,35 @@ public class  BitQuest extends JavaPlugin {
     public void updatePlayerTeam(Player player) {
 
     }
+    public String chain_name() {
+        if(this.BLOCKCHAIN.equals("btc/main")) {
+            return "Bitcoin";
+        } else if(this.BLOCKCHAIN.equals("doge/main")) {
+            return "Dogecoin";
+        } else if(this.BLOCKCHAIN.equals("btc/test3")) {
+            return "Testnet";
+        } else {
+            return "Blockchain";
+        }
+    }
+
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
         // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
-        if(this.BLOCKCHAIN.equals("btc/main")) {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.wallet.address);
-        } else {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Testnet Address: "+ChatColor.WHITE+user.wallet.address);
-        }
+        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your "+chain_name()+" Address: "+ChatColor.WHITE+user.wallet.address);
+
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
         user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.address) + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
-        if(BLOCKCHAIN.equals("btc/main")) {
-            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+
+        if(user.wallet.url()!=null) {
+            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + user.wallet.url());
         }
-        if(BLOCKCHAIN.equals("btc/test3")) {
-            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc-testnet/address/" + user.wallet.address);
-        }
+
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
         if(BITQUEST_ENV.equalsIgnoreCase("development")) {
