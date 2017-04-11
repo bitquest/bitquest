@@ -35,11 +35,13 @@ public class ChatEvents implements Listener {
 
 				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
 				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + "%1$s " + ChatColor.WHITE + "%2$s");
-				Set<Player> teammates = new HashSet<Player>();
-				if(sender.getScoreboard().getPlayerTeam(sender) != null) {
-					for(OfflinePlayer player : sender.getScoreboard().getPlayerTeam(sender).getPlayers()) {
-						if(player.isOnline()) {
-							teammates.add(player.getPlayer());
+				Set<Player> clanMembers = new HashSet<Player>();
+                String senderClan = REDIS.get("clan:"+owner_uuid);
+				if(senderClan != null) {
+                    for (Player recipient : Bukkit.getOnlinePlayers()) {
+                        String recipientClan = REDIS.get("clan:" + recipient.getUniqueId().toString());
+						if(senderClan.equals(recipientClan)) {
+							clanMembers.add(player.getPlayer());
 						}
 					}
 				} else {
@@ -50,8 +52,8 @@ public class ChatEvents implements Listener {
 				if(teammates.size() <= 1) {
 					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You have no online clanmates!");
 				} else {
-					for(Player teammate : teammates) {
-						teammate.sendMessage(event.getFormat());
+					for(Player clanMember : clanMembers) {
+						clanMember.sendMessage(event.getFormat());
 					}
 					System.out.println(ChatColor.stripColor(event.getFormat()));
 				}
