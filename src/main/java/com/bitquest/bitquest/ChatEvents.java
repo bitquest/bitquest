@@ -61,7 +61,7 @@ public class ChatEvents implements Listener {
 				event.setMessage(message.substring(1, message.length()));
 
 				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
-				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + "%2$s");
+				event.setFormat(ChatColor.BLUE.toString() + sender.getLevel() + " " + ChatColor.YELLOW + "51$s " + ChatColor.WHITE + "%2$s");
 			} else {
 				event.setCancelled(true);
 			}
