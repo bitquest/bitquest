@@ -24,41 +24,42 @@ public class ChatEvents implements Listener {
 
 		String message = event.getMessage();
 		Player sender = event.getPlayer();
-
-		if(message.startsWith("@")) {
-			event.setCancelled(true);
-			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
-				event.setMessage(event.getMessage().substring(1, message.length()));
-				String clan = sender.getScoreboard().getPlayerTeam(sender).getPrefix();
-				clan = clan.trim();
-				clan = clan.substring(1, clan.length() - 1);
-
-				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
-				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + "%1$s " + ChatColor.WHITE + "%2$s");
-				Set<Player> clanMembers = new HashSet<Player>();
-                String senderClan = REDIS.get("clan:"+owner_uuid);
-				if(senderClan != null) {
-                    for (Player recipient : Bukkit.getOnlinePlayers()) {
-                        String recipientClan = REDIS.get("clan:" + recipient.getUniqueId().toString());
-						if(senderClan.equals(recipientClan)) {
-							clanMembers.add(player.getPlayer());
-						}
-					}
-				} else {
-					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You aren't in a clan, silly!");
-					return;
-				}
-			
-				if(teammates.size() <= 1) {
-					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You have no online clanmates!");
-				} else {
-					for(Player clanMember : clanMembers) {
-						clanMember.sendMessage(event.getFormat());
-					}
-					System.out.println(ChatColor.stripColor(event.getFormat()));
-				}
-			}
-		} else if(message.startsWith("!")) {
+// 		following code is commented while it fails to compile
+//		if(message.startsWith("@")) {
+//			event.setCancelled(true);
+//			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
+//				event.setMessage(event.getMessage().substring(1, message.length()));
+//				String clan = sender.getScoreboard().getPlayerTeam(sender).getPrefix();
+//				clan = clan.trim();
+//				clan = clan.substring(1, clan.length() - 1);
+//
+//				// Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
+//				event.setFormat(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + clan + "> " + ChatColor.YELLOW + "%1$s " + ChatColor.WHITE + "%2$s");
+//				Set<Player> clanMembers = new HashSet<Player>();
+//                String senderClan = REDIS.get("clan:"+owner_uuid);
+//				if(senderClan != null) {
+//                    for (Player recipient : Bukkit.getOnlinePlayers()) {
+//                        String recipientClan = REDIS.get("clan:" + recipient.getUniqueId().toString());
+//						if(senderClan.equals(recipientClan)) {
+//							clanMembers.add(player.getPlayer());
+//						}
+//					}
+//				} else {
+//					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You aren't in a clan, silly!");
+//					return;
+//				}
+//
+//				if(teammates.size() <= 1) {
+//					sender.sendMessage(ChatColor.DARK_PURPLE + ChatColor.BOLD.toString() + "Clan> " + ChatColor.RED + "You have no online clanmates!");
+//				} else {
+//					for(Player clanMember : clanMembers) {
+//						clanMember.sendMessage(event.getFormat());
+//					}
+//					System.out.println(ChatColor.stripColor(event.getFormat()));
+//				}
+//			}
+//		} else
+		if(message.startsWith("!")) {
 			if(message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
 				event.setMessage(message.substring(1, message.length()));
 
@@ -68,7 +69,7 @@ public class ChatEvents implements Listener {
 				event.setCancelled(true);
 			}
 		} else {
-			String message = ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message;
+			message = ChatColor.BLUE + ChatColor.BOLD.toString() + "Local> " + ChatColor.YELLOW + sender.getName() + " " + ChatColor.WHITE + message;
 			event.setCancelled(true);
 			Set<Player> recipients = new HashSet<Player>();
 			recipients.add(sender);
