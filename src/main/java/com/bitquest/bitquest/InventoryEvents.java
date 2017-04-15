@@ -165,10 +165,13 @@ public class InventoryEvents implements Listener {
 
                                     // Create an event
                                     org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
+                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), sat/200, null);
 
 
                                     ClientDelivery delivery = new ClientDelivery();
                                     delivery.addMessage(sentEvent);
+                                    delivery.addMessage(sentCharge);
+
 
                                     MixpanelAPI mixpanel = new MixpanelAPI();
                                     mixpanel.deliver(delivery);
