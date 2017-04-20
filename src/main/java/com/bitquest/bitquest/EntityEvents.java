@@ -60,6 +60,9 @@ public class EntityEvents implements Listener {
             Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
             Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.SILVER_SHULKER_BOX,
             Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX);
+
+    private static final List<EntityType> PROTECTED_ENTITIES = Arrays.asList(EntityType.ARMOR_STAND, EntityType.ITEM_FRAME,
+            EntityType.PAINTING, EntityType.ENDER_CRYSTAL);
     
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -640,6 +643,13 @@ public class EntityEvents implements Listener {
 
             if (damageEvent.getDamager() instanceof Player) {
                 Player player = (Player) damageEvent.getDamager();
+
+                // Player vs. Protected entities
+                if (PROTECTED_ENTITIES.contains(event.getEntity().getType())) {
+                    if(!bitQuest.canBuild(event.getEntity().getLocation(), player)){
+                        event.setCancelled(true);
+                    }
+                }
 
                 // Player vs. Animal in claimed location
                 if (event.getEntity() instanceof Animals){
