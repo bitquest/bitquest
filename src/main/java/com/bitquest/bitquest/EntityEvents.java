@@ -636,24 +636,27 @@ public class EntityEvents implements Listener {
 
     	// damage by entity
     	if (event instanceof EntityDamageByEntityEvent) {
-    		// Player vs. Animal in claimed location
-    		if (event.getEntity() instanceof Animals && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player){
-    			if(!bitQuest.canBuild(event.getEntity().getLocation(), (Player)((EntityDamageByEntityEvent) event).getDamager())){
-    				event.setCancelled(true);
-    			}
-    		}
-    		// Player vs. Villager
-    		if (event.getEntity() instanceof Villager) {
-    			event.setCancelled(true);
-    		}
-    		// PvP is always off
-    		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-    			event.setCancelled(true);
+            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
 
+            if (damageEvent.getDamager() instanceof Player) {
+                Player player = (Player) damageEvent.getDamager();
+
+                // Player vs. Animal in claimed location
+                if (event.getEntity() instanceof Animals){
+                    if(!bitQuest.canBuild(event.getEntity().getLocation(), player)){
+                        event.setCancelled(true);
+                    }
+                }
+                // Player vs. Villager
+                if (!bitQuest.isModerator(player) && event.getEntity() instanceof Villager) {
+                    event.setCancelled(true);
+                }
+                // PvP is always off
+                if (event.getEntity() instanceof Player) {
+                    event.setCancelled(true);
+
+                }
             }
-
-
-
         }
     }
 
