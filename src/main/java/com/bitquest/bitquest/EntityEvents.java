@@ -640,9 +640,16 @@ public class EntityEvents implements Listener {
     	// damage by entity
     	if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
+            Entity damager = damageEvent.getDamager();
+            if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+                Player player;
 
-            if (damageEvent.getDamager() instanceof Player) {
-                Player player = (Player) damageEvent.getDamager();
+                if (damager instanceof Arrow) {
+                    Arrow arrow = (Arrow) damager;
+                    player = (Player) arrow.getShooter();
+                } else {
+                    player = (Player) damager;
+                }
 
                 // Player vs. Protected entities
                 if (PROTECTED_ENTITIES.contains(event.getEntity().getType())) {
