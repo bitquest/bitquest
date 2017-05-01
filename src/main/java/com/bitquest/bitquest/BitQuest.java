@@ -1093,13 +1093,14 @@ public class  BitQuest extends JavaPlugin {
                         return false;
                     }
                 }
+                string banMessage = "Sorry";
                 if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
                     if(REDIS.get("uuid:"+args[0])!=null) {
                         UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
                         REDIS.sadd("banlist",uuid.toString());
                         Player kickedout=Bukkit.getPlayer(args[0]);
                         if(kickedout!=null) {
-                            kickedout.kickPlayer("Sorry.");
+                            kickedout.kickPlayer(banMessage);
                         }
                         return true;
                     } else {
@@ -1107,6 +1108,12 @@ public class  BitQuest extends JavaPlugin {
                         return true;
                     }
 
+                }
+                if (cmd.getName().equalsIgnoreCase("serverban") && args.length==1) {
+                    if (args[0] != isAlphaNumeric()){
+                        @EventHandler
+                        event.addBan(args[0], banMessage, null, null);
+                    }
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
                     if(REDIS.get("uuid:"+args[0])!=null) {
