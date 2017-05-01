@@ -65,6 +65,16 @@ public class BlockEvents implements Listener {
 		}
     }
 	@EventHandler
+	void onStructureGrow(StructureGrowEvent event) {
+		//cancels bonemealing other people's trees
+		if (event.isFromBonemeal) {
+			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
 	void onBlockPlace(BlockPlaceEvent event) {
 
 		// set clan
