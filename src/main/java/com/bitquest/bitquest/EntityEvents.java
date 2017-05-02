@@ -554,6 +554,7 @@ public class EntityEvents implements Listener {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
 
+	int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
 
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
@@ -561,7 +562,11 @@ public class EntityEvents implements Listener {
             int baselevel=16;
 
             if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=32;
+                if (spawn_distance > 4000) {
+			baselevel=110;
+		}
+		
+		else {baselevel=32;}
             } else if(e.getLocation().getWorld().getName().equals("world_end")) {
                 baselevel=64;
             }
@@ -574,7 +579,7 @@ public class EntityEvents implements Listener {
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int buff_level;
-		int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+
                 if (e.getLocation().getWorld().getName().equals("world_nether")) {
 			buff_level = (spawn_distance/192);
 		} //nerf Nether piggies 1.5x as much
@@ -587,12 +592,12 @@ public class EntityEvents implements Listener {
 		
                 if(buff_level>baselevel) buff_level=baselevel;
                 if(buff_level<1) buff_level=1;
-
+		
                 // max level is baselevel * 2 minus nerf level
                 int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
 
                 entity.setMaxHealth(level * 4);
-                entity.setHealth(level * 4);
+		entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
                 entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
