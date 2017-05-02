@@ -573,8 +573,18 @@ public class EntityEvents implements Listener {
                 e.setCancelled(false);
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
-                int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int buff_level=(spawn_distance/128);
+                int buff_level;
+		int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+                if (e.getLocation().getWorld().getName().equals("world_nether")) {
+			buff_level = (spawn_distance/192);
+		} //nerf Nether piggies 1.5x as much
+		else if (e.getLocation().getWorld().getName().equals("world_end")) {
+			buff_level = (spawn_distance/256);
+		} //nerf End mobs 2x as much
+		else {
+			buff_level = (spawn_distance/128);
+		} //nerf overworld normal amount
+		
                 if(buff_level>baselevel) buff_level=baselevel;
                 if(buff_level<1) buff_level=1;
 
