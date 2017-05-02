@@ -554,22 +554,8 @@ public class EntityEvents implements Listener {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
 
-	int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-
-        LivingEntity entity = e.getEntity();
-        if (entity instanceof Monster) {
-
-            int baselevel=16;
-
-            if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                if (spawn_distance > 4000) {
-			baselevel=110;
-		}
-		
-		else {baselevel=32;}
-            } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=64;
-            }
+	    int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+            int buff_level=(spawn_distance/128);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
