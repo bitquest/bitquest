@@ -7,7 +7,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 
-import com.evilmidget38.UUIDFetcher;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MessageBuilder;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
@@ -379,12 +378,11 @@ public class  BitQuest extends JavaPlugin {
                             final String newOwner = name.substring(9);
                             player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
 
-
-                            try {
-                                UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                            if (REDIS.exists("uuid:" + newOwner)) {
+                                String newOwnerUUID = REDIS.get("uuid:" + newOwner);
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID);
                                 player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
-                            } catch (Exception e) {
+                            } else {
                                 player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
                             }
 
@@ -543,7 +541,7 @@ public class  BitQuest extends JavaPlugin {
                         sb.append(" " + args[i]);
                     }
                     String claimName = sb.toString().trim();
-                    
+
                     Location location=player.getLocation();
                     try {
                         claimLand(claimName,location.getChunk(),player);
@@ -972,12 +970,12 @@ public class  BitQuest extends JavaPlugin {
 
             }
 
-                /***********************************************************
-                    /upgradewallet
-                    attempts to transfer funds from old (BQ2.0) wallet to
-                    the new HD (BQ2.1) wallet via BlockCypher's
-                    microtransaction endpoint
-                 ***********************************************************/
+            /***********************************************************
+             /upgradewallet
+             attempts to transfer funds from old (BQ2.0) wallet to
+             the new HD (BQ2.1) wallet via BlockCypher's
+             microtransaction endpoint
+             ***********************************************************/
             if(cmd.getName().equalsIgnoreCase("upgradewallet")) {
                 String fail_message="Cannot make transaction at this moment. Please try again later...";
                 player.sendMessage(ChatColor.YELLOW+"Searching for lost wallet...");
@@ -1032,7 +1030,7 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
 
-                // MODERATOR COMMANDS
+            // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
@@ -1094,28 +1092,33 @@ public class  BitQuest extends JavaPlugin {
                     }
                 }
                 if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
-                    if(REDIS.get("uuid:"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.sadd("banlist",uuid.toString());
-                        Player kickedout=Bukkit.getPlayer(args[0]);
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.sadd("banlist", uuid);
+                        Player kickedout = Bukkit.getPlayer(playerName);
                         if(kickedout!=null) {
                             kickedout.kickPlayer("Sorry.");
                         }
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " is now banned.");
+
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
-                    if(REDIS.get("uuid:"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.srem("banlist",uuid.toString());
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.srem("banlist",uuid);
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " has been unbanned.");
 
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
