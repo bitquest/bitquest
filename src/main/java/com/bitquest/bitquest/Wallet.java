@@ -476,6 +476,13 @@ public class Wallet {
         System.out.println(tosign);
         JSONArray signatures=new JSONArray();
         JSONArray pubkeys=new JSONArray();
+        if(BitQuest.HD_ROOT_ADDRESS) {
+            System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
+            System.out.println(BitQuest.REDIS.decrBy("final_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
+        } else {
+            System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+BitQuest.WORLD_ADDRESS,fees));
+            System.out.println(BitQuest.REDIS.decrBy("final_balance:"+BitQuest.WORLD_ADDRESS,fees));
+        }
 
         try {
             for(int i=0;i<tosign.size();i++) {
