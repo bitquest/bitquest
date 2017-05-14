@@ -60,6 +60,9 @@ public class EntityEvents implements Listener {
             Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX,
             Material.PINK_SHULKER_BOX, Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.SILVER_SHULKER_BOX,
             Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX);
+
+    private static final List<EntityType> PROTECTED_ENTITIES = Arrays.asList(EntityType.ARMOR_STAND, EntityType.ITEM_FRAME,
+            EntityType.PAINTING, EntityType.ENDER_CRYSTAL);
     
     public EntityEvents(BitQuest plugin) {
         bitQuest = plugin;
@@ -636,24 +639,41 @@ public class EntityEvents implements Listener {
 
     	// damage by entity
     	if (event instanceof EntityDamageByEntityEvent) {
-    		// Player vs. Animal in claimed location
-    		if (event.getEntity() instanceof Animals && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player){
-    			if(!bitQuest.canBuild(event.getEntity().getLocation(), (Player)((EntityDamageByEntityEvent) event).getDamager())){
-    				event.setCancelled(true);
-    			}
-    		}
-    		// Player vs. Villager
-    		if (event.getEntity() instanceof Villager) {
-    			event.setCancelled(true);
-    		}
-    		// PvP is always off
-    		if (event.getEntity() instanceof Player && ((EntityDamageByEntityEvent) event).getDamager() instanceof Player) {
-    			event.setCancelled(true);
+            EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
+            Entity damager = damageEvent.getDamager();
+            if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+                Player player;
 
+                if (damager instanceof Arrow) {
+                    Arrow arrow = (Arrow) damager;
+                    player = (Player) arrow.getShooter();
+                } else {
+                    player = (Player) damager;
+                }
+
+                // Player vs. Protected entities
+                if (PROTECTED_ENTITIES.contains(event.getEntity().getType())) {
+                    if(!bitQuest.canBuild(event.getEntity().getLocation(), player)){
+                        event.setCancelled(true);
+                    }
+                }
+
+                // Player vs. Animal in claimed location
+                if (event.getEntity() instanceof Animals){
+                    if(!bitQuest.canBuild(event.getEntity().getLocation(), player)){
+                        event.setCancelled(true);
+                    }
+                }
+                // Player vs. Villager
+                if (!bitQuest.isModerator(player) && event.getEntity() instanceof Villager) {
+                    event.setCancelled(true);
+                }
+                // PvP is always off
+                if (event.getEntity() instanceof Player) {
+                    event.setCancelled(true);
+
+                }
             }
-
-
-
         }
     }
 

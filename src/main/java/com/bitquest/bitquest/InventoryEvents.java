@@ -42,56 +42,56 @@ public class InventoryEvents implements Listener {
     public InventoryEvents(BitQuest plugin) {
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
-        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,32),10000));
-        trades.add(new Trade(new ItemStack(Material.COMPASS,1),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,1),100,true));
-        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),5000));
-        trades.add(new Trade(new ItemStack(Material.FENCE,32),10000));
-        trades.add(new Trade(new ItemStack(Material.GLASS,64),10000));
-        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),10000)); // kinda cheap
+        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,32),1000));
+        trades.add(new Trade(new ItemStack(Material.COMPASS,2),10000));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),1000,true));
+        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,3),5000));
+        trades.add(new Trade(new ItemStack(Material.FENCE,32),2000));
+        trades.add(new Trade(new ItemStack(Material.GLASS,64),3500));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,32),2500));
         trades.add(new Trade(new ItemStack(Material.LEATHER,32),10000));
-        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),10000));
-        trades.add(new Trade(new ItemStack(Material.RAILS,32),10000)); //we still need these to slow down, you know.
-        trades.add(new Trade(new ItemStack(Material.SANDSTONE,32),10000));
-        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,32),10000));
-        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,32),10000));
+        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,16),5000));
+        trades.add(new Trade(new ItemStack(Material.RAILS,32),1500));
+        trades.add(new Trade(new ItemStack(Material.SANDSTONE,32),3000));
+        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,32),5000));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,32),5000));
         trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,4),10000));
-        trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,4),10000));
-        trades.add(new Trade(new ItemStack(Material.DIAMOND,24),10000));//honestly needed more than 8
+        trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,4),30000));
+        trades.add(new Trade(new ItemStack(Material.DIAMOND,24),15000));
         trades.add(new Trade(new ItemStack(Material.ENDER_STONE,8),10000));
-        trades.add(new Trade(new ItemStack(Material.IRON_BLOCK,16),50000));
-        trades.add(new Trade(new ItemStack(Material.IRON_INGOT,32),10000));
-        trades.add(new Trade(new ItemStack(Material.NETHERRACK,8),10000));
-        trades.add(new Trade(new ItemStack(Material.QUARTZ,32),10000));
+        trades.add(new Trade(new ItemStack(Material.IRON_BLOCK,16),10000));
+        trades.add(new Trade(new ItemStack(Material.IRON_INGOT,32),3000));
+        trades.add(new Trade(new ItemStack(Material.NETHERRACK,32),10000));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ,32),3500));
         trades.add(new Trade(new ItemStack(Material.SOUL_SAND,16),10000));
         trades.add(new Trade(new ItemStack(Material.SPONGE,4),10000));
-        trades.add(new Trade(new ItemStack(Material.LOG,32),10000));
-        trades.add(new Trade(new ItemStack(Material.WOOL,32),10000));
-        trades.add(new Trade(new ItemStack(Material.PAPER,32),10000)); //needed
+        trades.add(new Trade(new ItemStack(Material.LOG,32),1000));
+        trades.add(new Trade(new ItemStack(Material.WOOL,32),5000));
+        trades.add(new Trade(new ItemStack(Material.PAPER,32),2500)); 
         trades.add(new Trade(new ItemStack(Material.PACKED_ICE,32),10000));
-        trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK,8),5000));
+        trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK,8),35000));
         trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,3),15000));
-        trades.add(new Trade(new ItemStack(Material.ARROW,32),15000));
+        trades.add(new Trade(new ItemStack(Material.ARROW,32),1000));
         trades.add(new Trade(new ItemStack(Material.PRISMARINE,32),15000));
         trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,32),15000));
         trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,32),15000));
         trades.add(new Trade(new ItemStack(Material.GLOWSTONE,32),15000));
-        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),10000));
+        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),2500));
         trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 1),1000));
-        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,22),20000)); // 1 emerald : 1 bit + 20b profit
-        trades.add(new Trade(new ItemStack(Material.NETHER_WARTS,8),10000));
+        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,20),18000)); 
+        trades.add(new Trade(new ItemStack(Material.NETHER_STALK,8),10000));
         trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,8),10000));
-        trades.add(new Trade(new ItemStack(Material.SADDLE,1),1500));
-        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,8),10000));
-        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 6, (short)1),60000)); //notch apples
-        trades.add(new Trade(new ItemStack(Material.APPLE,32),10000)); //normal apples :P
+        trades.add(new Trade(new ItemStack(Material.SADDLE,1),3000));
+        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,8),5000));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 6, (short)1),60000));
+        trades.add(new Trade(new ItemStack(Material.APPLE,32),10000)); 
         trades.add(new Trade(new ItemStack(Material.ELYTRA,1),100000));
-        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,2),100000)); //insane
+        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,2),200000)); 
         trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,8),20000));
-        trades.add(new Trade(new ItemStack(Material.CAKE,8),40000));
-        trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,4),20000)); //magical
+        trades.add(new Trade(new ItemStack(Material.CAKE,8),5000));
+        trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,4),20000)); 
         trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,3),20000));
-        //cool diamond sword
+        
 
 
     }
