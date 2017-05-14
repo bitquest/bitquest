@@ -142,10 +142,7 @@ public class InventoryEvents implements Listener {
 
 
                             if(user.wallet.payment(sat, bitQuest.wallet.address) == true) {
-                                // used to cover fees for each /transaction and dumping cold storage to hot wallets
-                                if(BitQuest.MINER_FEE_ADDRESS!=null) {
-                                    bitQuest.wallet.payment(sat/2,BitQuest.MINER_FEE_ADDRESS);
-                                }
+
                                 ItemStack item = event.getCurrentItem();
                                 ItemMeta meta = item.getItemMeta();
                                 ArrayList<String> Lore = new ArrayList<String>();
@@ -165,7 +162,7 @@ public class InventoryEvents implements Listener {
 
                                     // Create an event
                                     org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Purchase", null);
-                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), sat/200, null);
+                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), sat/100, null);
 
 
                                     ClientDelivery delivery = new ClientDelivery();
