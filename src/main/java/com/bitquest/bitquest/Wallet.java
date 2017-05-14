@@ -45,11 +45,13 @@ public class Wallet {
     int final_balance() throws IOException, ParseException {
         int total_received;
         int unconfirmed_balance;
-        JSONObject blockcypher_balance=this.get_blockcypher_balance();
         if(BitQuest.BITCORE_HOST!=null) {
-            total_received=((Number)blockcypher_balance.get("totalReceived")).intValue();
-            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmedBalance")).intValue();
+            JSONObject bitcore_balance=this.get_bitcore_balance();
+            total_received=((Number)bitcore_balance.get("totalReceived")).intValue();
+            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalance")).intValue();
         } else {
+            JSONObject blockcypher_balance=this.get_blockcypher_balance();
+
             total_received=((Number)blockcypher_balance.get("total_received")).intValue();
             unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
         }
@@ -476,7 +478,7 @@ public class Wallet {
         System.out.println(tosign);
         JSONArray signatures=new JSONArray();
         JSONArray pubkeys=new JSONArray();
-        if(BitQuest.HD_ROOT_ADDRESS) {
+        if(BitQuest.HD_ROOT_ADDRESS!=null) {
             System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
             System.out.println(BitQuest.REDIS.decrBy("final_balance:"+BitQuest.HD_ROOT_ADDRESS,fees));
         } else {
