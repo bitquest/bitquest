@@ -1094,28 +1094,33 @@ public class  BitQuest extends JavaPlugin {
                     }
                 }
                 if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
-                    if(REDIS.get("uuid:"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.sadd("banlist",uuid.toString());
-                        Player kickedout=Bukkit.getPlayer(args[0]);
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.sadd("banlist", uuid);
+                        Player kickedout = Bukkit.getPlayer(playerName);
                         if(kickedout!=null) {
                             kickedout.kickPlayer("Sorry.");
                         }
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " is now banned.");
+
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
-                    if(REDIS.get("uuid:"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.srem("banlist",uuid.toString());
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.srem("banlist",uuid);
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " has been unbanned.");
 
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
