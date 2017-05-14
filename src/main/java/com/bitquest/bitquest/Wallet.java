@@ -43,11 +43,19 @@ public class Wallet {
     private String privatekey=null;
 
     int final_balance() throws IOException, ParseException {
-
+        int total_received;
+        int unconfirmed_balance;
         JSONObject blockcypher_balance=this.get_blockcypher_balance();
-        int total_received=((Number)blockcypher_balance.get("total_received")).intValue();
+        if(BitQuest.BITCORE_HOST!=null) {
+            total_received=((Number)blockcypher_balance.get("totalReceived")).intValue();
+            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmedBalance")).intValue();
+        } else {
+            total_received=((Number)blockcypher_balance.get("total_received")).intValue();
+            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+        }
+
         int final_balance=total_received;
-        int unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+
         if(unconfirmed_balance>0) {
             final_balance=final_balance+unconfirmed_balance;
         }
@@ -56,6 +64,33 @@ public class Wallet {
         BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
         return final_balance;
     }
+    JSONObject get_bitcore_balance() throws IOException, ParseException {
+
+        System.out.println("[balance] "+this.address);
+        URL url;
+        url=new URL(BitQuest.BITCORE_HOST+"/insight-api/addr/"+address);
+        System.out.println(url.toString());
+        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+
+        JSONParser parser = new JSONParser();
+        return (JSONObject) parser.parse(response.toString());
+    }
+
     int payment_balance() {
         if(BitQuest.REDIS.exists("payment_balance:"+this.address)) {
             return Integer.parseInt(BitQuest.REDIS.get("payment_balance:"+this.address));
