@@ -72,7 +72,7 @@ public class Wallet {
         URL url;
         url=new URL(BitQuest.BITCORE_HOST+"/insight-api/addr/"+address);
         System.out.println(url.toString());
-        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
         con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
