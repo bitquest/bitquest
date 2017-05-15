@@ -47,8 +47,8 @@ public class Wallet {
         int unconfirmed_balance;
         if(BitQuest.BITCORE_HOST!=null) {
             JSONObject bitcore_balance=this.get_bitcore_balance();
-            total_received=((Number)bitcore_balance.get("totalReceived")).intValue();
-            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalance")).intValue();
+            total_received=((Number)bitcore_balance.get("totalReceivedSat")).intValue();
+            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalanceSat")).intValue();
         } else {
             JSONObject blockcypher_balance=this.get_blockcypher_balance();
 
