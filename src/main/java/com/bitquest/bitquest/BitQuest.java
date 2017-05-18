@@ -27,6 +27,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
+import com.ullink.slack.simpleslackapi.SlackSession;
+import com.ullink.slack.simpleslackapi.SlackChannel;
+import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -45,13 +48,20 @@ import javax.net.ssl.HttpsURLConnection;
  */
 
 public class  BitQuest extends JavaPlugin {
+    // TODO: remove env variables not being used anymore
     // Connecting to REDIS
     // Links to the administration account via Environment Variables
     public final static String BITQUEST_ENV = System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public final static UUID ADMIN_UUID = System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
-    public final static String BITCOIN_ADDRESS = System.getenv("BITCOIN_ADDRESS") != null ? System.getenv("BITCOIN_ADDRESS") : null;
-    public final static String BITCOIN_PRIVATE_KEY = System.getenv("BITCOIN_PRIVATE_KEY") != null ? System.getenv("BITCOIN_PRIVATE_KEY") : null;
+    public final static String HD_ROOT_ADDRESS = System.getenv("HD_ROOT_ADDRESS") != null ? System.getenv("HD_ROOT_ADDRESS") : null;
+    public final static String WORLD_ADDRESS = System.getenv("WORLD_ADDRESS") != null ? System.getenv("WORLD_ADDRESS") : null;
+    public final static String WORLD_PRIVATE_KEY = System.getenv("WORLD_PRIVATE_KEY") != null ? System.getenv("WORLD_PRIVATE_KEY") : null;
+    public final static String WORLD_PUBLIC_KEY = System.getenv("WORLD_PUBLIC_KEY") != null ? System.getenv("WORLD_PUBLIC_KEY") : null;
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
+    public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
+    public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
+    public final static int MAX_STOCK=100;
+
     public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
 
     public final static String MINER_FEE_ADDRESS = System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
@@ -69,18 +79,19 @@ public class  BitQuest extends JavaPlugin {
     // Support for mixpanel analytics
     public final static String MIXPANEL_TOKEN = System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
     public MessageBuilder messageBuilder;
+    // Support for slack bot
+    public final static String SLACK_BOT_AUTH_TOKEN = System.getenv("SLACK_BOT_AUTH_TOKEN") != null ? System.getenv("SLACK_BOT_AUTH_TOKEN") : null;
+    public final static String SLACK_BOT_REPORTS_CHANNEL = System.getenv("SLACK_BOT_REPORTS_CHANNEL") != null ? System.getenv("SLACK_BOT_REPORTS_CHANNEL") : "reports";
+    public SlackSession slackBotSession;
     // REDIS: Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public final static String REDIS_HOST = System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR") : "localhost";
     public final static Integer REDIS_PORT = System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT")) : 6379;
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
+    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 20000;
 
-
-    // TODO: Find out why this crashes the server
-    // public static ScoreboardManager manager = Bukkit.getScoreboardManager();
-    // public static Scoreboard scoreboard = manager.getNewScoreboard();
-    public final static int LAND_PRICE=20000;
+    public final static int MIN_TRANS=200000;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
@@ -91,9 +102,6 @@ public class  BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
-    public Wallet miner_wallet=null;
-
-
 
     @Override
     public void onEnable() {
@@ -104,8 +112,8 @@ public class  BitQuest extends JavaPlugin {
         if (ADMIN_UUID == null) {
             log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
         }
-        if(STATSD_HOST!=null && STATSD_PORT!=null && STATSD_PREFIX!=null) {
-            statsd = new NonBlockingStatsDClient(STATSD_PREFIX, System.getenv("STATSD_HOST") , Integer.parseInt(System.getenv("STATSD_PORT")));
+        if(STATSD_HOST!=null && STATSD_PORT!=null) {
+            statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST , new Integer(STATSD_PORT));
             System.out.println("StatsD support is on.");
         }
         // registers listener classes
@@ -115,106 +123,55 @@ public class  BitQuest extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
         getServer().getPluginManager().registerEvents(new SignEvents(this), this);
         getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+
+        // player does not lose inventory on death
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
 
         // loads config file. If it doesn't exist, creates it.
-        // get plugin config
         getDataFolder().mkdir();
         if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
             saveDefaultConfig();
         }
-        // loads/creates world wallet
-        if(BITCOIN_ADDRESS!=null && BITCOIN_PRIVATE_KEY!=null) {
-            wallet=new Wallet(BITCOIN_ADDRESS,BITCOIN_PRIVATE_KEY);
-            System.out.println("World wallet address is: "+BITCOIN_ADDRESS);
-            wallet.updateBalance();
-            System.out.println("Balance: "+wallet.balance);
-            System.out.println("Unconfirmed: "+wallet.unconfirmedBalance);
-            System.out.println("Final Balance: "+wallet.final_balance());
+
+        // loads world wallet
+        if(HD_ROOT_ADDRESS!=null) {
+            System.out.println("HD Wallets enabled.");
+            wallet=new Wallet(HD_ROOT_ADDRESS);
+            System.out.println("HD Root address is: "+wallet.address);
+
+        } else if(WORLD_ADDRESS!=null&&WORLD_PRIVATE_KEY!=null) {
+            wallet=new Wallet(WORLD_ADDRESS,WORLD_PRIVATE_KEY);
+            System.out.println("World wallet address is: "+wallet.address);
+
         } else {
-            System.out.println("Warning: world wallet address not defined in environment. A new one will be generated but it will cease to exists once the server stops. This is probably fine if you are running for development/testing purposes");
-            System.out.println("Generating new address...");
-            URL url = null;
-            try {
-                url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs");
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            HttpsURLConnection con = null;
-            try {
-                con = (HttpsURLConnection) url.openConnection();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                con.setRequestMethod("POST");
-            } catch (ProtocolException e) {
-                e.printStackTrace();
-            }
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-            con.setDoOutput(true);
-            DataOutputStream wr = null;
-            try {
-                wr = new DataOutputStream(con.getOutputStream());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                wr.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                wr.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(
-                        new InputStreamReader(con.getInputStream()));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            try {
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                in.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            JSONParser parser = new JSONParser();
-            final JSONObject jsonobj;
-            try {
-                jsonobj = (JSONObject) parser.parse(response.toString());
-                wallet=new Wallet((String) jsonobj.get("address"),(String) jsonobj.get("private"));
-
-            } catch (org.json.simple.parser.ParseException e) {
-                e.printStackTrace();
-            }
+            System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
+            Bukkit.shutdown();
         }
+
+        // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
+
+        // initialize mixpanel (optional)
         if(MIXPANEL_TOKEN!=null) {
             messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
             System.out.println("Mixpanel support is on");
+        }
+        if (SLACK_BOT_AUTH_TOKEN != null) {
+            slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
+            try {
+                slackBotSession.connect();
+            } catch (IOException e) {
+                System.out.println("Slack bot connection failed with error: " + e.getMessage());
+            }
         }
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
         //     removeAllEntities();
         killAllVillagers();
         createScheduledTimers();
 
-        // create scoreboards
+
+        // creates scheduled timers (update balances, etc)
+        createScheduledTimers();
 
     }
     public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -224,18 +181,24 @@ public class  BitQuest extends JavaPlugin {
         scoreboardManager = Bukkit.getScoreboardManager();
         walletScoreboard= scoreboardManager.getNewScoreboard();
         walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
-        if(REDIS.exists("final_balance:"+player.getUniqueId().toString())==false) {
-            User user=new User(player);
-            user.wallet.updateBalance();
-            REDIS.set("final_balance:"+player.getUniqueId().toString(),String.valueOf(user.wallet.final_balance()));
-            REDIS.expire("final_balance:"+player.getUniqueId().toString(),30);
-        }
+
+        User user=new User(player);
 
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        if(BLOCKCHAIN.equals("doge/main")) {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Doge" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        } else {
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+        }
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
-        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId().toString()));
+        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
+        if(statsd!=null) {
+            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
+
+        }
 
         score.setScore(final_balance/100);
         player.setScoreboard(walletScoreboard);
@@ -288,24 +251,26 @@ public class  BitQuest extends JavaPlugin {
         }, 0, 12000L);
         REDIS.set("lastloot","nobody");
 
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(BitQuest.BLOCKCHAIN.equals("bcy/test")) {
-                    wallet.getTestnetCoins();
-                }
-            }
-        }, 0, 72000L);
+
+    }
+    public void sendMetric(String name,int value) {
+        statsd.gauge(BITQUEST_ENV+"."+name,value);
+
     }
     public void sendWorldMetrics() {
-        statsd.gauge("players",Bukkit.getServer().getOnlinePlayers().size());
-        statsd.gauge("entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
-        statsd.gauge("entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
-        statsd.gauge("entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".players",Bukkit.getServer().getOnlinePlayers().size());
+        statsd.gauge(BITQUEST_ENV+".entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
+        statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
     }
     public  void sendWalletMetrics() {
-        statsd.gauge("wallet_balance",wallet.balance());
-
+        try {
+            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.final_balance());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+        }
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
@@ -350,7 +315,7 @@ public class  BitQuest extends JavaPlugin {
         System.out.println("[claim] "+player.getDisplayName()+" wants to claim "+x+","+z+" with name "+name);
 
         if (!name.isEmpty()) {
-            // check that desired area name is alphanumeric
+            // check that desired area name doesn't have non-alphanumeric characters
             boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
             if (!hasNonAlpha) {
                 // 16 characters max
@@ -366,58 +331,44 @@ public class  BitQuest extends JavaPlugin {
                         player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                         BitQuest bitQuest = this;
-                        scheduler.runTask(this, new Runnable() {
-                            @Override
-                            public void run() {
-                                // A villager is born
-                                try {
-                                    Wallet paymentWallet;
-                                    if (BitQuest.LAND_BITCOIN_ADDRESS != null) {
-                                        paymentWallet = new Wallet(BitQuest.LAND_BITCOIN_ADDRESS);
-                                    } else {
-                                        paymentWallet = bitQuest.wallet;
-                                    }
-                                    if (user.wallet.transaction(BitQuest.LAND_PRICE, paymentWallet)) {
 
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                                        player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-                                        if (bitQuest.messageBuilder != null) {
+                        try {
 
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                            org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_BITCOIN_ADDRESS)) {
+
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                if (bitQuest.messageBuilder != null) {
+
+                                    // Create an event
+                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
 
 
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-                                            delivery.addMessage(sentCharge);
+                                    ClientDelivery delivery = new ClientDelivery();
+                                    delivery.addMessage(sentEvent);
+                                    delivery.addMessage(sentCharge);
 
 
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    } else {
-                                        int balance = new User(player).wallet.balance();
-                                        if (balance < BitQuest.LAND_PRICE) {
-                                            player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                                    ChatColor.BOLD + Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
-                                        } else {
-                                            player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-                                        }
-                                    }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
+                                    MixpanelAPI mixpanel = new MixpanelAPI();
+                                    mixpanel.deliver(delivery);
                                 }
-                                ;
+                            } else {
+                                int balance = user.wallet.final_balance();
+                                if (balance < BitQuest.LAND_PRICE) {
+                                    player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                            ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                }
                             }
-                        });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
 
-                    } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || (isModerator(player) == true)) {
+
+                    } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || isModerator(player)) {
                         if (name.equals("abandon")) {
                             // Abandon land
                             BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
@@ -428,19 +379,14 @@ public class  BitQuest extends JavaPlugin {
                             final String newOwner = name.substring(9);
                             player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
 
-                            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                            scheduler.runTaskAsynchronously(this, new Runnable() {
-                                @Override
-                                public void run() {
-                                    try {
-                                        UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                        BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
-                                        player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
-                                    } catch (Exception e) {
-                                        player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
-                                    }
-                                }
-                            });
+
+                            try {
+                                UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                                player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
+                            } catch (Exception e) {
+                                player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
+                            }
 
                         } else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
                             player.sendMessage(ChatColor.RED + "You already own this land!");
@@ -483,16 +429,16 @@ public class  BitQuest extends JavaPlugin {
         } else if (landIsClaimed(location)) {
             if(isOwner(location,player)) {
                 return true;
-            } else if(landPermissionCode(location).equals("p")==true) {
+            } else if(landPermissionCode(location).equals("p")) {
                 return true;
-            } else if(landPermissionCode(location).equals("c")==true) {
+            } else if(landPermissionCode(location).equals("c")) {
                 String owner_uuid=REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner");
                 System.out.println(owner_uuid);
                 String owner_clan=REDIS.get("clan:"+owner_uuid);
                 System.out.println(owner_clan);
                 String player_clan=REDIS.get("clan:"+player.getUniqueId().toString());
                 System.out.println(player_clan);
-                if(owner_clan.equals(player_clan)==true) {
+                if(owner_clan.equals(player_clan)) {
                     return true;
                 } else {
                     return false;
@@ -542,27 +488,43 @@ public class  BitQuest extends JavaPlugin {
     public void updatePlayerTeam(Player player) {
 
     }
+    public String chain_name() {
+        if(this.BLOCKCHAIN.equals("btc/main")) {
+            return "Bitcoin";
+        } else if(this.BLOCKCHAIN.equals("doge/main")) {
+            return "Dogecoin";
+        } else if(this.BLOCKCHAIN.equals("btc/test3")) {
+            return "Testnet";
+        } else {
+            return "Blockchain";
+        }
+    }
+
 
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
-        user.wallet.updateBalance();
         // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
-        if(this.BLOCKCHAIN.equals("btc/main")) {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Bitcoin Address: "+ChatColor.WHITE+user.wallet.address);
-        } else {
-            user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your Testnet Address: "+ChatColor.WHITE+user.wallet.address);
-        }
-        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + user.wallet.final_balance()/100 + " Bits");
+        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your "+chain_name()+" Address: "+ChatColor.WHITE+user.wallet.address);
+
+//        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
+//        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
+        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.address) + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
-        user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "blockchain.info/address/" + user.wallet.address);
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
-        //      user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + "live.blockcypher.com/btc/address/" + user.wallet.address);
+
+        if(user.wallet.url()!=null) {
+            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + user.wallet.url());
+        }
+
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
-
+        if(BITQUEST_ENV.equalsIgnoreCase("development")) {
+            user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
+            if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
+                user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
+            }
+        }
     };
     public boolean landIsClaimed(Location location) {
         return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
@@ -576,9 +538,15 @@ public class  BitQuest extends JavaPlugin {
             // PLAYER COMMANDS
             if(cmd.getName().equalsIgnoreCase("land")) {
                 if(args[0].equalsIgnoreCase("claim")) {
+                    StringBuilder sb = new StringBuilder(args[2]);
+                    for (int i = 3; i < args.length; i++){
+                        sb.append(" " + args[i]);
+                    }
+                    String claimName = sb.toString().trim();
+                    
                     Location location=player.getLocation();
                     try {
-                        claimLand(args[1],location.getChunk(),player);
+                        claimLand(claimName,location.getChunk(),player);
                     } catch (ParseException e) {
                         e.printStackTrace();
                         player.sendMessage(ChatColor.RED+"Land claim failed. Please try again later.");
@@ -623,166 +591,187 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
             if(cmd.getName().equalsIgnoreCase("clan")) {
-
-                if(args[0].equals("new")) {
-                    if(!args[1].isEmpty()) {
-                        // check that desired clan name is alphanumeric
-                        boolean hasNonAlpha = args[1].matches("^.*[^a-zA-Z0-9 ].*$");
-                        if(!hasNonAlpha) {
-                            // 16 characters max
-                            if(args[1].length()<=16) {
-
-                                if(REDIS.get("clan:"+player.getUniqueId().toString())==null) {
-                                    if(!REDIS.sismember("clans",args[1])) {
-                                        REDIS.sadd("clans",args[1]);
-                                        REDIS.set("clan:"+player.getUniqueId().toString(),args[1]);
-                                        player.sendMessage(ChatColor.GREEN+"Congratulations! you are the founder of the "+args[1]+" clan");
-                                        return true;
+                if (args.length > 0) {
+                    String subCommand = args[0];
+                    if (subCommand.equals("new")) {
+                        if (args.length > 1) {
+                            String clanName = args[1];
+                            // check that desired clan name is alphanumeric
+                            boolean hasNonAlpha = clanName.matches("^.*[^a-zA-Z0-9 ].*$");
+                            if (!hasNonAlpha) {
+                                // 16 characters max
+                                if (clanName.length() <= 16) {
+                                    if (!REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                                        if (!REDIS.sismember("clans", clanName)) {
+                                            REDIS.sadd("clans", clanName);
+                                            REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                                            player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + clanName + " clan");
+                                            player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+                                            return true;
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "A clan with the name '" + clanName + "' already exists.");
+                                            return true;
+                                        }
                                     } else {
-                                        player.sendMessage(ChatColor.RED+"A clan with the name '"+args[1]+"' already exists.");
+                                        player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
                                         return true;
                                     }
                                 } else {
-                                    player.sendMessage(ChatColor.RED+"You already belong to the clan "+REDIS.get("clan"+player.getUniqueId().toString()));
+                                    player.sendMessage(ChatColor.RED + "Error: clan name must have 16 characters max");
                                     return true;
                                 }
                             } else {
-                                player.sendMessage(ChatColor.RED+"Error: clan name must have 16 characters max");
+                                player.sendMessage(ChatColor.RED + "Your clan name must only contain letters and numbers");
                                 return true;
                             }
+
                         } else {
-                            player.sendMessage(ChatColor.RED+"Your clan name must only contain letters and numbers");
+                            player.sendMessage(ChatColor.RED + "Usage: /clan new <your desired name>");
                             return true;
                         }
 
-                    } else {
-                        player.sendMessage(ChatColor.RED+"Usage: /clan new <your desired name>");
-                        return true;
                     }
+                    if (subCommand.equals("invite")) {
+                        if (args.length > 1) {
+                            String invitedName = args[1];
+                            if (invitedName.equals(player.getName())) {
+                                player.sendMessage(ChatColor.RED + "You can not invite yourself");
+                                return true;
+                            }
+                            // check that player is in a clan
+                            if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                                String clan = REDIS.get("clan:" + player.getUniqueId().toString());
+                                // check if user is in the uuid database
+                                if (REDIS.exists("uuid:" + invitedName)) {
+                                    // check if player already belongs to a clan
+                                    String uuid = REDIS.get("uuid:" + invitedName);
+                                    if (!REDIS.exists("clan:" + uuid)) {
+                                        // check if player is already invited to the clan
+                                        if (!REDIS.sismember("invitations:" + clan, uuid)) {
+                                            REDIS.sadd("invitations:" + clan, uuid);
+                                            player.sendMessage(ChatColor.GREEN + "You invited " + invitedName + " to the " + clan + " clan.");
+                                            if (Bukkit.getPlayerExact(invitedName) != null) {
+                                                Player invitedplayer = Bukkit.getPlayerExact(invitedName);
+                                                invitedplayer.sendMessage(ChatColor.GREEN + player.getName() + " invited you to the " + clan + " clan");
+                                            }
+                                            return true;
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " is already invited to the clan and must accept the invitation");
+                                            return true;
+                                        }
 
-                }
-                if(args[0].equals("invite")) {
-                    // check that argument is not empty
+                                    } else {
+                                        if (REDIS.get("clan:" + uuid).equals(clan)) {
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " already belongs to the clan " + clan);
 
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Player " + invitedName + " already belongs to a clan.");
 
-                    if(!args[1].isEmpty()) {
-                        // TODO: you shouldn't be able to invite yourself
-                        // check that player is in a clan
-                        if(REDIS.exists("clan:"+player.getUniqueId().toString())) {
-                            String clan=REDIS.get("clan:"+player.getUniqueId().toString());
-                            // check if user is in the uuid database
-                            if (REDIS.exists("uuid:" + args[1]) == true) {
-                                // check if player already belongs to a clan
-                                String uuid=REDIS.get("uuid:"+args[1]);
-                                if (REDIS.exists("clan:" + uuid) == false) {
-                                    // check if player is already invited to the clan
-                                    if (REDIS.sismember("invitations:"+clan,uuid)==false) {
-                                        REDIS.sadd("invitations:" + clan, uuid);
-                                        player.sendMessage(ChatColor.GREEN+"You invited " +args[1]+ " to the "+clan+" clan.");
-                                        if(Bukkit.getPlayerExact(args[1])!=null) {
-                                            Player invitedplayer = Bukkit.getPlayerExact(args[1]);
-                                            invitedplayer.sendMessage(ChatColor.GREEN+player.getDisplayName()+" invited you to the "+clan+" clan");
+                                        }
+                                        return true;
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "User " + invitedName + " does not play on this server");
+                                    return true;
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You don't belong to a clan");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Usage: /clan invite <player nickname>");
+                            return true;
+                        }
+                    }
+                    if (subCommand.equals("join")) {
+                        // check that argument is not empty
+                        if (args.length > 1) {
+                            String clanName = args[1];
+                            // check that player is invited to the clan he wants to join
+                            if (REDIS.sismember("invitations:" + clanName, player.getUniqueId().toString())) {
+                                // user is invited to join
+                                if (!REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                                    // user is not part of any clan
+                                    REDIS.srem("invitations:"+ clanName, player.getUniqueId().toString());
+                                    REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                                    player.sendMessage(ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
+                                    player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+                                    return true;
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "You already belong to the clan " + REDIS.get("clan:" + player.getUniqueId().toString()));
+                                    return true;
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You are not invited to join the " + clanName + " clan.");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Usage: /clan join <clan name>");
+                            return true;
+                        }
+                    }
+                    if (args[0].equals("kick")) {
+                        if (args.length > 1) {
+                            String toKick = args[1];
+                            // check if player is in the uuid database
+                            if (REDIS.exists("uuid:" + toKick)) {
+                                String uuid = REDIS.get("uuid:" + toKick);
+                                // check if player belongs to a clan
+                                if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                                    String clan = REDIS.get("clan:" + player.getUniqueId().toString());
+                                    // check that kicker and player are in the same clan
+                                    if (REDIS.get("clan:" + uuid).equals(clan)) {
+                                        REDIS.del("clan:" + uuid);
+                                        player.sendMessage(ChatColor.GREEN + "Player " + toKick + " was kicked from the " + clan + " clan.");
+                                        if (Bukkit.getPlayerExact(toKick) != null) {
+                                            Player invitedPlayer = Bukkit.getPlayerExact(toKick);
+                                            invitedPlayer.sendMessage(ChatColor.RED + player.getName() + " kick you from the " + clan + " clan");
+                                            invitedPlayer.setPlayerListName(invitedPlayer.getName());
                                         }
                                         return true;
                                     } else {
-                                        player.sendMessage(ChatColor.RED+"Player "+args[1]+" is already invited to the clan and must accept the invitation");
+                                        player.sendMessage(ChatColor.RED + "Player " + toKick + " is not a member of the clan " + clan);
                                         return true;
                                     }
-
                                 } else {
-                                    if(REDIS.get("clan:"+uuid).equals(clan)==true) {
-                                        player.sendMessage(ChatColor.RED + "Player " + args[1] + " already belongs to the clan "+clan);
-
-                                    } else {
-                                        player.sendMessage(ChatColor.RED + "Player " + args[1] + " already belongs to a clan.");
-
-                                    }
+                                    player.sendMessage(ChatColor.RED + "You don't belong to any clan.");
                                     return true;
                                 }
-                            } else {
-                                player.sendMessage(ChatColor.RED + "User " + args[1] + " does not play on this server");
-                                return true;
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED+"You don't belong to a clan");
-                            return true;
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED+"Usage: /clan invite <player nickname>");
-                        return true;
-                    }
-                }
-                if(args[0].equals("join")) {
-                    // check that argument is not empty
-                    if(!args[1].isEmpty()) {
-                        // check that player is invited to the clan he wants to join
-                        if(REDIS.sismember("invitations:"+args[1],player.getUniqueId().toString())) {
-                            // user is invited to join
-                            if(REDIS.get("clan:"+player.getUniqueId().toString())==null) {
-                                // user is not part of any clan
-                                REDIS.set("clan:"+player.getUniqueId().toString(),args[1]);
-                                player.sendMessage(ChatColor.GREEN+"You are now part of the "+REDIS.get("clan:"+player.getUniqueId().toString())+" clan!");
-                                return true;
-                            } else {
-                                player.sendMessage(ChatColor.RED+"You already belong to the clan "+REDIS.get("clan:"+player.getUniqueId().toString()));
-                                return true;
-                            }
-                        } else {
-                            player.sendMessage(ChatColor.RED+"You are not invited to join the "+args[1]+" clan.");
-                            return true;
-                        }
-                    } else {
-                        player.sendMessage(ChatColor.RED+"Usage: /clan join <clan name>");
-                        return true;
-                    }
-                }
-                if(args[0].equals("kick")) {
-                    if(!args[1].isEmpty()) {
-                        // check if player is in the uuid database
 
-                        if(REDIS.exists("uuid:"+args[1])==true) {
-                            String uuid=REDIS.get("uuid:"+args[1]);
-                            // check if player belongs to a clan
-                            if(REDIS.exists("clan:"+player.getUniqueId().toString())==true) {
-                                String clan=REDIS.get("clan:"+player.getUniqueId().toString());
-                                // check that kicker and player are in the same clan
-                                if(REDIS.get("clan:"+uuid).equals(clan)) {
-                                    REDIS.del("clan:"+REDIS.get("uuid"+args[1]));
-                                    player.sendMessage(ChatColor.GREEN+"Player "+args[1]+" was kicked from the "+clan+" clan.");
-                                    return true;
-                                } else {
-                                    player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not a member of the clan "+clan);
-                                    return true;
-                                }
                             } else {
-                                player.sendMessage(ChatColor.RED+"You don't belong to any clan.");
+                                player.sendMessage(ChatColor.RED + "Player " + toKick + " does not play on this server.");
                                 return true;
                             }
-
                         } else {
-                            player.sendMessage(ChatColor.RED+"Player "+args[1]+" does not play on this server.");
+                            player.sendMessage(ChatColor.RED + "Usage: /clan kick <player nickname>");
                             return true;
                         }
                     }
-                }
-                if(args[0].equals("leave")) {
-                    if(REDIS.exists("clan:"+player.getUniqueId().toString())==true) {
-                        // TODO: when a clan gets emptied, should be removed from the "clans" set
-                        player.sendMessage(ChatColor.GREEN+"You are no longer part of the "+REDIS.get("clan:"+player.getUniqueId().toString())+" clan");
-                        REDIS.del("clan:"+player.getUniqueId().toString());
-                        return true;
-                    } else {
-                        player.sendMessage(ChatColor.RED+"You don't belong to a clan.");
-                        return true;
+                    if (subCommand.equals("leave")) {
+                        if (REDIS.exists("clan:" + player.getUniqueId().toString())) {
+                            // TODO: when a clan gets emptied, should be removed from the "clans" set
+                            player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
+                            REDIS.del("clan:" + player.getUniqueId().toString());
+
+                            player.setPlayerListName(player.getName());
+                            return true;
+                        } else {
+                            player.sendMessage(ChatColor.RED + "You don't belong to a clan.");
+                            return true;
+                        }
                     }
+                } else {
+                    player.sendMessage(ChatColor.RED + "Usage: /clan <new|invite|kick|join|leave>");
+                    return true;
                 }
                 return false;
             }
             if(cmd.getName().equalsIgnoreCase("wallet")) {
                 try {
                     User user=new User(player);
+                    System.out.println("[/wallet] final balance: "+user.wallet.final_balance());
                     sendWalletInfo(user);
-
+                    updateScoreboard(player);
                 } catch (ParseException e) {
                     e.printStackTrace();
                     player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
@@ -800,7 +789,17 @@ public class  BitQuest extends JavaPlugin {
             }
             if(cmd.getName().equalsIgnoreCase("transfer")) {
                 if(args.length == 2) {
-                    final int sendAmount = Integer.valueOf(args[0])*100;
+                    for(char c : args[0].toCharArray()) {
+                        if(!Character.isDigit(c))
+                            return false;
+                    }
+                    int sendAmount=0;
+                    try {
+                        sendAmount = Integer.valueOf(args[0])*100;
+                    } catch(NumberFormatException e) {
+                        return false;
+                    }
+                    System.out.println(sendAmount);
                     Wallet fromWallet = null;
                     try {
                         fromWallet = new User(player).wallet;
@@ -812,80 +811,228 @@ public class  BitQuest extends JavaPlugin {
                         e1.printStackTrace();
                     }
                     try {
-                        if(fromWallet != null && fromWallet.balance() >= sendAmount) {
-                            player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
-                            for(final OfflinePlayer offlinePlayer : Bukkit.getOfflinePlayers()) {
-                                System.out.println(offlinePlayer);
-                                if(offlinePlayer.getName()!=null && args[1]!=null && offlinePlayer.getName().equals(args[1])) {
-                                    final Wallet finalFromWallet = fromWallet;
-                                    BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                                    final Wallet toWallet = new User(offlinePlayer.getPlayer()).wallet;
-                                    REDIS.expire("balance"+player.getUniqueId().toString(),5);
-                                    scheduler.runTaskAsynchronously(this, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            try {
+                        if( sendAmount < MIN_TRANS) {
+                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
+                            return true;
+                        } else try {
+                            if(fromWallet.final_balance()<sendAmount) {
+                                player.sendMessage(ChatColor.RED+"You don't have enough balance.");
+                                System.out.println("not enough balance: "+fromWallet.final_balance()+" vs. "+sendAmount);
+                                return true;
+                            } else if(fromWallet != null) {
+                                player.sendMessage(ChatColor.YELLOW+"Sending " + args[0] + " Bits to "+args[1]+"...");
 
-                                                if (finalFromWallet.transaction(sendAmount, toWallet)) {
-                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + sendAmount / 100 + " Bits to " + offlinePlayer.getName() + ".");
-                                                    if (offlinePlayer.isOnline()) {
-                                                        offlinePlayer.getPlayer().sendMessage(ChatColor.GREEN + "" + player.getName() + " just sent you " + sendAmount / 100 + " Bits!");
-                                                    }
-                                                } else {
-                                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
-                                                }
-
-                                            } catch (IOException e1) {
-                                                e1.printStackTrace();
-                                            }
-                                        }
-                                    });
-
-                                    updateScoreboard(player);
-                                    return true;
-                                }
-                            }
-                            // validate e-mail address
-                            String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
-                            java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
-                            java.util.regex.Matcher m = p.matcher(args[0]);
-                            if(m.matches()) {
-                                // TODO: send money through xapo
-
-                            } else {
-                                try {
-
-                                    Wallet toWallet = new Wallet(args[1]);
-
-                                    if(fromWallet.transaction(sendAmount,toWallet)) {
-                                        player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
-                                        updateScoreboard(player);
+                                // validate e-mail address
+                                String ePattern = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@((\\[[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\])|(([a-zA-Z\\-0-9]+\\.)+[a-zA-Z]{2,}))$";
+                                java.util.regex.Pattern p = java.util.regex.Pattern.compile(ePattern);
+                                java.util.regex.Matcher m = p.matcher(args[1]);
+                                if(m.matches()) {
+                                    if(fromWallet.email_transaction(sendAmount,args[1])) {
+                                        player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to "+args[1]);
+                                        return true;
                                     } else {
                                         player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                        return true;
                                     }
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
+                                } else {
+                                    try {
 
+                                        Wallet toWallet = new Wallet(args[1]);
+
+                                        if(fromWallet.create_blockcypher_transaction(sendAmount,toWallet.address)) {
+                                            player.sendMessage(ChatColor.GREEN+"Succesfully sent "+args[0]+" Bits to external address.");
+                                            updateScoreboard(player);
+                                        } else {
+                                            player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    } catch (org.json.simple.parser.ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+                                    }
+
+                                }
+                                return true;
                             }
+                        } catch (org.json.simple.parser.ParseException e) {
+                            player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+
+                            e.printStackTrace();
                             return true;
                         }
+                        return true;
                     } catch (IOException e) {
+                        player.sendMessage(ChatColor.RED+"Transaction failed. Please try again in a few moments.");
+
                         e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                        e.printStackTrace();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
+                        return true;
+
                     }
                 }
                 return false;
             }
+            if (cmd.getName().equalsIgnoreCase("report")) {
+                if (slackBotSession != null && slackBotSession.isConnected()) {
+                    if (args.length >= 2) {
+                        String badPlayer = args[0];
+                        String message = args[1];
+                        for (int i = 2; i < args.length; i++) {
+                            message += " ";
+                            message += args[i];
+                        }
 
-            // MODERATOR COMMANDS
+                        if (REDIS.exists("uuid:" + badPlayer)) {
+                            String uuid = REDIS.get("uuid:" + badPlayer);
+                            String slackMessage = "Player " + player.getName() + " reports " + badPlayer + " (" + uuid + ") because: " + message;
+                            SlackChannel channel = slackBotSession.findChannelByName(SLACK_BOT_REPORTS_CHANNEL);
+                            if (channel != null) {
+                                slackBotSession.sendMessage(channel, slackMessage);
+                                String playerMessage = ChatColor.GREEN + "The report has been send to a moderator. Thanks for making " +
+                                        ChatColor.GOLD + ChatColor.BOLD +"Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" +
+                                        ChatColor.RESET + ChatColor.GREEN + " a better place.";
+                                player.sendMessage(playerMessage);
+                                return true;
+                            } else {
+                                player.sendMessage(ChatColor.RED + "There was a problem sending the report. Please try again later.");
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Player " + badPlayer + " does not play on this server.");
+                            return true;
+                        }
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Usage: /report <player> <reason>");
+                        return true;
+                    }
+                } else {
+                    player.sendMessage(ChatColor.RED + "The /report command is not active.");
+                    return true;
+                }
+            }
+            /***********************************************************
+             /send
+             a player-to-player-transaction
+             ***********************************************************/
+            if(cmd.getName().equalsIgnoreCase("send")) {
+                if(args.length==2) {
+                    for(char c : args[0].toCharArray()) {
+                        if(!Character.isDigit(c))
+                            return false;
+                    }
+                    int bits=Integer.valueOf(args[0]);
+                    if(bits>0&&bits<=10000) {
+                        int sat=bits*100;
+                        for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                            if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                                try {
+                                    User user=new User(player);
+                                    User user_tip=new User(onlinePlayer);
+                                    if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
+                                        updateScoreboard(onlinePlayer);
+                                        updateScoreboard(player);
+                                        player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
+                                        onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
+                                        return true;
+                                    } else {
+                                        player.sendMessage(ChatColor.RED+"Tip failed.");
+                                        return true;
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED+"Tip failed.");
+                                    return true;
+                                }
+
+                            }
+                        }
+                        player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
+
+                        return true;
+                    } else {
+                        player.sendMessage("Minimum tip is 1 bit. Maximum is 10000");
+                        return true;
+                    }
+                } else {
+                    return false;
+                }
+
+
+            }
+
+                /***********************************************************
+                    /upgradewallet
+                    attempts to transfer funds from old (BQ2.0) wallet to
+                    the new HD (BQ2.1) wallet via BlockCypher's
+                    microtransaction endpoint
+                 ***********************************************************/
+            if(cmd.getName().equalsIgnoreCase("upgradewallet")) {
+                String fail_message="Cannot make transaction at this moment. Please try again later...";
+                player.sendMessage(ChatColor.YELLOW+"Searching for lost wallet...");
+                if(REDIS.exists("address"+player.getUniqueId().toString())&&REDIS.exists("private"+player.getUniqueId().toString())) {
+                    Wallet old_wallet=new Wallet(
+                            REDIS.get("address"+player.getUniqueId().toString()),
+                            REDIS.get("private"+player.getUniqueId().toString()));
+                    player.sendMessage(ChatColor.YELLOW+"Found wallet "+old_wallet.address+"! looking for bits...");
+                    try {
+                        JSONObject balance=old_wallet.get_blockcypher_balance();
+                        int confirmed_balance=((Number)balance.get("balance")).intValue();
+                        player.sendMessage(ChatColor.YELLOW+"Confirmed balance in lost wallet is "+confirmed_balance+" sat");
+
+                        if(confirmed_balance>100) {
+                            int transaction_balance=Math.min(4000000,confirmed_balance);
+                            try {
+                                User user=new User(player);
+                                player.sendMessage(ChatColor.YELLOW+"Sending "+transaction_balance/100+" bits to "+user.wallet.address);
+
+                                if(old_wallet.blockcypher_microtransaction(transaction_balance,user.wallet.address)==true) {
+                                    player.sendMessage(ChatColor.GREEN+"Transaction successful.");
+
+                                    return true;
+                                } else {
+                                    player.sendMessage(ChatColor.RED+fail_message);
+
+                                    return true;
+                                }
+                            } catch (ParseException e) {
+                                player.sendMessage(ChatColor.RED+"Error loading new wallet.");
+                                e.printStackTrace();
+                                return true;
+                            }
+                        } else {
+                            player.sendMessage(ChatColor.RED+"Not enough balance for recovery. If you think this is an error e-mail bitquest@bitquest.co");
+
+                            return true;
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+fail_message);
+                        return true;
+                    } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                        player.sendMessage(ChatColor.RED+fail_message);
+                        return true;
+                    }
+
+
+                } else {
+                    player.sendRawMessage(ChatColor.RED+"Old wallet not found. If you think this is an error please contact bitquest@bitquest.co");
+                }
+            }
+
+                // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
@@ -914,21 +1061,23 @@ public class  BitQuest extends JavaPlugin {
                     this.setEnabled(false);
                 }
                 if (cmd.getName().equalsIgnoreCase("mod")) {
-                    Set<String> allplayers=REDIS.smembers("players");
                     if(args[0].equals("add")) {
                         // Sub-command: /mod add
-                        if(REDIS.get("uuid"+args[1])!=null) {
-                            UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
+
+                        if(REDIS.exists("uuid:"+args[1])) {
+                            UUID uuid=UUID.fromString(REDIS.get("uuid:"+args[1]));
                             REDIS.sadd("moderators",uuid.toString());
+                            sender.sendMessage(ChatColor.GREEN+REDIS.get("name:"+uuid)+" added to moderators group");
+
                             return true;
                         } else {
                             sender.sendMessage(ChatColor.RED+"Cannot find player "+args[1]);
                             return true;
                         }
-                    } else if(args[0].equals("del")) {
+                    } else if(args[0].equals("remove")) {
                         // Sub-command: /mod del
-                        if(REDIS.get("uuid"+args[1])!=null) {
-                            UUID uuid=UUID.fromString(REDIS.get("uuid"+args[1]));
+                        if(REDIS.exists("uuid:"+args[1])) {
+                            UUID uuid=UUID.fromString(REDIS.get("uuid:"+args[1]));
                             REDIS.srem("moderators",uuid.toString());
                             return true;
                         }
@@ -937,34 +1086,41 @@ public class  BitQuest extends JavaPlugin {
                         // Sub-command: /mod list
                         Set<String> moderators=REDIS.smembers("moderators");
                         for(String uuid:moderators) {
-                            sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
-                        }
-                        return true;
-                    }
-                }
-                if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
-                    if(REDIS.get("uuid"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.sadd("banlist",uuid.toString());
-                        Player kickedout=Bukkit.getPlayer(args[0]);
-                        if(kickedout!=null) {
-                            kickedout.kickPlayer("Sorry.");
+                            sender.sendMessage(ChatColor.YELLOW+REDIS.get("name:"+uuid));
                         }
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        return false;
+                    }
+                }
+                if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.sadd("banlist", uuid);
+                        Player kickedout = Bukkit.getPlayer(playerName);
+                        if(kickedout!=null) {
+                            kickedout.kickPlayer("Sorry.");
+                        }
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " is now banned.");
+
+                        return true;
+                    } else {
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
-                    if(REDIS.get("uuid"+args[0])!=null) {
-                        UUID uuid=UUID.fromString(REDIS.get("uuid"+args[0]));
-                        REDIS.srem("banlist",uuid.toString());
+                    String playerName = args[0];
+                    if(REDIS.exists("uuid:" + playerName)) {
+                        String uuid = REDIS.get("uuid:" + playerName);
+                        REDIS.srem("banlist",uuid);
+                        sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " has been unbanned.");
 
                         return true;
                     } else {
-                        sender.sendMessage(ChatColor.RED+"Can't find player "+args[0]);
+                        sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
                         return true;
                     }
 
@@ -972,7 +1128,7 @@ public class  BitQuest extends JavaPlugin {
                 if (cmd.getName().equalsIgnoreCase("banlist")) {
                     Set<String> banlist=REDIS.smembers("banlist");
                     for(String uuid:banlist) {
-                        sender.sendMessage(ChatColor.YELLOW+REDIS.get("name"+uuid));
+                        sender.sendMessage(ChatColor.YELLOW+REDIS.get("name:"+uuid));
                     }
                     return true;
 
@@ -1014,7 +1170,7 @@ public class  BitQuest extends JavaPlugin {
                 User user= null;
                 try {
                     user = new User(player);
-                    if(user.wallet.getTestnetCoins()==true) {
+                    if(user.wallet.getTestnetCoins()) {
                         player.sendMessage(ChatColor.GREEN+"Some testnet coins were delivered to your wallet.");
                     } else {
                         player.sendMessage(ChatColor.RED+"There was an error getting testnet coins.");

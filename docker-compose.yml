@@ -5,7 +5,6 @@ spigot:
   container_name: bitquest
   environment:
     - BITQUEST_ENV=development
-    - BLOCKCHAIN=btc/main
   build: .
   volumes:
     - "./build/libs/:/spigot/plugins"
@@ -14,6 +13,5 @@ spigot:
     - "25565:25565"
   links:
     - redis
-  command: java -jar spigot.jar
 redis:
   image: redis
