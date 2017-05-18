@@ -44,7 +44,7 @@ public class InventoryEvents implements Listener {
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.CLAY_BALL,32),1000));
         trades.add(new Trade(new ItemStack(Material.COMPASS,2),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),1000,true));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,1),100,true));
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,3),5000));
         trades.add(new Trade(new ItemStack(Material.FENCE,32),2000));
         trades.add(new Trade(new ItemStack(Material.GLASS,64),3500));
