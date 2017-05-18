@@ -488,6 +488,7 @@ public class EntityEvents implements Listener {
                                     org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
+
                                     ClientDelivery delivery = new ClientDelivery();
                                     delivery.addMessage(sentEvent);
 

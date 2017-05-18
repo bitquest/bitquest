@@ -192,6 +192,7 @@ public class InventoryEvents implements Listener {
             
             } else {
                 // player sells (experimental)
+
                  final ItemStack clicked = event.getCurrentItem();
                  if(clicked!=null && clicked.getType()!=Material.AIR) {
 
