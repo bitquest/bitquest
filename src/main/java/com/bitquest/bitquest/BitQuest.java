@@ -7,7 +7,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 
-import com.evilmidget38.UUIDFetcher;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MessageBuilder;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
@@ -379,12 +378,11 @@ public class  BitQuest extends JavaPlugin {
                             final String newOwner = name.substring(9);
                             player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
 
-
-                            try {
-                                UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                            if (REDIS.exists("uuid:" + newOwner)) {
+                                String newOwnerUUID = REDIS.get("uuid:" + newOwner);
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID);
                                 player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
-                            } catch (Exception e) {
+                            } else {
                                 player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
                             }
 
