@@ -929,6 +929,8 @@ public class  BitQuest extends JavaPlugin {
                         int sat=bits*100;
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                                if (!args[1] = command.getSender()) {
+                                
                                 try {
                                     User user=new User(player);
                                     User user_tip=new User(onlinePlayer);
@@ -955,7 +957,10 @@ public class  BitQuest extends JavaPlugin {
                                     player.sendMessage(ChatColor.RED+"Tip failed.");
                                     return true;
                                 }
-
+                                }
+                                else {
+                                    player.sendMessage(ChatCOlor.RED+"You cannot send to yourself!")
+                                }
                             }
                         }
                         player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
