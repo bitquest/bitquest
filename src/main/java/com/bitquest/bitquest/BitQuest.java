@@ -7,7 +7,6 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.*;
 
-import com.evilmidget38.UUIDFetcher;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MessageBuilder;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
@@ -379,12 +378,11 @@ public class  BitQuest extends JavaPlugin {
                             final String newOwner = name.substring(9);
                             player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
 
-
-                            try {
-                                UUID newOwnerUUID = UUIDFetcher.getUUIDOf(newOwner);
-                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID.toString());
+                            if (REDIS.exists("uuid:" + newOwner)) {
+                                String newOwnerUUID = REDIS.get("uuid:" + newOwner);
+                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID);
                                 player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
-                            } catch (Exception e) {
+                            } else {
                                 player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
                             }
 
@@ -929,6 +927,8 @@ public class  BitQuest extends JavaPlugin {
                         int sat=bits*100;
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                                if (!args[1] = command.getSender()) {
+                                
                                 try {
                                     User user=new User(player);
                                     User user_tip=new User(onlinePlayer);
@@ -955,7 +955,10 @@ public class  BitQuest extends JavaPlugin {
                                     player.sendMessage(ChatColor.RED+"Tip failed.");
                                     return true;
                                 }
-
+                                }
+                                else {
+                                    player.sendMessage(ChatCOlor.RED+"You cannot send to yourself!")
+                                }
                             }
                         }
                         player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
