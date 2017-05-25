@@ -44,7 +44,7 @@ public class InventoryEvents implements Listener {
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.CLAY_BALL,32),1000));
         trades.add(new Trade(new ItemStack(Material.COMPASS,2),10000));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),1000,true));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),1000));
         trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,3),5000));
         trades.add(new Trade(new ItemStack(Material.FENCE,32),2000));
         trades.add(new Trade(new ItemStack(Material.GLASS,64),3500));
@@ -123,9 +123,7 @@ public class InventoryEvents implements Listener {
                                 sat = trades.get(i).price;
                                 trade=trades.get(i);
 
-                                if(trades.get(i).has_stock) {
-                                    sat=trades.get(i).price_for_stock(bitQuest.REDIS)*2;
-                                }
+
                             }
 
                         }
@@ -151,12 +149,7 @@ public class InventoryEvents implements Listener {
                                 player.getInventory().addItem(item);
                                 player.sendMessage(ChatColor.GREEN + "You bought " + clicked.getType() + " for "+sat/100);
 
-                                if(trade.has_stock==true) {
-                                    bitQuest.REDIS.decr("stock:"+trade.itemStack.getType());
-                                    System.out.println("[buy] stock: "+ bitQuest.REDIS.get("stock:"+trade.itemStack.getType()));
-                                    bitQuest.sendMetric("price."+clicked.getType(),trade.price_for_stock(bitQuest.REDIS));
 
-                                }
                                 bitQuest.updateScoreboard(player);
                                 if (bitQuest.messageBuilder != null) {
 
@@ -190,57 +183,6 @@ public class InventoryEvents implements Listener {
 
                 }
             
-            } else {
-                // player sells (experimental)
-
-                 final ItemStack clicked = event.getCurrentItem();
-                 if(clicked!=null && clicked.getType()!=Material.AIR) {
-
-                     Trade trade=null;
-                     int sat = 0;
-                     for (int i = 0; i < trades.size(); i++) {
-                         if (clicked.getType() == trades.get(i).itemStack.getType()&&trades.get(i).has_stock==true){
-                             sat = trades.get(i).price;
-                             trade=trades.get(i);
-                             if(trades.get(i).has_stock==true) {
-
-                                 sat=trades.get(i).price_for_stock(bitQuest.REDIS);
-                             }
-                         }
-
-                     }
-
-                     if(sat>=100&&trade!=null) {
-                         if(trade.has_stock==true&&trade.will_buy(bitQuest.REDIS)) {
-                             player.closeInventory();
-
-                             System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
-                             player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
-                             if (bitQuest.wallet.payment(sat, user.wallet.address)) {
-                                 player.getInventory().removeItem(trade.itemStack);
-
-                                 player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
-                                 bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
-                                 System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
-                                 bitQuest.updateScoreboard(player);
-                                 bitQuest.sendMetric("price."+clicked.getType(),trade.price_for_stock(bitQuest.REDIS));
-                             }
-                         } else {
-                             event.setCancelled(true);
-                             player.closeInventory();
-                             player.updateInventory();
-                             player.sendMessage(ChatColor.RED + "I have too much " + clicked.getType() + "...");
-
-                         }
-                     } else {
-                         event.setCancelled(true);
-                         player.closeInventory();
-                         player.updateInventory();
-                         player.sendMessage(ChatColor.RED + "I'm not buying " + clicked.getType() + "...");
-                     }
-
-                 }
-                event.setCancelled(true);
             }
 
         } else if (inventory.getName().equals("Compass") && !player.hasMetadata("teleporting")) {
@@ -295,22 +237,14 @@ public class InventoryEvents implements Listener {
             Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
                 int inventory_stock=bitQuest.MAX_STOCK;
-                if(trades.get(i).has_stock==true) {
-                    if(bitQuest.REDIS.exists("stock:"+trades.get(i).itemStack.getType())) {
-                        inventory_stock=Integer.valueOf(bitQuest.REDIS.get("stock:"+trades.get(i).itemStack.getType()));
-                    } else {
-                        inventory_stock=0;
-                    }
-                }
+
                 if(inventory_stock>0) {
                     ItemStack button = new ItemStack(trades.get(i).itemStack);
                     ItemMeta meta = button.getItemMeta();
                     ArrayList<String> lore = new ArrayList<String>();
                     int bits_price;
                     bits_price=trades.get(i).price/100;
-                    if(trades.get(i).has_stock==true) {
-                        bits_price=(trades.get(i).price_for_stock(bitQuest.REDIS)*2)/100;
-                    }
+
                     lore.add("Price: "+bits_price);
                     meta.setLore(lore);
                     button.setItemMeta(meta);
