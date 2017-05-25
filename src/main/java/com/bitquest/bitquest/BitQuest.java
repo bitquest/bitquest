@@ -927,37 +927,36 @@ public class  BitQuest extends JavaPlugin {
                         int sat=bits*100;
                         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                             if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
-                                if (!args[1] = command.getSender()) {
+                                if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
                                 
-                                try {
-                                    User user=new User(player);
-                                    User user_tip=new User(onlinePlayer);
-                                    if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
-                                        updateScoreboard(onlinePlayer);
-                                        updateScoreboard(player);
-                                        player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
-                                        onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
+                                    try {
+                                        User user=new User(player);
+                                        User user_tip=new User(onlinePlayer);
+                                        if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
+                                            updateScoreboard(onlinePlayer);
+                                            updateScoreboard(player);
+                                            player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
+                                            onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
+                                            return true;
+                                        } else {
+                                            player.sendMessage(ChatColor.RED+"Tip failed.");
+                                            return true;
+                                        }
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Tip failed.");
                                         return true;
-                                    } else {
+                                    } catch (org.json.simple.parser.ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED+"Tip failed.");
+                                        return true;
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
                                         player.sendMessage(ChatColor.RED+"Tip failed.");
                                         return true;
                                     }
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED+"Tip failed.");
-                                    return true;
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED+"Tip failed.");
-                                    return true;
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED+"Tip failed.");
-                                    return true;
-                                }
-                                }
-                                else {
-                                    player.sendMessage(ChatCOlor.RED+"You cannot send to yourself!")
+                                } else {
+                                    player.sendMessage(ChatColor.RED+"You cannot send to yourself!");
                                 }
                             }
                         }
