@@ -221,11 +221,9 @@ public class EntityEvents implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         final Player player=event.getPlayer();
         // On dev environment, admin gets op. In production, nobody gets op.
-        if(BitQuest.BITQUEST_ENV.equals("development") && player.getUniqueId().toString().equals(BitQuest.ADMIN_UUID.toString())) {
+        if(BitQuest.BITQUEST_ENV.equals("development")) {
             player.setOp(true);
-        } else {
-            player.setOp(false);
-        }
+        } 
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
         bitQuest.updateScoreboard(player);
