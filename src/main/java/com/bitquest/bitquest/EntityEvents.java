@@ -553,17 +553,8 @@ public class EntityEvents implements Listener {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
 
-
-        LivingEntity entity = e.getEntity();
-        if (entity instanceof Monster) {
-
-            int baselevel=16;
-
-            if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=32;
-            } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=64;
-            }
+	    int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+            int buff_level=(spawn_distance/128);
 
             // Disable mob spawners. Keep mob farmers away
             if (e.getSpawnReason() == SpawnReason.SPAWNER) {
@@ -572,16 +563,26 @@ public class EntityEvents implements Listener {
                 e.setCancelled(false);
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
-                int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int buff_level=(spawn_distance/128);
+                int buff_level;
+
+                if (e.getLocation().getWorld().getName().equals("world_nether")) {
+			buff_level = (spawn_distance/192);
+		} //nerf Nether piggies 1.5x as much
+		else if (e.getLocation().getWorld().getName().equals("world_end")) {
+			buff_level = (spawn_distance/256);
+		} //nerf End mobs 2x as much
+		else {
+			buff_level = (spawn_distance/128);
+		} //nerf overworld normal amount
+		
                 if(buff_level>baselevel) buff_level=baselevel;
                 if(buff_level<1) buff_level=1;
-
+		
                 // max level is baselevel * 2 minus nerf level
                 int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
 
                 entity.setMaxHealth(level * 4);
-                entity.setHealth(level * 4);
+		entity.setHealth(level * 4);
                 entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
                 entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
