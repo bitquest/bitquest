@@ -223,7 +223,7 @@ public class EntityEvents implements Listener {
         // On dev environment, admin gets op. In production, nobody gets op.
         if(BitQuest.BITQUEST_ENV.equals("development")) {
             player.setOp(true);
-        } 
+        }
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
         bitQuest.updateScoreboard(player);
