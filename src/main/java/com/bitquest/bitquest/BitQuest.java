@@ -89,7 +89,7 @@ public class  BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
-    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 20000;
+    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 10000;
 
     public final static int MIN_TRANS=200000;
     // utilities: distance and rand
@@ -334,7 +334,7 @@ public class  BitQuest extends JavaPlugin {
 
                         try {
 
-                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.WORLD_ADDRESS)) {
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_BITCOIN_ADDRESS)) {
 
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
