@@ -590,20 +590,21 @@ public class EntityEvents implements Listener {
                 entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
                 // add potion effects
-                if (BitQuest.rand(0, 128) < level)
+                if (level>2)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>4)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>8)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>16)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>32)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>64) {
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
+                }
+
 
                 // give random equipment
                 if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
