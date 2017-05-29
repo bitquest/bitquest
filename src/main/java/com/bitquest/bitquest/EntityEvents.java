@@ -630,7 +630,7 @@ public class EntityEvents implements Listener {
                         randomEnchantItem(bow);
                     }
                 }
-                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance+" buff level: "+buff_level);
+                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance);
             } else {
                 e.setCancelled(true);
             }
