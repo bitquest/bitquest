@@ -473,7 +473,7 @@ public class EntityEvents implements Listener {
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
                     try {
-                        if (bitQuest.wallet.final_balance() > money && d20 > 18) {
+                        if (d20==20&&bitQuest.wallet.final_balance() > money) {
 
 
                             final Wallet userWallet = user.wallet;
@@ -536,7 +536,6 @@ public class EntityEvents implements Listener {
                         }
                     } catch(IOException ex) {
                         ex.printStackTrace();
-                        Bukkit.shutdown();
                     }
                 }
 
