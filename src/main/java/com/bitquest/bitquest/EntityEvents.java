@@ -472,67 +472,71 @@ public class EntityEvents implements Listener {
                     final int money = BitQuest.rand(100, Math.min(128000,Math.max(100,level*100)));
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(bitQuest.wallet.final_balance()>money && d20>18) {
+                    try {
+                        if (bitQuest.wallet.final_balance() > money && d20 > 18) {
 
 
-                        final Wallet userWallet=user.wallet;
-                        BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
+                            final Wallet userWallet = user.wallet;
+                            BitQuest.REDIS.expire("balance" + player.getUniqueId().toString(), 5);
 
 
-                        try {
-                            if (bitQuest.wallet.payment(money, userWallet.address)) {
-                                System.out.println("[loot] "+player.getDisplayName()+": "+money);
-                                player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
-                                if (bitQuest.messageBuilder != null) {
+                            try {
+                                if (bitQuest.wallet.payment(money, userWallet.address)) {
+                                    System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                    player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                    // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                    if (bitQuest.messageBuilder != null) {
 
-                                    // Create an event
-                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
 
-                                    ClientDelivery delivery = new ClientDelivery();
-                                    delivery.addMessage(sentEvent);
-
-                                    MixpanelAPI mixpanel = new MixpanelAPI();
-                                    mixpanel.deliver(delivery);
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
+                                    }
                                 }
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
                             }
 
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+
                         }
+                        // Add EXP
+                        user.addExperience(level * 2);
+                        if (bitQuest.messageBuilder != null) {
 
+                            final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-                    }
-                    // Add EXP
-                    user.addExperience(level*2);
-                    if(bitQuest.messageBuilder!=null) {
+                            //                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                            //
+                            //
+                            //                            @Override
+                            //                            public void run() {
+                            //                                // Create an event
+                            //                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
+                            //
+                            //
+                            //                                ClientDelivery delivery = new ClientDelivery();
+                            //                                delivery.addMessage(sentEvent);
+                            //
+                            //                                MixpanelAPI mixpanel = new MixpanelAPI();
+                            //                                try {
+                            //                                    mixpanel.deliver(delivery);
+                            //                                } catch (IOException e1) {
+                            //                                    e1.printStackTrace();
+                            //                                }
+                            //                            }
+                            //
+                            //                        });
 
-                        final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-//                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-//
-//
-//                            @Override
-//                            public void run() {
-//                                // Create an event
-//                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
-//
-//
-//                                ClientDelivery delivery = new ClientDelivery();
-//                                delivery.addMessage(sentEvent);
-//
-//                                MixpanelAPI mixpanel = new MixpanelAPI();
-//                                try {
-//                                    mixpanel.deliver(delivery);
-//                                } catch (IOException e1) {
-//                                    e1.printStackTrace();
-//                                }
-//                            }
-//
-//                        });
-
+                        }
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
+                        Bukkit.shutdown();
                     }
                 }
 
