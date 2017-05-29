@@ -434,7 +434,9 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if (event.getDamager() instanceof Player) {
+        if(event.getDamager() instanceof LargeFireball||event.getDamager() instanceof Fireball) {
+            // TODO :modify fireball damage
+        } else if (event.getDamager() instanceof Player) {
             bitQuest.updateScoreboard((Player) event.getDamager());
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
