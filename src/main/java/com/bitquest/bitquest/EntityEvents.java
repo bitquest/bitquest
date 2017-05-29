@@ -104,10 +104,10 @@ public class EntityEvents implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
 
         }
+        Player player=event.getPlayer();
 
         try {
 
-            Player player=event.getPlayer();
 
             BitQuest.REDIS.set("name:"+player.getUniqueId().toString(),player.getName());
             BitQuest.REDIS.set("uuid:"+player.getName().toString(),player.getUniqueId().toString());
@@ -209,8 +209,10 @@ public class EntityEvents implements Listener {
         try {
             System.out.println("player balance is: "+user.wallet.final_balance());
         } catch (IOException e) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             System.out.println("[login] wallet balance update fails");
         } catch (org.json.simple.parser.ParseException e) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             System.out.println("[login] wallet balance update fails");
         }
 
