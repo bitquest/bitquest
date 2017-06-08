@@ -812,7 +812,7 @@ public class  BitQuest extends JavaPlugin {
                     }
                     try {
                         if( sendAmount < MIN_TRANS) {
-                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
+                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits. Use /send to send to players.");
                             return true;
                         } else try {
                             if(fromWallet.final_balance()<sendAmount) {
