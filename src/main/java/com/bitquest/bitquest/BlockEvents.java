@@ -37,7 +37,7 @@ public class BlockEvents implements Listener {
 			if(event.getPlayer() != null) {
 				if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
 					event.setCancelled(true);
-					event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
+					event.getPlayer().sendMessage(ChatColor.RED + "You cannot burn this!");
 				}
 			}
 		} else if(event.getCause().equals(IgniteCause.SPREAD)) {
@@ -54,7 +54,7 @@ public class BlockEvents implements Listener {
     void onBlockBreak(BlockBreakEvent event) {
     	// If block is bedrock, cancel the event
     	if(event.getBlock().getType().equals(Material.BEDROCK)) {
-    		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
+    		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed, you hacker!");
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
     	} else if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
@@ -65,6 +65,16 @@ public class BlockEvents implements Listener {
 		}
     }
 	@EventHandler
+	void onStructureGrow(StructureGrowEvent event) {
+		//cancels bonemealing other people's trees
+		if (event.isFromBonemeal) {
+			if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+				event.setCancelled(true);
+			}
+		}
+	}
+	
+	@EventHandler
 	void onBlockPlace(BlockPlaceEvent event) {
 
 		// set clan
@@ -73,7 +83,7 @@ public class BlockEvents implements Listener {
 			event.setCancelled(true);
 			bitQuest.error(event.getPlayer(), "You may not place blocks here!");
 		} else if(event.getBlock().getType().equals(Material.BEDROCK)) {
-			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed!");
+			bitQuest.error(event.getPlayer(), "Placing bedrock is not allowed, you hacker!");
 			event.setCancelled(true);
 		} else {
 			event.setCancelled(false);
