@@ -812,7 +812,7 @@ public class  BitQuest extends JavaPlugin {
                     }
                     try {
                         if( sendAmount < MIN_TRANS) {
-                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits.");
+                            player.sendMessage(ChatColor.RED+"Minimum transaction is "+MIN_TRANS/100+" Bits. Use /send to send to players.");
                             return true;
                         } else try {
                             if(fromWallet.final_balance()<sendAmount) {
@@ -1097,6 +1097,7 @@ public class  BitQuest extends JavaPlugin {
                         return false;
                     }
                 }
+                string banMessage = "Sorry";
                 if (cmd.getName().equalsIgnoreCase("ban") && args.length==1) {
                     String playerName = args[0];
                     if(REDIS.exists("uuid:" + playerName)) {
@@ -1104,7 +1105,7 @@ public class  BitQuest extends JavaPlugin {
                         REDIS.sadd("banlist", uuid);
                         Player kickedout = Bukkit.getPlayer(playerName);
                         if(kickedout!=null) {
-                            kickedout.kickPlayer("Sorry.");
+                            kickedout.kickPlayer(banMessage);
                         }
                         sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " is now banned.");
 
@@ -1114,6 +1115,12 @@ public class  BitQuest extends JavaPlugin {
                         return true;
                     }
 
+                }
+                if (cmd.getName().equalsIgnoreCase("serverban") && args.length==1) {
+                    if (args[0] != isAlphaNumeric()){
+                        @EventHandler
+                        event.addBan(args[0], banMessage, null, null);
+                    }
                 }
                 if (cmd.getName().equalsIgnoreCase("unban") && args.length==1) {
                     String playerName = args[0];
