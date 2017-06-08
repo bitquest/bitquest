@@ -543,7 +543,7 @@ public class  BitQuest extends JavaPlugin {
                         sb.append(" " + args[i]);
                     }
                     String claimName = sb.toString().trim();
-                    
+
                     Location location=player.getLocation();
                     try {
                         claimLand(claimName,location.getChunk(),player);
@@ -976,12 +976,12 @@ public class  BitQuest extends JavaPlugin {
 
             }
 
-                /***********************************************************
-                    /upgradewallet
-                    attempts to transfer funds from old (BQ2.0) wallet to
-                    the new HD (BQ2.1) wallet via BlockCypher's
-                    microtransaction endpoint
-                 ***********************************************************/
+            /***********************************************************
+             /upgradewallet
+             attempts to transfer funds from old (BQ2.0) wallet to
+             the new HD (BQ2.1) wallet via BlockCypher's
+             microtransaction endpoint
+             ***********************************************************/
             if(cmd.getName().equalsIgnoreCase("upgradewallet")) {
                 String fail_message="Cannot make transaction at this moment. Please try again later...";
                 player.sendMessage(ChatColor.YELLOW+"Searching for lost wallet...");
@@ -1036,7 +1036,7 @@ public class  BitQuest extends JavaPlugin {
                 }
             }
 
-                // MODERATOR COMMANDS
+            // MODERATOR COMMANDS
             if (isModerator(player)) {
                 // COMMAND: MOD
                 if (cmd.getName().equalsIgnoreCase("butcher")) {
