@@ -16,10 +16,15 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -31,6 +36,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -363,6 +369,34 @@ public class EntityEvents implements Listener {
         }
 
 
+    }
+
+    @EventHandler
+    public void itemConsume(PlayerItemConsumeEvent event) {
+        ItemStack item = event.getItem();
+        if (item != null && item.hasItemMeta()) {
+            if (item.getItemMeta() instanceof PotionMeta) {
+                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                PotionData potionData = potionMeta.getBasePotionData();
+                if (potionData.getType() == PotionType.WATER) {
+                    Player player = event.getPlayer();
+                    if (player != null) {
+                        PlayerInventory inventory = player.getInventory();
+                        ItemStack helmet = inventory.getHelmet();
+                        if (helmet != null && helmet.getType() == Material.PUMPKIN) {
+                            Map<Enchantment, Integer> enchantments = helmet.getEnchantments();
+                            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                                if (entry.getKey().equals(Enchantment.BINDING_CURSE)) {
+                                    inventory.setHelmet(null);
+                                    player.getWorld().dropItemNaturally(player.getLocation(), helmet);
+                                    player.sendMessage("You are finally free of the " + ChatColor.BOLD + ChatColor.GOLD + "Pumpkin " + ChatColor.GRAY + ChatColor.ITALIC + "curse");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     @EventHandler
