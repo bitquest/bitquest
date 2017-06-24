@@ -317,7 +317,7 @@ public class  BitQuest extends JavaPlugin {
 
         if (!name.isEmpty()) {
             // check that desired area name doesn't have non-alphanumeric characters
-            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
+            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
             if (!hasNonAlpha) {
                 // 16 characters max
                 if (name.length() <= 16) {
