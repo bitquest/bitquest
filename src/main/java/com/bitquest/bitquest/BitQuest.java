@@ -61,7 +61,7 @@ public class  BitQuest extends JavaPlugin {
     public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
     public final static int MAX_STOCK=100;
 
-    public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
+    public final static String LAND_ADDRESS = System.getenv("LAND_ADDRESS") != null ? System.getenv("LAND_ADDRESS") : null;
 
     public final static String MINER_FEE_ADDRESS = System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
 
@@ -335,7 +335,7 @@ public class  BitQuest extends JavaPlugin {
 
                         try {
 
-                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_BITCOIN_ADDRESS)) {
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_ADDRESS)) {
 
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
