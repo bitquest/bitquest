@@ -827,7 +827,29 @@ public class EntityEvents implements Listener {
 
         }
     }
-    
+
+    @EventHandler
+    public void onArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+        ArmorStand stand = event.getRightClicked();
+
+        if (!bitQuest.canBuild(stand.getLocation(), player)){
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        if (PROTECTED_ENTITIES.contains(entity.getType())) {
+            if (!bitQuest.canBuild(entity.getLocation(), player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         bitQuest.updateScoreboard(event.getPlayer());
