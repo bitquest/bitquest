@@ -596,12 +596,14 @@ public class EntityEvents implements Listener {
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
 
-            int baselevel=1;
-
+            int maxlevel=16;
+            int minlevel=1;
             if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=4;
+                minlevel=16;
+                maxlevel=32;
             } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=16;
+                minlevel=64;
+                maxlevel=128;
             }
 
             // Disable mob spawners. Keep mob farmers away
@@ -612,7 +614,7 @@ public class EntityEvents implements Listener {
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int level=BitQuest.rand(baselevel,baselevel*8);
+                int level=BitQuest.rand(minlevel,Math.min(maxlevel,spawn_distance/2048));
                 if(level<1) level=1;
 
 
