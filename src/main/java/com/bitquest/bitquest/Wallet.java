@@ -42,7 +42,7 @@ public class Wallet {
     public String address=null;
     private String privatekey=null;
 
-    int final_balance() throws IOException, ParseException {
+    public int final_balance() throws IOException, ParseException {
         int total_received;
         int unconfirmed_balance;
         if(BitQuest.BITCORE_HOST!=null) {
@@ -177,7 +177,7 @@ public class Wallet {
         return Integer.parseInt(response.toString());
 
     }
-    JSONObject get_blockcypher_balance() throws IOException, ParseException {
+    public JSONObject get_blockcypher_balance() throws IOException, ParseException {
         System.out.println("[balance] "+this.address);
         URL url;
         url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
@@ -417,7 +417,7 @@ public class Wallet {
             return null;
         }
     }
-    boolean payment(int sat, String address) {
+    public boolean payment(int sat, String address) {
         try {
             if(this.final_balance()>=sat&&sat>=100) {
                 System.out.println("[payment] "+this.address+" -- "+sat+" -> "+address);
@@ -569,7 +569,7 @@ public class Wallet {
             return false;
         }
     }
-    boolean create_blockcypher_transaction(int sat, String address) throws IOException, ParseException {
+    public boolean create_blockcypher_transaction(int sat, String address) throws IOException, ParseException {
         if(this.final_balance()>=sat) {
 
 
@@ -658,7 +658,7 @@ public class Wallet {
             return false;
         }
     }
-    boolean blockcypher_microtransaction(int sat, String address) throws IOException {
+    public boolean blockcypher_microtransaction(int sat, String address) throws IOException {
         JsonObject payload=new JsonObject();
         payload.addProperty("from_private",this.privatekey);
         payload.addProperty("to_address",address);
@@ -716,7 +716,7 @@ public class Wallet {
             return false;
         }
     }
-    boolean email_transaction(int sat, String email) throws IOException {
+    public boolean email_transaction(int sat, String email) throws IOException {
         System.out.println("------------- tx "+this.address+" --> "+email+" -----------");
         // get xapo token
         String token=this.get_xapo_token();
