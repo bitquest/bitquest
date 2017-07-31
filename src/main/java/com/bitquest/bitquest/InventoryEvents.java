@@ -253,8 +253,6 @@ public class InventoryEvents implements Listener {
 
             }
             event.getPlayer().openInventory(marketInventory);
-        } else {
-            event.setCancelled(false);
         }
 
     }

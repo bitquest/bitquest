@@ -465,19 +465,6 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if(event.getDamager() instanceof LargeFireball||event.getDamager() instanceof Fireball) {
-            // TODO :modify fireball damage
-        } else if (event.getDamager() instanceof Player) {
-            bitQuest.updateScoreboard((Player) event.getDamager());
-            int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
-            int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
-            String name = event.getEntity().getName();
-            // TODO: Show damage message
-        }
-    }
-
-    @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         event.setKeepInventory(true);
         event.setKeepLevel(true);
@@ -590,87 +577,92 @@ public class EntityEvents implements Listener {
     // TODO: Magma Cubes don't get levels or custom names for some reason...
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+        Chunk chunk=e.getLocation().getChunk();
+
+            LivingEntity entity = e.getEntity();
+            if (entity instanceof Monster) {
+                String key="mob:"+e.getLocation().getWorld().getName()+":"+chunk.getX()+":"+chunk.getZ();
 
 
 
-        LivingEntity entity = e.getEntity();
-        if (entity instanceof Monster) {
-
-            int baselevel=1;
-
-            if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=4;
-            } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=16;
-            }
-
-            // Disable mob spawners. Keep mob farmers away
-            if (e.getSpawnReason() == SpawnReason.SPAWNER) {
-                e.setCancelled(true);
-            } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
-                e.setCancelled(false);
-                EntityType entityType = entity.getType();
-                // nerf_level makes sure high level mobs are away from the spawn
-                int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int level=BitQuest.rand(baselevel,baselevel*8);
-                if(level<1) level=1;
-
-
-
-                entity.setMaxHealth(level * 4);
-                entity.setHealth(level * 4);
-                entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
-
-                // add potion effects
-                if (level>2)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                if (level>4)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                if (level>8)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 4), true);
-                if (level>16)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 5), true);
-                if (level>32)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5), true);
-                if (level>64) {
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 5), true);
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 5), true);
-                }
-
-
-                // give random equipment
-                if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
-                    useRandomEquipment(entity, level);
-                }
-
-                // some creepers are charged
-                if (entity instanceof Creeper && BitQuest.rand(0, 100) < level) {
-                    ((Creeper) entity).setPowered(true);
-                }
-
-                // pigzombies are always angry
-                if (entity instanceof PigZombie) {
-                    PigZombie pigZombie = (PigZombie) entity;
-                    pigZombie.setAngry(true);
-                }
-
-                // some skeletons are black
-                if (entity instanceof Skeleton) {
-                    Skeleton skeleton = (Skeleton) entity;
-                    ItemStack bow = new ItemStack(Material.BOW);
-                    if (BitQuest.rand(0, 64) < level) {
-                        randomEnchantItem(bow);
+                    int maxlevel = 16;
+                    int minlevel = 1;
+                    if (e.getLocation().getWorld().getName().equals("world_nether")) {
+                        minlevel = 16;
+                        maxlevel = 32;
+                    } else if (e.getLocation().getWorld().getName().equals("world_end")) {
+                        minlevel = 64;
+                        maxlevel = 128;
                     }
-                }
-                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance);
+
+                    // Disable mob spawners. Keep mob farmers away
+                    if (e.getSpawnReason() == SpawnReason.SPAWNER) {
+                        e.setCancelled(true);
+                    } else if (bitQuest.landIsClaimed(e.getLocation()) == false&&(bitQuest.REDIS.exists(key)==false||BitQuest.rand(1,20)==20)) {
+                        bitQuest.REDIS.set(key,"1");
+                        bitQuest.REDIS.expire(key,3000);
+                        e.setCancelled(false);
+                        EntityType entityType = entity.getType();
+                        // nerf_level makes sure high level mobs are away from the spawn
+                        int spawn_distance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+                        int level = BitQuest.rand(minlevel, Math.min(maxlevel, spawn_distance / 2048));
+                        if (level < 1) level = 1;
+
+
+                        entity.setMaxHealth(level * 4);
+                        entity.setHealth(level * 4);
+                        entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
+                        entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
+
+                        // add potion effects
+                        if (level > 2)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
+                        if (level > 4)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+                        if (level > 8)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 4), true);
+                        if (level > 16)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 5), true);
+                        if (level > 32)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5), true);
+                        if (level > 64) {
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 5), true);
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 5), true);
+                        }
+
+
+                        // give random equipment
+                        if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
+                            useRandomEquipment(entity, level);
+                        }
+
+                        // some creepers are charged
+                        if (entity instanceof Creeper && BitQuest.rand(0, 100) < level) {
+                            ((Creeper) entity).setPowered(true);
+                        }
+
+                        // pigzombies are always angry
+                        if (entity instanceof PigZombie) {
+                            PigZombie pigZombie = (PigZombie) entity;
+                            pigZombie.setAngry(true);
+                        }
+
+                        // some skeletons are black
+                        if (entity instanceof Skeleton) {
+                            Skeleton skeleton = (Skeleton) entity;
+                            ItemStack bow = new ItemStack(Material.BOW);
+                            if (BitQuest.rand(0, 64) < level) {
+                                randomEnchantItem(bow);
+                            }
+                        }
+                        System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
+                    } else {
+                        e.setCancelled(true);
+                    }
             } else {
-                e.setCancelled(true);
+                e.setCancelled(false);
             }
-        } else {
-            e.setCancelled(false);
-        }
+
     }
     @EventHandler
     void onEntityDamage(EntityDamageEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
@@ -828,7 +820,29 @@ public class EntityEvents implements Listener {
 
         }
     }
-    
+
+    @EventHandler
+    public void onArmorStandManipulate(PlayerArmorStandManipulateEvent event) {
+        Player player = event.getPlayer();
+        ArmorStand stand = event.getRightClicked();
+
+        if (!bitQuest.canBuild(stand.getLocation(), player)){
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onPlayerInteractEntity(PlayerInteractEntityEvent event) {
+        Player player = event.getPlayer();
+        Entity entity = event.getRightClicked();
+
+        if (PROTECTED_ENTITIES.contains(entity.getType())) {
+            if (!bitQuest.canBuild(entity.getLocation(), player)) {
+                event.setCancelled(true);
+            }
+        }
+    }
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         bitQuest.updateScoreboard(event.getPlayer());
