@@ -16,10 +16,15 @@ import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.ScoreboardManager;
@@ -31,6 +36,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -104,10 +110,10 @@ public class EntityEvents implements Listener {
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
 
         }
+        Player player=event.getPlayer();
 
         try {
 
-            Player player=event.getPlayer();
 
             BitQuest.REDIS.set("name:"+player.getUniqueId().toString(),player.getName());
             BitQuest.REDIS.set("uuid:"+player.getName().toString(),player.getUniqueId().toString());
@@ -209,8 +215,10 @@ public class EntityEvents implements Listener {
         try {
             System.out.println("player balance is: "+user.wallet.final_balance());
         } catch (IOException e) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             System.out.println("[login] wallet balance update fails");
         } catch (org.json.simple.parser.ParseException e) {
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
             System.out.println("[login] wallet balance update fails");
         }
 
@@ -221,9 +229,7 @@ public class EntityEvents implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
         final Player player=event.getPlayer();
         // On dev environment, admin gets op. In production, nobody gets op.
-        if(BitQuest.BITQUEST_ENV.equals("development")) {
-            player.setOp(true);
-        }
+
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(player);
         bitQuest.updateScoreboard(player);
@@ -366,6 +372,34 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
+    public void itemConsume(PlayerItemConsumeEvent event) {
+        ItemStack item = event.getItem();
+        if (item != null && item.hasItemMeta()) {
+            if (item.getItemMeta() instanceof PotionMeta) {
+                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                PotionData potionData = potionMeta.getBasePotionData();
+                if (potionData.getType() == PotionType.WATER) {
+                    Player player = event.getPlayer();
+                    if (player != null) {
+                        PlayerInventory inventory = player.getInventory();
+                        ItemStack helmet = inventory.getHelmet();
+                        if (helmet != null && helmet.getType() == Material.PUMPKIN) {
+                            Map<Enchantment, Integer> enchantments = helmet.getEnchantments();
+                            for (Map.Entry<Enchantment, Integer> entry : enchantments.entrySet()) {
+                                if (entry.getKey().equals(Enchantment.BINDING_CURSE)) {
+                                    inventory.setHelmet(null);
+                                    player.getWorld().dropItemNaturally(player.getLocation(), helmet);
+                                    player.sendMessage("You are finally free of the " + ChatColor.BOLD + ChatColor.GOLD + "Pumpkin " + ChatColor.GRAY + ChatColor.ITALIC + "curse");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onClick(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         bitQuest.updateScoreboard(event.getPlayer());
 
@@ -432,7 +466,9 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onAttack(EntityDamageByEntityEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if (event.getDamager() instanceof Player) {
+        if(event.getDamager() instanceof LargeFireball||event.getDamager() instanceof Fireball) {
+            // TODO :modify fireball damage
+        } else if (event.getDamager() instanceof Player) {
             bitQuest.updateScoreboard((Player) event.getDamager());
             int maxHealth = (int) ((LivingEntity) event.getEntity()).getMaxHealth() * 2;
             int health = (int) (((LivingEntity) event.getEntity()).getHealth() - event.getDamage()) * 2;
@@ -468,67 +504,71 @@ public class EntityEvents implements Listener {
                     final int money = BitQuest.rand(1,level);
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
-                    if(d20==20&&bitQuest.wallet.final_balance()>money) {
+
+                    try {
+                        if (d20==20&&bitQuest.wallet.final_balance() > money) {
 
 
-                        final Wallet userWallet=user.wallet;
-                        BitQuest.REDIS.expire("balance"+player.getUniqueId().toString(),5);
+                            final Wallet userWallet = user.wallet;
+                            BitQuest.REDIS.expire("balance" + player.getUniqueId().toString(), 5);
 
 
-                        try {
-                            if (bitQuest.wallet.payment(money, userWallet.address)) {
-                                System.out.println("[loot] "+player.getDisplayName()+": "+money);
-                                player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
-                                if (bitQuest.messageBuilder != null) {
+                            try {
+                                if (bitQuest.wallet.payment(money, userWallet.address)) {
+                                    System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                    player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                    // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                    if (bitQuest.messageBuilder != null) {
 
-                                    // Create an event
-                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
 
-                                    ClientDelivery delivery = new ClientDelivery();
-                                    delivery.addMessage(sentEvent);
-
-                                    MixpanelAPI mixpanel = new MixpanelAPI();
-                                    mixpanel.deliver(delivery);
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
+                                    }
                                 }
+
+                            } catch (IOException e1) {
+                                e1.printStackTrace();
                             }
 
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
+
                         }
+                        // Add EXP
+                        user.addExperience(level * 2);
+                        if (bitQuest.messageBuilder != null) {
 
+                            final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-                    }
-                    // Add EXP
-                    user.addExperience(level*2);
-                    if(bitQuest.messageBuilder!=null) {
+                            //                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
+                            //
+                            //
+                            //                            @Override
+                            //                            public void run() {
+                            //                                // Create an event
+                            //                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
+                            //
+                            //
+                            //                                ClientDelivery delivery = new ClientDelivery();
+                            //                                delivery.addMessage(sentEvent);
+                            //
+                            //                                MixpanelAPI mixpanel = new MixpanelAPI();
+                            //                                try {
+                            //                                    mixpanel.deliver(delivery);
+                            //                                } catch (IOException e1) {
+                            //                                    e1.printStackTrace();
+                            //                                }
+                            //                            }
+                            //
+                            //                        });
 
-                        final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-//                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-//
-//
-//                            @Override
-//                            public void run() {
-//                                // Create an event
-//                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
-//
-//
-//                                ClientDelivery delivery = new ClientDelivery();
-//                                delivery.addMessage(sentEvent);
-//
-//                                MixpanelAPI mixpanel = new MixpanelAPI();
-//                                try {
-//                                    mixpanel.deliver(delivery);
-//                                } catch (IOException e1) {
-//                                    e1.printStackTrace();
-//                                }
-//                            }
-//
-//                        });
-
+                        }
+                    } catch(IOException ex) {
+                        ex.printStackTrace();
                     }
                 }
 
@@ -557,12 +597,12 @@ public class EntityEvents implements Listener {
         LivingEntity entity = e.getEntity();
         if (entity instanceof Monster) {
 
-            int baselevel=16;
+            int baselevel=1;
 
             if(e.getLocation().getWorld().getName().equals("world_nether")) {
-                baselevel=32;
+                baselevel=4;
             } else if(e.getLocation().getWorld().getName().equals("world_end")) {
-                baselevel=64;
+                baselevel=16;
             }
 
             // Disable mob spawners. Keep mob farmers away
@@ -573,12 +613,10 @@ public class EntityEvents implements Listener {
                 EntityType entityType = entity.getType();
                 // nerf_level makes sure high level mobs are away from the spawn
                 int spawn_distance= (int)e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                int buff_level=(spawn_distance/128);
-                if(buff_level>baselevel) buff_level=baselevel;
-                if(buff_level<1) buff_level=1;
+                int level=BitQuest.rand(baselevel,baselevel*8);
+                if(level<1) level=1;
 
-                // max level is baselevel * 2 minus nerf level
-                int level=BitQuest.rand(baselevel-15, baselevel+buff_level);
+
 
                 entity.setMaxHealth(level * 4);
                 entity.setHealth(level * 4);
@@ -586,20 +624,21 @@ public class EntityEvents implements Listener {
                 entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
                 // add potion effects
-                if (BitQuest.rand(0, 128) < level)
+                if (level>2)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
+                if (level>4)
                     entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-                if (BitQuest.rand(0, 128) < level)
-                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
+                if (level>8)
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 4), true);
+                if (level>16)
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 5), true);
+                if (level>32)
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5), true);
+                if (level>64) {
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 5), true);
+                    entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 5), true);
+                }
+
 
                 // give random equipment
                 if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
@@ -625,7 +664,7 @@ public class EntityEvents implements Listener {
                         randomEnchantItem(bow);
                     }
                 }
-                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance+" buff level: "+buff_level);
+                System.out.println("[spawn mob] "+entityType.name()+" lvl "+level+" spawn distance: "+spawn_distance);
             } else {
                 e.setCancelled(true);
             }

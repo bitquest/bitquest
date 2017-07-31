@@ -61,7 +61,7 @@ public class  BitQuest extends JavaPlugin {
     public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
     public final static int MAX_STOCK=100;
 
-    public final static String LAND_BITCOIN_ADDRESS = System.getenv("LAND_BITCOIN_ADDRESS") != null ? System.getenv("LAND_BITCOIN_ADDRESS") : null;
+    public final static String LAND_ADDRESS = System.getenv("LAND_ADDRESS") != null ? System.getenv("LAND_ADDRESS") : null;
 
     public final static String MINER_FEE_ADDRESS = System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
 
@@ -192,8 +192,10 @@ public class  BitQuest extends JavaPlugin {
 
         }
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-
-        int final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
+        int final_balance=0;
+        if(REDIS.exists("final_balance:"+user.wallet.address)) {
+            final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
+        }
         if(statsd!=null) {
             statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
 
@@ -315,7 +317,7 @@ public class  BitQuest extends JavaPlugin {
 
         if (!name.isEmpty()) {
             // check that desired area name doesn't have non-alphanumeric characters
-            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 ].*$");
+            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
             if (!hasNonAlpha) {
                 // 16 characters max
                 if (name.length() <= 16) {
@@ -333,7 +335,7 @@ public class  BitQuest extends JavaPlugin {
 
                         try {
 
-                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_BITCOIN_ADDRESS)) {
+                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_ADDRESS)) {
 
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
