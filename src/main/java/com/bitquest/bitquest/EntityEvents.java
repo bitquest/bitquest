@@ -488,9 +488,10 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
-                    final int money = BitQuest.rand(100, Math.min(128000,Math.max(100,level*100)));
+                    final int money = BitQuest.rand(1,level);
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
+
                     try {
                         if (d20==20&&bitQuest.wallet.final_balance() > money) {
 
