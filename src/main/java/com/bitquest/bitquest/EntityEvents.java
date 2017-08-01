@@ -605,7 +605,7 @@ public class EntityEvents implements Listener {
                         EntityType entityType = entity.getType();
                         // nerf_level makes sure high level mobs are away from the spawn
                         int spawn_distance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-                        int level = BitQuest.rand(minlevel, Math.max(minlevel,(Math.min(maxlevel, spawn_distance / 2048))));
+                        int level = BitQuest.rand(minlevel, Math.max(minlevel,(Math.min(maxlevel, spawn_distance / 64))));
                         if (level < 1) level = 1;
 
 
