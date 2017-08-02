@@ -607,7 +607,7 @@ public class EntityEvents implements Listener {
                         int spawn_distance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
                         int level = BitQuest.rand(minlevel, Math.max(minlevel,(Math.min(maxlevel, spawn_distance / 64))));
                         if (level < 1) level = 1;
-
+                        if(bitQuest.rand(1,20)==20) level=level*2;
 
                         entity.setMaxHealth(level * 4);
                         entity.setHealth(level * 4);
@@ -615,20 +615,25 @@ public class EntityEvents implements Listener {
                         entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
                         // add potion effects
-                        if (level > 2)
+                        if (bitQuest.rand(1,128) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                        if (level > 4)
+                        if (bitQuest.rand(1,128) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                        if (level > 8)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 4), true);
-                        if (level > 16)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 5), true);
-                        if (level > 32)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 5), true);
-                        if (level > 64) {
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 5), true);
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 5), true);
-                        }
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1,128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
+                        if (level>64)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 2), true);
+
 
 
                         // give random equipment
