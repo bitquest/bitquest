@@ -621,26 +621,20 @@ public class EntityEvents implements Listener {
                         entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
                         // add potion effects
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level) //Level also == % chance now
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
+                        if (bitQuest.rand(1,100) < level)
                             entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-                        if (bitQuest.rand(1,128) < level)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
-                        if (level>64)
-                            entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 2), true);
-
-
+                        if (bitQuest.rand(1,100) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true)
 
                         // give random equipment
                         if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
