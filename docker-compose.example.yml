@@ -1,0 +1,16 @@
+spigot:
+  container_name: bitquest
+  environment:
+    - BITQUEST_ENV=development
+    - BITCOIN_NODE_USERNAME=bitquest
+    - BITCOIN_NODE_PASSWORD=changeme
+  build: .
+  volumes:
+    - "./build/libs/:/spigot/plugins"
+    - ".:/bitquest"
+  ports:
+    - "25565:25565"
+  links:
+    - redis
+redis:
+  image: redis

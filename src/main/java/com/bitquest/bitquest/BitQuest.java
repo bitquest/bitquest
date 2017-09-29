@@ -1,6 +1,7 @@
 package com.bitquest.bitquest;
 
 import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -35,6 +36,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
@@ -59,8 +61,8 @@ public class  BitQuest extends JavaPlugin {
     public final static String WORLD_PUBLIC_KEY = System.getenv("WORLD_PUBLIC_KEY") != null ? System.getenv("WORLD_PUBLIC_KEY") : "76e8a7eb479256c68f59f66c7b744891bc2f632ff3c7a3f69a5c4aeccda687e3";
     public final static String BITCOIN_NODE_HOST = System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : "localhost";
     public final static int BITCOIN_NODE_PORT = System.getenv("BITCOIN_NODE_PORT") != null ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT")) : 18332;
-    public final static String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME") != null ? System.getenv("BITCOIN_NODE_USERNAME") : null;
-    public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD") != null ? System.getenv("BITCOIN_NODE_PASSWORD") : null;
+    public final static String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
+    public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
 
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
@@ -155,7 +157,11 @@ public class  BitQuest extends JavaPlugin {
             System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
             Bukkit.shutdown();
         }
-
+        try {
+            getBlockChainInfo();
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+        }
         // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
 
@@ -201,6 +207,50 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("banlist", new BanlistCommand());
         modCommands.put("spectate", new SpectateCommand(this));
         modCommands.put("emergencystop", new EmergencystopCommand());
+    }
+    // @todo: make this just accept the endpoint name and (optional) parameters
+    public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
+        JSONParser parser = new JSONParser();
+
+        try {
+            final JSONObject jsonObject=new JSONObject();
+            jsonObject.put("jsonrpc","1.0");
+            jsonObject.put("id","bitquest");
+            jsonObject.put("method","getblockchaininfo");
+            JSONArray params=new JSONArray();
+            jsonObject.put("params",params);
+            System.out.println("Checking blockchain info...");
+            URL url = new URL("http://"+BITCOIN_NODE_HOST+":"+BITCOIN_NODE_PORT);
+            System.out.println(url.toString());
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+            out.write(jsonObject.toString());
+            out.close();
+
+            int responseCode = con.getResponseCode();
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+            return (JSONObject) parser.parse(response.toString());
+        } catch (IOException e) {
+            System.out.println("problem connecting with bitcoin node");
+            System.out.println(e);
+            // Unable to call API?
+        }
+
+        return new JSONObject(); // just give them an empty object
     }
     public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         ScoreboardManager scoreboardManager;
