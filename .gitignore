@@ -15,8 +15,8 @@
 log/
 target/
 
-# development.yml is ignored to prevent leaks of api keys
-development.yml
+# docker-compose.yml is ignored to prevent leaks of api keys
+docker-compose.yml
 
 # Other stuff
 install.log
