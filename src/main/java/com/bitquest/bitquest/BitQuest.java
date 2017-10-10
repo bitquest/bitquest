@@ -144,19 +144,7 @@ public class  BitQuest extends JavaPlugin {
         }
 
         // loads world wallet
-        if(HD_ROOT_ADDRESS!=null) {
-            System.out.println("HD Wallets enabled.");
-            wallet=new Wallet(HD_ROOT_ADDRESS);
-            System.out.println("HD Root address is: "+wallet.address);
-
-        } else if(WORLD_ADDRESS!=null&&WORLD_PRIVATE_KEY!=null) {
-            wallet=new Wallet(WORLD_ADDRESS,WORLD_PRIVATE_KEY);
-            System.out.println("World wallet address is: "+wallet.address);
-
-        } else {
-            System.out.println("Server is shutting down because WORLD_ADDRESS is not set");
-            Bukkit.shutdown();
-        }
+        wallet=new Wallet("bitquest_market");
         try {
             getBlockChainInfo();
         } catch (org.json.simple.parser.ParseException e) {
@@ -223,6 +211,10 @@ public class  BitQuest extends JavaPlugin {
             URL url = new URL("http://"+BITCOIN_NODE_HOST+":"+BITCOIN_NODE_PORT);
             System.out.println(url.toString());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            String userPassword = BITCOIN_NODE_USERNAME + ":" + BITCOIN_NODE_PASSWORD;
+            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+            con.setRequestProperty("Authorization", "Basic " + encoding);
+
             con.setRequestMethod("POST");
             con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
@@ -263,17 +255,13 @@ public class  BitQuest extends JavaPlugin {
         User user=new User(player);
 
         walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-        if(BLOCKCHAIN.equals("doge/main")) {
-            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Doge" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
 
-        } else {
-            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
 
-        }
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
         int final_balance=0;
-        if(REDIS.exists("final_balance:"+user.wallet.address)) {
-            final_balance=Integer.parseInt(REDIS.get("final_balance:"+user.wallet.address));
+        if(REDIS.exists("final_balance:"+player.getUniqueId())) {
+            final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId()));
         }
         if(statsd!=null) {
             statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
@@ -345,7 +333,7 @@ public class  BitQuest extends JavaPlugin {
     }
     public  void sendWalletMetrics() {
         try {
-            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.final_balance());
+            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.getBalance());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (org.json.simple.parser.ParseException e) {
@@ -435,7 +423,7 @@ public class  BitQuest extends JavaPlugin {
                                     mixpanel.deliver(delivery);
                                 }
                             } else {
-                                int balance = user.wallet.final_balance();
+                                int balance = user.wallet.getBalance();
                                 if (balance < BitQuest.LAND_PRICE) {
                                     player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
                                             ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
@@ -583,11 +571,11 @@ public class  BitQuest extends JavaPlugin {
     public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // int chainHeight = user.wallet.getBlockchainHeight();
         // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
-        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your "+chain_name()+" Address: "+ChatColor.WHITE+user.wallet.address);
+        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your "+chain_name()+" Address: "+ChatColor.WHITE+user.wallet.getAccountAddress());
 
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.address) + " Satoshi");
+        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.getAccountAddress()) + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");

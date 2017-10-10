@@ -18,6 +18,7 @@ import java.net.*;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.UUID;
 
 /**
  * Created by cristian on 12/15/15.
@@ -26,51 +27,131 @@ public class Wallet {
     public int balance;
     public int unconfirmedBalance;
     public String path;
-    public String public_key;
-    public Wallet(String address, String path, String public_key) {
-        this.address=address; this.path=path; this.public_key=public_key;
+    public String account_id;
+
+    public Wallet(String account_id) {
+
+        this.account_id=account_id;
     }
 
-    public Wallet(String address,String privatekey) {
-        this.address=address;
-        this.privatekey=privatekey;
-    }
 
-    public Wallet(String address) {
-        this.address=address;
-    }
-    public String address=null;
-    private String privatekey=null;
 
-    public int final_balance() throws IOException, ParseException {
-        int total_received;
-        int unconfirmed_balance;
-        if(BitQuest.BITCORE_HOST!=null) {
-            JSONObject bitcore_balance=this.get_bitcore_balance();
-            total_received=((Number)bitcore_balance.get("totalReceivedSat")).intValue();
-            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalanceSat")).intValue();
-        } else {
-            JSONObject blockcypher_balance=this.get_blockcypher_balance();
 
-            total_received=((Number)blockcypher_balance.get("total_received")).intValue();
-            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+//    public int final_balance() throws IOException, ParseException {
+//        int total_received;
+//        int unconfirmed_balance;
+////        if(BitQuest.BITCORE_HOST!=null) {
+////            JSONObject bitcore_balance=this.get_bitcore_balance();
+////            total_received=((Number)bitcore_balance.get("totalReceivedSat")).intValue();
+////            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalanceSat")).intValue();
+////        } else {
+////            JSONObject blockcypher_balance=this.get_blockcypher_balance();
+////            total_received=((Number)blockcypher_balance.get("total_received")).intValue();
+////            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+////        }
+//
+//
+//        int final_balance=total_received;
+//
+//        if(unconfirmed_balance>0) {
+//            final_balance=final_balance+unconfirmed_balance;
+//        }
+//        final_balance=final_balance+this.payment_balance();
+//
+//        BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
+//        return final_balance;
+//    }
+    long getBalance() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+
+        final JSONObject jsonObject=new JSONObject();
+        jsonObject.put("jsonrpc","1.0");
+        jsonObject.put("id","bitquest");
+        jsonObject.put("method","getbalance");
+        JSONArray params=new JSONArray();
+        params.add(this.account_id);
+        jsonObject.put("params",params);
+        System.out.println("Checking blockchain info...");
+        URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+        System.out.println(url.toString());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
+        String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+        con.setRequestProperty("Authorization", "Basic " + encoding);
+
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        out.write(jsonObject.toString());
+        out.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
         }
+        in.close();
+        System.out.println(response.toString());
+        JSONObject response_object= (JSONObject) parser.parse(response.toString());
+        System.out.println(response_object);
+        return ((long)response_object.get("result")*100000000L);
 
-        int final_balance=total_received;
+    }
+    String getAccountAddress() throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
 
-        if(unconfirmed_balance>0) {
-            final_balance=final_balance+unconfirmed_balance;
+        final JSONObject jsonObject=new JSONObject();
+        jsonObject.put("jsonrpc","1.0");
+        jsonObject.put("id","bitquest");
+        jsonObject.put("method","getaccountaddress");
+        JSONArray params=new JSONArray();
+        params.add(this.account_id);
+        jsonObject.put("params",params);
+        System.out.println("Checking blockchain info...");
+        URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+        System.out.println(url.toString());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
+        String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+        con.setRequestProperty("Authorization", "Basic " + encoding);
+
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        out.write(jsonObject.toString());
+        out.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
         }
-        final_balance=final_balance+this.payment_balance();
+        in.close();
+        System.out.println(response.toString());
+        JSONObject response_object= (JSONObject) parser.parse(response.toString());
+        System.out.println(response_object);
+        return (String)response_object.get("result");
 
-        BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
-        return final_balance;
     }
     JSONObject get_bitcore_balance() throws IOException, ParseException {
 
-        System.out.println("[balance] "+this.address);
+        System.out.println("[balance] "+this.getAccountAddress());
         URL url;
-        url=new URL(BitQuest.BITCORE_HOST+"/insight-api/addr/"+address);
+        url=new URL(BitQuest.BITCORE_HOST+"/insight-api/addr/"+getAccountAddress());
         System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -94,8 +175,8 @@ public class Wallet {
     }
 
     int payment_balance() {
-        if(BitQuest.REDIS.exists("payment_balance:"+this.address)) {
-            return Integer.parseInt(BitQuest.REDIS.get("payment_balance:"+this.address));
+        if(BitQuest.REDIS.exists("payment_balance:"+this.getAccountAddress())) {
+            return Integer.parseInt(BitQuest.REDIS.get("payment_balance:"+this.getAccountAddress()));
         } else {
             return 0;
         }
@@ -178,9 +259,9 @@ public class Wallet {
 
     }
     public JSONObject get_blockcypher_balance() throws IOException, ParseException {
-        System.out.println("[balance] "+this.address);
+        System.out.println("[balance] "+this.getAccountAddress());
         URL url;
-        url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+address+"/balance");
+        url=new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+this.getAccountAddress()+"/balance");
         System.out.println(url.toString());
         HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
         con.setRequestMethod("GET");
@@ -417,16 +498,17 @@ public class Wallet {
             return null;
         }
     }
-    public boolean payment(int sat, String address) {
+    public boolean payment(long sat, String to) {
         try {
-            if(this.final_balance()>=sat&&sat>=100) {
-                System.out.println("[payment] "+this.address+" -- "+sat+" -> "+address);
-                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.address,sat));
-                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.address,sat));
+            if(this.getBalance()>=sat&&sat>=100) {
+
+                System.out.println("[payment] "+this.getBalance()+" -- "+sat+" -> "+address);
+                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.getAccountAddress(),sat));
+                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.getAccountAddress(),sat));
                 System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
                 System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
 
-                return true;
+                return this.move(to,sat);
             } else {
                 return false;
             }
@@ -437,6 +519,51 @@ public class Wallet {
             e.printStackTrace();
             return false;
         }
+    }
+    boolean move(String to,long sat) throws IOException, ParseException {
+        JSONParser parser = new JSONParser();
+
+        final JSONObject jsonObject=new JSONObject();
+        jsonObject.put("jsonrpc","1.0");
+        jsonObject.put("id","bitquest");
+        jsonObject.put("method","move");
+        JSONArray params=new JSONArray();
+        params.add(this.account_id);
+        params.add(to);
+        params.add(sat/100000000L);
+
+        jsonObject.put("params",params);
+        System.out.println("Checking blockchain info...");
+        URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+        System.out.println(url.toString());
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
+        String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+        con.setRequestProperty("Authorization", "Basic " + encoding);
+
+        con.setRequestMethod("POST");
+        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        out.write(jsonObject.toString());
+        out.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        System.out.println(response.toString());
+        JSONObject response_object= (JSONObject) parser.parse(response.toString());
+        System.out.println(response_object);
+        return (boolean)response_object.get("result");
     }
     String sign_transaction(String tosign) throws InterruptedException, IOException {
         // Get runtime
