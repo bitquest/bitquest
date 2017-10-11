@@ -196,7 +196,6 @@ public class EntityEvents implements Listener {
                     System.out.println(" ------------- new hd wallet for player "+player.getDisplayName()+" ----------");
                     System.out.println(" hd address: "+user.wallet.address);
                     System.out.println(" hd path: "+user.wallet.path);
-                    System.out.println(" hd public key: "+user.wallet.public_key);
                     System.out.println(" --------------------------------------------------------------------");
                 }
             }

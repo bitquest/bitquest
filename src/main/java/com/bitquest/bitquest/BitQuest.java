@@ -144,11 +144,20 @@ public class  BitQuest extends JavaPlugin {
         }
 
         // loads world wallet
-        wallet=new Wallet("bitquest_market");
+        try {
+            wallet=new Wallet("bitquest_market");
+        } catch (IOException e) {
+            e.printStackTrace();
+            Bukkit.shutdown();
+        } catch (org.json.simple.parser.ParseException e) {
+            e.printStackTrace();
+            Bukkit.shutdown();
+        }
         try {
             getBlockChainInfo();
         } catch (org.json.simple.parser.ParseException e) {
             e.printStackTrace();
+            Bukkit.shutdown();
         }
         // sets the redis save intervals
         REDIS.configSet("SAVE","900 1 300 10 60 10000");
@@ -423,7 +432,7 @@ public class  BitQuest extends JavaPlugin {
                                     mixpanel.deliver(delivery);
                                 }
                             } else {
-                                int balance = user.wallet.getBalance();
+                                long balance = user.wallet.getBalance();
                                 if (balance < BitQuest.LAND_PRICE) {
                                     player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
                                             ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
