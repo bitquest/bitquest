@@ -28,39 +28,40 @@ public class Wallet {
     public int unconfirmedBalance;
     public String path;
     public String account_id;
+    public String address;
 
-    public Wallet(String account_id) {
-
+    public Wallet(String account_id) throws IOException, ParseException {
+        this.address=this.getAccountAddress();
         this.account_id=account_id;
     }
 
 
 
 
-//    public int final_balance() throws IOException, ParseException {
-//        int total_received;
-//        int unconfirmed_balance;
-////        if(BitQuest.BITCORE_HOST!=null) {
-////            JSONObject bitcore_balance=this.get_bitcore_balance();
-////            total_received=((Number)bitcore_balance.get("totalReceivedSat")).intValue();
-////            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalanceSat")).intValue();
-////        } else {
-////            JSONObject blockcypher_balance=this.get_blockcypher_balance();
-////            total_received=((Number)blockcypher_balance.get("total_received")).intValue();
-////            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
-////        }
-//
-//
-//        int final_balance=total_received;
-//
-//        if(unconfirmed_balance>0) {
-//            final_balance=final_balance+unconfirmed_balance;
-//        }
-//        final_balance=final_balance+this.payment_balance();
-//
-//        BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
-//        return final_balance;
-//    }
+    public int final_balance() throws IOException, ParseException {
+        int total_received;
+        int unconfirmed_balance;
+        if(BitQuest.BITCORE_HOST!=null) {
+            JSONObject bitcore_balance=this.get_bitcore_balance();
+            total_received=((Number)bitcore_balance.get("totalReceivedSat")).intValue();
+            unconfirmed_balance=((Number)bitcore_balance.get("unconfirmedBalanceSat")).intValue();
+        } else {
+            JSONObject blockcypher_balance=this.get_blockcypher_balance();
+            total_received=((Number)blockcypher_balance.get("total_received")).intValue();
+            unconfirmed_balance=((Number)blockcypher_balance.get("unconfirmed_balance")).intValue();
+        }
+
+
+        int final_balance=total_received;
+
+        if(unconfirmed_balance>0) {
+            final_balance=final_balance+unconfirmed_balance;
+        }
+        final_balance=final_balance+this.payment_balance();
+
+        BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
+        return final_balance;
+    }
     long getBalance() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
@@ -174,7 +175,7 @@ public class Wallet {
         return (JSONObject) parser.parse(response.toString());
     }
 
-    int payment_balance() {
+    int payment_balance() throws IOException, ParseException {
         if(BitQuest.REDIS.exists("payment_balance:"+this.getAccountAddress())) {
             return Integer.parseInt(BitQuest.REDIS.get("payment_balance:"+this.getAccountAddress()));
         } else {
@@ -787,7 +788,7 @@ public class Wallet {
     }
     public boolean blockcypher_microtransaction(int sat, String address) throws IOException {
         JsonObject payload=new JsonObject();
-        payload.addProperty("from_private",this.privatekey);
+        // payload.addProperty("from_private",this.privatekey);
         payload.addProperty("to_address",address);
         payload.addProperty("value_satoshis",sat);
         URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/txs/micro?token=" + BitQuest.BLOCKCYPHER_API_KEY);
