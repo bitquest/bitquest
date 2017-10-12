@@ -503,29 +503,30 @@ public class Wallet {
             return null;
         }
     }
-    public boolean payment(long sat, String to) {
-        try {
-            if(this.getBalance()>=sat&&sat>=100) {
-
-                System.out.println("[payment] "+this.getBalance()+" -- "+sat+" -> "+address);
-                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.getAccountAddress(),sat));
-                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.getAccountAddress(),sat));
-                System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
-                System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
-
-                return this.move(to,sat);
-            } else {
-                return false;
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            return false;
-        }
+    public boolean payment(int sat, String to) {
+//        try {
+//            if(this.getBalance()>=sat&&sat>=100) {
+//
+//                System.out.println("[payment] "+this.getBalance()+" -- "+sat+" -> "+address);
+//                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.getAccountAddress(),sat));
+//                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.getAccountAddress(),sat));
+//                System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
+//                System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
+//
+//                return this.move(to,sat);
+//            } else {
+//                return false;
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//            return false;
+//        } catch (ParseException e) {
+//            e.printStackTrace();
+//            return false;
+//        }
+        return false;
     }
-    boolean move(String to,long sat) throws IOException, ParseException {
+    boolean move(String to,int sat) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject=new JSONObject();
@@ -535,8 +536,12 @@ public class Wallet {
         JSONArray params=new JSONArray();
         params.add(this.account_id);
         params.add(to);
-        params.add(sat/100000000L);
+        System.out.println(sat);
+        Double double_sat=new Double(sat);
+        System.out.println(double_sat);
 
+        params.add(double_sat/100000000L);
+        System.out.println(params);
         jsonObject.put("params",params);
         System.out.println("Checking blockchain info...");
         URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
