@@ -595,11 +595,22 @@ public class  BitQuest extends JavaPlugin {
 
         //      user.player.sendMessage(ChatColor.YELLOW + " ");
 //        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
-        if(BITQUEST_ENV.equalsIgnoreCase("development")) {
-            user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
-            if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
-                user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
+//        if(BITQUEST_ENV.equalsIgnoreCase("development")) {
+//            user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
+//            if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
+//                user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
+//            }
+//        }
+        if(REDIS.exists("hd:address:"+user.player.getUniqueId().toString())){
+            String address=REDIS.get("hd:address:"+user.player.getUniqueId().toString());
+            user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
+
+            if(REDIS.exists("final_balance:"+address)) {
+                String final_balance=BitQuest.REDIS.get("final_balance:"+address);
+                user.player.sendMessage(ChatColor.GREEN + "Balance: " +ChatColor.WHITE+final_balance);
+                user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits." );
             }
+
         }
     };
     public boolean landIsClaimed(Location location) {

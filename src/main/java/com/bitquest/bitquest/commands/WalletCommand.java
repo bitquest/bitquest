@@ -20,7 +20,6 @@ public class WalletCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         try {
             User user=new User(player);
-            System.out.println("[/wallet] final balance: "+user.wallet.final_balance());
             bitQuest.sendWalletInfo(user);
             bitQuest.updateScoreboard(player);
         } catch (ParseException e) {
