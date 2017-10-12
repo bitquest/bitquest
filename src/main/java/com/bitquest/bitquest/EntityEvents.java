@@ -406,7 +406,6 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onClick(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        bitQuest.updateScoreboard(event.getPlayer());
 
         if (event.getItem() != null) {
             final Player player=event.getPlayer();
