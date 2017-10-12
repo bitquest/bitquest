@@ -410,36 +410,42 @@ public class  BitQuest extends JavaPlugin {
                         BitQuest bitQuest = this;
 
                         try {
+                            if(user.wallet.getBalance()>=LAND_PRICE) {
+                                if (user.wallet.move("land", LAND_PRICE)) {
 
-                            if (user.wallet.payment(BitQuest.LAND_PRICE, BitQuest.LAND_ADDRESS)) {
+                                    BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                    BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                    player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                    updateScoreboard(player);
+                                    if (bitQuest.messageBuilder != null) {
 
-                                BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                                BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                                player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-                                if (bitQuest.messageBuilder != null) {
-
-                                    // Create an event
-                                    org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                    org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
-
-
-                                    ClientDelivery delivery = new ClientDelivery();
-                                    delivery.addMessage(sentEvent);
-                                    delivery.addMessage(sentCharge);
+                                        // Create an event
+                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                        org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
 
 
-                                    MixpanelAPI mixpanel = new MixpanelAPI();
-                                    mixpanel.deliver(delivery);
+                                        ClientDelivery delivery = new ClientDelivery();
+                                        delivery.addMessage(sentEvent);
+                                        delivery.addMessage(sentCharge);
+
+
+                                        MixpanelAPI mixpanel = new MixpanelAPI();
+                                        mixpanel.deliver(delivery);
+                                    }
+                                } else {
+                                    long balance = user.wallet.getBalance();
+                                    if (balance < BitQuest.LAND_PRICE) {
+                                        player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                                ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                    } else {
+                                        player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                    }
                                 }
                             } else {
-                                long balance = user.wallet.getBalance();
-                                if (balance < BitQuest.LAND_PRICE) {
-                                    player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                            ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
-                                } else {
-                                    player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-                                }
+                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                        ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100)+ChatColor.RESET+ChatColor.RED+" Bits.");
                             }
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
