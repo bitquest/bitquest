@@ -20,10 +20,10 @@ public class LandCommand extends CommandAction {
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if(args[0].equalsIgnoreCase("claim")) {
-            StringBuilder sb = new StringBuilder(args[2]);
-            for (int i = 3; i < args.length; i++){
-                sb.append(" " + args[i]);
-            }
+            StringBuilder sb = new StringBuilder(args[1]);
+//            for (int i = 3; i < args.length; i++){
+//                sb.append(" " + args[i]);
+//            }
             String claimName = sb.toString().trim();
 
             Location location=player.getLocation();
