@@ -269,15 +269,15 @@ public class  BitQuest extends JavaPlugin {
 
         Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
         int final_balance=0;
-        if(REDIS.exists("final_balance:"+player.getUniqueId())) {
-            final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId()));
-        }
-        if(statsd!=null) {
-            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
+//        if(REDIS.exists("final_balance:"+player.getUniqueId())) {
+//            final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId()));
+//        }
+//        if(statsd!=null) {
+//            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
+//
+//        }
 
-        }
-
-        score.setScore(final_balance/100);
+        score.setScore((int) (user.wallet.getBalance()/100));
         player.setScoreboard(walletScoreboard);
     }
     public void createScheduledTimers() {
@@ -584,7 +584,7 @@ public class  BitQuest extends JavaPlugin {
 
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + BitQuest.REDIS.get("final_balance:"+user.wallet.getAccountAddress()) + " Satoshi");
+        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance() + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");

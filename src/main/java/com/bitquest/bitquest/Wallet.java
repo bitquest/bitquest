@@ -31,8 +31,9 @@ public class Wallet {
     public String address;
 
     public Wallet(String account_id) throws IOException, ParseException {
-        this.address=this.getAccountAddress();
         this.account_id=account_id;
+        this.address=this.getAccountAddress();
+
     }
 
 
@@ -62,7 +63,7 @@ public class Wallet {
         BitQuest.REDIS.set("final_balance:"+this.address,String.valueOf(final_balance));
         return final_balance;
     }
-    long getBalance() throws IOException, ParseException {
+    Long getBalance() throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject=new JSONObject();
@@ -71,8 +72,9 @@ public class Wallet {
         jsonObject.put("method","getbalance");
         JSONArray params=new JSONArray();
         params.add(this.account_id);
+        params.add(0);
         jsonObject.put("params",params);
-        System.out.println("Checking blockchain info...");
+        System.out.println(params);
         URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
         System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -102,7 +104,8 @@ public class Wallet {
         System.out.println(response.toString());
         JSONObject response_object= (JSONObject) parser.parse(response.toString());
         System.out.println(response_object);
-        return ((long)response_object.get("result")*100000000L);
+        System.out.println(response_object.get("result"));
+        return new Double((double)response_object.get("result")*100000000).longValue();
 
     }
     String getAccountAddress() throws IOException, ParseException {
@@ -114,8 +117,9 @@ public class Wallet {
         jsonObject.put("method","getaccountaddress");
         JSONArray params=new JSONArray();
         params.add(this.account_id);
+        System.out.println(params);
+
         jsonObject.put("params",params);
-        System.out.println("Checking blockchain info...");
         URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
         System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
