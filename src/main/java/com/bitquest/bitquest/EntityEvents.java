@@ -493,12 +493,14 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(player);
-                    final int money = BitQuest.rand(1,level);
+                    int money = BitQuest.rand(1,level);
+                    money=money*100;
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
 
                     try {
-                        if (d20==20&&bitQuest.wallet.final_balance() > money) {
+                        System.out.println(bitQuest.wallet.getBalance());
+                        if (d20==20&&bitQuest.wallet.getBalance() > money) {
 
 
                             final Wallet userWallet = user.wallet;
@@ -506,10 +508,10 @@ public class EntityEvents implements Listener {
 
 
                             try {
-                                if (bitQuest.wallet.payment(money, userWallet.address)) {
+                                if (bitQuest.wallet.move(player.getUniqueId().toString(),money)) {
                                     System.out.println("[loot] " + player.getDisplayName() + ": " + money);
                                     player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                    // player.playSound(player.getLocation(), Sound.LEVEL_UP, 20, 1);
+                                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
                                     if (bitQuest.messageBuilder != null) {
 
                                         // Create an event
