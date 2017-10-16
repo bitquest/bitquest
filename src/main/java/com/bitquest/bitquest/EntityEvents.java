@@ -258,9 +258,6 @@ public class EntityEvents implements Listener {
                 String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
                 String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
-                if(name1==null) name1="the wilderness";
-                if(name2==null) name2="the wilderness";
-
                 if(!name1.equals(name2)) {
                     if(name2.equals("the wilderness")){
                         event.getPlayer().sendMessage(ChatColor.GRAY+"[ "+name2+" ]");
