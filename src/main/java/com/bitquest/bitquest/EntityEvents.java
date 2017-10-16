@@ -255,11 +255,8 @@ public class EntityEvents implements Listener {
                 int x2=event.getTo().getChunk().getX();
                 int z2=event.getTo().getChunk().getZ();
 
-                String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-                String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
-
-                if(name1==null) name1="the wilderness";
-                if(name2==null) name2="the wilderness";
+                String name1 = BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
+                String name2 = BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
                 if(!name1.equals(name2)) {
                     if(name2.equals("the wilderness")){
@@ -621,73 +618,81 @@ public class EntityEvents implements Listener {
 
         // Gives random SWORD
         if (BitQuest.rand(0, 32) < level && !(entity instanceof Skeleton)) {
-            ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_AXE);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOOD_SWORD);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_SWORD);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.DIAMOND_SWORD);
+            Material material = Material.WOODEN_DOOR;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_AXE;
+            if (BitQuest.rand(0, 128) < level) material = Material.WOOD_SWORD;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_SWORD;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_SWORD;
+            ItemStack sword = new ItemStack(material);
 
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
+            for(short i = 0; i < 4; i++){
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(sword);
+            }
 
             entity.getEquipment().setItemInHand(sword);
         }
 
         // Gives random HELMET
         if (BitQuest.rand(0, 32) < level) {
-            ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.IRON_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.DIAMOND_HELMET);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
+            Material material = Material.LEATHER_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_HELMET;
+            ItemStack helmet = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++){
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(helmet);
+            }
 
             entity.getEquipment().setHelmet(helmet);
         }
 
         // Gives random CHESTPLATE
         if (BitQuest.rand(0, 32) < level) {
-            ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.IRON_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.DIAMOND_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
+            Material material = Material.LEATHER_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_CHESTPLATE;
+            ItemStack chest = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(chest);
+            }
 
             entity.getEquipment().setChestplate(chest);
         }
 
         // Gives random Leggings
         if (BitQuest.rand(0, 128) < level) {
-            ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.IRON_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.DIAMOND_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
+            Material material = Material.LEATHER_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_LEGGINGS;
+            ItemStack leggings = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(leggings);
+            }
 
             entity.getEquipment().setLeggings(leggings);
         }
 
         // Gives Random BOOTS
         if (BitQuest.rand(0, 128) < level) {
-            ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.CHAINMAIL_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.IRON_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.DIAMOND_BOOTS);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
+            Material material = Material.LEATHER_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_BOOTS;
+            ItemStack boots = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(boots);
+            }
 
             entity.getEquipment().setBoots(boots);
         }
