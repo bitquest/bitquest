@@ -394,8 +394,6 @@ public class EntityEvents implements Listener {
 
 
                             final Wallet userWallet = user.wallet;
-                            BitQuest.REDIS.expire("balance" + player.getUniqueId().toString(), 5);
-
 
                             try {
                                 if (bitQuest.wallet.move(player.getUniqueId().toString(),money)) {
