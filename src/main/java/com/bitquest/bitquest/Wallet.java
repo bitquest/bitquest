@@ -512,53 +512,53 @@ public class Wallet {
         return false;
     }
     public boolean move(String to,int sat) throws IOException, ParseException {
-        JSONParser parser = new JSONParser();
+        int MAX_MOVE=10000000;
 
-        final JSONObject jsonObject=new JSONObject();
-        jsonObject.put("jsonrpc","1.0");
-        jsonObject.put("id","bitquest");
-        jsonObject.put("method","move");
-        JSONArray params=new JSONArray();
-        params.add(this.account_id);
-        params.add(to);
-        System.out.println(sat);
-        Double double_sat=new Double(sat);
-        System.out.println(double_sat);
+        if(sat>=100&&sat<=MAX_MOVE) {
+            JSONParser parser = new JSONParser();
 
-        params.add(double_sat/100000000L);
-        System.out.println(params);
-        jsonObject.put("params",params);
-        System.out.println("Checking blockchain info...");
-        URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
-        System.out.println(url.toString());
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-        String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
-        con.setRequestProperty("Authorization", "Basic " + encoding);
+            final JSONObject jsonObject=new JSONObject();
+            jsonObject.put("jsonrpc","1.0");
+            jsonObject.put("id","bitquest");
+            jsonObject.put("method","move");
+            JSONArray params=new JSONArray();
+            params.add(this.account_id);
+            params.add(to);
+            Double double_sat=new Double(sat);
 
-        con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-        con.setDoOutput(true);
-        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        out.write(jsonObject.toString());
-        out.close();
+            params.add(double_sat/100000000L);
+            jsonObject.put("params",params);
+            URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
+            String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+            con.setRequestProperty("Authorization", "Basic " + encoding);
 
-        int responseCode = con.getResponseCode();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+            con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            con.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+            out.write(jsonObject.toString());
+            out.close();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+            int responseCode = con.getResponseCode();
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            JSONObject response_object= (JSONObject) parser.parse(response.toString());
+            return (boolean)response_object.get("result");
+        } else {
+            System.out.println("[move] "+this.account_id+"-> "+sat+" --> "+to+": FAIL (must be between 100 & "+MAX_MOVE+")");
+            return false;
         }
-        in.close();
-        System.out.println(response.toString());
-        JSONObject response_object= (JSONObject) parser.parse(response.toString());
-        System.out.println(response_object);
-        return (boolean)response_object.get("result");
     }
 
     public boolean sendFrom(String address,int sat) throws IOException, ParseException {
