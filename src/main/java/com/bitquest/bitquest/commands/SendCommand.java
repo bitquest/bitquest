@@ -37,9 +37,9 @@ public class SendCommand extends CommandAction {
                         if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
 
                             try {
-                                User user=new User(player);
+                                final User user=new User(player);
                                 User user_tip=new User(onlinePlayer);
-                                if(user.wallet.payment(sat,user_tip.wallet.address)==true) {
+                                if(user.wallet.move(user_tip.player.getUniqueId().toString(),sat)) {
                                     bitQuest.updateScoreboard(onlinePlayer);
                                     bitQuest.updateScoreboard(player);
                                     player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
