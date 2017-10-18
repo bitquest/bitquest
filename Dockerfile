@@ -1,9 +1,9 @@
-FROM debian:jessie
+FROM debian:stretch
 
 RUN apt-get update
 RUN apt-get install -y wget
-RUN apt-get install -y default-jre
-RUN apt-get install -y default-jdk
+RUN apt-get install -y openjdk-8-jre
+RUN apt-get install -y openjdk-8-jdk
 RUN apt-get install -y git
 
 RUN mkdir /bitquest
