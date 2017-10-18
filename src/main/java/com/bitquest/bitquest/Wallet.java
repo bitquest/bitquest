@@ -59,7 +59,7 @@ public class Wallet {
             return 0;
         }
     }
-    Long getBalance() throws IOException, ParseException {
+    public Long getBalance(int confirmations) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject=new JSONObject();
@@ -561,7 +561,7 @@ public class Wallet {
         }
     }
 
-    public boolean sendFrom(String address,int sat) throws IOException, ParseException {
+    public String sendFrom(String address,int sat) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject=new JSONObject();
@@ -608,7 +608,7 @@ public class Wallet {
         System.out.println(response.toString());
         JSONObject response_object= (JSONObject) parser.parse(response.toString());
         System.out.println(response_object);
-        return (boolean)response_object.get("result");
+        return (String)response_object.get("result");
     }
     String sign_transaction(String tosign) throws InterruptedException, IOException {
         // Get runtime

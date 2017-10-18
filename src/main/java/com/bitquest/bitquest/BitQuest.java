@@ -63,7 +63,7 @@ public class  BitQuest extends JavaPlugin {
     public final static int BITCOIN_NODE_PORT = System.getenv("BITCOIN_NODE_PORT") != null ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT")) : 18332;
     public final static String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
     public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
-
+    public final static String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
     public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
     public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
@@ -277,7 +277,7 @@ public class  BitQuest extends JavaPlugin {
 //
 //        }
 
-        score.setScore((int) (user.wallet.getBalance()/100));
+        score.setScore((int) (user.wallet.getBalance(0)/100));
         player.setScoreboard(walletScoreboard);
     }
     public void createScheduledTimers() {
@@ -342,7 +342,7 @@ public class  BitQuest extends JavaPlugin {
     }
     public  void sendWalletMetrics() {
         try {
-            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.getBalance());
+            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.getBalance(0));
         } catch (IOException e) {
             e.printStackTrace();
         } catch (org.json.simple.parser.ParseException e) {
@@ -410,7 +410,7 @@ public class  BitQuest extends JavaPlugin {
                         BitQuest bitQuest = this;
 
                         try {
-                            if(user.wallet.getBalance()>=LAND_PRICE) {
+                            if(user.wallet.getBalance(0)>=LAND_PRICE) {
                                 if (user.wallet.move("land", LAND_PRICE)) {
 
                                     BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
@@ -433,7 +433,7 @@ public class  BitQuest extends JavaPlugin {
                                         mixpanel.deliver(delivery);
                                     }
                                 } else {
-                                    long balance = user.wallet.getBalance();
+                                    long balance = user.wallet.getBalance(0);
                                     if (balance < BitQuest.LAND_PRICE) {
                                         player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
                                                 ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
@@ -590,7 +590,8 @@ public class  BitQuest extends JavaPlugin {
 
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Final Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance() + " Satoshi");
+        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(0) + " Satoshi");
+        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(5) + " Satoshi");
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");

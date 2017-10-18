@@ -49,21 +49,25 @@ public class TransferCommand extends CommandAction {
                 if (fromWallet != null) {
                     player.sendMessage(ChatColor.YELLOW + "Sending " + args[0] + " Bits to " + args[1] + "...");
                     try {
-                        if (fromWallet.sendFrom(args[1], sendAmount)) {
-                            player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " Bits to external address.");
-                            bitQuest.updateScoreboard(player);
-                            return true;
-                        } else {
-                            player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
-                            return true;
-                        }
+                        String txid=fromWallet.sendFrom(args[1], sendAmount);
+                        player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " Bits to external address.");
+                        player.sendMessage(ChatColor.BLUE+" "+ChatColor.UNDERLINE+ "https://live.blockcypher.com/btc-main/tx/"+txid);
+                        bitQuest.updateScoreboard(player);
+                        return true;
+
                     } catch (IOException e) {
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
+
                         e.printStackTrace();
                         return true;
                     } catch (org.json.simple.parser.ParseException e) {
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
+
                         e.printStackTrace();
                         return true;
                     } catch (ParseException e) {
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
+
                         e.printStackTrace();
                         return true;
                     }
