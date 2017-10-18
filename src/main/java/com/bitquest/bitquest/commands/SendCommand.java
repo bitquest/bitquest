@@ -64,6 +64,7 @@ public class SendCommand extends CommandAction {
                             }
                         } else {
                             player.sendMessage(ChatColor.RED+"You cannot send to yourself!");
+                            return true;
                         }
                     }
                 }
