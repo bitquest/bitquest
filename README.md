@@ -48,7 +48,6 @@ The BitQuest server has it's own address, used for giving Loot to players
 ## About the back-end technology
 
 All persistent data is saved in a redis database so the server can respond as quick as possible. 
-All transactions in the game are on-chain using [Blockcypher](http://blockcypher.com/)'s microtransactions API or in case of player-to-email [XAPO API](http://docs.xapo.apiary.io/).
 
 Everybody is welcome to contribute. :D
 
@@ -75,61 +74,45 @@ After the workspace is set up, we can compile using the shadowJar task that will
 ````
 ./gradlew shadowJar
 ````
+# Requirements for development
+
+A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
 
 # Running a local BitQuest test server
 
-Running locally via Docker is the fastest way to develop and test code. Docker is also the recommended way to run BitQuest in production, however configuration is different. Docker works by creating a "container" that runs your code that is very similar in concept to a Virtual machine. The file docker-compose.yml can be used to create this image and run a local server "synced" with your builds, so you won't need to restart the server to update changes.
+Running locally via Docker is the fastest way to develop and test code. [Docker](http://docker.com) and [Docker Compose](https://docs.docker.com/compose/) can be used for testing the compiled plugin on spigot.
 
 1. Build BitQuest using the instructions above (./gradlew shadowJar).
-2. Install Docker, the container runtime (For Windows and Mac, Beta version is recommended):
-[Get Docker](http://docs.docker.com/mac/started/)
-3. Install docker-compose, to orchestrate our dev environment: [Get docker-compose](http://docs.docker.com/mac/started/)
-4. Create development.yml file, where your local variables will be. This is done to protect API and private keys you might want to use to test. (development.yml is in .gitignore so it won't be uploaded to github) A good starting point is:
+2. Install [Docker](https://docs.docker.com/engine/installation/), and [Docker Compose](https://docs.docker.com/compose/install/) if you haven't yet.
+3. Create a docker-compose.yml file with your configuration. A good idea is to create a volume on spigot's 'plugins' pointing to the local directory where .jar files are compiled. Or you can use the following example:
 
 ````
 spigot:
+  container_name: bitquest
   environment:
-    - BLOCKCYPHER_API_KEY=<your API key here>
+    - BITQUEST_ENV=development
+    - BITCOIN_NODE_HOST=127.0.0.1 # or the IP of your Bitcoin Core node
+    - BITCOIN_NODE_USERNAME=alice # the username for the RPC-JSON interface
+    - BITCOIN_NODE_PASSWORD=secret # the password for RPC-JSON
+  build: .
+  volumes:
+    - "./build/libs/:/spigot/plugins"
+    - ".:/bitquest"
+  ports:
+    - "25565:25565"
+  links:
+    - redis
+redis:
+  image: redis
+
 
 ````
 
-5. Create a "bitquest" HD wallet in BlockCypher, using your API Key and a Bitcoin public key. You can use the testnet public key found on the docker-compose.yml:
+4. Use docker-compose to spawn a test server
 
 ```
-curl -d '{"name": "bitquest", "extended_public_key": "tpubD6NzVbkrYhZ4Wwu2zXR4r2LAD87nLwqdKWBsH8qa2EkSbD5RSJARhCEKoBjuJAbig7aowS6gGJz9S6R77Yqf6DLE7qTFuT3ZV6ZZeKQGRs7", "subchain_indexes": [0]}' https://api.blockcypher.com/v1/btc/test3/wallets/hd?token=<Your API Key>
-```
-
-6. To start your test server with docker-compose you can now run:
-
-````
 docker-compose up
-````
-The server will run with a local volume pointing to your latest jar built with Gradle. That means you can /reload inside the server and watch changes without restarting the Spigot container.
-
-# Running your local BitQuest server
-To run BitQuest might want to do the same steps as with a local test server, but specify a Bitcoin address for your local loot wallet, a BlockCypher API key and (optional) your Mojang account UUID so you are admin in your own server (otherwise you won't have op). To do this, you'll need to create a development.yml file that docker-compose will use to configure your local BitQuest instance.
-
-You will be able to connect to ````localhost```` in Minecraft, and every time you run the ````shadowJar```` gradle task, following a ````/reload````command inside the game, you'll be playing in your newest compiled code, without restarting or rebuilding the container.
-
-# Environment variables reference
-
-## BLOCKCYPHER_API_KEY
-Your API key obtained by blockcypher. This is not optional
-
-## BLOCKCHAIN
-The Blockhain the server will run in. Options are btc/main for Bitcoin, btc/test3 for Testnet, doge/main for Dogecoin
-
-## WORLD_ADDRESS
-The address of the world wallet. World wallet is where purchases are going to, and where loot comes from.
-
-## HD_TRANSFER_ADDRESS
-if defined, the world will use HD wallets for users and only one private key (WORLD_PRIVATE_KEY) will be used for /transfer. Otherwise /transfer (and fees) will occur on each player's wallet.
-
-## WORLD_PRIVATE_KEY
-Private key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the private key of HD_TRANSFER_ADDRESS
-
-## WORLD_PUBLIC_KEY
-Public key of the world wallet. If TRANSFER_ADDRESS is defined, it should be the public key of HD_TRANSFER_ADDRESS
+```
 
 # More info
 
