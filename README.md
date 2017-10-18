@@ -17,7 +17,6 @@ This server is still under development, and bugs can, and most likely will, happ
 The [BitQuest](https://bitquest.co/) server and every player has a bitcoin address. Any player can receive and send bitcoin to any address inside or outside the game. This is useful for buying materials, selling crafts, trading, tipping, etcetera.
 ![A player just joined the server](http://i.imgur.com/1A6wkaB.png)
 ![The playercan see it's bitcoin balance](http://i.imgur.com/5g5pBXB.png)
-Thanks to the open nature of Bitcoin, all transactions in the server can be seen on the Blockchain using tools like [Insight](https://insight.bitpay.com/) or [Blockchain.Info](https://blockchain.info/). This is helpful for debugging and transparency.
 
 ## And there's loot!
 Every time a player kills an enemy (mob) there is a chance to get loot. If that is the case the server makes a transaction directly from the server address to the player address and the player is notified.
