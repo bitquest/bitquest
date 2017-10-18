@@ -611,8 +611,8 @@ public class  BitQuest extends JavaPlugin {
         if(REDIS.exists("hd:address:"+user.player.getUniqueId().toString())){
             String address=REDIS.get("hd:address:"+user.player.getUniqueId().toString());
             user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
-
-            if(REDIS.exists("final_balance:"+address)) {
+            int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
+            if(legacy_wallet_balance>0) {
                 String final_balance=BitQuest.REDIS.get("final_balance:"+address);
                 user.player.sendMessage(ChatColor.GREEN + "Balance: " +ChatColor.WHITE+final_balance);
                 user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits." );
