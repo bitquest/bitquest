@@ -113,7 +113,4 @@ redis:
 docker-compose up
 ```
 
-# More info
 
-More info about [BitQuest](https://bitquest.co/) at
-https://bitquest.co/
