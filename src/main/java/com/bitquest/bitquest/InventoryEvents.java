@@ -134,7 +134,7 @@ public class InventoryEvents implements Listener {
                                 break;
                             }
                         }
-                        if(user.wallet.getBalance()>=sat) {
+                        if(user.wallet.getBalance(0)>=sat) {
                             if (hasOpenSlots) {
 
 

@@ -142,7 +142,7 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.getBalance() / 100 + " bits");
+            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.getBalance(0) / 100 + " bits");
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
 
@@ -368,8 +368,7 @@ public class EntityEvents implements Listener {
         event.setKeepInventory(true);
         event.setKeepLevel(true);
         event.setDeathMessage(null);
-        String spawnkey=spawnKey(event.getEntity().getLocation());
-        BitQuest.REDIS.expire(spawnkey,30);
+
     }
     @EventHandler
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
@@ -378,10 +377,7 @@ public class EntityEvents implements Listener {
         int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
-            final String spawnkey = spawnKey(entity.getLocation());
 
-            BitQuest.REDIS.expire(spawnkey,30000);
-            System.out.println("[death] "+spawnkey+", "+level);
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
@@ -393,8 +389,8 @@ public class EntityEvents implements Listener {
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
 
                     try {
-                        System.out.println(bitQuest.wallet.getBalance());
-                        if (d20==20&&bitQuest.wallet.getBalance() > money) {
+                        System.out.println(bitQuest.wallet.getBalance(0));
+                        if (d20==20&&bitQuest.wallet.getBalance(0) > money) {
 
 
                             final Wallet userWallet = user.wallet;
@@ -482,7 +478,7 @@ public class EntityEvents implements Listener {
 
             LivingEntity entity = e.getEntity();
             if (entity instanceof Monster) {
-                String key="mob:"+e.getLocation().getWorld().getName()+":"+chunk.getX()+":"+chunk.getZ();
+                    String key="mob:"+e.getLocation().getWorld().getName()+":"+chunk.getX()+":"+chunk.getZ();
 
 
 
@@ -499,7 +495,7 @@ public class EntityEvents implements Listener {
                     // Disable mob spawners. Keep mob farmers away
                     if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                         e.setCancelled(true);
-                    } else if (bitQuest.landIsClaimed(e.getLocation()) == false&&(bitQuest.REDIS.exists(key)==false||BitQuest.rand(1,20)==20)) {
+                    } else if (bitQuest.landIsClaimed(e.getLocation()) == false) {
                         bitQuest.REDIS.set(key,"1");
                         bitQuest.REDIS.expire(key,3000);
                         e.setCancelled(false);
