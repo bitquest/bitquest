@@ -317,7 +317,7 @@ public class  BitQuest extends JavaPlugin {
                     sendWorldMetrics();
                 }
             }
-        }, 0, 1200L);
+        }, 0, 12000L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
