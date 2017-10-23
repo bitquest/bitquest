@@ -317,7 +317,7 @@ public class  BitQuest extends JavaPlugin {
                     sendWorldMetrics();
                 }
             }
-        }, 0, 12000L);
+        }, 0, 120000L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
@@ -325,7 +325,7 @@ public class  BitQuest extends JavaPlugin {
                     sendWalletMetrics();
                 }
             }
-        }, 0, 12000L);
+        }, 0, 120000L);
         REDIS.set("lastloot","nobody");
 
 
