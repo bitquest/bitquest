@@ -191,7 +191,8 @@ public class  BitQuest extends JavaPlugin {
         commands.put("transfer", new TransferCommand(this));
         commands.put("report", new ReportCommand(this));
         commands.put("send", new SendCommand(this));
-        commands.put("upgradeWallet", new UpgradeWallet());
+        commands.put("upgradewallet", new UpgradeWallet(this));
+        commands.put("donate", new DonateCommand(this));
 
         modCommands = new HashMap<String, CommandAction>();
         modCommands.put("butcher", new ButcherCommand());
