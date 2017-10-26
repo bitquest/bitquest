@@ -58,3 +58,6 @@ commands:
   report:
     description: "Sends a report message to the moderators"
     usage: "/report <player> <reason>"
+  donate:
+    description: "Donate to BitQuest from your wallet"
+    usage: "/donate <bits>"
