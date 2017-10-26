@@ -91,7 +91,8 @@ public class InventoryEvents implements Listener {
         trades.add(new Trade(new ItemStack(Material.CAKE,4),2500));
         trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,2),10000));
         trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,3),20000));
-        
+        trades.add(new Trade(new ItemStack(Material.PUMPKIN,3),100));
+
 
 
     }

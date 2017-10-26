@@ -136,6 +136,8 @@ public class  BitQuest extends JavaPlugin {
 
         // player does not lose inventory on death
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doDaylightCycle false");
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 20000");
 
         // loads config file. If it doesn't exist, creates it.
         getDataFolder().mkdir();
@@ -205,6 +207,7 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("banlist", new BanlistCommand());
         modCommands.put("spectate", new SpectateCommand(this));
         modCommands.put("emergencystop", new EmergencystopCommand());
+        sendDiscordMessage("bitquest started");
     }
     // @todo: make this just accept the endpoint name and (optional) parameters
     public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
@@ -325,11 +328,16 @@ public class  BitQuest extends JavaPlugin {
                 if(statsd!=null) {
                     sendWalletMetrics();
                 }
+                set_night_time();
             }
         }, 0, 120000L);
         REDIS.set("lastloot","nobody");
 
 
+    }
+    public void set_night_time() {
+        World world=this.getServer().getWorld("world");
+        world.setTime(20000);
     }
     public void sendMetric(String name,int value) {
         statsd.gauge(BITQUEST_ENV+"."+name,value);
@@ -650,7 +658,49 @@ public class  BitQuest extends JavaPlugin {
         }
         return true;
     }
+    public boolean sendDiscordMessage(String content) {
+        System.out.println(DISCORD_HOOK_URL);
+        if(DISCORD_HOOK_URL!=null) {
+            try {
+                JSONParser parser = new JSONParser();
 
+                final JSONObject jsonObject=new JSONObject();
+                jsonObject.put("content",content);
+
+                URL url = new URL(DISCORD_HOOK_URL);
+                HttpsURLConnection con = null;
+
+                con = (HttpsURLConnection) url.openConnection();
+
+
+                con.setRequestMethod("POST");
+                con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                con.setDoOutput(true);
+                OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+                out.write(jsonObject.toString());
+                out.close();
+                int responseCode = con.getResponseCode();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                System.out.println(response.toString());
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
     public void crashtest() {
         this.setEnabled(false);
     }
