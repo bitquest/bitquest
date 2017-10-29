@@ -136,8 +136,7 @@ public class  BitQuest extends JavaPlugin {
 
         // player does not lose inventory on death
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule doDaylightCycle false");
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "time set 20000");
+
 
         // loads config file. If it doesn't exist, creates it.
         getDataFolder().mkdir();
