@@ -108,11 +108,9 @@ public class Wallet {
         jsonObject.put("method","getaccountaddress");
         JSONArray params=new JSONArray();
         params.add(this.account_id);
-        System.out.println(params);
 
         jsonObject.put("params",params);
         URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
-        System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
         String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
@@ -137,9 +135,7 @@ public class Wallet {
             response.append(inputLine);
         }
         in.close();
-        System.out.println(response.toString());
         JSONObject response_object= (JSONObject) parser.parse(response.toString());
-        System.out.println(response_object);
         return (String)response_object.get("result");
 
     }
