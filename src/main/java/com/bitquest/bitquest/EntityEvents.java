@@ -472,6 +472,8 @@ public class EntityEvents implements Listener {
     // TODO: Magma Cubes don't get levels or custom names for some reason...
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
+        // e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);
+
         Chunk chunk=e.getLocation().getChunk();
 
             LivingEntity entity = e.getEntity();
@@ -556,6 +558,11 @@ public class EntityEvents implements Listener {
                             }
                         }
                         System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
+                        if(bitQuest.rand(1,20)==20&& bitQuest.spookyMode==true) {
+                            e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
+                            e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);
+
+                        }
                     } else {
                         e.setCancelled(true);
                     }

@@ -18,10 +18,7 @@ import org.bukkit.*;
 import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
+import org.bukkit.entity.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -109,6 +106,7 @@ public class  BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
+    public boolean spookyMode=false;
 
     private Map<String, CommandAction> commands;
     private Map<String, CommandAction> modCommands;
@@ -320,23 +318,39 @@ public class  BitQuest extends JavaPlugin {
                     sendWorldMetrics();
                 }
             }
-        }, 0, 120000L);
+        }, 0, 12000L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 if(statsd!=null) {
                     sendWalletMetrics();
                 }
-                set_night_time();
             }
-        }, 0, 120000L);
+        }, 0, 12000L);
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                run_season_events();
+            }
+        }, 0, 1200L);
         REDIS.set("lastloot","nobody");
 
 
     }
-    public void set_night_time() {
-        World world=this.getServer().getWorld("world");
-        world.setTime(20000);
+
+    public void run_season_events() {
+        java.util.Date date= new Date();
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        int month = cal.get(Calendar.MONTH);
+        if(month==9) {
+            World world=this.getServer().getWorld("world");
+            world.setTime(20000);
+            world.setStorm(false);
+            spookyMode=true;
+        } else {
+            spookyMode=false;
+        }
     }
     public void sendMetric(String name,int value) {
         statsd.gauge(BITQUEST_ENV+"."+name,value);
