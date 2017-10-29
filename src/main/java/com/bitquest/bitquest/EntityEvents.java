@@ -489,7 +489,8 @@ public class EntityEvents implements Listener {
         int spawn_distance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
 
         EntityType entityType = entity.getType();
-        int level = BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 64))));
+        // TODO: Increase spawn_distance divisor to 64 or 32
+        int level = BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 16))));
 
         if (entity instanceof Monster) {
                 String key = "mob:" + e.getLocation().getWorld().getName() + ":" + chunk.getX() + ":" + chunk.getZ();
@@ -561,15 +562,16 @@ public class EntityEvents implements Listener {
                     }
                     System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
                     if (bitQuest.rand(1, 20) == 20 && bitQuest.spookyMode == true) {
-                        e.getLocation().getWorld().spawnEntity(new Location(e.getLocation().getWorld(),e.getLocation().getX(),100,e.getLocation().getZ()), EntityType.WITCH);
-                        e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);
-
+                        e.getLocation().getWorld().spawnEntity(new Location(e.getLocation().getWorld(),e.getLocation().getX(),100,e.getLocation().getZ()), EntityType.GHAST);
+                        e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
+                        e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
                     }
                 } else {
                     e.setCancelled(true);
                 }
             } else if(entity instanceof Ghast) {
-                System.out.println("[spawn ghast] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
+                entity.setMaxHealth(level*4);
+                System.out.println("[spawn ghast] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance+ " maxhealth: "+entity.getMaxHealth());
 
             } else {
                 e.setCancelled(false);
