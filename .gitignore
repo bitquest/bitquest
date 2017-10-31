@@ -17,6 +17,7 @@ target/
 
 # docker-compose.yml is ignored to prevent leaks of api keys
 docker-compose.yml
+development.yml
 
 # Other stuff
 install.log
