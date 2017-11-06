@@ -1,4 +1,5 @@
 FROM debian:stretch
+ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
 RUN apt-get install -y wget
@@ -22,15 +23,6 @@ COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
 
-# Include blockcypher's bcutils
-ENV DEBIAN_FRONTEND noninteractive
-RUN mkdir /go/
-ENV GOPATH /go/
-RUN apt-get -y install golang
-RUN cd / && git clone https://github.com/blockcypher/btcutils.git
-RUN cd / && go get github.com/btcsuite/btcd/btcec
-RUN cd /btcutils/signer && go build
-RUN chmod +x /btcutils/signer/signer
 
 RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
 RUN cd /bitquest/ && ./gradlew shadowJar
