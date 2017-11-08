@@ -27,13 +27,27 @@ public class UpgradeWallet extends CommandAction {
         User user= null;
         try {
             user = new User(player);
-            String address=bitQuest.REDIS.get("hd:address:"+user.player.getUniqueId().toString());
+            if(bitQuest.REDIS.exists("hd:address:"+user.player.getUniqueId().toString())==true) {
+                String address=bitQuest.REDIS.get("hd:address:"+user.player.getUniqueId().toString());
 
-            if(user.wallet.legacy_wallet_balance(address)>0)
-                user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
-            int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
-            user.player.sendMessage(ChatColor.GREEN + "SAT: " +ChatColor.WHITE+legacy_wallet_balance);
-            return true;
+                if(user.wallet.legacy_wallet_balance(address)>0)
+                    user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
+                int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
+                user.player.sendMessage(ChatColor.GREEN + "SAT: " +ChatColor.WHITE+legacy_wallet_balance);
+                Wallet upgrades_wallet=new Wallet("bitquest_upgrades");
+                if(upgrades_wallet.move(player.getUniqueId().toString(),legacy_wallet_balance)==true) {
+                    user.player.sendMessage(ChatColor.GREEN + "Moved " +legacy_wallet_balance+" SAT to new account");
+                    bitQuest.REDIS.del("hd:address:"+user.player.getUniqueId().toString());
+                    return true;
+                } else {
+                    user.player.sendMessage(ChatColor.RED+"Upgrade failed.");
+                    return true; ad
+                }
+            } else {
+                user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
+                return true;
+            }
+
         } catch (ParseException e) {
             user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
             e.printStackTrace();
