@@ -41,7 +41,7 @@ public class UpgradeWallet extends CommandAction {
                     return true;
                 } else {
                     user.player.sendMessage(ChatColor.RED+"Upgrade failed.");
-                    return true; ad
+                    return true;
                 }
             } else {
                 user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
