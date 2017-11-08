@@ -139,6 +139,7 @@ public class Wallet {
         return (String)response_object.get("result");
 
     }
+
     JSONObject get_bitcore_balance() throws IOException, ParseException {
 
         System.out.println("[balance] "+this.getAccountAddress());
