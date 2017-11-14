@@ -27,7 +27,7 @@ public class UpgradeWallet extends CommandAction {
         User user= null;
         try {
             user = new User(player);
-            if(bitQuest.isModerator(player)&&bitQuest.REDIS.exists("hd:address:"+user.player.getUniqueId().toString())==true) {
+            if(bitQuest.REDIS.exists("hd:address:"+user.player.getUniqueId().toString())==true) {
                 System.out.println("[upgrade] "+player.getDisplayName());
 
                 String address=bitQuest.REDIS.get("hd:address:"+user.player.getUniqueId().toString());
