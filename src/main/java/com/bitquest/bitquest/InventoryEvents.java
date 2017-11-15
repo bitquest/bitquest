@@ -139,7 +139,7 @@ public class InventoryEvents implements Listener {
                             if (hasOpenSlots) {
 
 
-                                if(user.wallet.move("loot",sat) == true) {
+                                if(user.wallet.move("bitquest_market",sat) == true) {
 
                                     ItemStack item = event.getCurrentItem();
                                     ItemMeta meta = item.getItemMeta();
