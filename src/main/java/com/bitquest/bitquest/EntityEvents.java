@@ -502,69 +502,74 @@ public class EntityEvents implements Listener {
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
                 } else if (bitQuest.landIsClaimed(e.getLocation()) == false) {
-                    bitQuest.REDIS.set(key, "1");
-                    bitQuest.REDIS.expire(key, 3000);
-                    e.setCancelled(false);
+                    try {
+                        bitQuest.REDIS.set(key, "1");
+                        bitQuest.REDIS.expire(key, 3000);
+                        e.setCancelled(false);
 
-                    // nerf_level makes sure high level mobs are away from the spawn
-                    if (level < 1) level = 1;
-                    if (bitQuest.rand(1, 20) == 20) level = level * 2;
+                        // nerf_level makes sure high level mobs are away from the spawn
+                        if (level < 1) level = 1;
+                        if (bitQuest.rand(1, 20) == 20) level = level * 2;
 
-                    entity.setMaxHealth(level * 4);
-                    entity.setHealth(level * 4);
-                    entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
-                    entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
+                        entity.setMaxHealth(level * 4);
+                        entity.setHealth(level * 4);
+                        entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
+                        entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
-                    // add potion effects
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-                    if (bitQuest.rand(1, 128) < level)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
-                    if (level > 64)
-                        entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 2), true);
+                        // add potion effects
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
+                        if (bitQuest.rand(1, 128) < level)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
+                        if (level > 64)
+                            entity.addPotionEffect(new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 2), true);
 
 
-                    // give random equipment
-                    if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
-                        useRandomEquipment(entity, level);
-                    }
-
-                    // some creepers are charged
-                    if (entity instanceof Creeper && BitQuest.rand(0, 100) < level) {
-                        ((Creeper) entity).setPowered(true);
-                    }
-
-                    // pigzombies are always angry
-                    if (entity instanceof PigZombie) {
-                        PigZombie pigZombie = (PigZombie) entity;
-                        pigZombie.setAngry(true);
-                    }
-
-                    // some skeletons are black
-                    if (entity instanceof Skeleton) {
-                        Skeleton skeleton = (Skeleton) entity;
-                        ItemStack bow = new ItemStack(Material.BOW);
-                        if (BitQuest.rand(0, 64) < level) {
-                            randomEnchantItem(bow);
+                        // give random equipment
+                        if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
+                            useRandomEquipment(entity, level);
                         }
-                    }
-                    System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
-                    if (bitQuest.rand(1, 20) == 20 && bitQuest.spookyMode == true) {
-                        e.getLocation().getWorld().spawnEntity(new Location(e.getLocation().getWorld(),e.getLocation().getX(),100,e.getLocation().getZ()), EntityType.GHAST);
-                        e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
-                        e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
+
+                        // some creepers are charged
+                        if (entity instanceof Creeper && BitQuest.rand(0, 100) < level) {
+                            ((Creeper) entity).setPowered(true);
+                        }
+
+                        // pigzombies are always angry
+                        if (entity instanceof PigZombie) {
+                            PigZombie pigZombie = (PigZombie) entity;
+                            pigZombie.setAngry(true);
+                        }
+
+                        // some skeletons are black
+                        if (entity instanceof Skeleton) {
+                            Skeleton skeleton = (Skeleton) entity;
+                            ItemStack bow = new ItemStack(Material.BOW);
+                            if (BitQuest.rand(0, 64) < level) {
+                                randomEnchantItem(bow);
+                            }
+                        }
+                        System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
+                        if (bitQuest.rand(1, 20) == 20 && bitQuest.spookyMode == true) {
+                            e.getLocation().getWorld().spawnEntity(new Location(e.getLocation().getWorld(), e.getLocation().getX(), 100, e.getLocation().getZ()), EntityType.GHAST);
+                            e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
+                            e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
+                        }
+                    } catch (Exception e1) {
+                        System.out.println("Event failed. Shutting down...");
+                        Bukkit.shutdown();
                     }
                 } else {
                     e.setCancelled(true);
