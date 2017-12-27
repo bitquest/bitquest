@@ -2,6 +2,7 @@ package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.User;
+import com.bitquest.bitquest.Wallet;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,7 +20,7 @@ public class SendCommand extends CommandAction {
         bitQuest = plugin;
     }
 
-    public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
+    public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
         /***********************************************************
          /send
          a player-to-player-transaction
@@ -29,15 +30,15 @@ public class SendCommand extends CommandAction {
                 if(!Character.isDigit(c))
                     return false;
             }
-            int bits=Integer.valueOf(args[0]);
+            final int bits=Integer.valueOf(args[0]);
             if(bits>0&&bits<=10000) {
-                int sat=bits*100;
-                for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                final int sat=bits*100;
+                for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                         if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
                             final User user;
                             try {
-                                user = new User(player);
+                                user = new User(bitQuest, player);
                             } catch (ParseException e) {
                                 e.printStackTrace();
                                 player.sendMessage(ChatColor.RED+"Tip failed.");
@@ -53,46 +54,36 @@ public class SendCommand extends CommandAction {
 
                             }
 
-                            try {
-                                if(user.wallet.getBalance(0)>=sat) {
-                                    try {
-                                        User user_tip=new User(onlinePlayer);
-                                        if(user.wallet.move(user_tip.player.getUniqueId().toString(),sat)) {
-                                            bitQuest.updateScoreboard(onlinePlayer);
-                                            bitQuest.updateScoreboard(player);
-                                            player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
-                                            onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
-                                            return true;
-                                        } else {
+                            user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                                @Override
+                                public void run(Long balance) {
+                                    if(balance >= sat) {
+                                        try {
+                                            User user_tip=new User(bitQuest, onlinePlayer);
+                                            if(user.wallet.move(user_tip.player.getUniqueId().toString(),sat)) {
+                                                bitQuest.updateScoreboard(onlinePlayer);
+                                                bitQuest.updateScoreboard(player);
+                                                player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
+                                                onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
+                                            } else {
+                                                player.sendMessage(ChatColor.RED+"Tip failed.");
+                                            }
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
                                             player.sendMessage(ChatColor.RED+"Tip failed.");
-                                            return true;
+                                        } catch (org.json.simple.parser.ParseException e) {
+                                            e.printStackTrace();
+                                            player.sendMessage(ChatColor.RED+"Tip failed.");
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                            player.sendMessage(ChatColor.RED+"Tip failed.");
                                         }
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                        player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        return true;
-                                    } catch (org.json.simple.parser.ParseException e) {
-                                        e.printStackTrace();
-                                        player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        return true;
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                        player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        return true;
+                                    } else {
+                                        player.sendMessage(ChatColor.RED+"Not enough balance");
                                     }
-                                } else {
-                                    player.sendMessage(ChatColor.RED+"Not enough balance");
-                                    return true;
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                return true;
-                            } catch (org.json.simple.parser.ParseException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                return true;
-                            }
+                            });
+                            return true;
 
                         } else {
                             player.sendMessage(ChatColor.RED+"You cannot send to yourself!");

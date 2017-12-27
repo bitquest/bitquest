@@ -115,7 +115,7 @@ public class Wallet {
                         public void run() {
                             callback.run(balance);
                         }
-                    })
+                    });
                 } catch (IOException e) {
                     System.out.println("Error on getBalance");
                     e.printStackTrace();

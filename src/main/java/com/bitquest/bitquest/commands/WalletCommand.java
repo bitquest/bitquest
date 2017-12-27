@@ -19,7 +19,7 @@ public class WalletCommand extends CommandAction {
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         try {
-            User user=new User(player);
+            User user=new User(bitQuest, player);
             bitQuest.sendWalletInfo(user);
             bitQuest.updateScoreboard(player);
         } catch (ParseException e) {

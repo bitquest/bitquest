@@ -25,10 +25,12 @@ import java.text.ParseException;
 public class User {
     public Wallet wallet;
     private String clan;
+    private BitQuest bitQuest;
     public Player player;
-    public User(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+    public User(BitQuest plugin, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         this.player=player;
-        this.wallet=new Wallet(this.player.getUniqueId().toString());
+        this.bitQuest = plugin;
+        this.wallet=new Wallet(this.bitQuest, this.player.getUniqueId().toString());
 //        if(BitQuest.REDIS.exists("hd:address:"+this.player.getUniqueId().toString())&&BitQuest.REDIS.exists("hd:path:"+this.player.getUniqueId().toString())&&BitQuest.REDIS.exists("hd:public:"+this.player.getUniqueId().toString())) {
 //            this.wallet=new Wallet(
 //                    BitQuest.REDIS.get("hd:address:"+this.player.getUniqueId().toString()),
