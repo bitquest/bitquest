@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -99,7 +100,7 @@ public class EntityEvents implements Listener {
         Player player=event.getPlayer();
 
         try {
-            user = new User(player);
+            user = new User(bitQuest, player);
         } catch (ParseException e) {
             e.printStackTrace();
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
@@ -129,7 +130,7 @@ public class EntityEvents implements Listener {
         // On dev environment, admin gets op. In production, nobody gets op.
 
         player.setGameMode(GameMode.SURVIVAL);
-        final User user = new User(player);
+        final User user = new User(bitQuest, player);
         bitQuest.updateScoreboard(player);
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
@@ -142,7 +143,12 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.getBalance(0) / 100 + " bits");
+            bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(Long balance) {
+                    player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + balance / 100 + " bits");
+                }
+            });
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
 
@@ -374,7 +380,7 @@ public class EntityEvents implements Listener {
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final LivingEntity entity = e.getEntity();
 
-        int level = new Double(entity.getMaxHealth() / 4).intValue();
+        final int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
 
@@ -382,76 +388,42 @@ public class EntityEvents implements Listener {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
-                    final User user = new User(player);
-                    int money = BitQuest.rand(1,level);
-                    money=money*100;
+                    final User user = new User(bitQuest, player);
+                    final int money = BitQuest.rand(1,level) * 100;
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
 
-                    try {
-                        System.out.println(bitQuest.wallet.getBalance(0));
-                        if (d20==20&&bitQuest.wallet.getBalance(0) > money) {
+                    bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                        @Override
+                        public void run(Long balance) {
+                            System.out.println(balance);
+                            if (d20 == 20 && balance > money) {
+                                try {
+                                    if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
+                                        System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
+                                        if (bitQuest.messageBuilder != null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
-                            final Wallet userWallet = user.wallet;
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
 
-                            try {
-                                if (bitQuest.wallet.move(player.getUniqueId().toString(),money)) {
-                                    System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                                    player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
-                                    if (bitQuest.messageBuilder != null) {
-
-                                        // Create an event
-                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
-
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
                                     }
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
                                 }
-
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
                             }
-
-
+                            // Add EXP
+                            user.addExperience(level * 2);
                         }
-                        // Add EXP
-                        user.addExperience(level * 2);
-                        if (bitQuest.messageBuilder != null) {
-
-                            final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-                            //                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-                            //
-                            //
-                            //                            @Override
-                            //                            public void run() {
-                            //                                // Create an event
-                            //                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
-                            //
-                            //
-                            //                                ClientDelivery delivery = new ClientDelivery();
-                            //                                delivery.addMessage(sentEvent);
-                            //
-                            //                                MixpanelAPI mixpanel = new MixpanelAPI();
-                            //                                try {
-                            //                                    mixpanel.deliver(delivery);
-                            //                                } catch (IOException e1) {
-                            //                                    e1.printStackTrace();
-                            //                                }
-                            //                            }
-                            //
-                            //                        });
-
-                        }
-                    } catch(IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    });
                 }
 
             } else {
@@ -631,73 +603,81 @@ public class EntityEvents implements Listener {
 
         // Gives random SWORD
         if (BitQuest.rand(0, 32) < level && !(entity instanceof Skeleton)) {
-            ItemStack sword = new ItemStack(Material.WOODEN_DOOR);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOODEN_DOOR);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_AXE);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.WOOD_SWORD);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.IRON_SWORD);
-            if (BitQuest.rand(0, 128) < level) sword = new ItemStack(Material.DIAMOND_SWORD);
+            Material material = Material.WOODEN_DOOR;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_AXE;
+            if (BitQuest.rand(0, 128) < level) material = Material.WOOD_SWORD;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_SWORD;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_SWORD;
+            ItemStack sword = new ItemStack(material);
 
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(sword);
+            for(short i = 0; i < 4; i++){
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(sword);
+            }
 
             entity.getEquipment().setItemInHand(sword);
         }
 
         // Gives random HELMET
         if (BitQuest.rand(0, 32) < level) {
-            ItemStack helmet = new ItemStack(Material.LEATHER_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.CHAINMAIL_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.IRON_HELMET);
-            if (BitQuest.rand(0, 128) < level) helmet = new ItemStack(Material.DIAMOND_HELMET);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(helmet);
+            Material material = Material.LEATHER_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_HELMET;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_HELMET;
+            ItemStack helmet = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++){
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(helmet);
+            }
 
             entity.getEquipment().setHelmet(helmet);
         }
 
         // Gives random CHESTPLATE
         if (BitQuest.rand(0, 32) < level) {
-            ItemStack chest = new ItemStack(Material.LEATHER_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.CHAINMAIL_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.IRON_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) chest = new ItemStack(Material.DIAMOND_CHESTPLATE);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(chest);
+            Material material = Material.LEATHER_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_CHESTPLATE;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_CHESTPLATE;
+            ItemStack chest = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(chest);
+            }
 
             entity.getEquipment().setChestplate(chest);
         }
 
         // Gives random Leggings
         if (BitQuest.rand(0, 128) < level) {
-            ItemStack leggings = new ItemStack(Material.LEATHER_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.CHAINMAIL_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.IRON_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) leggings = new ItemStack(Material.DIAMOND_LEGGINGS);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(leggings);
+            Material material = Material.LEATHER_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_LEGGINGS;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_LEGGINGS;
+            ItemStack leggings = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(leggings);
+            }
 
             entity.getEquipment().setLeggings(leggings);
         }
 
         // Gives Random BOOTS
         if (BitQuest.rand(0, 128) < level) {
-            ItemStack boots = new ItemStack(Material.LEATHER_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.CHAINMAIL_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.IRON_BOOTS);
-            if (BitQuest.rand(0, 128) < level) boots = new ItemStack(Material.DIAMOND_BOOTS);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
-            if (BitQuest.rand(0, 128) < level) randomEnchantItem(boots);
+            Material material = Material.LEATHER_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.CHAINMAIL_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.IRON_BOOTS;
+            if (BitQuest.rand(0, 128) < level) material = Material.DIAMOND_BOOTS;
+            ItemStack boots = new ItemStack(material);
+
+            for(short i = 0; i < 4; i++) {
+                if (BitQuest.rand(0, 128) < level)
+                    randomEnchantItem(boots);
+            }
 
             entity.getEquipment().setBoots(boots);
         }
