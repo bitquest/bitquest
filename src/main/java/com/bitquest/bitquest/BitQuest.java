@@ -146,7 +146,7 @@ public class  BitQuest extends JavaPlugin {
 
         // loads world wallet
         try {
-            wallet=new Wallet("bitquest_market");
+            wallet=new Wallet(this, "bitquest_market");
         } catch (IOException e) {
             e.printStackTrace();
             Bukkit.shutdown();
@@ -200,7 +200,7 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
         modCommands.put("crashTest", new CrashtestCommand(this));
         modCommands.put("mod", new ModCommand());
-        modCommands.put("faucet", new FaucetCommand());
+        modCommands.put("faucet", new FaucetCommand(this));
         modCommands.put("ban", new BanCommand());
         modCommands.put("unban", new UnbanCommand());
         modCommands.put("banlist", new BanlistCommand());
@@ -256,32 +256,29 @@ public class  BitQuest extends JavaPlugin {
 
         return new JSONObject(); // just give them an empty object
     }
-    public void updateScoreboard(Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        ScoreboardManager scoreboardManager;
-        Scoreboard walletScoreboard;
-        Objective walletScoreboardObjective;
-        scoreboardManager = Bukkit.getScoreboardManager();
-        walletScoreboard= scoreboardManager.getNewScoreboard();
-        walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
+    public void updateScoreboard(final Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+        final User user=new User(this, player);
 
-        User user=new User(player);
+        user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+            @Override
+            public void run(Long balance) {
+                ScoreboardManager scoreboardManager;
+                Scoreboard walletScoreboard;
+                Objective walletScoreboardObjective;
+                scoreboardManager = Bukkit.getScoreboardManager();
+                walletScoreboard= scoreboardManager.getNewScoreboard();
+                walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet","dummy");
 
-        walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+                walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+                walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + "Bit" + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
 
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
-        int final_balance=0;
-//        if(REDIS.exists("final_balance:"+player.getUniqueId())) {
-//            final_balance=Integer.parseInt(REDIS.get("final_balance:"+player.getUniqueId()));
-//        }
-//        if(statsd!=null) {
-//            statsd.gauge(BITQUEST_ENV+".balance."+user.player.getName(),final_balance);
-//
-//        }
+                Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); //Get a fake offline player
 
-        score.setScore((int) (user.wallet.getBalance(0)/100));
-        player.setScoreboard(walletScoreboard);
+                score.setScore((int) (balance/100));
+                player.setScoreboard(walletScoreboard);
+            }
+        });
     }
     public void createScheduledTimers() {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -365,13 +362,12 @@ public class  BitQuest extends JavaPlugin {
         statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
     }
     public  void sendWalletMetrics() {
-        try {
-            statsd.gauge(BITQUEST_ENV+".wallet_balance",wallet.getBalance(0));
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (org.json.simple.parser.ParseException e) {
-            e.printStackTrace();
-        }
+        wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+            @Override
+            public void run(Long balance) {
+                statsd.gauge(BITQUEST_ENV+".wallet_balance", balance);
+            }
+        });
     }
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
@@ -409,7 +405,7 @@ public class  BitQuest extends JavaPlugin {
         recipient.sendMessage(ChatColor.RED + msg);
     }
 
-    public void claimLand(String name, Chunk chunk, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
+    public void claimLand(final String name, Chunk chunk, final Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // check that land actually has a name
         final int x = chunk.getX();
         final int z = chunk.getZ();
@@ -428,53 +424,55 @@ public class  BitQuest extends JavaPlugin {
                         return;
                     }
                     if (REDIS.get("chunk" + x + "," + z + "owner") == null) {
-                        final User user = new User(player);
+                        final User user = new User(this, player);
                         player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                        BitQuest bitQuest = this;
+                        final BitQuest bitQuest = this;
 
-                        try {
-                            if(user.wallet.getBalance(0)>=LAND_PRICE) {
-                                if (user.wallet.move("land", LAND_PRICE)) {
+                        user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(Long balance) {
+                                try {
+                                    if (balance >= LAND_PRICE) {
+                                        if (user.wallet.move("land", LAND_PRICE)) {
 
-                                    BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                                    BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                                    player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
-                                    updateScoreboard(player);
-                                    if (bitQuest.messageBuilder != null) {
+                                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                            BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                            player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                            updateScoreboard(player);
+                                            if (bitQuest.messageBuilder != null) {
 
-                                        // Create an event
-                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                        org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / DENOMINATION_FACTOR, null);
-
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-                                        delivery.addMessage(sentCharge);
+                                                // Create an event
+                                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
+                                                org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
 
 
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
-                                    }
-                                } else {
-                                    long balance = user.wallet.getBalance(0);
-                                    if (balance < BitQuest.LAND_PRICE) {
-                                        player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                                ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more "+DENOMINATION_NAME+"s.");
+                                                ClientDelivery delivery = new ClientDelivery();
+                                                delivery.addMessage(sentEvent);
+                                                delivery.addMessage(sentCharge);
+
+
+                                                MixpanelAPI mixpanel = new MixpanelAPI();
+                                                mixpanel.deliver(delivery);
+                                            }
+                                        } else {
+                                            if (balance < BitQuest.LAND_PRICE) {
+                                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                                        ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                            } else {
+                                                player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                            }
+                                        }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+                                        player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
+                                                ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100) + ChatColor.RESET + ChatColor.RED + " Bits.");
                                     }
+                                } catch (Exception e) {
+                                    System.out.println("Error on claiming land");
+                                    e.printStackTrace();
                                 }
-                            } else {
-                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                        ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100)+ChatColor.RESET+ChatColor.RED+" "+DENOMINATION_NAME+"s.");
                             }
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-
-
+                        });
                     } else if (REDIS.get("chunk" + x + "," + z + "owner").equals(player.getUniqueId().toString()) || isModerator(player)) {
                         if (name.equals("abandon")) {
                             // Abandon land
@@ -607,42 +605,42 @@ public class  BitQuest extends JavaPlugin {
     }
 
 
-    public void sendWalletInfo(User user) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        // int chainHeight = user.wallet.getBlockchainHeight();
-        // BitQuest.REDIS.del("balance:"+user.player.getUniqueId().toString());
-        user.player.sendMessage(ChatColor.BOLD+""+ChatColor.GREEN + "Your "+chain_name()+" Address: "+ChatColor.WHITE+user.wallet.getAccountAddress());
+    public void sendWalletInfo(final User user) {
+        user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+            @Override
+            public void run(final Long unconfirmedBalance) {
+                user.wallet.getBalance(5, new Wallet.GetBalanceCallback() {
+                    @Override
+                    public void run(Long balance) {
+                        try {
+                            user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your " + chain_name() + " Address: " + ChatColor.WHITE + user.wallet.getAccountAddress());
+                            user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + unconfirmedBalance + " Satoshi");
+                            user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + balance + " Satoshi");
+                            if (user.wallet.url() != null) {
+                                user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                            }
 
-//        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
-//        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(0)/DENOMINATION_FACTOR + " "+DENOMINATION_NAME);
-        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(5)/DENOMINATION_FACTOR + " "+DENOMINATION_NAME);
-        // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
-        //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
-        //    user.player.sendMessage(ChatColor.YELLOW + " ");
+                            // This callback is called with runTask. I think this call it form the main thread.
+                            // If I'm wrong this REDIS call can cause problems.
+                            if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+                                int legacy_wallet_balance = user.wallet.legacy_wallet_balance(address);
+                                if (legacy_wallet_balance > 0) {
+                                    String final_balance = BitQuest.REDIS.get("final_balance:" + address);
+                                    user.player.sendMessage(ChatColor.GREEN + "Balance: " + ChatColor.WHITE + final_balance);
+                                    user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits.");
+                                }
 
-        if(user.wallet.url()!=null) {
-            user.player.sendMessage(ChatColor.BLUE+""+ChatColor.UNDERLINE + user.wallet.url());
-        }
-
-        //      user.player.sendMessage(ChatColor.YELLOW + " ");
-//        user.player.sendMessage(ChatColor.YELLOW+"Blockchain Height: " + Integer.toString(chainHeight));
-//        if(BITQUEST_ENV.equalsIgnoreCase("development")) {
-//            user.player.sendMessage(ChatColor.GREEN + "Payment Balance: " +ChatColor.WHITE+ user.wallet.payment_balance()/100 + " Bits");
-//            if(REDIS.exists("address"+user.player.getUniqueId().toString())) {
-//                user.player.sendMessage(ChatColor.GREEN + "Old wallet: " +ChatColor.WHITE+ REDIS.get("address"+user.player.getUniqueId().toString()));
-//            }
-//        }
-        if(REDIS.exists("hd:address:"+user.player.getUniqueId().toString())){
-            String address=REDIS.get("hd:address:"+user.player.getUniqueId().toString());
-            user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
-            int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
-            if(legacy_wallet_balance>0) {
-                String final_balance=BitQuest.REDIS.get("final_balance:"+address);
-                user.player.sendMessage(ChatColor.GREEN + "Balance: " +ChatColor.WHITE+final_balance);
-                user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits." );
+                            }
+                        } catch (Exception e) {
+                            System.out.println("Error on sending wallet info");
+                            e.printStackTrace();
+                        }
+                    }
+                });
             }
-
-        }
+        });
     };
     public boolean landIsClaimed(Location location) {
         return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
