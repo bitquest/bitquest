@@ -95,7 +95,7 @@ public class  BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
-    public final static int LAND_PRICE = System.getenv("LAND_PRICE") != null ? Integer.parseInt(System.getenv("LAND_PRICE")) : 10000;
+    public final static int LAND_PRICE = DENOMINATION_FACTOR*100;
 
     public final static int MIN_TRANS=200000;
     // utilities: distance and rand
