@@ -38,6 +38,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -99,7 +100,7 @@ public class EntityEvents implements Listener {
         Player player=event.getPlayer();
 
         try {
-            user = new User(player);
+            user = new User(bitQuest, player);
         } catch (ParseException e) {
             e.printStackTrace();
             event.disallow(PlayerLoginEvent.Result.KICK_OTHER,PROBLEM_MESSAGE);
@@ -129,7 +130,7 @@ public class EntityEvents implements Listener {
         // On dev environment, admin gets op. In production, nobody gets op.
 
         player.setGameMode(GameMode.SURVIVAL);
-        final User user = new User(player);
+        final User user = new User(bitQuest, player);
         bitQuest.updateScoreboard(player);
         user.setTotalExperience(user.experience());
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
@@ -142,7 +143,12 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
-            player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + bitQuest.wallet.getBalance(0) / 100 + " bits");
+            bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(Long balance) {
+                    player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + balance / 100 + " bits");
+                }
+            });
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
         }
 
@@ -374,7 +380,7 @@ public class EntityEvents implements Listener {
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final LivingEntity entity = e.getEntity();
 
-        int level = new Double(entity.getMaxHealth() / 4).intValue();
+        final int level = new Double(entity.getMaxHealth() / 4).intValue();
 
         if (entity instanceof Monster) {
 
@@ -382,76 +388,42 @@ public class EntityEvents implements Listener {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     final Player player = (Player) damage.getDamager();
-                    final User user = new User(player);
-                    int money = BitQuest.rand(1,level);
-                    money=money*100;
+                    final User user = new User(bitQuest, player);
+                    final int money = BitQuest.rand(1,level) * 100;
                     final int d20=BitQuest.rand(1,20);
                     System.out.println("lastloot: "+BitQuest.REDIS.get("lastloot"));
 
-                    try {
-                        System.out.println(bitQuest.wallet.getBalance(0));
-                        if (d20==20&&bitQuest.wallet.getBalance(0) > money) {
+                    bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                        @Override
+                        public void run(Long balance) {
+                            System.out.println(balance);
+                            if (d20 == 20 && balance > money) {
+                                try {
+                                    if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
+                                        System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
+                                        if (bitQuest.messageBuilder != null) {
+
+                                            // Create an event
+                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
 
 
-                            final Wallet userWallet = user.wallet;
+                                            ClientDelivery delivery = new ClientDelivery();
+                                            delivery.addMessage(sentEvent);
 
-                            try {
-                                if (bitQuest.wallet.move(player.getUniqueId().toString(),money)) {
-                                    System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                                    player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
-                                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
-                                    if (bitQuest.messageBuilder != null) {
-
-                                        // Create an event
-                                        org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
-
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
+                                            MixpanelAPI mixpanel = new MixpanelAPI();
+                                            mixpanel.deliver(delivery);
+                                        }
                                     }
+                                } catch (Exception e1) {
+                                    e1.printStackTrace();
                                 }
-
-                            } catch (IOException e1) {
-                                e1.printStackTrace();
                             }
-
-
+                            // Add EXP
+                            user.addExperience(level * 2);
                         }
-                        // Add EXP
-                        user.addExperience(level * 2);
-                        if (bitQuest.messageBuilder != null) {
-
-                            final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-
-                            //                        scheduler.runTaskAsynchronously(bitQuest, new Runnable() {
-                            //
-                            //
-                            //                            @Override
-                            //                            public void run() {
-                            //                                // Create an event
-                            //                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Kill", null);
-                            //
-                            //
-                            //                                ClientDelivery delivery = new ClientDelivery();
-                            //                                delivery.addMessage(sentEvent);
-                            //
-                            //                                MixpanelAPI mixpanel = new MixpanelAPI();
-                            //                                try {
-                            //                                    mixpanel.deliver(delivery);
-                            //                                } catch (IOException e1) {
-                            //                                    e1.printStackTrace();
-                            //                                }
-                            //                            }
-                            //
-                            //                        });
-
-                        }
-                    } catch(IOException ex) {
-                        ex.printStackTrace();
-                    }
+                    });
                 }
 
             } else {

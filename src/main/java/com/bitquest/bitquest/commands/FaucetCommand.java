@@ -1,6 +1,7 @@
 package com.bitquest.bitquest.commands;
 
 
+import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.User;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -11,10 +12,16 @@ import java.io.IOException;
 import java.text.ParseException;
 
 public class FaucetCommand extends CommandAction {
+    private BitQuest bitQuest;
+
+    public FaucetCommand(BitQuest plugin) {
+        bitQuest = plugin;
+    }
+
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         User user= null;
         try {
-            user = new User(player);
+            user = new User(bitQuest, player);
             if(user.wallet.getTestnetCoins()) {
                 player.sendMessage(ChatColor.GREEN+"Some testnet coins were delivered to your wallet.");
             } else {
