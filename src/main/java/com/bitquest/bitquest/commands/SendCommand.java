@@ -23,16 +23,17 @@ public class SendCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
         /***********************************************************
          /send
-         a player-to-player-transaction
+         a off-chain player-to-player-transaction
          ***********************************************************/
+        int MAX_SEND=10000; // to be multiplied by DENOMINATION_FACTOR
         if(args.length==2) {
             for(char c : args[0].toCharArray()) {
                 if(!Character.isDigit(c))
                     return false;
             }
             final int bits=Integer.valueOf(args[0]);
-            if(bits>0&&bits<=10000) {
-                final int sat=bits*100;
+            if(bits>0&&bits<=MAX_SEND) {
+                final int sat=bits*BitQuest.DENOMINATION_FACTOR;
                 for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                         if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
@@ -95,7 +96,7 @@ public class SendCommand extends CommandAction {
 
                 return true;
             } else {
-                player.sendMessage("Minimum tip is 1 bit. Maximum is 10000");
+                player.sendMessage("Minimum tip is 1 bit. Maximum is "+MAX_SEND);
                 return true;
             }
         } else {

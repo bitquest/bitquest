@@ -27,7 +27,7 @@ public class TransferCommand extends CommandAction {
             }
             int sendAmount = 0;
             try {
-                sendAmount = Integer.valueOf(args[0]) * 100;
+                sendAmount = Integer.valueOf(args[0]) * BitQuest.DENOMINATION_FACTOR;
             } catch (NumberFormatException e) {
                 return false;
             }
@@ -43,7 +43,7 @@ public class TransferCommand extends CommandAction {
                 e1.printStackTrace();
             }
             if (sendAmount < BitQuest.MIN_TRANS) {
-                player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MIN_TRANS / 100 + " Bits.");
+                player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MIN_TRANS / BitQuest.DENOMINATION_FACTOR + " "+BitQuest.DENOMINATION_NAME+".");
                 return true;
             } else {
                 if (fromWallet != null) {
@@ -59,10 +59,10 @@ public class TransferCommand extends CommandAction {
                                     @Override
                                     public void run(Long balance) {
                                         if(unconfirmed_balance != balance) {
-                                            player.sendMessage(ChatColor.YELLOW + "Sending " + args[0] + " Bits to " + args[1] + "...");
+                                            player.sendMessage(ChatColor.YELLOW + "Sending " + args[0] + " "+BitQuest.DENOMINATION_NAME+" to " + args[1] + "...");
                                             try {
                                                 String txid=fromWalletFinal.sendFrom(args[1], sendAmoutFinal);
-                                                player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " Bits to external address.");
+                                                player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " "+BitQuest.DENOMINATION_NAME+" to external address.");
                                                 player.sendMessage(ChatColor.BLUE+" "+ChatColor.UNDERLINE+ "https://live.blockcypher.com/btc-main/tx/"+txid);
                                                 bitQuest.updateScoreboard(player);
 
