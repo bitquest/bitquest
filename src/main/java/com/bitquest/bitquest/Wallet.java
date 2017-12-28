@@ -69,6 +69,7 @@ public class Wallet {
     }
     public void getBalance(int confirmations, final GetBalanceCallback callback) {
         final String account_id = this.account_id;
+        System.out.println(account_id);
         Bukkit.getScheduler().runTaskAsynchronously(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -108,8 +109,12 @@ public class Wallet {
                     }
                     in.close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    final Long balance = Double.valueOf(response_object.get("result").toString()).longValue();
+                    System.out.println(response_object.get("result").toString());
+                    Double d = Double.parseDouble(response_object.get("result").toString().trim())*100000000L;
 
+
+                    final Long balance = d.longValue();
+                    System.out.println(balance);
                     Bukkit.getScheduler().runTask(bitQuest, new Runnable() {
                         @Override
                         public void run() {

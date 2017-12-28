@@ -3,8 +3,8 @@ spigot:
   environment:
     - BITQUEST_ENV=development
     - BITCOIN_NODE_HOST=10.1.1.3
-    - BITCOIN_NODE_USERNAME=alice
-    - BITCOIN_NODE_PASSWORD=odonkor1
+    - BITCOIN_NODE_USERNAME=lizard
+    - BITCOIN_NODE_PASSWORD=veAGuP2t3UMgsJgB
     - ADMIN_UUID=ae89b9c1-2d1d-4d0b-957d-1e5acd114e6e
     - DISCORD_HOOK_URL=https://discordapp.com/api/webhooks/370295091979354113/8B2T1IwYrB2ujDOyg9pYZmjNrU7EmSTX7TPvEAD8r04tJNejkvyoUQMaTxSUW8HUpjMu
   build: .
