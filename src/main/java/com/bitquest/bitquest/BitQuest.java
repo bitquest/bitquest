@@ -58,6 +58,8 @@ public class  BitQuest extends JavaPlugin {
     public final static String WORLD_PUBLIC_KEY = System.getenv("WORLD_PUBLIC_KEY") != null ? System.getenv("WORLD_PUBLIC_KEY") : "76e8a7eb479256c68f59f66c7b744891bc2f632ff3c7a3f69a5c4aeccda687e3";
     public final static String BITCOIN_NODE_HOST = System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : "localhost";
     public final static int BITCOIN_NODE_PORT = System.getenv("BITCOIN_NODE_PORT") != null ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT")) : 18332;
+    public final static int DENOMINATION_FACTOR = System.getenv("DENOMINATION_FACTOR") != null ? Integer.parseInt(System.getenv("DENOMINATION_FACTOR")) : 100;
+    public final static String DENOMINATION_NAME = System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bit";
     public final static String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
     public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
     public final static String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
@@ -443,7 +445,7 @@ public class  BitQuest extends JavaPlugin {
 
                                         // Create an event
                                         org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Claim", null);
-                                        org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / 100, null);
+                                        org.json.JSONObject sentCharge = bitQuest.messageBuilder.trackCharge(player.getUniqueId().toString(), BitQuest.LAND_PRICE / DENOMINATION_FACTOR, null);
 
 
                                         ClientDelivery delivery = new ClientDelivery();
@@ -458,14 +460,14 @@ public class  BitQuest extends JavaPlugin {
                                     long balance = user.wallet.getBalance(0);
                                     if (balance < BitQuest.LAND_PRICE) {
                                         player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                                ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                                ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more "+DENOMINATION_NAME+"s.");
                                     } else {
                                         player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
                                     }
                                 }
                             } else {
                                 player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                        ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100)+ChatColor.RESET+ChatColor.RED+" Bits.");
+                                        ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100)+ChatColor.RESET+ChatColor.RED+" "+DENOMINATION_NAME+"s.");
                             }
 
                         } catch (IOException e) {
@@ -612,8 +614,8 @@ public class  BitQuest extends JavaPlugin {
 
 //        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " +ChatColor.WHITE+ user.wallet.balance/100 + " Bits");
 //        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " +ChatColor.WHITE+user.wallet.unconfirmedBalance/100 + " Bits");
-        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(0) + " Satoshi");
-        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(5) + " Satoshi");
+        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(0)/DENOMINATION_FACTOR + " "+DENOMINATION_NAME);
+        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: "+ChatColor.WHITE + ChatColor.WHITE+user.wallet.getBalance(5)/DENOMINATION_FACTOR + " "+DENOMINATION_NAME);
         // user.player.sendMessage(ChatColor.YELLOW + "On-Chain Wallet Info:");
         //  user.player.sendMessage(ChatColor.YELLOW + " "); // spacing to let these URLs breathe a little
         //    user.player.sendMessage(ChatColor.YELLOW + " ");
