@@ -2,6 +2,7 @@ package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.User;
+import com.bitquest.bitquest.Wallet;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,25 +20,32 @@ public class DonateCommand extends CommandAction {
         bitQuest = plugin;
     }
 
-    public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
+    public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
         if(args.length!=1) {
             try {
-                int bits=Integer.valueOf(args[0]);
-                int sat=bits*100;
-                User user=new User(player);
-                if(user.wallet.getBalance(0)>sat) {
-                    if (user.wallet.move("donations", sat)) {
-                        player.sendMessage(ChatColor.GREEN+"Thanks for your support!");
+                final int bits=Integer.valueOf(args[0]);
+                final int sat=bits*100;
+                final User user=new User(bitQuest, player);
+                user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                    @Override
+                    public void run(Long balance) {
+                        try {
+                            if (balance > sat) {
+                                if (user.wallet.move("donations", sat)) {
+                                    player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
 
-                        return true;
-                    } else {
-                        player.sendMessage(ChatColor.RED+"Donation failed");
-                        return true;
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Donation failed");
+                                }
+                            } else {
+                                player.sendMessage(ChatColor.RED + "Not enough balance to donate " + bits);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
                     }
-                } else {
-                    player.sendMessage(ChatColor.RED+"Not enough balance to donate "+bits);
-                    return true;
-                }
+                });
+                return true;
             } catch (ParseException e) {
 
                 e.printStackTrace();

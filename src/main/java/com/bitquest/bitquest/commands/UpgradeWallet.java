@@ -26,7 +26,7 @@ public class UpgradeWallet extends CommandAction {
          ***/
         User user= null;
         try {
-            user = new User(player);
+            user = new User(bitQuest, player);
             if(bitQuest.REDIS.exists("hd:address:"+user.player.getUniqueId().toString())==true) {
                 System.out.println("[upgrade] "+player.getDisplayName());
 
@@ -38,7 +38,7 @@ public class UpgradeWallet extends CommandAction {
                 int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
                 System.out.println("[upgrade] "+legacy_wallet_balance);
                 user.player.sendMessage(ChatColor.GREEN + "SAT: " +ChatColor.WHITE+legacy_wallet_balance);
-                Wallet upgrades_wallet=new Wallet("bitquest_upgrades");
+                Wallet upgrades_wallet=new Wallet(bitQuest, "bitquest_upgrades");
                 if(upgrades_wallet.move(player.getUniqueId().toString(),legacy_wallet_balance)==true) {
                     user.player.sendMessage(ChatColor.GREEN + "Moved " +legacy_wallet_balance+" SAT to new account");
                     bitQuest.REDIS.del("hd:address:"+user.player.getUniqueId().toString());
