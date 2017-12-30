@@ -33,7 +33,7 @@ public class DonateCommand extends CommandAction {
                             if (balance > sat) {
                                 if (user.wallet.move("donations", sat)) {
                                     player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
-
+                                    bitQuest.updateScoreboard(player);
                                 } else {
                                     player.sendMessage(ChatColor.RED + "Donation failed");
                                 }
