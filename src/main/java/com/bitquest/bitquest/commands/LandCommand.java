@@ -3,6 +3,7 @@ package com.bitquest.bitquest.commands;
 import com.bitquest.bitquest.BitQuest;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -27,6 +28,11 @@ public class LandCommand extends CommandAction {
             String claimName = sb.toString().trim();
 
             Location location=player.getLocation();
+            if (!location.getWorld().getEnvironment().equals(World.Environment.NORMAL)) {
+                player.sendMessage(ChatColor.RED+"You cannot claim land here.");
+                return true;
+            }
+
             try {
                 bitQuest.claimLand(claimName,location.getChunk(),player);
             } catch (ParseException e) {
