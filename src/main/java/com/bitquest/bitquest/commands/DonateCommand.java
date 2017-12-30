@@ -24,7 +24,7 @@ public class DonateCommand extends CommandAction {
         if(args.length == 1) {
             try {
                 final int bits=Integer.valueOf(args[0]);
-                final int sat=bits*100;
+                final int sat=bits*bitQuest.DENOMINATION_FACTOR;
                 final User user=new User(bitQuest, player);
                 user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                     @Override
