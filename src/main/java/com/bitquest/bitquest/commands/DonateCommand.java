@@ -21,7 +21,7 @@ public class DonateCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-        if(args.length!=1) {
+        if(args.length == 1) {
             try {
                 final int bits=Integer.valueOf(args[0]);
                 final int sat=bits*100;
@@ -59,7 +59,8 @@ public class DonateCommand extends CommandAction {
             }
 
         } else {
-            return false;
+            player.sendMessage(ChatColor.RED + "Usage: /donate <amount>");
+            return true;
         }
     }
 }
