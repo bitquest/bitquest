@@ -532,7 +532,8 @@ public class EntityEvents implements Listener {
                                 randomEnchantItem(bow);
                             }
                         }
-                        System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
+                        if(BitQuest.BITQUEST_ENV.equals("development"))
+                            System.out.println("[spawn mob] " + entityType.name() + " lvl " + level + " spawn distance: " + spawn_distance);
                         if (bitQuest.rand(1, 20) == 20 && bitQuest.spookyMode == true) {
                             e.getLocation().getWorld().spawnEntity(new Location(e.getLocation().getWorld(), e.getLocation().getX(), 100, e.getLocation().getZ()), EntityType.GHAST);
                             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
