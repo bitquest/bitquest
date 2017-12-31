@@ -617,8 +617,8 @@ public class  BitQuest extends JavaPlugin {
                             public void run(String accountAddress) {
                                 try {
                                     user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your " + chain_name() + " Address: " + ChatColor.WHITE + accountAddress);
-                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + unconfirmedBalance + " Satoshi");
-                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + balance + " Satoshi");
+                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
                                     if (user.wallet.url() != null) {
                                         user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
                                     }

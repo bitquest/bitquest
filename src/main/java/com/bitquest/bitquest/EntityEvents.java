@@ -146,7 +146,7 @@ public class EntityEvents implements Listener {
             bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                 @Override
                 public void run(Long balance) {
-                    player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + balance / BitQuest.DENOMINATION_FACTOR + " bits");
+                    player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + balance / BitQuest.DENOMINATION_FACTOR + " "+BitQuest.DENOMINATION_NAME);
                 }
             });
             player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
