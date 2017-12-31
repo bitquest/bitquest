@@ -31,6 +31,10 @@ public class SendCommand extends CommandAction {
                 if(!Character.isDigit(c))
                     return false;
             }
+            if(args[0].length()>8) {
+                // maximum send is 8 digits
+                return false;
+            }
             final Long amount=Long.parseLong(args[0]);
             final Long sat=amount*BitQuest.DENOMINATION_FACTOR;
 

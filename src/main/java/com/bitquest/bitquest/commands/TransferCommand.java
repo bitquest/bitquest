@@ -21,6 +21,10 @@ public class TransferCommand extends CommandAction {
 
     public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
         if (args.length == 2) {
+            if(args[0].length()>8) {
+                // maximum transfer is 8 digits
+                return false;
+            }
             for (char c : args[0].toCharArray()) {
                 if (!Character.isDigit(c))
                     return false;
@@ -31,6 +35,7 @@ public class TransferCommand extends CommandAction {
             } catch (NumberFormatException e) {
                 return false;
             }
+
             System.out.println(sendAmount);
             Wallet fromWallet = null;
             try {
