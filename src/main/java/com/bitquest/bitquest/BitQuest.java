@@ -382,6 +382,14 @@ public class  BitQuest extends JavaPlugin {
                 ((Villager)entity).remove();
             }
         }
+        w=Bukkit.getWorld("world_nether");
+        entities = w.getEntities();
+        for ( Entity entity : entities){
+            if ((entity instanceof Villager)) {
+                villagerskilled=villagerskilled+1;
+                ((Villager)entity).remove();
+            }
+        }
         System.out.println("Killed "+villagerskilled+" villagers");
 
     }
