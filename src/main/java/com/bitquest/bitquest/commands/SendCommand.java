@@ -31,9 +31,10 @@ public class SendCommand extends CommandAction {
                 if(!Character.isDigit(c))
                     return false;
             }
-            final int bits=Integer.valueOf(args[0]);
-            if(bits>0&&bits<=MAX_SEND) {
-                final int sat=bits*BitQuest.DENOMINATION_FACTOR;
+            final Long amount=Long.parseLong(args[0]);
+            final Long sat=amount*BitQuest.DENOMINATION_FACTOR;
+
+            if(amount!=0&&amount<=MAX_SEND) {
                 for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
                     if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                         if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
@@ -64,8 +65,8 @@ public class SendCommand extends CommandAction {
                                             if(user.wallet.move(user_tip.player.getUniqueId().toString(),sat)) {
                                                 bitQuest.updateScoreboard(onlinePlayer);
                                                 bitQuest.updateScoreboard(player);
-                                                player.sendMessage(ChatColor.GREEN+"You sent "+bits+" bits to user "+onlinePlayer.getName());
-                                                onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+bits+" bits from user "+player.getName());
+                                                player.sendMessage(ChatColor.GREEN+"You sent "+amount+" "+BitQuest.DENOMINATION_NAME+" to user "+onlinePlayer.getName());
+                                                onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+amount+" "+BitQuest.DENOMINATION_FACTOR+" from user "+player.getName());
                                             } else {
                                                 player.sendMessage(ChatColor.RED+"Tip failed.");
                                             }

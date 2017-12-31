@@ -25,9 +25,9 @@ public class TransferCommand extends CommandAction {
                 if (!Character.isDigit(c))
                     return false;
             }
-            int sendAmount = 0;
+            Long sendAmount;
             try {
-                sendAmount = Integer.valueOf(args[0]) * BitQuest.DENOMINATION_FACTOR;
+                sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
             } catch (NumberFormatException e) {
                 return false;
             }
@@ -48,7 +48,7 @@ public class TransferCommand extends CommandAction {
             } else {
                 if (fromWallet != null) {
                     final Wallet fromWalletFinal = fromWallet;
-                    final int sendAmoutFinal = sendAmount;
+                    final Long sendAmoutFinal = sendAmount;
                     fromWallet.getBalance(0, new Wallet.GetBalanceCallback() {
                         @Override
                         public void run(final Long unconfirmed_balance) {

@@ -40,6 +40,8 @@ public class InventoryEvents implements Listener {
     ArrayList<Trade> trades;
 
     public InventoryEvents(BitQuest plugin) {
+        // Villager Prices
+        // By default, prices are in bits (not satoshi)
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
         trades.add(new Trade(new ItemStack(Material.CLAY_BALL,16),5));
@@ -253,7 +255,7 @@ public class InventoryEvents implements Listener {
                     ItemMeta meta = button.getItemMeta();
                     ArrayList<String> lore = new ArrayList<String>();
                     int bits_price;
-                    bits_price=trades.get(i).price/100;
+                    bits_price=trades.get(i).price;
 
                     lore.add("Price: "+bits_price);
                     meta.setLore(lore);

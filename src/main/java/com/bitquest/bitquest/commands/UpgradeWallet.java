@@ -21,54 +21,9 @@ public class UpgradeWallet extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        /***
-        TODO: Complete command code
-         ***/
-        User user= null;
-        try {
-            user = new User(bitQuest, player);
-            if(bitQuest.REDIS.exists("hd:address:"+user.player.getUniqueId().toString())==true) {
-                System.out.println("[upgrade] "+player.getDisplayName());
+       player.sendMessage("This command is deprecated. If you need to retrieve funds from old wallet please email bitquest@bitquest.co to get help.");
+       return true;
 
-                String address=bitQuest.REDIS.get("hd:address:"+user.player.getUniqueId().toString());
-                System.out.println("[upgrade] "+address);
-
-                if(user.wallet.legacy_wallet_balance(address)>0)
-                    user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " +ChatColor.WHITE+address);
-                int legacy_wallet_balance=user.wallet.legacy_wallet_balance(address);
-                System.out.println("[upgrade] "+legacy_wallet_balance);
-                user.player.sendMessage(ChatColor.GREEN + "SAT: " +ChatColor.WHITE+legacy_wallet_balance);
-                Wallet upgrades_wallet=new Wallet(bitQuest, "bitquest_upgrades");
-                if(upgrades_wallet.move(player.getUniqueId().toString(),legacy_wallet_balance)==true) {
-                    user.player.sendMessage(ChatColor.GREEN + "Moved " +legacy_wallet_balance+" SAT to new account");
-                    bitQuest.REDIS.del("hd:address:"+user.player.getUniqueId().toString());
-                    System.out.println("[upgrade] success");
-
-                    return true;
-                } else {
-                    user.player.sendMessage(ChatColor.RED+"Upgrade failed.");
-                    System.out.println("[upgrade] failed");
-
-                    return true;
-                }
-            } else {
-                user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
-                return true;
-            }
-
-        } catch (ParseException e) {
-            user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
-            e.printStackTrace();
-            return true;
-        } catch (org.json.simple.parser.ParseException e) {
-            user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
-            e.printStackTrace();
-            return true;
-        } catch (IOException e) {
-            user.player.sendMessage(ChatColor.RED + "Wallet upgrade failed.");
-            e.printStackTrace();
-            return true;
-        }
 
     }
 }

@@ -579,7 +579,7 @@ public class Wallet {
         }
     }
 
-    public String sendFrom(String address,int sat) throws IOException, ParseException {
+    public String sendFrom(String address,Long sat) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject=new JSONObject();
