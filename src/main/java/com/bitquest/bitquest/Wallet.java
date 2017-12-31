@@ -530,10 +530,9 @@ public class Wallet {
 //        }
         return false;
     }
-    public boolean move(String to,int sat) throws IOException, ParseException {
-        int MAX_MOVE=10000000;
+    public boolean move(String to,Long sat) throws IOException, ParseException {
 
-        if(sat>=100&&sat<=MAX_MOVE) {
+        if(sat>=100&&sat<=Long.MAX_VALUE) {
             JSONParser parser = new JSONParser();
 
             final JSONObject jsonObject=new JSONObject();
@@ -575,7 +574,7 @@ public class Wallet {
             JSONObject response_object= (JSONObject) parser.parse(response.toString());
             return (boolean)response_object.get("result");
         } else {
-            System.out.println("[move] "+this.account_id+"-> "+sat+" --> "+to+": FAIL (must be between 100 & "+MAX_MOVE+")");
+            System.out.println("[move] "+this.account_id+"-> "+sat+" --> "+to+": FAIL (must be between 100 & "+Long.MAX_VALUE+")");
             return false;
         }
     }
