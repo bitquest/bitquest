@@ -118,12 +118,10 @@ public class Wallet {
                     }
                     in.close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    System.out.println(response_object.get("result").toString());
                     Double d = Double.parseDouble(response_object.get("result").toString().trim())*100000000L;
 
 
                     final Long balance = d.longValue();
-                    System.out.println(balance);
                     Bukkit.getScheduler().runTask(bitQuest, new Runnable() {
                         @Override
                         public void run() {
