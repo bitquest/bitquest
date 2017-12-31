@@ -145,15 +145,7 @@ public class  BitQuest extends JavaPlugin {
         }
 
         // loads world wallet
-        try {
-            wallet=new Wallet(this, "bitquest_market");
-        } catch (IOException e) {
-            e.printStackTrace();
-            Bukkit.shutdown();
-        } catch (org.json.simple.parser.ParseException e) {
-            e.printStackTrace();
-            Bukkit.shutdown();
-        }
+        wallet=new Wallet(this, "bitquest_market");
         try {
             getBlockChainInfo();
         } catch (org.json.simple.parser.ParseException e) {
@@ -611,32 +603,37 @@ public class  BitQuest extends JavaPlugin {
             public void run(final Long unconfirmedBalance) {
                 user.wallet.getBalance(5, new Wallet.GetBalanceCallback() {
                     @Override
-                    public void run(Long balance) {
-                        try {
-                            user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your wallet address: " + ChatColor.WHITE + user.wallet.getAccountAddress());
-                            user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (int)(unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                            user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (int)(balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                            if (user.wallet.url() != null) {
-                                user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
-                            }
+                    public void run(final Long balance) {
+                        user.wallet.getAccountAddress(new Wallet.GetAccountAddressCallback() {
+                            @Override
+                            public void run(String accountAddress) {
+                                try {
+                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your " + chain_name() + " Address: " + ChatColor.WHITE + accountAddress);
+                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + unconfirmedBalance + " Satoshi");
+                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + balance + " Satoshi");
+                                    if (user.wallet.url() != null) {
+                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                    }
 
-                            // This callback is called with runTask. I think this call it form the main thread.
-                            // If I'm wrong this REDIS call can cause problems.
-                            if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
-                                String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
-                                user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
-                                int legacy_wallet_balance = user.wallet.legacy_wallet_balance(address);
-                                if (legacy_wallet_balance > 0) {
-                                    String final_balance = BitQuest.REDIS.get("final_balance:" + address);
-                                    user.player.sendMessage(ChatColor.GREEN + "Balance: " + ChatColor.WHITE + final_balance);
-                                    user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits.");
+                                    // This callback is called with runTask. I think this call it form the main thread.
+                                    // If I'm wrong this REDIS call can cause problems.
+                                    if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                        String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+                                        int legacy_wallet_balance = user.wallet.legacy_wallet_balance(address);
+                                        if (legacy_wallet_balance > 0) {
+                                            String final_balance = BitQuest.REDIS.get("final_balance:" + address);
+                                            user.player.sendMessage(ChatColor.GREEN + "Balance: " + ChatColor.WHITE + final_balance);
+                                            user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits.");
+                                        }
+
+                                    }
+                                } catch (Exception e) {
+                                    System.out.println("Error on sending wallet info");
+                                    e.printStackTrace();
                                 }
-
                             }
-                        } catch (Exception e) {
-                            System.out.println("Error on sending wallet info");
-                            e.printStackTrace();
-                        }
+                        });
                     }
                 });
             }

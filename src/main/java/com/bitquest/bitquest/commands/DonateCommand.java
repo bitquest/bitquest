@@ -21,10 +21,10 @@ public class DonateCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-        if(args.length!=1) {
+        if(args.length == 1) {
             try {
                 final int bits=Integer.valueOf(args[0]);
-                final int sat=bits*100;
+                final int sat=bits*bitQuest.DENOMINATION_FACTOR;
                 final User user=new User(bitQuest, player);
                 user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                     @Override
@@ -33,7 +33,7 @@ public class DonateCommand extends CommandAction {
                             if (balance > sat) {
                                 if (user.wallet.move("donations", sat)) {
                                     player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
-
+                                    bitQuest.updateScoreboard(player);
                                 } else {
                                     player.sendMessage(ChatColor.RED + "Donation failed");
                                 }
@@ -59,7 +59,8 @@ public class DonateCommand extends CommandAction {
             }
 
         } else {
-            return false;
+            player.sendMessage(ChatColor.RED + "Usage: /donate <amount>");
+            return true;
         }
     }
 }

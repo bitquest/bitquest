@@ -60,4 +60,4 @@ commands:
     usage: "/report <player> <reason>"
   donate:
     description: "Donate to BitQuest from your wallet"
-    usage: "/donate <bits>"
+    usage: "/donate <amount>"
