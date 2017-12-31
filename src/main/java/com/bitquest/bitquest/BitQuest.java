@@ -97,7 +97,7 @@ public class  BitQuest extends JavaPlugin {
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
     public final static Long LAND_PRICE = DENOMINATION_FACTOR*100;
     // Minimum transaction by default is 2000 bits
-    public final static int MINIMUM_TRANSACTION=2000;
+    public final static Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION")) : 2000L;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
