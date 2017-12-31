@@ -275,7 +275,7 @@ public class  BitQuest extends JavaPlugin {
 
                 Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + BitQuest.DENOMINATION_NAME); //Get a fake offline player
 
-                score.setScore((int) (balance/100));
+                score.setScore((int) (balance/DENOMINATION_FACTOR));
                 player.setScoreboard(walletScoreboard);
             }
         });
@@ -613,9 +613,9 @@ public class  BitQuest extends JavaPlugin {
                     @Override
                     public void run(Long balance) {
                         try {
-                            user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your " + chain_name() + " Address: " + ChatColor.WHITE + user.wallet.getAccountAddress());
-                            user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + unconfirmedBalance + " Satoshi");
-                            user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + balance + " Satoshi");
+                            user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your wallet address: " + ChatColor.WHITE + user.wallet.getAccountAddress());
+                            user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (int)(unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                            user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (int)(balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
                             if (user.wallet.url() != null) {
                                 user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
                             }

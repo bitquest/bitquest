@@ -1003,14 +1003,10 @@ public class Wallet {
         }
     }
     public String url() {
-        if(BitQuest.BLOCKCHAIN.equals("btc/main")) {
-            return "live.blockcypher.com/btc/address/"+address;
-        } else if(BitQuest.BLOCKCHAIN.equals("doge/main")) {
-            return "live.blockcypher.com/doge/address/"+address;
-        } else if(BitQuest.BLOCKCHAIN.equals("btc/test3")) {
+        if(address.substring(0,1).equals("N")||address.substring(0,1).equals("n")) {
             return "live.blockcypher.com/btc-testnet/address/"+address;
         } else {
-            return null;
+            return "live.blockcypher.com/btc/address/"+address;
         }
     }
 }
