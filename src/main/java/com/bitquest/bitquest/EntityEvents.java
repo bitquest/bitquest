@@ -390,8 +390,13 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     final User user = new User(bitQuest, player);
                     final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
-                    final int d20=BitQuest.rand(1,20);
+                    final int d20;
+                    if(BitQuest.BITQUEST_ENV=="development") {
+                        d20=20;
+                    } else {
+                        d20=BitQuest.rand(1,20);
 
+                    }
                     bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                         @Override
                         public void run(Long balance) {
