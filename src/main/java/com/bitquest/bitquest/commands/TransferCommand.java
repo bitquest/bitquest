@@ -47,8 +47,8 @@ public class TransferCommand extends CommandAction {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            if (sendAmount < BitQuest.MIN_TRANS) {
-                player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MIN_TRANS / BitQuest.DENOMINATION_FACTOR + " "+BitQuest.DENOMINATION_NAME+".");
+            if (sendAmount < (BitQuest.MINIMUM_TRANSACTION*BitQuest.DENOMINATION_FACTOR)) {
+                player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MINIMUM_TRANSACTION + " "+BitQuest.DENOMINATION_NAME+".");
                 return true;
             } else {
                 if (fromWallet != null) {
