@@ -94,6 +94,7 @@ public class Wallet {
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                    con.setConnectTimeout(5000);
                     String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
                     String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
                     con.setRequestProperty("Authorization", "Basic " + encoding);

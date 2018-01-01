@@ -109,7 +109,7 @@ public class  BitQuest extends JavaPlugin {
     public StatsDClient statsd;
     public Wallet wallet=null;
     public boolean spookyMode=false;
-
+    public boolean rate_limit=false;
     private Map<String, CommandAction> commands;
     private Map<String, CommandAction> modCommands;
 
@@ -324,7 +324,12 @@ public class  BitQuest extends JavaPlugin {
                 run_season_events();
             }
         }, 0, 1200L);
-        REDIS.set("lastloot","nobody");
+        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                reset_rate_limits();
+            }
+        }, 0, 100L);
 
 
     }
@@ -721,6 +726,9 @@ public class  BitQuest extends JavaPlugin {
     }
     public void crashtest() {
         this.setEnabled(false);
+    }
+    public void reset_rate_limits() {
+        rate_limit=false;
     }
 }
 
