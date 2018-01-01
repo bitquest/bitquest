@@ -252,7 +252,6 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
         if(event.getFrom().getChunk()!=event.getTo().getChunk()) {
-            bitQuest.updateScoreboard(event.getPlayer());
             if(!event.getFrom().getWorld().getName().endsWith("_nether") && !event.getFrom().getWorld().getName().endsWith("_end")) {
                 // announce new area
                 int x1=event.getFrom().getChunk().getX();
@@ -396,7 +395,7 @@ public class EntityEvents implements Listener {
                         @Override
                         public void run(Long balance) {
                             System.out.println(balance);
-                            if (d20 > 16 && balance > money) {
+                            if (bitQuest.rate_limit==false && d20 > 16 && balance > money) {
                                 try {
                                     if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
                                         System.out.println("[loot] " + player.getDisplayName() + ": " + money);
@@ -744,7 +743,6 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        bitQuest.updateScoreboard(event.getPlayer());
 
         Block b = event.getClickedBlock();
         Player p = event.getPlayer();

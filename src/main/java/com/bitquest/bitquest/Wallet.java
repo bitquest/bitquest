@@ -121,7 +121,8 @@ public class Wallet {
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
                     Double d = Double.parseDouble(response_object.get("result").toString().trim())*100000000L;
 
-
+                    if(bitQuest.BITQUEST_ENV=="development")
+                        System.out.println(response_object);
                     final Long balance = d.longValue();
                     Bukkit.getScheduler().runTask(bitQuest, new Runnable() {
                         @Override
@@ -160,7 +161,7 @@ public class Wallet {
                     String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
                     String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
                     con.setRequestProperty("Authorization", "Basic " + encoding);
-
+                    con.setConnectTimeout(5000);
                     con.setRequestMethod("POST");
                     con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
                     con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
@@ -181,6 +182,8 @@ public class Wallet {
                     }
                     in.close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
+                    if(bitQuest.BITQUEST_ENV=="development")
+                        System.out.println(response_object);
                     callback.run(response_object.get("result").toString());
                 } catch (Exception e) {
                     System.out.println("Error on getAccountAddress");
@@ -239,33 +242,7 @@ public class Wallet {
         
         return new JSONObject(); // just give them an empty object
     }
-    int bitcore_balance(String host, String address, boolean confirmed) throws IOException {
-        URL url;
-        if(confirmed==true) {
-            url=new URL("http://"+host+"/insight-api/addr/"+address+"/balance");
-        } else {
-            url=new URL("http://"+host+"/insight-api/addr/"+address+"/unconfirmedBalance");
-        }
 
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-        int responseCode = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        return Integer.parseInt(response.toString());
-
-    }
     public JSONObject get_blockcypher_balance(String address) throws IOException, ParseException {
         System.out.println("[balance] "+address);
         URL url;
@@ -506,29 +483,7 @@ public class Wallet {
             return null;
         }
     }
-    public boolean payment(int sat, String to) {
-//        try {
-//            if(this.getBalance()>=sat&&sat>=100) {
-//
-//                System.out.println("[payment] "+this.getBalance()+" -- "+sat+" -> "+address);
-//                System.out.println(BitQuest.REDIS.decrBy("payment_balance:"+this.getAccountAddress(),sat));
-//                System.out.println(BitQuest.REDIS.decrBy("final_balance:"+this.getAccountAddress(),sat));
-//                System.out.println(BitQuest.REDIS.incrBy("payment_balance:"+address,sat));
-//                System.out.println(BitQuest.REDIS.incrBy("final_balance:"+address,sat));
-//
-//                return this.move(to,sat);
-//            } else {
-//                return false;
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return false;
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//            return false;
-//        }
-        return false;
-    }
+
     public boolean move(String to,Long sat) throws IOException, ParseException {
 
         if(sat>=100&&sat<=Long.MAX_VALUE) {
@@ -550,7 +505,7 @@ public class Wallet {
             String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
             String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
             con.setRequestProperty("Authorization", "Basic " + encoding);
-
+            con.setConnectTimeout(5000);
             con.setRequestMethod("POST");
             con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
@@ -571,6 +526,8 @@ public class Wallet {
             }
             in.close();
             JSONObject response_object= (JSONObject) parser.parse(response.toString());
+            if(bitQuest.BITQUEST_ENV=="development")
+                System.out.println(response_object);
             return (boolean)response_object.get("result");
         } else {
             System.out.println("[move] "+this.account_id+"-> "+sat+" --> "+to+": FAIL (must be between 100 & "+Long.MAX_VALUE+")");

@@ -21,91 +21,98 @@ public class SendCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-        /***********************************************************
-         /send
-         a off-chain player-to-player-transaction
-         ***********************************************************/
-        int MAX_SEND=10000; // to be multiplied by DENOMINATION_FACTOR
-        if(args.length==2) {
-            for(char c : args[0].toCharArray()) {
-                if(!Character.isDigit(c))
+        if(bitQuest.rate_limit==false) {
+            bitQuest.rate_limit=true;
+
+            /***********************************************************
+             /send
+             a off-chain player-to-player-transaction
+             ***********************************************************/
+            int MAX_SEND = 10000; // to be multiplied by DENOMINATION_FACTOR
+            if (args.length == 2) {
+                for (char c : args[0].toCharArray()) {
+                    if (!Character.isDigit(c))
+                        return false;
+                }
+                if (args[0].length() > 8) {
+                    // maximum send is 8 digits
                     return false;
-            }
-            if(args[0].length()>8) {
-                // maximum send is 8 digits
-                return false;
-            }
-            final Long amount=Long.parseLong(args[0]);
-            final Long sat=amount*BitQuest.DENOMINATION_FACTOR;
+                }
+                final Long amount = Long.parseLong(args[0]);
+                final Long sat = amount * BitQuest.DENOMINATION_FACTOR;
 
-            if(amount!=0&&amount<=MAX_SEND) {
-                for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-                    if(onlinePlayer.getName().equalsIgnoreCase(args[1])) {
-                        if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
-                            final User user;
-                            try {
-                                user = new User(bitQuest, player);
-                            } catch (ParseException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                return true;
-                            } catch (org.json.simple.parser.ParseException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                return true;
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                return true;
+                if (amount != 0 && amount <= MAX_SEND) {
+                    for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                        if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                            if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
+                                final User user;
+                                try {
+                                    user = new User(bitQuest, player);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Tip failed.");
+                                    return true;
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Tip failed.");
+                                    return true;
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Tip failed.");
+                                    return true;
 
-                            }
-
-                            user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
-                                @Override
-                                public void run(Long balance) {
-                                    if(balance >= sat) {
-                                        try {
-                                            User user_tip=new User(bitQuest, onlinePlayer);
-                                            if(user.wallet.move(user_tip.player.getUniqueId().toString(),sat)) {
-                                                bitQuest.updateScoreboard(onlinePlayer);
-                                                bitQuest.updateScoreboard(player);
-                                                player.sendMessage(ChatColor.GREEN+"You sent "+amount+" "+BitQuest.DENOMINATION_NAME+" to user "+onlinePlayer.getName());
-                                                onlinePlayer.sendMessage(ChatColor.GREEN+"You got "+amount+" "+BitQuest.DENOMINATION_FACTOR+" from user "+player.getName());
-                                            } else {
-                                                player.sendMessage(ChatColor.RED+"Tip failed.");
-                                            }
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                            player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        } catch (org.json.simple.parser.ParseException e) {
-                                            e.printStackTrace();
-                                            player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                            player.sendMessage(ChatColor.RED+"Tip failed.");
-                                        }
-                                    } else {
-                                        player.sendMessage(ChatColor.RED+"Not enough balance");
-                                    }
                                 }
-                            });
-                            return true;
 
-                        } else {
-                            player.sendMessage(ChatColor.RED+"You cannot send to yourself!");
-                            return true;
+                                user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                                    @Override
+                                    public void run(Long balance) {
+                                        if (balance >= sat) {
+                                            try {
+                                                User user_tip = new User(bitQuest, onlinePlayer);
+                                                if (user.wallet.move(user_tip.player.getUniqueId().toString(), sat)) {
+                                                    bitQuest.updateScoreboard(onlinePlayer);
+                                                    bitQuest.updateScoreboard(player);
+                                                    player.sendMessage(ChatColor.GREEN + "You sent " + amount + " " + BitQuest.DENOMINATION_NAME + " to user " + onlinePlayer.getName());
+                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + amount + " " + BitQuest.DENOMINATION_FACTOR + " from user " + player.getName());
+                                                } else {
+                                                    player.sendMessage(ChatColor.RED + "Tip failed.");
+                                                }
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                                player.sendMessage(ChatColor.RED + "Tip failed.");
+                                            } catch (org.json.simple.parser.ParseException e) {
+                                                e.printStackTrace();
+                                                player.sendMessage(ChatColor.RED + "Tip failed.");
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                                player.sendMessage(ChatColor.RED + "Tip failed.");
+                                            }
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "Not enough balance");
+                                        }
+                                    }
+                                });
+                                return true;
+
+                            } else {
+                                player.sendMessage(ChatColor.RED + "You cannot send to yourself!");
+                                return true;
+                            }
                         }
                     }
-                }
-                player.sendMessage(ChatColor.RED+"Player "+args[1]+" is not online");
+                    player.sendMessage(ChatColor.RED + "Player " + args[1] + " is not online");
 
-                return true;
+                    return true;
+                } else {
+                    player.sendMessage("Minimum tip is 1 bit. Maximum is " + MAX_SEND);
+                    return true;
+                }
             } else {
-                player.sendMessage("Minimum tip is 1 bit. Maximum is "+MAX_SEND);
-                return true;
+                return false;
             }
         } else {
-            return false;
+            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+            return true;
         }
     }
 }
