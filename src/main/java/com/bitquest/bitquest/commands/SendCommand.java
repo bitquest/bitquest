@@ -73,7 +73,7 @@ public class SendCommand extends CommandAction {
                                                     bitQuest.updateScoreboard(onlinePlayer);
                                                     bitQuest.updateScoreboard(player);
                                                     player.sendMessage(ChatColor.GREEN + "You sent " + amount + " " + BitQuest.DENOMINATION_NAME + " to user " + onlinePlayer.getName());
-                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + amount + " " + BitQuest.DENOMINATION_FACTOR + " from user " + player.getName());
+                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + amount + " " + BitQuest.DENOMINATION_NAME + " from user " + player.getName());
                                                 } else {
                                                     player.sendMessage(ChatColor.RED + "Tip failed.");
                                                 }
