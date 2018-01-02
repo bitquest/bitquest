@@ -91,51 +91,12 @@ public class User {
         player.setExp(progress);
         setPlayerMaxHealth();
     }
-    private float round(float d, int decimalPlace) {
-        BigDecimal bd = new BigDecimal(Float.toString(d));
-        bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_DOWN);
-        return bd.floatValue();
-    }
+
 
     public void setPlayerMaxHealth() {
         int health=20+new Double(player.getLevel()/6.4).intValue();
         if(health>40) health=40;
         player.setMaxHealth(health);
     }
-    public String getAddress() {
-        return BitQuest.REDIS.get("address"+this.player.getUniqueId().toString());
-    }
 
-    public int bitcoinBalance() throws IOException, org.json.simple.parser.ParseException {
-
-        URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCHAIN+"/addrs/"+getAddress()+"/balance");
-        HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-
-        int responseCode = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-        }
-        in.close();
-
-        //print result
-        JSONParser parser = new JSONParser();
-        final JSONObject jsonobj = (JSONObject) parser.parse(response.toString());
-        return ((Number) jsonobj.get("final_balance")).intValue();
-
-
-    }
-
-    private boolean setClan(String tag) {
-        // TODO: Write user clan info
-        return false;
-    }
 }

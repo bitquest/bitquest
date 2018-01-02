@@ -72,8 +72,7 @@ public class  BitQuest extends JavaPlugin {
 
     public final static String MINER_FEE_ADDRESS = System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
 
-    // if BLOCKCHAIN is set, users can choose a blockchain supported by BlockCypher (very useful for development on testnet, or maybe DogeQuest?)
-    public final static String BLOCKCHAIN = System.getenv("BLOCKCHAIN") != null ? System.getenv("BLOCKCHAIN") : "btc/test3";
+    public final static boolean SEGWIT = System.getenv("SEGWIT") != null ? true : false;
 
     // Support for the bitcore full node and insight-api.
     public final static String BITCORE_HOST = System.getenv("BITCORE_HOST") != null ? System.getenv("BITCORE_HOST") : null;
@@ -116,7 +115,9 @@ public class  BitQuest extends JavaPlugin {
     @Override
     public void onEnable() {
         log("BitQuest starting");
-        log("Using the "+BitQuest.BLOCKCHAIN+" blockchain");
+        if(SEGWIT) {
+            log("Segwit (experimental) is enabled");
+        }
         REDIS.set("STARTUP","1");
         REDIS.expire("STARTUP",300);
         if (ADMIN_UUID == null) {
@@ -192,7 +193,6 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
         modCommands.put("crashTest", new CrashtestCommand(this));
         modCommands.put("mod", new ModCommand());
-        modCommands.put("faucet", new FaucetCommand(this));
         modCommands.put("ban", new BanCommand());
         modCommands.put("unban", new UnbanCommand());
         modCommands.put("banlist", new BanlistCommand());
@@ -594,20 +594,7 @@ public class  BitQuest extends JavaPlugin {
         return false;
 
     }
-    public void updatePlayerTeam(Player player) {
 
-    }
-    public String chain_name() {
-        if(this.BLOCKCHAIN.equals("btc/main")) {
-            return "Bitcoin";
-        } else if(this.BLOCKCHAIN.equals("doge/main")) {
-            return "Dogecoin";
-        } else if(this.BLOCKCHAIN.equals("btc/test3")) {
-            return "Testnet";
-        } else {
-            return "Blockchain";
-        }
-    }
 
 
     public void sendWalletInfo(final User user) {
@@ -621,7 +608,7 @@ public class  BitQuest extends JavaPlugin {
                             @Override
                             public void run(String accountAddress) {
                                 try {
-                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Your " + chain_name() + " Address: " + ChatColor.WHITE + accountAddress);
+                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
                                     user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
                                     user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
                                     if (user.wallet.url() != null) {
@@ -633,12 +620,6 @@ public class  BitQuest extends JavaPlugin {
                                     if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
                                         String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
                                         user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
-                                        int legacy_wallet_balance = user.wallet.legacy_wallet_balance(address);
-                                        if (legacy_wallet_balance > 0) {
-                                            String final_balance = BitQuest.REDIS.get("final_balance:" + address);
-                                            user.player.sendMessage(ChatColor.GREEN + "Balance: " + ChatColor.WHITE + final_balance);
-                                            user.player.sendMessage(ChatColor.GREEN + "Write /upgradewallet to claim bits.");
-                                        }
 
                                     }
                                 } catch (Exception e) {
