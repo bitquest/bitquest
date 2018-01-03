@@ -197,6 +197,7 @@ public class ClanCommand extends CommandAction {
         if (BitQuest.REDIS.scard("clan:" + clan + ":members") == 0) {
             BitQuest.REDIS.del("clan:" + clan + ":members");
             BitQuest.REDIS.srem("clans", clan);
+            BitQuest.REDIS.del("invitations:" + clan);
         }
     }
 }
