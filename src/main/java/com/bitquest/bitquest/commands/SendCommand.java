@@ -104,11 +104,12 @@ public class SendCommand extends CommandAction {
 
                     return true;
                 } else {
-                    player.sendMessage("Minimum tip is 1 bit. Maximum is " + MAX_SEND);
+                    player.sendMessage("Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + MAX_SEND);
                     return true;
                 }
             } else {
-                return false;
+                player.sendMessage(ChatColor.RED + "Usage: /send <amount> <player>");
+                return true;
             }
         } else {
             player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");

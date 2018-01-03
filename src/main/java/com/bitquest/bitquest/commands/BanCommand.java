@@ -27,7 +27,9 @@ public class BanCommand extends CommandAction {
                 return true;
             }
 
+        } else {
+            player.sendMessage(ChatColor.RED + "Usage: /ban <player>");
+            return true;
         }
-        return false;
     }
 }

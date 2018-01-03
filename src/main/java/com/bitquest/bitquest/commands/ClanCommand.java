@@ -49,8 +49,7 @@ public class ClanCommand extends CommandAction {
                     return true;
                 }
 
-            }
-            if (subCommand.equals("invite")) {
+            } else if (subCommand.equals("invite")) {
                 if (args.length > 1) {
                     String invitedName = args[1];
                     if (invitedName.equals(player.getName())) {
@@ -101,8 +100,7 @@ public class ClanCommand extends CommandAction {
                     player.sendMessage(ChatColor.RED + "Usage: /clan invite <player nickname>");
                     return true;
                 }
-            }
-            if (subCommand.equals("join")) {
+            } else if (subCommand.equals("join")) {
                 // check that argument is not empty
                 if (args.length > 1) {
                     String clanName = args[1];
@@ -128,8 +126,7 @@ public class ClanCommand extends CommandAction {
                     player.sendMessage(ChatColor.RED + "Usage: /clan join <clan name>");
                     return true;
                 }
-            }
-            if (args[0].equals("kick")) {
+            } else if (subCommand.equals("kick")) {
                 if (args.length > 1) {
                     String toKick = args[1];
                     // check if player is in the uuid database
@@ -165,8 +162,7 @@ public class ClanCommand extends CommandAction {
                     player.sendMessage(ChatColor.RED + "Usage: /clan kick <player nickname>");
                     return true;
                 }
-            }
-            if (subCommand.equals("leave")) {
+            } else if (subCommand.equals("leave")) {
                 if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
                     // TODO: when a clan gets emptied, should be removed from the "clans" set
                     player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + BitQuest.REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
@@ -178,11 +174,13 @@ public class ClanCommand extends CommandAction {
                     player.sendMessage(ChatColor.RED + "You don't belong to a clan.");
                     return true;
                 }
+            } else {
+                player.sendMessage(ChatColor.RED + "Usage: /clan <new|invite|kick|join|leave>");
+                return true;
             }
         } else {
             player.sendMessage(ChatColor.RED + "Usage: /clan <new|invite|kick|join|leave>");
             return true;
         }
-        return false;
     }
 }

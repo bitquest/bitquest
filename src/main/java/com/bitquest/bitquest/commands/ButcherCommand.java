@@ -27,7 +27,7 @@ public class ButcherCommand extends CommandAction {
                     System.out.println("[butcher] removed "+entity.getName());
                 }
             }
-            player.sendMessage(ChatColor.GREEN+"Killed "+killed+" entities");
+            player.sendMessage(ChatColor.GREEN+"Killed "+killed+" entities on " + w.getName());
 
         }
         return false;

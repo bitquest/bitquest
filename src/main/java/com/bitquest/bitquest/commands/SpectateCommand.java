@@ -2,6 +2,7 @@ package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -26,7 +27,9 @@ public class SpectateCommand extends CommandAction {
                 bitQuest.error(((Player) sender), "Player " + args[0] + " isn't online.");
             }
             return true;
+        } else {
+            player.sendMessage(ChatColor.RED + "Usage: /spectate <player>");
+            return true;
         }
-        return false;
     }
 }

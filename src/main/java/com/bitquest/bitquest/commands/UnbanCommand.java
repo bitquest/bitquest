@@ -22,7 +22,9 @@ public class UnbanCommand extends CommandAction {
                 return true;
             }
 
+        } else {
+            player.sendMessage(ChatColor.RED + "Usage: /unban <player>");
+            return true;
         }
-        return false;
     }
 }
