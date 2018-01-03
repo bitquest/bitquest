@@ -61,3 +61,6 @@ commands:
   donate:
     description: "Donate to BitQuest from your wallet"
     usage: "/donate <amount>"
+  migrateclans:
+    description: "Migrate clans to keep track of members"
+    usage: "/migrateclans"

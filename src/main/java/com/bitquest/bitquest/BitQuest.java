@@ -198,6 +198,8 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("banlist", new BanlistCommand());
         modCommands.put("spectate", new SpectateCommand(this));
         modCommands.put("emergencystop", new EmergencystopCommand());
+        // TODO: Remove this command after migrate.
+        modCommands.put("migrateclans", new MigrateClansCommand());
         sendDiscordMessage("bitquest started");
     }
     // @todo: make this just accept the endpoint name and (optional) parameters
