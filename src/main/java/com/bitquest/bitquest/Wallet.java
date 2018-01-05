@@ -541,7 +541,9 @@ public class Wallet {
 
     public String url() {
         if(address.substring(0,1).equals("N")||address.substring(0,1).equals("n")) {
-            return "live.blockcypher.com/btc-testnet/address/"+address;
+            return "live.blockcypher.com/btc-testnet/address/" + address;
+        } if(address.substring(0,1).equals("D")) {
+            return "live.blockcypher.com/doge/address/"+address;
         } else {
             return "live.blockcypher.com/btc/address/"+address;
         }
