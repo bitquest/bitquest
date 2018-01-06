@@ -55,7 +55,7 @@ public class LandCommand extends CommandAction {
                 Location location=player.getLocation();
                 int x=location.getChunk().getX();
                 int z=location.getChunk().getZ();
-                if(bitQuest.isOwner(location,player)) {
+                if(bitQuest.landIsClaimed(location) && bitQuest.isOwner(location,player)) {
                     String landname= BitQuest.REDIS.get("chunk"+x+","+z+"name");
 
                     if(args[1].equalsIgnoreCase("public")) {

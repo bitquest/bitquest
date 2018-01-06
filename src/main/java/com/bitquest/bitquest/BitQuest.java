@@ -516,16 +516,13 @@ public class  BitQuest extends JavaPlugin {
         }
     }
     public boolean isOwner(Location location, Player player) {
-        if (landIsClaimed(location)) {
-            if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
-                // player is the owner of the chunk
-                return true;
-            } else {
-                return false;
-            }
+        if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
+            // player is the owner of the chunk
+            return true;
         } else {
             return false;
         }
+
     }
     public boolean canBuild(Location location, Player player) {
         // returns true if player has permission to build in location
