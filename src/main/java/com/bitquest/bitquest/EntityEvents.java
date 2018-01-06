@@ -471,7 +471,7 @@ public class EntityEvents implements Listener {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
-                } else if (bitQuest.landIsClaimed(e.getLocation()) == false) {
+                } else {
                     try {
                         bitQuest.REDIS.set(key, "1");
                         bitQuest.REDIS.expire(key, 3000);
