@@ -399,7 +399,7 @@ public class EntityEvents implements Listener {
                                 try {
                                     if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
                                         System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / 100 + ChatColor.GREEN + " bits of loot!");
+                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / bitQuest.DENOMINATION_FACTOR + ChatColor.GREEN + " "+bitQuest.DENOMINATION_NAME+" of loot!");
                                         player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
                                         if (bitQuest.messageBuilder != null) {
 
