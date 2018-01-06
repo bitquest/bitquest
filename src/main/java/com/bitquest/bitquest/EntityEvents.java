@@ -395,7 +395,7 @@ public class EntityEvents implements Listener {
                         @Override
                         public void run(Long balance) {
                             System.out.println(balance);
-                            if (bitQuest.rate_limit==false && d20 > 16 && balance > money) {
+                            if (bitQuest.rate_limit==false && d20==1 && balance > money) {
                                 try {
                                     if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
                                         System.out.println("[loot] " + player.getDisplayName() + ": " + money);
@@ -542,8 +542,6 @@ public class EntityEvents implements Listener {
                         System.out.println("Event failed. Shutting down...");
                         Bukkit.shutdown();
                     }
-                } else {
-                    e.setCancelled(true);
                 }
             } else if(entity instanceof Ghast) {
                 entity.setMaxHealth(level*4);
