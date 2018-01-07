@@ -2,6 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 
-script:
+before_script:
   - ./gradlew setupWorkspace
+
+script:
   - ./gradlew shadowJar
