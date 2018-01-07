@@ -25,6 +25,9 @@ commands:
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"
+  maintenance_mode:
+    description: "Enables maintenance mode and stops players from joining the server"
+    usage: "/maintenance_mode <on|off>"
   banlist:
     description: "Prints the list of banned players"
     usage: "/banlist"

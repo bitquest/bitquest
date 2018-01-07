@@ -109,10 +109,14 @@ public class  BitQuest extends JavaPlugin {
     public Wallet wallet=null;
     public boolean spookyMode=false;
     public boolean rate_limit=false;
+    // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
     public HashMap<String,String> land_owner_cache = new HashMap();
+    // when true, server is closed for maintenance and not allowing players to join in.
+    public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
+
     @Override
     public void onEnable() {
         log("BitQuest starting");
@@ -517,7 +521,14 @@ public class  BitQuest extends JavaPlugin {
         }
     }
     public boolean isOwner(Location location, Player player) {
-        if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
+        String key="chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
+        if(land_owner_cache.containsKey(key)) {
+            if(land_owner_cache.get(key).equals(player.getUniqueId().toString())) {
+                return true;
+            } else {
+                return false;
+            }
+        } else if (REDIS.get(key).equals(player.getUniqueId().toString())) {
             // player is the owner of the chunk
             return true;
         } else {
