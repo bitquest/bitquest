@@ -109,11 +109,10 @@ public class  BitQuest extends JavaPlugin {
     public Wallet wallet=null;
     public boolean spookyMode=false;
     public boolean rate_limit=false;
-
+    public HashMap<String,String> land_owner_cache = new HashMap();
     private Map<String, CommandAction> commands;
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
-    private boolean[][] land_ownership_cache;
     @Override
     public void onEnable() {
         log("BitQuest starting");
@@ -442,7 +441,7 @@ public class  BitQuest extends JavaPlugin {
                                 try {
                                     if (balance >= LAND_PRICE) {
                                         if (user.wallet.move("land", LAND_PRICE)) {
-
+                                            land_owner_cache=new HashMap();
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
                                             player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
@@ -631,7 +630,17 @@ public class  BitQuest extends JavaPlugin {
         });
     };
     public boolean landIsClaimed(Location location) {
-        return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
+        String key="chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner";
+        if (land_owner_cache.containsKey(key)) {
+            return true;
+        } else {
+            if(REDIS.exists(key)==true) {
+                land_owner_cache.put(key,REDIS.get(key));
+                return true;
+            } else {
+                return false;
+            }
+        }
     }
 
     @Override
