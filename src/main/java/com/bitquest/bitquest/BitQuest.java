@@ -631,22 +631,7 @@ public class  BitQuest extends JavaPlugin {
         });
     };
     public boolean landIsClaimed(Location location) {
-        if(location.getChunk().getX()>-1024&&location.getChunk().getZ()>-1024&&location.getChunk().getX()<1024&&location.getChunk().getZ()<1024) {
-            System.out.println("[land cache] "+location.getChunk().getX()+","+location.getChunk().getZ());
-
-            if(land_ownership_cache[location.getChunk().getX()][location.getChunk().getZ()]) {
-                return true;
-            } else {
-                return false;
-            }
-        } else {
-            if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner")) {
-                land_ownership_cache[location.getChunk().getX()][location.getChunk().getZ()]=true;
-                return true;
-            } else {
-                return false;
-            }
-        }
+        return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
     }
 
     @Override
