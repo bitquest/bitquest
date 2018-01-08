@@ -567,6 +567,7 @@ public class EntityEvents implements Listener {
                         }
                     } catch (Exception e1) {
                         System.out.println("Event failed. Shutting down...");
+                        e1.printStackTrace();
                         Bukkit.shutdown();
                     }
                 } else {
@@ -666,8 +667,9 @@ public class EntityEvents implements Listener {
         if (BitQuest.rand(0, 32) < level) chestplate_material = Material.CHAINMAIL_CHESTPLATE;
         if (BitQuest.rand(0, 64) < level) chestplate_material = Material.IRON_CHESTPLATE;
         if (BitQuest.rand(0, 128) < level) chestplate_material = Material.DIAMOND_CHESTPLATE;
-        ItemStack chest = new ItemStack(chestplate_material);
+
         if(chestplate_material!=null) {
+            ItemStack chest = new ItemStack(chestplate_material);
             randomEnchantItem(chest,level);
 
             entity.getEquipment().setChestplate(chest);
