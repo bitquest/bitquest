@@ -111,6 +111,7 @@ public class  BitQuest extends JavaPlugin {
     public boolean spookyMode=false;
     public boolean rate_limit=false;
     // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
+    public HashMap<String,Boolean> land_unclaimed_cache = new HashMap();
     public HashMap<String,String> land_owner_cache = new HashMap();
     public HashMap<String,String> land_permission_cache = new HashMap();
     public HashMap<String,String> land_name_cache = new HashMap();
@@ -683,13 +684,16 @@ public class  BitQuest extends JavaPlugin {
     };
     public boolean landIsClaimed(Location location) {
         String key="chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner";
-        if (land_owner_cache.containsKey(key)) {
+        if(land_unclaimed_cache.containsKey(key)) {
+            return false;
+        } else if (land_owner_cache.containsKey(key)) {
             return true;
         } else {
             if(REDIS.exists(key)==true) {
                 land_owner_cache.put(key,REDIS.get(key));
                 return true;
             } else {
+                land_unclaimed_cache.put(key,true);
                 return false;
             }
         }
