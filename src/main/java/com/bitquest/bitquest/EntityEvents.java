@@ -394,42 +394,51 @@ public class EntityEvents implements Listener {
             if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
+                    // roll a D20
+                    final int d20=BitQuest.rand(1,20);
                     final Player player = (Player) damage.getDamager();
-                    final User user = new User(bitQuest, player);
-                    final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
-                    final int d20=BitQuest.rand(1,20);;
+                    boolean loot_limit=false;
+                    if(bitQuest.last_loot_player!=null&&!bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
+                    if(loot_limit==false&&d20==1) {
 
-                    bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
-                        @Override
-                        public void run(Long balance) {
-                            System.out.println(balance);
-                            if (bitQuest.rate_limit==false && d20==1 && balance > money) {
-                                try {
-                                    if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
-                                        System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                                        player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / bitQuest.DENOMINATION_FACTOR + ChatColor.GREEN + " "+bitQuest.DENOMINATION_NAME+" of loot!");
-                                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
-                                        if (bitQuest.messageBuilder != null) {
-
-                                            // Create an event
-                                            org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+                        final User user = new User(bitQuest, player);
+                        final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
 
 
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
+                        bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(Long balance) {
+                                System.out.println(balance);
+                                if (bitQuest.rate_limit==false && balance > money) {
+                                    try {
+                                        if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
+                                            bitQuest.last_loot_player=player;
+                                            System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                            player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / bitQuest.DENOMINATION_FACTOR + ChatColor.GREEN + " "+bitQuest.DENOMINATION_NAME+" of loot!");
+                                            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
+                                            if (bitQuest.messageBuilder != null) {
 
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
+                                                // Create an event
+                                                org.json.JSONObject sentEvent = bitQuest.messageBuilder.event(player.getUniqueId().toString(), "Loot", null);
+
+
+                                                ClientDelivery delivery = new ClientDelivery();
+                                                delivery.addMessage(sentEvent);
+
+                                                MixpanelAPI mixpanel = new MixpanelAPI();
+                                                mixpanel.deliver(delivery);
+                                            }
                                         }
+                                    } catch (Exception e1) {
+                                        e1.printStackTrace();
                                     }
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
                                 }
+                                // Add EXP
+                                user.addExperience(level * 2);
                             }
-                            // Add EXP
-                            user.addExperience(level * 2);
-                        }
-                    });
+                        });
+                    }
+
                 }
 
             } else {

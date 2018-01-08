@@ -107,6 +107,7 @@ public class  BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
+    public Player last_loot_player;
     public boolean spookyMode=false;
     public boolean rate_limit=false;
     // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
