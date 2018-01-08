@@ -259,9 +259,17 @@ public class EntityEvents implements Listener {
 
                 int x2=event.getTo().getChunk().getX();
                 int z2=event.getTo().getChunk().getZ();
+                String name1="the wilderness";
+                String name2="the wilderness";
+                String key1="chunk"+x1+","+z1+"name";
+                String key2="chunk"+x2+","+z2+"name";
+                if(bitQuest.landIsClaimed(event.getFrom())) {
+                    name1=BitQuest.REDIS.get(key1)!= null ? BitQuest.REDIS.get(key1) : "the wilderness";
+                }
+                if(bitQuest.landIsClaimed(event.getTo())) {
+                    name2=BitQuest.REDIS.get(key2)!= null ? BitQuest.REDIS.get(key2) : "the wilderness";
+                }
 
-                String name1=BitQuest.REDIS.get("chunk"+x1+","+z1+"name")!= null ? BitQuest.REDIS.get("chunk"+x1+","+z1+"name") : "the wilderness";
-                String name2=BitQuest.REDIS.get("chunk"+x2+","+z2+"name")!= null ? BitQuest.REDIS.get("chunk"+x2+","+z2+"name") : "the wilderness";
 
                 if(!name1.equals(name2)) {
                     if(name2.equals("the wilderness")){

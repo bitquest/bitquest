@@ -112,6 +112,7 @@ public class  BitQuest extends JavaPlugin {
     // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
     public HashMap<String,String> land_owner_cache = new HashMap();
     public HashMap<String,String> land_permission_cache = new HashMap();
+    public HashMap<String,String> land_name_cache = new HashMap();
     // when true, server is closed for maintenance and not allowing players to join in.
     public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;

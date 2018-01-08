@@ -54,6 +54,7 @@ public class LandCommand extends CommandAction {
                 return true;
             } else if(args[0].equalsIgnoreCase("permission")) {
                 bitQuest.land_permission_cache=new HashMap();
+                bitQuest.land_name_cache=new HashMap();
                 Location location=player.getLocation();
                 int x=location.getChunk().getX();
                 int z=location.getChunk().getZ();
