@@ -47,12 +47,11 @@ public class User {
     private int expFactor = 256;
 
 
-
-    public void addExperience(int exp) {
-        BitQuest.REDIS.incrBy("experience.raw."+this.player.getUniqueId().toString(),exp);
-        setTotalExperience(experience());
-        System.out.println(exp);
-    }
+//    public void addExperience(int exp) {
+//        BitQuest.REDIS.incrBy("experience.raw."+this.player.getUniqueId().toString(),exp);
+//        setTotalExperience(experience());
+//        System.out.println(exp);
+//    }
     public int experience() {
         if(BitQuest.REDIS.get("experience.raw."+this.player.getUniqueId().toString())==null) {
             return 0;
@@ -62,41 +61,33 @@ public class User {
     }
 
 
-
-    public int getLevel(int exp) {
-        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
-    }
-
-    public int getExpForLevel(int level) {
-        return (int) Math.pow(level,2)*expFactor;
-    }
-
-    public float getExpProgress(int exp) {
-        int level = getLevel(exp);
-        int nextlevel = getExpForLevel(level + 1);
-        int prevlevel = 0;
-        if(level > 0) {
-            prevlevel = getExpForLevel(level);
-        }
-        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
-        return progress;
-    }
-
-    public void setTotalExperience(int rawxp) {
-        // lower factor, experience is easier to get. you can increase to get the opposite effect
-        int level = getLevel(rawxp);
-        float progress = getExpProgress(rawxp);
-
-        player.setLevel(level);
-        player.setExp(progress);
-        setPlayerMaxHealth();
-    }
-
-
-    public void setPlayerMaxHealth() {
-        int health=20+new Double(player.getLevel()/6.4).intValue();
-        if(health>40) health=40;
-        player.setMaxHealth(health);
-    }
+//
+//    public int getLevel(int exp) {
+//        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));
+//    }
+//
+//    public int getExpForLevel(int level) {
+//        return (int) Math.pow(level,2)*expFactor;
+//    }
+//
+//    public float getExpProgress(int exp) {
+//        int level = getLevel(exp);
+//        int nextlevel = getExpForLevel(level + 1);
+//        int prevlevel = 0;
+//        if(level > 0) {
+//            prevlevel = getExpForLevel(level);
+//        }
+//        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+//        return progress;
+//    }
+//
+//
+//
+//
+//    public void setPlayerMaxHealth() {
+//        int health=1+player.getLevel();
+//        if(health>40) health=40;
+//        player.setMaxHealth(health);
+//    }
 
 }

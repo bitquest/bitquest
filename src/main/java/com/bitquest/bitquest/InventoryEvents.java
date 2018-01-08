@@ -100,7 +100,7 @@ public class InventoryEvents implements Listener {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         final User user=new User(bitQuest, player);
-        user.setTotalExperience(user.experience());
+
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
             if(bitQuest.rate_limit==false) {

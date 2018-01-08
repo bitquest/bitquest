@@ -132,7 +132,7 @@ public class EntityEvents implements Listener {
         player.setGameMode(GameMode.SURVIVAL);
         final User user = new User(bitQuest, player);
         bitQuest.updateScoreboard(player);
-        user.setTotalExperience(user.experience());
+        bitQuest.setTotalExperience(player);
         final String ip=player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User "+player.getName()+"logged in with IP "+ip);
         BitQuest.REDIS.set("ip"+player.getUniqueId().toString(),ip);
@@ -161,7 +161,7 @@ public class EntityEvents implements Listener {
         }
 
         // Prints the user balance
-        user.setTotalExperience((Integer) user.experience());
+        bitQuest.setTotalExperience(player);
 
         try {
 
@@ -397,7 +397,7 @@ public class EntityEvents implements Listener {
     void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException {
         final LivingEntity entity = e.getEntity();
 
-        final int level = new Double(entity.getMaxHealth() / 4).intValue();
+        final int level = (new Double(entity.getMaxHealth()).intValue())-1;
 
         if (entity instanceof Monster) {
 
@@ -409,9 +409,12 @@ public class EntityEvents implements Listener {
                     final Player player = (Player) damage.getDamager();
                     boolean loot_limit=false;
                     if(bitQuest.last_loot_player!=null&&!bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
+                    // Add EXP
+                    int exp=level*8;
+                    bitQuest.REDIS.incrBy("experience.raw."+player.getUniqueId().toString(),exp);
+                    bitQuest.setTotalExperience(player);
                     if(loot_limit==false&&d20==1) {
 
-                        final User user = new User(bitQuest, player);
                         final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
 
 
@@ -443,8 +446,7 @@ public class EntityEvents implements Listener {
                                         e1.printStackTrace();
                                     }
                                 }
-                                // Add EXP
-                                user.addExperience(level * 2);
+
                             }
                         });
                     }
@@ -508,8 +510,8 @@ public class EntityEvents implements Listener {
                         if (level < 1) level = 1;
                         if (bitQuest.rand(1, 20) == 20) level = level * 2;
 
-                        entity.setMaxHealth(level * 4);
-                        entity.setHealth(level * 4);
+                        entity.setMaxHealth(1+level);
+                        entity.setHealth(1+level);
                         entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
                         entity.setCustomName(String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 

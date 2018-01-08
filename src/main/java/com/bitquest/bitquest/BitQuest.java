@@ -417,6 +417,41 @@ public class  BitQuest extends JavaPlugin {
     public void error(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.RED + msg);
     }
+    public int getLevel(int exp) {
+        return (int) Math.floor(Math.sqrt(exp / (float)256));
+    }
+    public int getExpForLevel(int level) {
+        return (int) Math.pow(level,2)*256;
+    }
+
+    public float getExpProgress(int exp) {
+        int level = getLevel(exp);
+        int nextlevel = getExpForLevel(level + 1);
+        int prevlevel = 0;
+        if(level > 0) {
+            prevlevel = getExpForLevel(level);
+        }
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        return progress;
+    }
+    public void setTotalExperience(Player player) {
+        int rawxp=0;
+        if(BitQuest.REDIS.exists("experience.raw."+player.getUniqueId().toString())) {
+            rawxp=Integer.parseInt(BitQuest.REDIS.get("experience.raw."+player.getUniqueId().toString()));
+        }
+        // lower factor, experience is easier to get. you can increase to get the opposite effect
+        int level = getLevel(rawxp);
+        float progress = getExpProgress(rawxp);
+
+        player.setLevel(level);
+        player.setExp(progress);
+        setPlayerMaxHealth(player);
+    }
+    public void setPlayerMaxHealth(Player player) {
+        int health=1+player.getLevel();
+        if(health>40) health=40;
+        player.setMaxHealth(health);
+    }
 
     public void claimLand(final String name, Chunk chunk, final Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // check that land actually has a name
