@@ -687,7 +687,6 @@ public class  BitQuest extends JavaPlugin {
     public boolean landIsClaimed(Location location) {
         String key="chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner";
         if(land_unclaimed_cache.containsKey(key)) {
-            System.out.println("uc");
             return false;
         } else if (land_owner_cache.containsKey(key)) {
             return true;
