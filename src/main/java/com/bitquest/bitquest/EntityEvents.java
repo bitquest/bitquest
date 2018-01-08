@@ -488,7 +488,7 @@ public class EntityEvents implements Listener {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
-                } else {
+                } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
                     try {
                         bitQuest.REDIS.set(key, "1");
                         bitQuest.REDIS.expire(key, 3000);
@@ -559,6 +559,8 @@ public class EntityEvents implements Listener {
                         System.out.println("Event failed. Shutting down...");
                         Bukkit.shutdown();
                     }
+                } else {
+                    e.setCancelled(true);
                 }
             } else if(entity instanceof Ghast) {
                 entity.setMaxHealth(level*4);
