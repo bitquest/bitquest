@@ -484,11 +484,12 @@ public class  BitQuest extends JavaPlugin {
                                 try {
                                     if (balance >= LAND_PRICE) {
                                         if (user.wallet.move("land", LAND_PRICE)) {
+
+                                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+                                            BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
                                             land_owner_cache=new HashMap();
                                             land_name_cache=new HashMap();
                                             land_unclaimed_cache=new HashMap();
-                                            BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                                            BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
                                             player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
                                             updateScoreboard(player);
                                             if (bitQuest.messageBuilder != null) {
