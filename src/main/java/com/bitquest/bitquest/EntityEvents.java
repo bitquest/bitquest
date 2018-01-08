@@ -491,7 +491,6 @@ public class EntityEvents implements Listener {
         int level = BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 16))));
 
         if (entity instanceof Monster) {
-                String key = "mob:" + e.getLocation().getWorld().getName() + ":" + chunk.getX() + ":" + chunk.getZ();
 
 
 
@@ -499,10 +498,9 @@ public class EntityEvents implements Listener {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
-                } else if(bitQuest.landIsClaimed(e.getLocation())==false) {
+                } else if(bitQuest.land_unclaimed_cache.containsKey("chunk"+e.getLocation().getChunk().getX()+","+e.getLocation().getChunk().getZ()+"owner")) {
                     try {
-                        bitQuest.REDIS.set(key, "1");
-                        bitQuest.REDIS.expire(key, 3000);
+
                         e.setCancelled(false);
 
                         // nerf_level makes sure high level mobs are away from the spawn
