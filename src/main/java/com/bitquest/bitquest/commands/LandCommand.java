@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.HashMap;
 
 
 public class LandCommand extends CommandAction {
@@ -52,6 +53,7 @@ public class LandCommand extends CommandAction {
                 }
                 return true;
             } else if(args[0].equalsIgnoreCase("permission")) {
+                bitQuest.land_permission_cache=new HashMap();
                 Location location=player.getLocation();
                 int x=location.getChunk().getX();
                 int z=location.getChunk().getZ();

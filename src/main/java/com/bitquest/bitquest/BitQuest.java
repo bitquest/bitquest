@@ -111,6 +111,7 @@ public class  BitQuest extends JavaPlugin {
     public boolean rate_limit=false;
     // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
     public HashMap<String,String> land_owner_cache = new HashMap();
+    public HashMap<String,String> land_permission_cache = new HashMap();
     // when true, server is closed for maintenance and not allowing players to join in.
     public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;
@@ -568,8 +569,13 @@ public class  BitQuest extends JavaPlugin {
         // p = public
         // c = clan
         // n = no permissions (private)
-        if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions")) {
-            return REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions");
+        String key = "chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions";
+        if(land_permission_cache.containsKey(key)) {
+            return land_permission_cache.get(key);
+        } else if(REDIS.exists(key)) {
+            String code=REDIS.get(key);
+            land_permission_cache.put(key,code);
+            return code;
         } else {
             return "n";
         }
