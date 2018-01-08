@@ -409,7 +409,7 @@ public class EntityEvents implements Listener {
                     boolean loot_limit=false;
                     if(bitQuest.last_loot_player!=null&&!bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
                     // Add EXP
-                    int exp=level*8;
+                    int exp=level*4;
                     bitQuest.REDIS.incrBy("experience.raw."+player.getUniqueId().toString(),exp);
                     bitQuest.setTotalExperience(player);
                     if(loot_limit==false&&d20==1) {
