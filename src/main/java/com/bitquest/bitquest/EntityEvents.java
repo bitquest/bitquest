@@ -169,7 +169,6 @@ public class EntityEvents implements Listener {
             bitQuest.updateScoreboard(player);
 
 
-            bitQuest.sendWalletInfo(user);
 
             player.sendMessage("");
             player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
