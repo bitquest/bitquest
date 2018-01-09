@@ -497,7 +497,7 @@ public class EntityEvents implements Listener {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
-                } else if(bitQuest.land_unclaimed_cache.containsKey("chunk"+e.getLocation().getChunk().getX()+","+e.getLocation().getChunk().getZ()+"owner")) {
+                } else if(bitQuest.land_unclaimed_cache.containsKey("chunk"+e.getLocation().getChunk().getX()+","+e.getLocation().getChunk().getZ()+"owner")||e.getLocation().getWorld().getName().equals("world_nether")||e.getLocation().getWorld().getName().equals("world_end")) {
                     try {
 
                         e.setCancelled(false);
