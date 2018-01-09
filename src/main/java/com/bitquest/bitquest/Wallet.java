@@ -76,7 +76,9 @@ public class Wallet {
                     jsonObject.put("method", "getbalance");
                     JSONArray params = new JSONArray();
                     params.add(account_id);
-                    params.add(0);
+                    params.add(confirmations);
+                    if(bitQuest.BITQUEST_ENV=="development")
+                        System.out.println("[getbalance] "+account_id+" "+confirmations);
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -140,7 +142,8 @@ public class Wallet {
                     jsonObject.put("method", "getaccountaddress");
                     JSONArray params = new JSONArray();
                     params.add(account_id);
-
+                    if(bitQuest.BITQUEST_ENV=="development")
+                        System.out.println("[getaccountaddress] "+account_id);
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -224,7 +227,7 @@ public class Wallet {
                         System.out.println(response_object);
                     callback.run(response_object.get("result").toString());
                 } catch (Exception e) {
-                    System.out.println("Error on getAccountAddress");
+                    System.out.println("[addwitnessaddress] fail");
                     e.printStackTrace();
                 }
             }
@@ -237,11 +240,10 @@ public class Wallet {
             public void run() {
                 try {
                     JSONParser parser = new JSONParser();
-
                     final JSONObject jsonObject = new JSONObject();
                     jsonObject.put("jsonrpc", "1.0");
                     jsonObject.put("id", "bitquest");
-                    jsonObject.put("method", "addwitnessaddress");
+                    jsonObject.put("method", "setaccount");
                     JSONArray params = new JSONArray();
                     params.add(address);
                     params.add(account_id);
@@ -277,7 +279,7 @@ public class Wallet {
                         System.out.println(response_object);
                     callback.run(true);
                 } catch (Exception e) {
-                    System.out.println("Error on getAccountAddress");
+                    System.out.println("[setaccount] error");
                     e.printStackTrace();
                 }
             }

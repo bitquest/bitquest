@@ -651,7 +651,6 @@ public class  BitQuest extends JavaPlugin {
                 user.wallet.getBalance(5, new Wallet.GetBalanceCallback() {
                     @Override
                     public void run(final Long balance) {
-
                         user.wallet.getAccountAddress(new Wallet.GetAccountAddressCallback() {
                             @Override
                             public void run(String accountAddress) {
