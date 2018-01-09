@@ -404,7 +404,10 @@ public class EntityEvents implements Listener {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     // roll a D20
-                    final int d100=BitQuest.rand(1,100);
+
+                    int dice=BitQuest.rand(1,100);
+                    if(bitQuest.wallet_balance_cache>100*bitQuest.DENOMINATION_FACTOR) dice=BitQuest.rand(1,20);
+                    if(bitQuest.wallet_balance_cache>1000*bitQuest.DENOMINATION_FACTOR) dice=7;
                     final Player player = (Player) damage.getDamager();
                     boolean loot_limit=false;
                     if(bitQuest.last_loot_player!=null&&bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
@@ -412,20 +415,17 @@ public class EntityEvents implements Listener {
                     int exp=level*4;
                     bitQuest.REDIS.incrBy("experience.raw."+player.getUniqueId().toString(),exp);
                     bitQuest.setTotalExperience(player);
-                    if(d100==7) {
+                    if(dice==7) {
 
                         final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
 
-
-                        bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
-                            @Override
-                            public void run(Long balance) {
-                                System.out.println(balance);
-                                if (bitQuest.rate_limit==false && balance > money) {
+                                if (bitQuest.rate_limit==false && bitQuest.wallet_balance_cache > money) {
                                     try {
                                         if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
                                             bitQuest.last_loot_player=player;
+                                            bitQuest.wallet_balance_cache-=money;
                                             System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                            System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
                                             player.sendMessage(ChatColor.GREEN + "You got " + ChatColor.BOLD + money / bitQuest.DENOMINATION_FACTOR + ChatColor.GREEN + " "+bitQuest.DENOMINATION_NAME+" of loot!");
                                             player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
                                             if (bitQuest.messageBuilder != null) {
@@ -446,8 +446,7 @@ public class EntityEvents implements Listener {
                                     }
                                 }
 
-                            }
-                        });
+
                     }
 
                 }

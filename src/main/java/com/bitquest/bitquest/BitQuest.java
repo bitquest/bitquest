@@ -64,9 +64,9 @@ public class  BitQuest extends JavaPlugin {
     public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
     public final static String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
-    public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
-    public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
+
     public final static int MAX_STOCK=100;
+    public final static String SERVER_NAME=System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : null;
 
     public final static String LAND_ADDRESS = System.getenv("LAND_ADDRESS") != null ? System.getenv("LAND_ADDRESS") : null;
 
@@ -115,6 +115,7 @@ public class  BitQuest extends JavaPlugin {
     public HashMap<String,String> land_owner_cache = new HashMap();
     public HashMap<String,String> land_permission_cache = new HashMap();
     public HashMap<String,String> land_name_cache = new HashMap();
+    public Long wallet_balance_cache=0L;
     // when true, server is closed for maintenance and not allowing players to join in.
     public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;
@@ -311,19 +312,12 @@ public class  BitQuest extends JavaPlugin {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 0, 72000L);
+
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 if(statsd!=null) {
-                    sendWorldMetrics();
-                }
-            }
-        }, 0, 12000L);
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(statsd!=null) {
-                    sendWalletMetrics();
+                    updateMetrics();
                 }
             }
         }, 0, 12000L);
@@ -357,24 +351,22 @@ public class  BitQuest extends JavaPlugin {
             spookyMode=false;
         }
     }
-    public void sendMetric(String name,int value) {
-        statsd.gauge(BITQUEST_ENV+"."+name,value);
+    public void recordMetric(String name,int value) {
+        if(SERVER_NAME!=null) {
+            statsd.gauge("bitquest."+SERVER_NAME+"."+name,value);
+        }
+        System.out.println("["+name+"] "+value);
 
     }
-    public void sendWorldMetrics() {
-        statsd.gauge(BITQUEST_ENV+".players",Bukkit.getServer().getOnlinePlayers().size());
-        statsd.gauge(BITQUEST_ENV+".entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
-        statsd.gauge(BITQUEST_ENV+".entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
-        statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
-    }
-    public  void sendWalletMetrics() {
+    public void updateMetrics() {
         wallet.getBalance(0, new Wallet.GetBalanceCallback() {
             @Override
-            public void run(Long balance) {
-                statsd.gauge(BITQUEST_ENV+".wallet_balance", balance);
+            public void run(final Long unconfirmedBalance) {
+                wallet_balance_cache=unconfirmedBalance;
             }
         });
     }
+
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
         List<Entity> entities = w.getEntities();
