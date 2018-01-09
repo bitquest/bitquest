@@ -497,7 +497,7 @@ public class EntityEvents implements Listener {
                 // Disable mob spawners. Keep mob farmers away
                 if (e.getSpawnReason() == SpawnReason.SPAWNER) {
                     e.setCancelled(true);
-                } else if(bitQuest.land_unclaimed_cache.containsKey("chunk"+e.getLocation().getChunk().getX()+","+e.getLocation().getChunk().getZ()+"owner")||e.getLocation().getWorld().getName().equals("world_nether")||e.getLocation().getWorld().getName().equals("world_end")) {
+                } else {
                     try {
 
                         e.setCancelled(false);
@@ -566,8 +566,6 @@ public class EntityEvents implements Listener {
                         e1.printStackTrace();
                         Bukkit.shutdown();
                     }
-                } else {
-                    e.setCancelled(true);
                 }
             } else if(entity instanceof Ghast) {
                 entity.setMaxHealth(level*4);
