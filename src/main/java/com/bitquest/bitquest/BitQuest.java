@@ -651,28 +651,56 @@ public class  BitQuest extends JavaPlugin {
                 user.wallet.getBalance(5, new Wallet.GetBalanceCallback() {
                     @Override
                     public void run(final Long balance) {
+
                         user.wallet.getAccountAddress(new Wallet.GetAccountAddressCallback() {
                             @Override
                             public void run(String accountAddress) {
-                                try {
-                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
-                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                                    if (user.wallet.url() != null) {
-                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
-                                    }
+                                if(SEGWIT) {
+                                    user.wallet.addWitnessAddress(accountAddress,new Wallet.AddWitnessAddressCallback(){
+                                        @Override
+                                        public void run(String witnessAddress) {
+                                            user.wallet.setAccount(witnessAddress,new Wallet.SetAccountCallback(){
+                                                public void run(Boolean set_account_success) {
+                                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + witnessAddress);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                                    if (user.wallet.url() != null) {
+                                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                                    }
 
-                                    // This callback is called with runTask. I think this call it form the main thread.
-                                    // If I'm wrong this REDIS call can cause problems.
-                                    if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
-                                        String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
-                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+                                                    // This callback is called with runTask. I think this call it form the main thread.
+                                                    // If I'm wrong this REDIS call can cause problems.
+                                                    if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                                        String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
 
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    try {
+                                        user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
+                                        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                        if (user.wallet.url() != null) {
+                                            user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                        }
+
+                                        // This callback is called with runTask. I think this call it form the main thread.
+                                        // If I'm wrong this REDIS call can cause problems.
+                                        if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                            String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                            user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+
+                                        }
+                                    } catch (Exception e) {
+                                        System.out.println("Error on sending wallet info");
+                                        e.printStackTrace();
                                     }
-                                } catch (Exception e) {
-                                    System.out.println("Error on sending wallet info");
-                                    e.printStackTrace();
                                 }
+
                             }
                         });
                     }

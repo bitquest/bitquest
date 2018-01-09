@@ -244,6 +244,7 @@ public class Wallet {
                     jsonObject.put("method", "addwitnessaddress");
                     JSONArray params = new JSONArray();
                     params.add(address);
+                    params.add(account_id);
 
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
