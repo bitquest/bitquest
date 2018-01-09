@@ -404,7 +404,7 @@ public class EntityEvents implements Listener {
                 final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     // roll a D20
-                    final int d20=BitQuest.rand(1,20);
+                    final int d100=BitQuest.rand(1,100);
                     final Player player = (Player) damage.getDamager();
                     boolean loot_limit=false;
                     if(bitQuest.last_loot_player!=null&&bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
@@ -412,7 +412,7 @@ public class EntityEvents implements Listener {
                     int exp=level*4;
                     bitQuest.REDIS.incrBy("experience.raw."+player.getUniqueId().toString(),exp);
                     bitQuest.setTotalExperience(player);
-                    if(loot_limit==false&&d20==1) {
+                    if(d100==7) {
 
                         final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
 
