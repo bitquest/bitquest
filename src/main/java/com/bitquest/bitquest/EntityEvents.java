@@ -170,11 +170,11 @@ public class EntityEvents implements Listener {
 
 
 
-            player.sendMessage("");
-            player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the BitQuest Wiki");
-            player.sendMessage(ChatColor.YELLOW + "There's tons of useful stuff there!");
-            player.sendMessage("");
-            player.sendMessage(ChatColor.BLUE + "     " + ChatColor.UNDERLINE + "http://bit.ly/wikibq");
+            player.sendMessage(ChatColor.YELLOW + "     Welcome to "+bitQuest.SERVER_NAME+"! ");
+            player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
+            player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
+
+            player.sendMessage(ChatColor.BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
             player.sendMessage("");
         } catch (ParseException e) {
             e.printStackTrace();
