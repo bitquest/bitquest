@@ -407,7 +407,7 @@ public class EntityEvents implements Listener {
                     final int d20=BitQuest.rand(1,20);
                     final Player player = (Player) damage.getDamager();
                     boolean loot_limit=false;
-                    if(bitQuest.last_loot_player!=null&&!bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
+                    if(bitQuest.last_loot_player!=null&&bitQuest.last_loot_player.getUniqueId().toString().equals(player.getUniqueId().toString())) loot_limit=true;
                     // Add EXP
                     int exp=level*8;
                     bitQuest.REDIS.incrBy("experience.raw."+player.getUniqueId().toString(),exp);

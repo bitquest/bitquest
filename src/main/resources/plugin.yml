@@ -4,30 +4,33 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
-  butcher:
-      description: "kills all entities in the current chunk"
-      usage: "/butcher"
-  clan:
-    description: "used for creating, joining, operating clans"
-    usage: "/clan <new|invite|kick|join|leave>"
-  send:
-    description: "sends bits to other player"
-    usage: "/send <amount> <player>"
-  land:
-    description: "Manage permissions for the land you're standing on"
-    usage: "/land <claim|transfer|permissions>"
-  transfer:
-    description: "Sends your BitQuest wallet balance to an external address of your own"
-    usage: "/transfer <amount> <bitcoin address, e-mail or username>"
   ban:
     description: "Adds player to the ban list"
     usage: "/ban <player>"
+  butcher:
+    description: "kills all entities in the current chunk"
+    usage: "/butcher"
+  clan:
+    description: "used for creating, joining, operating clans"
+    usage: "/clan <new|invite|kick|join|leave>"
+  land:
+    description: "Manage permissions for the land you're standing on"
+    usage: "/land <claim|transfer|permissions>"
+  maintenance:
+    description: "Enables maintenance mode and stops players from joining the server"
+    usage: "/maintenance <seconds>"
+  send:
+    description: "sends bits to other player"
+    usage: "/send <amount> <player>"
+  spawn:
+    description: "teleports to spawn"
+    usage: "/spawn"
+  transfer:
+    description: "Sends your BitQuest wallet balance to an external address of your own"
+    usage: "/transfer <amount> <bitcoin address, e-mail or username>"
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"
-  maintenance_mode:
-    description: "Enables maintenance mode and stops players from joining the server"
-    usage: "/maintenance_mode <on|off>"
   banlist:
     description: "Prints the list of banned players"
     usage: "/banlist"
