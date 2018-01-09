@@ -487,7 +487,7 @@ public class EntityEvents implements Listener {
 
         EntityType entityType = entity.getType();
         // TODO: Increase spawn_distance divisor to 64 or 32
-        int level = BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 16))));
+        int level = BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 64))));
 
         if (entity instanceof Monster) {
 
