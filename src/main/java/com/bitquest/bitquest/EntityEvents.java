@@ -405,6 +405,7 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     // roll a D20
 
+                    Long money = 1 * BitQuest.DENOMINATION_FACTOR;
                     int dice=BitQuest.rand(1,100);
                     if(bitQuest.wallet_balance_cache>100*bitQuest.DENOMINATION_FACTOR) dice=BitQuest.rand(1,20);
                     if(bitQuest.wallet_balance_cache>1000*bitQuest.DENOMINATION_FACTOR) dice=7;
@@ -417,7 +418,7 @@ public class EntityEvents implements Listener {
                     bitQuest.setTotalExperience(player);
                     if(dice==7) {
 
-                        final Long money = BitQuest.rand(1,level) * BitQuest.DENOMINATION_FACTOR;
+
 
                                 if (bitQuest.rate_limit==false && bitQuest.wallet_balance_cache > money) {
                                     try {
