@@ -447,6 +447,7 @@ public class  BitQuest extends JavaPlugin {
         // level health max=
         int health=8+(player.getLevel()/2);
         if(health>40) health=40;
+        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, player.getLevel(), true));
         player.setMaxHealth(health);
     }
 
