@@ -22,6 +22,7 @@ import org.bukkit.entity.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -199,7 +200,8 @@ public class  BitQuest extends JavaPlugin {
         commands.put("send", new SendCommand(this));
         commands.put("upgradewallet", new UpgradeWallet(this));
         commands.put("donate", new DonateCommand(this));
-
+        commands.put("profession", new ProfessionCommand(this));
+        commands.put("spawn", new SpawnCommand(this));
         modCommands = new HashMap<String, CommandAction>();
         modCommands.put("butcher", new ButcherCommand());
         modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
@@ -283,6 +285,29 @@ public class  BitQuest extends JavaPlugin {
                 player.setScoreboard(walletScoreboard);
             }
         });
+    }
+    public void teleportToSpawn(Player player) {
+        if (!player.hasMetadata("teleporting")) {
+            player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
+            player.setMetadata("teleporting", new FixedMetadataValue(this, true));
+            World world = Bukkit.getWorld("world");
+
+            final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
+
+            Chunk c = spawn.getChunk();
+            if (!c.isLoaded()) {
+                c.load();
+            }
+            BitQuest plugin = this;
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+            scheduler.scheduleSyncDelayedTask(this, new Runnable() {
+
+                public void run() {
+                    player.teleport(spawn);
+                    player.removeMetadata("teleporting", plugin);
+                }
+            }, 60L);
+        }
     }
     public void createScheduledTimers() {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -447,7 +472,7 @@ public class  BitQuest extends JavaPlugin {
         // level health max=
         int health=8+(player.getLevel()/2);
         if(health>40) health=40;
-        player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, player.getLevel(), true));
+        // player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, player.getLevel(), true));
         player.setMaxHealth(health);
     }
 

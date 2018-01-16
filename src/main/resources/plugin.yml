@@ -7,6 +7,9 @@ commands:
   ban:
     description: "Adds player to the ban list"
     usage: "/ban <player>"
+  banlist:
+    description: "Prints the list of banned players"
+    usage: "/banlist"
   butcher:
     description: "kills all entities in the current chunk"
     usage: "/butcher"
@@ -19,6 +22,9 @@ commands:
   maintenance:
     description: "Enables maintenance mode and stops players from joining the server"
     usage: "/maintenance <seconds>"
+  profession:
+    description: "(EXPERIMENTAL) choose a profession"
+    usage: "/profession rogue"
   send:
     description: "sends bits to other player"
     usage: "/send <amount> <player>"
@@ -31,9 +37,6 @@ commands:
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"
-  banlist:
-    description: "Prints the list of banned players"
-    usage: "/banlist"
   spectate:
     description: "Allows moderators to spectate players' actions"
     usage: "/spectate <player>"
