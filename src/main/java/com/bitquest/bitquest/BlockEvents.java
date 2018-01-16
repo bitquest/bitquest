@@ -53,8 +53,7 @@ public class BlockEvents implements Listener {
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
     	// If block is bedrock, cancel the event
-    	if(event.getBlock().getType().equals(Material.BEDROCK)) {
-    		bitQuest.error(event.getPlayer(), "Removing bedrock is not allowed!");
+    	if(event.getBlock().getType().equals(Material.BEDROCK)||event.getBlock().getType().equals(Material.END_BRICKS)||event.getBlock().getType().equals(Material.ENDER_STONE)) {
     		event.setCancelled(true);
     	// If player is in a no-build zone, cancel the event
     	} else if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {

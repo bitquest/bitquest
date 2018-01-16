@@ -291,8 +291,17 @@ public class  BitQuest extends JavaPlugin {
             player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
             player.setMetadata("teleporting", new FixedMetadataValue(this, true));
             World world = Bukkit.getWorld("world");
+            Location random_location=world.getSpawnLocation();
+            random_location.setX(random_location.getX()+rand(0,64)-32);
+            random_location.setZ(random_location.getX()+rand(0,64)-32);
+            random_location.setY(random_location.getWorld().getHighestBlockYAt(random_location.getBlockX(),random_location.getBlockY()));
 
-            final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
+            final Location spawn;
+            if(random_location.getY()>10&&random_location.getY()<100) {
+                spawn=random_location;
+            } else {
+                spawn=world.getSpawnLocation();
+            }
 
             Chunk c = spawn.getChunk();
             if (!c.isLoaded()) {

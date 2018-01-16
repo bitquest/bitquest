@@ -106,6 +106,21 @@ public class EntityEvents implements Listener {
        
 
     }
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player=event.getPlayer();
+        if(player.getBedSpawnLocation()==null) {
+            Location location=event.getRespawnLocation();
+            location.setX(location.getX()+BitQuest.rand(0,64)-32);
+            location.setZ(location.getZ()+BitQuest.rand(0,64)-32);
+            location.setY(location.getWorld().getHighestBlockYAt(location.getBlockX(),location.getBlockY()));
+            if(location.getY()<10) location = location.getWorld().getSpawnLocation();
+
+            event.setRespawnLocation(location);
+        }
+
+
+    }
 
 
     @EventHandler
