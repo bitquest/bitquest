@@ -207,30 +207,37 @@ public class InventoryEvents implements Listener {
                         System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
                         player.getInventory().removeItem(clicked);
                         player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
-                        user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                        bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                             @Override
                             public void run(Long balance) {
-                                try {
-                                    System.out.println(balance);
-                                    if(bitQuest.wallet.move(player.getUniqueId().toString(),1*bitQuest.DENOMINATION_FACTOR)) {
-                                        player.sendMessage(ChatColor.GREEN + "You sold a book");
-                                        bitQuest.updateScoreboard(player);
-                                        bitQuest.books.add(clicked);
+                                if(balance>128*bitQuest.DENOMINATION_FACTOR) {
 
+
+                                    try {
+                                        System.out.println(balance);
+                                        if (bitQuest.wallet.move(player.getUniqueId().toString(), 1 * bitQuest.DENOMINATION_FACTOR)) {
+                                            player.sendMessage(ChatColor.GREEN + "You sold a book");
+                                            bitQuest.updateScoreboard(player);
+                                            bitQuest.books.add(clicked);
+
+                                        }
+                                    } catch (IllegalArgumentException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
+                                    } catch (org.json.simple.parser.ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 5)");
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 6)");
+
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
                                     }
-                                } catch (IllegalArgumentException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
-                                } catch (org.json.simple.parser.ParseException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 5)");
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "I'm not buying right now");
 
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 6)");
-
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
                                 }
                             }
 
