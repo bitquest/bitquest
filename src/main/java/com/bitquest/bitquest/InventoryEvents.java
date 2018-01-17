@@ -119,6 +119,7 @@ public class InventoryEvents implements Listener {
                         try {
                             int sat = 0;
                             Trade trade=null;
+
                             for (int i = 0; i < trades.size(); i++) {
                                 if (clicked.getType() == trades.get(i).itemStack.getType()) {
                                     sat = trades.get(i).price;
@@ -143,8 +144,10 @@ public class InventoryEvents implements Listener {
                                 public void run(Long balance) {
                                     try {
                                         if (balance >= satFinal) {
+
                                             if (hasOpenSlotsFinal) {
                                                 if (user.wallet.move("bitquest_market", satFinal)) {
+                                                    if(clicked.getType() == Material.ENCHANTED_BOOK) bitQuest.books.remove(0);
 
                                                     ItemStack item = event.getCurrentItem();
                                                     ItemMeta meta = item.getItemMeta();
@@ -212,6 +215,8 @@ public class InventoryEvents implements Listener {
                                     if(bitQuest.wallet.move(player.getUniqueId().toString(),1*bitQuest.DENOMINATION_FACTOR)) {
                                         player.sendMessage(ChatColor.GREEN + "You sold a book");
                                         bitQuest.updateScoreboard(player);
+                                        bitQuest.books.add(clicked);
+
                                     }
                                 } catch (IllegalArgumentException e) {
                                     e.printStackTrace();
@@ -335,6 +340,7 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
+
             Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
                 int inventory_stock=bitQuest.MAX_STOCK;
@@ -352,6 +358,18 @@ public class InventoryEvents implements Listener {
                     marketInventory.setItem(i, button);
                 }
 
+            }
+            if(bitQuest.books.size()>0) {
+                ItemStack button = new ItemStack(bitQuest.books.get(0));
+                ItemMeta meta = button.getItemMeta();
+                ArrayList<String> lore = new ArrayList<String>();
+                int bits_price;
+                bits_price=2;
+
+                lore.add("Price: "+bits_price);
+                meta.setLore(lore);
+                button.setItemMeta(meta);
+                marketInventory.setItem(trades.size(), button);
             }
             event.getPlayer().openInventory(marketInventory);
         }

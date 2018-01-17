@@ -119,6 +119,7 @@ public class  BitQuest extends JavaPlugin {
     public HashMap<String,String> land_permission_cache = new HashMap();
     public HashMap<String,String> land_name_cache = new HashMap();
     public Long wallet_balance_cache=0L;
+    public ArrayList<ItemStack> books=new ArrayList<ItemStack>();
     // when true, server is closed for maintenance and not allowing players to join in.
     public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;
