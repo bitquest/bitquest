@@ -194,6 +194,90 @@ public class InventoryEvents implements Listener {
                         }
                     }
 
+                } else {
+                    // player sells (experimental)
+
+                    final ItemStack clicked = event.getCurrentItem();
+                    if (clicked != null && clicked.getType() == Material.ENCHANTED_BOOK) {
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
+                        player.getInventory().removeItem(clicked);
+                        player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+                        user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(Long balance) {
+                                try {
+                                    System.out.println(balance);
+                                    if(bitQuest.wallet.move(player.getUniqueId().toString(),1*bitQuest.DENOMINATION_FACTOR)) {
+                                        player.sendMessage(ChatColor.GREEN + "You sold a book");
+                                        bitQuest.updateScoreboard(player);
+                                    }
+                                } catch (IllegalArgumentException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
+                                } catch (org.json.simple.parser.ParseException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 5)");
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                    player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 6)");
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+
+//                        Trade trade = null;
+//                        int sat = 0;
+//                        for (int i = 0; i < trades.size(); i++) {
+//                            if (clicked.getType() == trades.get(i).itemStack.getType() && trades.get(i).has_stock == true) {
+//                                sat = trades.get(i).price;
+//                                trade = trades.get(i);
+//                                if (trades.get(i).has_stock == true) {
+//
+//                                    sat = trades.get(i).price_for_stock(bitQuest.REDIS);
+//                                }
+//                            }
+//
+//                        }
+//
+//                        if (sat >= 100 && trade != null) {
+//                            if (trade.has_stock == true && trade.will_buy(bitQuest.REDIS)) {
+//                                player.closeInventory();
+//
+//                                System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
+//                                player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+//                                if (bitQuest.wallet.payment(sat, user.wallet.address)) {
+//                                    player.getInventory().removeItem(trade.itemStack);
+//
+//                                    player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
+//                                    bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
+//                                    System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
+//                                    bitQuest.updateScoreboard(player);
+//                                    bitQuest.sendMetric("price." + clicked.getType(), trade.price_for_stock(bitQuest.REDIS));
+//                                }
+//                            } else {
+//                                event.setCancelled(true);
+//                                player.closeInventory();
+//                                player.updateInventory();
+//                                player.sendMessage(ChatColor.RED + "I have too much " + clicked.getType() + "...");
+//
+//                            }
+//                        } else {
+//                            event.setCancelled(true);
+//                            player.closeInventory();
+//                            player.updateInventory();
+//                            player.sendMessage(ChatColor.RED + "I'm not buying " + clicked.getType() + "...");
+//                        }
+
+                        });
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 4)");
+
+                    }
+
                 }
             } else {
                 player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 3)");
