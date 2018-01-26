@@ -24,6 +24,7 @@ public class ClanCommand extends CommandAction {
                                 if (!BitQuest.REDIS.sismember("clans", clanName)) {
                                     BitQuest.REDIS.sadd("clans", clanName);
                                     BitQuest.REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                                    BitQuest.REDIS.sadd("clan:" + clanName + ":members", player.getUniqueId().toString());
                                     player.sendMessage(ChatColor.GREEN + "Congratulations! you are the founder of the " + clanName + " clan");
                                     player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
                                     return true;
@@ -114,6 +115,7 @@ public class ClanCommand extends CommandAction {
                             // user is not part of any clan
                             BitQuest.REDIS.srem("invitations:" + clanName, player.getUniqueId().toString());
                             BitQuest.REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
+                            BitQuest.REDIS.sadd("clan:" + clanName + ":members", player.getUniqueId().toString());
                             player.sendMessage(ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
                             player.setPlayerListName(ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
                             return true;
@@ -142,6 +144,8 @@ public class ClanCommand extends CommandAction {
                             // check that kicker and player are in the same clan
                             if (BitQuest.REDIS.get("clan:" + uuid).equals(clan)) {
                                 BitQuest.REDIS.del("clan:" + uuid);
+                                BitQuest.REDIS.srem("clan:" + clan + ":members", uuid);
+                                removeEmptyClan(clan);
                                 player.sendMessage(ChatColor.GREEN + "Player " + toKick + " was kicked from the " + clan + " clan.");
                                 if (Bukkit.getPlayerExact(toKick) != null) {
                                     Player invitedPlayer = Bukkit.getPlayerExact(toKick);
@@ -169,11 +173,14 @@ public class ClanCommand extends CommandAction {
             }
             if (subCommand.equals("leave")) {
                 if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-                    // TODO: when a clan gets emptied, should be removed from the "clans" set
-                    player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + BitQuest.REDIS.get("clan:" + player.getUniqueId().toString()) + " clan");
+                    String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
+                    player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + clan + " clan");
                     BitQuest.REDIS.del("clan:" + player.getUniqueId().toString());
+                    BitQuest.REDIS.srem("clan:" + clan + ":members", player.getUniqueId().toString());
 
                     player.setPlayerListName(player.getName());
+
+                    removeEmptyClan(clan);
                     return true;
                 } else {
                     player.sendMessage(ChatColor.RED + "You don't belong to a clan.");
@@ -185,5 +192,13 @@ public class ClanCommand extends CommandAction {
             return true;
         }
         return false;
+    }
+
+    private void removeEmptyClan(String clan) {
+        if (BitQuest.REDIS.scard("clan:" + clan + ":members") == 0) {
+            BitQuest.REDIS.del("clan:" + clan + ":members");
+            BitQuest.REDIS.srem("clans", clan);
+            BitQuest.REDIS.del("invitations:" + clan);
+        }
     }
 }
