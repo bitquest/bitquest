@@ -210,7 +210,7 @@ public class InventoryEvents implements Listener {
                         bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                             @Override
                             public void run(Long balance) {
-                                if(balance>128*bitQuest.DENOMINATION_FACTOR) {
+                                if(balance>1024*bitQuest.DENOMINATION_FACTOR) {
 
 
                                     try {
