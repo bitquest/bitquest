@@ -494,8 +494,8 @@ public class  BitQuest extends JavaPlugin {
             // check that desired area name doesn't have non-alphanumeric characters
             boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
             if (!hasNonAlpha) {
-                // 16 characters max
-                if (name.length() <= 16) {
+                // 16 characters max + ^transfer ^ (11 characters)
+                if (name.length() <= 27) {
 
 
                     if (name.equalsIgnoreCase("the wilderness")) {
