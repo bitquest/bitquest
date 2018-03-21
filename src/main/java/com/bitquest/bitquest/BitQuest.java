@@ -560,7 +560,7 @@ public class  BitQuest extends JavaPlugin {
                             // Abandon land
                             BitQuest.REDIS.del("chunk" + x + "," + z + "owner");
                             BitQuest.REDIS.del("chunk" + x + "," + z + "name");
-                            BitQuest.REDIS.del("chunk" + x+","+z+"permissions");
+                            BitQuest.REDIS.del("chunk" + x + "," + z + "permissions");
                         } else if (name.startsWith("transfer ") && name.length() > 9) {
                             // If the name starts with "transfer " and has at least one more character,
                             // transfer land
