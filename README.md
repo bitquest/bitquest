@@ -111,6 +111,9 @@ redis:
 ```
 docker-compose up
 ```
+# Troubleshooting
+## I'm getting a JedisConnectionException error when starting
+Please make sure you have redis installed. If you are running via docker please make sure you have a redis container linked to the bitquest container.
 
 # More info
 
