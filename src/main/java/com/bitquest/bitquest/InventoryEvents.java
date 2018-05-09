@@ -44,56 +44,53 @@ public class InventoryEvents implements Listener {
         // By default, prices are in bits (not satoshi)
         bitQuest = plugin;
         trades=new ArrayList<Trade>();
-        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,16),5));
-        trades.add(new Trade(new ItemStack(Material.COMPASS,1),50));
-        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,16),5));
-        trades.add(new Trade(new ItemStack(Material.EYE_OF_ENDER,1),20));
-        trades.add(new Trade(new ItemStack(Material.FENCE,16),10));
-        trades.add(new Trade(new ItemStack(Material.GLASS,32),15));
-        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,16),1250));
-        trades.add(new Trade(new ItemStack(Material.LEATHER,16),50));
-        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,8),25));
-        trades.add(new Trade(new ItemStack(Material.RAILS,16),750));
-        trades.add(new Trade(new ItemStack(Material.SANDSTONE,16),15));
-        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,16),25));
-        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,16),25));
-        trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,2),50));
-        trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,2),150));
-        trades.add(new Trade(new ItemStack(Material.DIAMOND,12),75));
-        trades.add(new Trade(new ItemStack(Material.ENDER_STONE,4),50));
-        trades.add(new Trade(new ItemStack(Material.IRON_BLOCK,8),50));
-        trades.add(new Trade(new ItemStack(Material.IRON_INGOT,16),15));
-        trades.add(new Trade(new ItemStack(Material.NETHERRACK,8),50));
-        trades.add(new Trade(new ItemStack(Material.QUARTZ,16),1750));
-        trades.add(new Trade(new ItemStack(Material.SOUL_SAND,8),50));
-        trades.add(new Trade(new ItemStack(Material.SPONGE,2),50));
-        trades.add(new Trade(new ItemStack(Material.LOG,16),5));
-        trades.add(new Trade(new ItemStack(Material.WOOL,16),25));
-        trades.add(new Trade(new ItemStack(Material.PAPER,16),1250));
-        trades.add(new Trade(new ItemStack(Material.PACKED_ICE,16),50));
-        trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK,4),175));
-        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,1),50));
-        trades.add(new Trade(new ItemStack(Material.ARROW,16),5));
-        trades.add(new Trade(new ItemStack(Material.PRISMARINE,16),75));
-        trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,16),75));
-        trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,16),75));
-        trades.add(new Trade(new ItemStack(Material.GLOWSTONE,16),75));
-        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),25));
-        trades.add(new Trade(new ItemStack(Material.ENDER_PEARL, 1),10));
-        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,10),90));
-        trades.add(new Trade(new ItemStack(Material.NETHER_STALK,4),50));
-        trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,4),50));
-        trades.add(new Trade(new ItemStack(Material.SADDLE,1),30));
-        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,4),25));
-        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 3, (short)1),300));
-        trades.add(new Trade(new ItemStack(Material.APPLE,16),50));
-        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),1000));
-        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,1),1000));
-        trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,4),100));
-        trades.add(new Trade(new ItemStack(Material.CAKE,4),25));
-        trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,2),100));
-        trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,3),200));
-        trades.add(new Trade(new ItemStack(Material.PUMPKIN,3),1));
+        trades.add(new Trade(new ItemStack(Material.CLAY_BALL,16),1));
+        trades.add(new Trade(new ItemStack(Material.COOKED_BEEF,32),1));
+        trades.add(new Trade(new ItemStack(Material.FENCE,16),1));
+        trades.add(new Trade(new ItemStack(Material.GLASS,32),2));
+        trades.add(new Trade(new ItemStack(Material.HAY_BLOCK,2),1));
+        trades.add(new Trade(new ItemStack(Material.LEATHER,8),1));
+        trades.add(new Trade(new ItemStack(Material.OBSIDIAN,8),1));
+        trades.add(new Trade(new ItemStack(Material.RAILS,8),1));
+        trades.add(new Trade(new ItemStack(Material.SANDSTONE,16),1));
+        trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE,8),1));
+        trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK,16),1));
+        trades.add(new Trade(new ItemStack(Material.BLAZE_ROD,1),2));
+        trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER,1),5));
+        trades.add(new Trade(new ItemStack(Material.DIAMOND,4),1));
+        trades.add(new Trade(new ItemStack(Material.ENDER_STONE,1),4));
+        trades.add(new Trade(new ItemStack(Material.IRON_BLOCK,1),8));
+        trades.add(new Trade(new ItemStack(Material.IRON_INGOT,8),1));
+        trades.add(new Trade(new ItemStack(Material.NETHERRACK,1),2));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ,8),1));
+        trades.add(new Trade(new ItemStack(Material.SOUL_SAND,2),1));
+        trades.add(new Trade(new ItemStack(Material.SPONGE,1),2));
+        trades.add(new Trade(new ItemStack(Material.LOG,64),1));
+        trades.add(new Trade(new ItemStack(Material.WOOL,16),1));
+        trades.add(new Trade(new ItemStack(Material.PAPER,1),4));
+        trades.add(new Trade(new ItemStack(Material.PACKED_ICE,1),2));
+        trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK,1),2));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE,1),5));
+        trades.add(new Trade(new ItemStack(Material.ARROW,32),1));
+        trades.add(new Trade(new ItemStack(Material.PRISMARINE,2),1));
+        trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK,2),1));
+        trades.add(new Trade(new ItemStack(Material.SEA_LANTERN,2),1));
+        trades.add(new Trade(new ItemStack(Material.GLOWSTONE,2),1));
+        trades.add(new Trade(new ItemStack(Material.ANVIL, 1),2));
+        trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK,1),1));
+        trades.add(new Trade(new ItemStack(Material.NETHER_STALK,2),1));
+        trades.add(new Trade(new ItemStack(Material.LAPIS_ORE,2),1));
+        trades.add(new Trade(new ItemStack(Material.SADDLE,1),2));
+        trades.add(new Trade(new ItemStack(Material.SLIME_BALL,2),1));
+        trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 1, (short)1),20));
+        trades.add(new Trade(new ItemStack(Material.APPLE,4),1));
+        trades.add(new Trade(new ItemStack(Material.ELYTRA,1),200));
+        trades.add(new Trade(new ItemStack(Material.PURPLE_SHULKER_BOX,1),500));
+        trades.add(new Trade(new ItemStack(Material.BOOK_AND_QUILL,1),2));
+        trades.add(new Trade(new ItemStack(Material.CAKE,2),1));
+        trades.add(new Trade(new ItemStack(Material.DRAGONS_BREATH,1),5));
+        trades.add(new Trade(new ItemStack(Material.EMPTY_MAP,1),3));
+        trades.add(new Trade(new ItemStack(Material.PUMPKIN,6),1));
 
 
 
@@ -103,7 +100,7 @@ public class InventoryEvents implements Listener {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
         final User user=new User(bitQuest, player);
-        user.setTotalExperience(user.experience());
+
         // Merchant inventory
         if(inventory.getName().equalsIgnoreCase("Market")) {
             if(bitQuest.rate_limit==false) {
@@ -122,6 +119,7 @@ public class InventoryEvents implements Listener {
                         try {
                             int sat = 0;
                             Trade trade=null;
+
                             for (int i = 0; i < trades.size(); i++) {
                                 if (clicked.getType() == trades.get(i).itemStack.getType()) {
                                     sat = trades.get(i).price;
@@ -146,8 +144,10 @@ public class InventoryEvents implements Listener {
                                 public void run(Long balance) {
                                     try {
                                         if (balance >= satFinal) {
+
                                             if (hasOpenSlotsFinal) {
                                                 if (user.wallet.move("bitquest_market", satFinal)) {
+                                                    if(clicked.getType() == Material.ENCHANTED_BOOK) bitQuest.books.remove(0);
 
                                                     ItemStack item = event.getCurrentItem();
                                                     ItemMeta meta = item.getItemMeta();
@@ -195,6 +195,99 @@ public class InventoryEvents implements Listener {
                             e.printStackTrace();
                             player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
                         }
+                    }
+
+                } else {
+                    // player sells (experimental)
+
+                    final ItemStack clicked = event.getCurrentItem();
+                    if (clicked != null && clicked.getType() == Material.ENCHANTED_BOOK) {
+                        event.setCancelled(true);
+                        player.closeInventory();
+                        System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
+                        player.getInventory().removeItem(clicked);
+                        player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+                        bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(Long balance) {
+                                if(balance>1024*bitQuest.DENOMINATION_FACTOR) {
+
+
+                                    try {
+                                        System.out.println(balance);
+                                        if (bitQuest.wallet.move(player.getUniqueId().toString(), 1 * bitQuest.DENOMINATION_FACTOR)) {
+                                            player.sendMessage(ChatColor.GREEN + "You sold a book");
+                                            bitQuest.updateScoreboard(player);
+                                            bitQuest.books.add(clicked);
+
+                                        }
+                                    } catch (IllegalArgumentException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 2)");
+                                    } catch (org.json.simple.parser.ParseException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 5)");
+
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 6)");
+
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "I'm not buying right now");
+
+                                }
+                            }
+
+//                        Trade trade = null;
+//                        int sat = 0;
+//                        for (int i = 0; i < trades.size(); i++) {
+//                            if (clicked.getType() == trades.get(i).itemStack.getType() && trades.get(i).has_stock == true) {
+//                                sat = trades.get(i).price;
+//                                trade = trades.get(i);
+//                                if (trades.get(i).has_stock == true) {
+//
+//                                    sat = trades.get(i).price_for_stock(bitQuest.REDIS);
+//                                }
+//                            }
+//
+//                        }
+//
+//                        if (sat >= 100 && trade != null) {
+//                            if (trade.has_stock == true && trade.will_buy(bitQuest.REDIS)) {
+//                                player.closeInventory();
+//
+//                                System.out.println("[sell] " + player.getName() + " -> " + clicked.getType());
+//                                player.sendMessage(ChatColor.YELLOW + "Selling " + clicked.getType() + "...");
+//                                if (bitQuest.wallet.payment(sat, user.wallet.address)) {
+//                                    player.getInventory().removeItem(trade.itemStack);
+//
+//                                    player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
+//                                    bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
+//                                    System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
+//                                    bitQuest.updateScoreboard(player);
+//                                    bitQuest.sendMetric("price." + clicked.getType(), trade.price_for_stock(bitQuest.REDIS));
+//                                }
+//                            } else {
+//                                event.setCancelled(true);
+//                                player.closeInventory();
+//                                player.updateInventory();
+//                                player.sendMessage(ChatColor.RED + "I have too much " + clicked.getType() + "...");
+//
+//                            }
+//                        } else {
+//                            event.setCancelled(true);
+//                            player.closeInventory();
+//                            player.updateInventory();
+//                            player.sendMessage(ChatColor.RED + "I'm not buying " + clicked.getType() + "...");
+//                        }
+
+                        });
+                    } else {
+                        player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 4)");
+
                     }
 
                 }
@@ -254,6 +347,7 @@ public class InventoryEvents implements Listener {
             // compass
 
             // open menu
+
             Inventory marketInventory = Bukkit.getServer().createInventory(null,  54, "Market");
             for (int i = 0; i < trades.size(); i++) {
                 int inventory_stock=bitQuest.MAX_STOCK;
@@ -271,6 +365,18 @@ public class InventoryEvents implements Listener {
                     marketInventory.setItem(i, button);
                 }
 
+            }
+            if(bitQuest.books.size()>0) {
+                ItemStack button = new ItemStack(bitQuest.books.get(0));
+                ItemMeta meta = button.getItemMeta();
+                ArrayList<String> lore = new ArrayList<String>();
+                int bits_price;
+                bits_price=2;
+
+                lore.add("Price: "+bits_price);
+                meta.setLore(lore);
+                button.setItemMeta(meta);
+                marketInventory.setItem(trades.size(), button);
             }
             event.getPlayer().openInventory(marketInventory);
         }

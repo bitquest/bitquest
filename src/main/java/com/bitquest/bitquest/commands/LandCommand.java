@@ -34,7 +34,6 @@ public class LandCommand extends CommandAction {
                             player.sendMessage(ChatColor.RED + "You cannot claim land here.");
                             return true;
                         }
-
                         try {
                             bitQuest.claimLand(claimName, location.getChunk(), player);
                         } catch (ParseException e) {

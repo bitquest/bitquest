@@ -30,16 +30,11 @@ You can send Bitcoin to an external wallet with /transfer:
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
 ![Player notification](http://i.imgur.com/PHmomoS.png)
 ![Player's public transaction](http://i.imgur.com/JPO4AXt.png)  
-Players can also send Bitcoin using email instead of a Bitcoin address using:
-```sh
-/transfer <amount> <recipient-email>
-```
+
 Additionally, players can send Bitcoin to other players via /send:
 ```sh
 /send <amount> <username>
 ```
-
-With this method the recipient will receive an email notifying that a bitcoin transaction has been made to a [XAPO wallet](https://xapo.com/wallet/) linked to his email.
 
 ## Server address
 The BitQuest server has it's own address, used for giving Loot to players
@@ -55,25 +50,29 @@ Here are the instructions to modify, install and run the server as localhost.
 
 # Building the BitQuest Java Plugin
 
-## Install bash (Windows only)
-To setup the workspace you need to run a gradle script that only runs on bash. You can get a distribution of bash by installing git from the [git-scm](https://git-scm.com/) website.
+## 1. Install Requirements
+Windows: The Windows Subsystem for Linux enables the bash shell which will be used to download the Spigot API. After [installing WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) you can follow the Linux instructions below.
 
-Warning: building BitQuest is not currently supoported on Windows 10 Anniversary edition bash. If you have that feature installed, your build will fail. If you are building using Windows 10 Anniversary edition, it's recommended to uninstall the Windows Subsytem for Linux feature first.
+You must install Java JRE and JDK
 
-## Setup Workspace
+```
+sudo apt install default-jre default-jdk
+```
+
+## 2. Setup Workspace
 There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
 
 ````
 ./gradlew setupWorkspace
 ````
 
-## Compile BitQuest and generate a JAR file
+## 3. Compile BitQuest and generate a JAR file
 After the workspace is set up, we can compile using the shadowJar task that will create a file under build/libs. This should be dropped on the plugins folder of your Spigot server, but you can automate the process for testing using Docker (instructions below)
 
 ````
 ./gradlew shadowJar
 ````
-# Requirements for development
+# Requirements for running
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
 
@@ -112,6 +111,9 @@ redis:
 ```
 docker-compose up
 ```
+# Troubleshooting
+## I'm getting a JedisConnectionException error when starting
+Please make sure you have redis installed. If you are running via docker please make sure you have a redis container linked to the bitquest container.
 
 # More info
 

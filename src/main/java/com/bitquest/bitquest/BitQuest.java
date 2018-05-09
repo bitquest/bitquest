@@ -22,7 +22,10 @@ import org.bukkit.entity.*;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
 import com.ullink.slack.simpleslackapi.SlackSession;
@@ -64,9 +67,9 @@ public class  BitQuest extends JavaPlugin {
     public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
     public final static String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
     public final static String BLOCKCYPHER_API_KEY = System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
-    public final static String XAPO_API_KEY = System.getenv("XAPO_API_KEY") != null ? System.getenv("XAPO_API_KEY") : null;
-    public final static String XAPO_SECRET = System.getenv("XAPO_SECRET") != null ? System.getenv("XAPO_SECRET") : null;
+
     public final static int MAX_STOCK=100;
+    public final static String SERVER_NAME=System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
 
     public final static String LAND_ADDRESS = System.getenv("LAND_ADDRESS") != null ? System.getenv("LAND_ADDRESS") : null;
 
@@ -94,7 +97,7 @@ public class  BitQuest extends JavaPlugin {
     public final static Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
-    public final static Long LAND_PRICE = DENOMINATION_FACTOR*100;
+    public final static Long LAND_PRICE = DENOMINATION_FACTOR*10;
     // Minimum transaction by default is 2000 bits
     public final static Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION")) : 2000L;
     // utilities: distance and rand
@@ -107,10 +110,21 @@ public class  BitQuest extends JavaPlugin {
     }
     public StatsDClient statsd;
     public Wallet wallet=null;
+    public Player last_loot_player;
     public boolean spookyMode=false;
     public boolean rate_limit=false;
+    // caches is used to reduce the amounts of calls to redis, storing some chunk information in memory
+    public HashMap<String,Boolean> land_unclaimed_cache = new HashMap();
+    public HashMap<String,String> land_owner_cache = new HashMap();
+    public HashMap<String,String> land_permission_cache = new HashMap();
+    public HashMap<String,String> land_name_cache = new HashMap();
+    public Long wallet_balance_cache=0L;
+    public ArrayList<ItemStack> books=new ArrayList<ItemStack>();
+    // when true, server is closed for maintenance and not allowing players to join in.
+    public boolean maintenance_mode=false;
     private Map<String, CommandAction> commands;
     private Map<String, CommandAction> modCommands;
+    private Player[] moderators;
 
     @Override
     public void onEnable() {
@@ -187,7 +201,8 @@ public class  BitQuest extends JavaPlugin {
         commands.put("send", new SendCommand(this));
         commands.put("upgradewallet", new UpgradeWallet(this));
         commands.put("donate", new DonateCommand(this));
-
+        commands.put("profession", new ProfessionCommand(this));
+        commands.put("spawn", new SpawnCommand(this));
         modCommands = new HashMap<String, CommandAction>();
         modCommands.put("butcher", new ButcherCommand());
         modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
@@ -198,6 +213,8 @@ public class  BitQuest extends JavaPlugin {
         modCommands.put("banlist", new BanlistCommand());
         modCommands.put("spectate", new SpectateCommand(this));
         modCommands.put("emergencystop", new EmergencystopCommand());
+        // TODO: Remove this command after migrate.
+        modCommands.put("migrateclans", new MigrateClansCommand());
         sendDiscordMessage("bitquest started");
     }
     // @todo: make this just accept the endpoint name and (optional) parameters
@@ -272,6 +289,34 @@ public class  BitQuest extends JavaPlugin {
             }
         });
     }
+    public void teleportToSpawn(Player player) {
+        if (!player.hasMetadata("teleporting")) {
+            player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
+            player.setMetadata("teleporting", new FixedMetadataValue(this, true));
+            World world = Bukkit.getWorld("world");
+
+            Location location=world.getSpawnLocation();
+            location.setX(location.getX()+BitQuest.rand(0,64)-32);
+            location.setZ(location.getZ()+BitQuest.rand(0,64)-32);
+            location.setY(location.getWorld().getHighestBlockYAt(location.getBlockX(),location.getBlockY()));
+
+            final Location spawn=location;
+
+            Chunk c = spawn.getChunk();
+            if (!c.isLoaded()) {
+                c.load();
+            }
+            BitQuest plugin = this;
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+            scheduler.scheduleSyncDelayedTask(this, new Runnable() {
+
+                public void run() {
+                    player.teleport(spawn);
+                    player.removeMetadata("teleporting", plugin);
+                }
+            }, 60L);
+        }
+    }
     public void createScheduledTimers() {
         BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
@@ -302,19 +347,12 @@ public class  BitQuest extends JavaPlugin {
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
         }, 0, 72000L);
+
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 if(statsd!=null) {
-                    sendWorldMetrics();
-                }
-            }
-        }, 0, 12000L);
-        scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-            @Override
-            public void run() {
-                if(statsd!=null) {
-                    sendWalletMetrics();
+                    updateMetrics();
                 }
             }
         }, 0, 12000L);
@@ -348,24 +386,22 @@ public class  BitQuest extends JavaPlugin {
             spookyMode=false;
         }
     }
-    public void sendMetric(String name,int value) {
-        statsd.gauge(BITQUEST_ENV+"."+name,value);
+    public void recordMetric(String name,int value) {
+        if(SERVER_NAME!=null) {
+            statsd.gauge("bitquest."+SERVER_NAME+"."+name,value);
+        }
+        System.out.println("["+name+"] "+value);
 
     }
-    public void sendWorldMetrics() {
-        statsd.gauge(BITQUEST_ENV+".players",Bukkit.getServer().getOnlinePlayers().size());
-        statsd.gauge(BITQUEST_ENV+".entities_world",Bukkit.getServer().getWorld("world").getEntities().size());
-        statsd.gauge(BITQUEST_ENV+".entities_nether",Bukkit.getServer().getWorld("world_nether").getEntities().size());
-        statsd.gauge(BITQUEST_ENV+".entities_the_end",Bukkit.getServer().getWorld("world_the_end").getEntities().size());
-    }
-    public  void sendWalletMetrics() {
+    public void updateMetrics() {
         wallet.getBalance(0, new Wallet.GetBalanceCallback() {
             @Override
-            public void run(Long balance) {
-                statsd.gauge(BITQUEST_ENV+".wallet_balance", balance);
+            public void run(final Long unconfirmedBalance) {
+                wallet_balance_cache=unconfirmedBalance;
             }
         });
     }
+
     public void removeAllEntities() {
         World w=Bukkit.getWorld("world");
         List<Entity> entities = w.getEntities();
@@ -409,6 +445,44 @@ public class  BitQuest extends JavaPlugin {
     public void error(Player recipient, String msg) {
         recipient.sendMessage(ChatColor.RED + msg);
     }
+    public int getLevel(int exp) {
+        return (int) Math.floor(Math.sqrt(exp / (float)256));
+    }
+    public int getExpForLevel(int level) {
+        return (int) Math.pow(level,2)*256;
+    }
+
+    public float getExpProgress(int exp) {
+        int level = getLevel(exp);
+        int nextlevel = getExpForLevel(level + 1);
+        int prevlevel = 0;
+        if(level > 0) {
+            prevlevel = getExpForLevel(level);
+        }
+        float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+        return progress;
+    }
+    public void setTotalExperience(Player player) {
+        int rawxp=0;
+        if(BitQuest.REDIS.exists("experience.raw."+player.getUniqueId().toString())) {
+            rawxp=Integer.parseInt(BitQuest.REDIS.get("experience.raw."+player.getUniqueId().toString()));
+        }
+        // lower factor, experience is easier to get. you can increase to get the opposite effect
+        int level = getLevel(rawxp);
+        float progress = getExpProgress(rawxp);
+
+        player.setLevel(level);
+        player.setExp(progress);
+        setPlayerMaxHealth(player);
+    }
+    public void setPlayerMaxHealth(Player player) {
+        // base health=6
+        // level health max=
+        int health=8+(player.getLevel()/2);
+        if(health>40) health=40;
+        // player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, player.getLevel(), true));
+        player.setMaxHealth(health);
+    }
 
     public void claimLand(final String name, Chunk chunk, final Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
         // check that land actually has a name
@@ -443,6 +517,9 @@ public class  BitQuest extends JavaPlugin {
 
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                                            land_owner_cache=new HashMap();
+                                            land_name_cache=new HashMap();
+                                            land_unclaimed_cache=new HashMap();
                                             player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
                                             updateScoreboard(player);
                                             if (bitQuest.messageBuilder != null) {
@@ -516,23 +593,25 @@ public class  BitQuest extends JavaPlugin {
         }
     }
     public boolean isOwner(Location location, Player player) {
-        if (landIsClaimed(location)) {
-            if (REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner").equals(player.getUniqueId().toString())) {
-                // player is the owner of the chunk
+        String key="chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
+        if(land_owner_cache.containsKey(key)) {
+            if(land_owner_cache.get(key).equals(player.getUniqueId().toString())) {
                 return true;
             } else {
                 return false;
             }
+        } else if (REDIS.get(key).equals(player.getUniqueId().toString())) {
+            // player is the owner of the chunk
+            return true;
         } else {
             return false;
         }
+
     }
     public boolean canBuild(Location location, Player player) {
         // returns true if player has permission to build in location
         // TODO: Find out how are we gonna deal with clans and locations, and how/if they are gonna share land resources
-        if(isModerator(player)) {
-            return true;
-        } else if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
+        if (!location.getWorld().getEnvironment().equals(Environment.NORMAL)) {
             // If theyre not in the overworld, they cant build
             return false;
         } else if (landIsClaimed(location)) {
@@ -542,11 +621,8 @@ public class  BitQuest extends JavaPlugin {
                 return true;
             } else if(landPermissionCode(location).equals("c")) {
                 String owner_uuid=REDIS.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner");
-                System.out.println(owner_uuid);
                 String owner_clan=REDIS.get("clan:"+owner_uuid);
-                System.out.println(owner_clan);
                 String player_clan=REDIS.get("clan:"+player.getUniqueId().toString());
-                System.out.println(player_clan);
                 if(owner_clan.equals(player_clan)) {
                     return true;
                 } else {
@@ -564,8 +640,13 @@ public class  BitQuest extends JavaPlugin {
         // p = public
         // c = clan
         // n = no permissions (private)
-        if(REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions")) {
-            return REDIS.get("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions");
+        String key = "chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"permissions";
+        if(land_permission_cache.containsKey(key)) {
+            return land_permission_cache.get(key);
+        } else if(REDIS.exists(key)) {
+            String code=REDIS.get(key);
+            land_permission_cache.put(key,code);
+            return code;
         } else {
             return "n";
         }
@@ -607,25 +688,52 @@ public class  BitQuest extends JavaPlugin {
                         user.wallet.getAccountAddress(new Wallet.GetAccountAddressCallback() {
                             @Override
                             public void run(String accountAddress) {
-                                try {
-                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
-                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
-                                    if (user.wallet.url() != null) {
-                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
-                                    }
+                                if(SEGWIT) {
+                                    user.wallet.addWitnessAddress(accountAddress,new Wallet.AddWitnessAddressCallback(){
+                                        @Override
+                                        public void run(String witnessAddress) {
+                                            user.wallet.setAccount(witnessAddress,new Wallet.SetAccountCallback(){
+                                                public void run(Boolean set_account_success) {
+                                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + witnessAddress);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                                    if (user.wallet.url() != null) {
+                                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                                    }
 
-                                    // This callback is called with runTask. I think this call it form the main thread.
-                                    // If I'm wrong this REDIS call can cause problems.
-                                    if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
-                                        String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
-                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+                                                    // This callback is called with runTask. I think this call it form the main thread.
+                                                    // If I'm wrong this REDIS call can cause problems.
+                                                    if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                                        String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
 
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                } else {
+                                    try {
+                                        user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
+                                        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance/DENOMINATION_FACTOR) + " "+DENOMINATION_NAME);
+                                        if (user.wallet.url() != null) {
+                                            user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                        }
+
+                                        // This callback is called with runTask. I think this call it form the main thread.
+                                        // If I'm wrong this REDIS call can cause problems.
+                                        if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
+                                            String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
+                                            user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+
+                                        }
+                                    } catch (Exception e) {
+                                        System.out.println("Error on sending wallet info");
+                                        e.printStackTrace();
                                     }
-                                } catch (Exception e) {
-                                    System.out.println("Error on sending wallet info");
-                                    e.printStackTrace();
                                 }
+
                             }
                         });
                     }
@@ -634,8 +742,22 @@ public class  BitQuest extends JavaPlugin {
         });
     };
     public boolean landIsClaimed(Location location) {
-        return REDIS.exists("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner");
+        String key="chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner";
+        if(land_unclaimed_cache.containsKey(key)) {
+            return false;
+        } else if (land_owner_cache.containsKey(key)) {
+            return true;
+        } else {
+            if(REDIS.exists(key)==true) {
+                land_owner_cache.put(key,REDIS.get(key));
+                return true;
+            } else {
+                land_unclaimed_cache.put(key,true);
+                return false;
+            }
+        }
     }
+
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {

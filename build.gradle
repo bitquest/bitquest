@@ -7,15 +7,14 @@ buildscript {
 
     dependencies {
         classpath group: 'eu.appsatori', name: 'gradle-fatjar-plugin', version: '0.3'
-
-        classpath group: 'de.undercouch', name: 'gradle-download-task', version: '1.2'
+        classpath group: 'de.undercouch', name: 'gradle-download-task', version: '2.0.0'
     }
 }
 
 
 plugins {
     id 'java' // or 'groovy' Must be explicitly applied
-    id 'com.github.johnrengelman.shadow' version '1.2.2'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
 
 }
 apply plugin: 'de.undercouch.download'
