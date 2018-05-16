@@ -75,7 +75,7 @@ public class LandCommand extends CommandAction {
                         return true;
                     } else {
                         return false;
-                    }//GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name, DARK_BLUE UNDERLINE : Link, RED : Server error, DARK_RED : User error, GRAY : Info, DARK_GRAY : Clan, DARK_GREEN : Landname
+                    }
 
                 } else {
                     player.sendMessage(ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");

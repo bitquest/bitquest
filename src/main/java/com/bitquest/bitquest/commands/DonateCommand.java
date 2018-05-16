@@ -38,7 +38,7 @@ public class DonateCommand extends CommandAction {
                                     player.sendMessage(ChatColor.RED + "Donation failed");
                                 }
                             } else {
-                                player.sendMessage(ChatColor.RED + "Not enough balance to donate " + bits);
+                                player.sendMessage(ChatColor.RED + "Not enough balance to donate " + ChatColor.LIGHT_PURLE + bits + " " + BitQuest.DENOMINATION_FACTOR);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -59,7 +59,7 @@ public class DonateCommand extends CommandAction {
             }
 
         } else {
-            player.sendMessage(ChatColor.RED + "Usage: /donate <amount>");
+            player.sendMessage(ChatColor.DARK_RED + "Usage: /donate <amount>");
             return true;
         }
     }
