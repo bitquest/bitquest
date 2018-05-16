@@ -49,6 +49,9 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by explodi on 11/1/15.
  */
 
+//Color Table :
+//GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name, DARK_BLUE UNDERLINE : Link, RED : Server error, DARK_RED : User error, GRAY : Info, DARK_GRAY : Clan, DARK_GREEN : Landname
+
 public class BitQuest extends JavaPlugin {
     // TODO: remove env variables not being used anymore
     // Connecting to REDIS
@@ -429,7 +432,7 @@ public class BitQuest extends JavaPlugin {
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
-    
+
     public int getLevel(int exp) {
         return (int) Math.floor(Math.sqrt(exp / (float) 256));
     }
@@ -484,7 +487,7 @@ public class BitQuest extends JavaPlugin {
 
 
                     if (name.equalsIgnoreCase("the wilderness")) {
-                        player.sendMessage(ChatColor.RED + "You cannot name your land that.");
+                        player.sendMessage(ChatColor.DARK_RED + "You cannot name your land that.");
                         return;
                     }
                     if (REDIS.get("chunk" + x + "," + z + "owner") == null) {
@@ -505,7 +508,7 @@ public class BitQuest extends JavaPlugin {
                                             land_owner_cache = new HashMap();
                                             land_name_cache = new HashMap();
                                             land_unclaimed_cache = new HashMap();
-                                            player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + name + "!");
+                                            player.sendMessage(ChatColor.GREEN + "Congratulations! You're now the owner of " + ChatColor.DARK_GREEN + name + ChatColor.GREEN + "!");
                                             updateScoreboard(player);
                                             if (bitQuest.messageBuilder != null) {
 
@@ -524,18 +527,19 @@ public class BitQuest extends JavaPlugin {
                                             }
                                         } else {
                                             if (balance < BitQuest.LAND_PRICE) {
-                                                player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                                    ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.RED + " more Bits.");
+                                                player.sendMessage(ChatColor.DARK_RED + "You don't have enough money! You need " +
+                                                    ChatColor.LIGHT_PURPLE + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / 100) + ChatColor.DARK_RED + " more Bits.");
                                             } else {
                                                 player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
                                             }
                                         }
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "You don't have enough money! You need " +
-                                            ChatColor.BOLD + (int) Math.ceil((BitQuest.LAND_PRICE) / 100) + ChatColor.RESET + ChatColor.RED + " Bits.");
+                                        player.sendMessage(ChatColor.DARK_RED + "You don't have enough money! You need " +
+                                            ChatColor.LIGHT_PURPLE + (int) Math.ceil((BitQuest.LAND_PRICE) / 100) + ChatColor.DARK_RED + " Bits.");
                                     }
                                 } catch (Exception e) {
                                     System.out.println("Error on claiming land");
+                                    player.sendMessage(ChatColor.RED + "Error on claiming land");
                                     e.printStackTrace();
                                 }
                             }
@@ -550,32 +554,32 @@ public class BitQuest extends JavaPlugin {
                             // If the name starts with "transfer " and has at least one more character,
                             // transfer land
                             final String newOwner = name.substring(9);
-                            player.sendMessage(ChatColor.YELLOW + "Transfering land to " + newOwner + "...");
+                            player.sendMessage(ChatColor.YELLOW + "Transfering land to " + ChatColor.BLUE + newOwner + ChatColor.YELLOW + "...");
 
                             if (REDIS.exists("uuid:" + newOwner)) {
                                 String newOwnerUUID = REDIS.get("uuid:" + newOwner);
                                 BitQuest.REDIS.set("chunk" + x + "," + z + "owner", newOwnerUUID);
-                                player.sendMessage(ChatColor.GREEN + "This land now belongs to " + newOwner);
+                                player.sendMessage(ChatColor.GREEN + "This land now belongs to " + ChatColor.BLUE + newOwner);
                             } else {
-                                player.sendMessage(ChatColor.RED + "Could not find " + newOwner + ". Did you misspell their name?");
+                                player.sendMessage(ChatColor.DARK_RED + "Could not find " + ChatColor.BLUE + newOwner + ChatColor.DARK_RED + ". Did you misspell their name?");
                             }
 
                         } else if (BitQuest.REDIS.get("chunk" + x + "," + z + "name").equals(name)) {
-                            player.sendMessage(ChatColor.RED + "You already own this land!");
+                            player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
                         } else {
                             // Rename land
-                            player.sendMessage(ChatColor.GREEN + "You renamed this land to " + name + ".");
                             BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+                            player.sendMessage(ChatColor.GREEN + "You renamed this land to " + ChatColor.DARK_GREEN + name + ChatColor.GREEN + ".");
                         }
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "Your land name must be 16 characters max");
+                    player.sendMessage(ChatColor.DARK_RED + "Your land name must be 16 characters max");
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "Your land name must contain only letters and numbers");
+                player.sendMessage(ChatColor.DARK_RED + "Your land name must contain only letters and numbers");
             }
         } else {
-            player.sendMessage(ChatColor.RED + "Your land must have a name");
+            player.sendMessage(ChatColor.DARK_RED + "Your land must have a name");
         }
     }
     public boolean isOwner(Location location, Player player) {
@@ -680,18 +684,18 @@ public class BitQuest extends JavaPlugin {
                                         public void run(String witnessAddress) {
                                             user.wallet.setAccount(witnessAddress, new Wallet.SetAccountCallback() {
                                                 public void run(Boolean set_account_success) {
-                                                    user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + witnessAddress);
-                                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
-                                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Wallet address: " + ChatColor.BOLD + witnessAddress);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.LIGHT_PURPLE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
+                                                    user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.LIGHT_PURPLE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                                     if (user.wallet.url() != null) {
-                                                        user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                                        user.player.sendMessage(ChatColor.DARK_BLUE + ChatColor.UNDERLINE + user.wallet.url());
                                                     }
 
                                                     // This callback is called with runTask. I think this call it form the main thread.
                                                     // If I'm wrong this REDIS call can cause problems.
                                                     if (REDIS.exists("hd:address:" + user.player.getUniqueId().toString())) {
                                                         String address = REDIS.get("hd:address:" + user.player.getUniqueId().toString());
-                                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.WHITE + address);
+                                                        user.player.sendMessage(ChatColor.GREEN + "You have an old wallet: " + ChatColor.BOLD + address);
 
                                                     }
                                                 }
@@ -700,11 +704,11 @@ public class BitQuest extends JavaPlugin {
                                     });
                                 } else {
                                     try {
-                                        user.player.sendMessage(ChatColor.BOLD + "" + ChatColor.GREEN + "Wallet address: " + ChatColor.WHITE + accountAddress);
-                                        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
-                                        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.WHITE + ChatColor.WHITE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
+                                        user.player.sendMessage(ChatColor.GREEN + "Wallet address: " + ChatColor.BOLD + accountAddress);
+                                        user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.LIGHT_PURPLE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
+                                        user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.LIGHT_PURPLE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                         if (user.wallet.url() != null) {
-                                            user.player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
+                                            user.player.sendMessage(ChatColor.DARK_BLUE + ChatColor.UNDERLINE + user.wallet.url());
                                         }
 
                                         // This callback is called with runTask. I think this call it form the main thread.
@@ -763,7 +767,7 @@ public class BitQuest extends JavaPlugin {
                     if (isModerator(player)) {
                         entry.getValue().run(sender, cmd, label, args, player);
                     } else {
-                        sender.sendMessage("You don't have enough permissions to execute this command!");
+                        sender.sendMessage(ChatColor.DARK_RED + "You don't have enough permissions to execute this command!");
                     }
                 }
             }
