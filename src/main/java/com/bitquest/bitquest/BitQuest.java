@@ -688,7 +688,7 @@ public class BitQuest extends JavaPlugin {
                                                     user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.LIGHT_PURPLE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                                     user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.LIGHT_PURPLE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                                     if (user.wallet.url() != null) {
-                                                        user.player.sendMessage(ChatColor.DARK_BLUE + ChatColor.UNDERLINE + user.wallet.url());
+                                                        user.player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
                                                     }
 
                                                     // This callback is called with runTask. I think this call it form the main thread.
@@ -708,7 +708,7 @@ public class BitQuest extends JavaPlugin {
                                         user.player.sendMessage(ChatColor.GREEN + "Unconfirmed Balance: " + ChatColor.LIGHT_PURPLE + (unconfirmedBalance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                         user.player.sendMessage(ChatColor.GREEN + "Confirmed Balance: " + ChatColor.LIGHT_PURPLE + (balance / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
                                         if (user.wallet.url() != null) {
-                                            user.player.sendMessage(ChatColor.DARK_BLUE + ChatColor.UNDERLINE + user.wallet.url());
+                                            user.player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + user.wallet.url());
                                         }
 
                                         // This callback is called with runTask. I think this call it form the main thread.
