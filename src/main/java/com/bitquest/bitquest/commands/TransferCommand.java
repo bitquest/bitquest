@@ -74,7 +74,7 @@ public class TransferCommand extends CommandAction {
                                                     player.sendMessage(ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "https://live.blockcypher.com/btc-main/tx/" + txid);
                                                     bitQuest.updateScoreboard(player);
 
-                                                } catch (IOException e) {+ args[0] + " " + BitQuest.DENOMINATION_NAME
+                                                } catch (IOException e) {
                                                     player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments.");
 
                                                     e.printStackTrace();
