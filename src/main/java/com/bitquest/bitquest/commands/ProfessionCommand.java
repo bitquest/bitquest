@@ -22,7 +22,7 @@ public class ProfessionCommand extends CommandAction {
                 bitQuest.REDIS.set("profession:" + player.getUniqueId(), profession);
             }
         } else {
-            player.sendMessage(ChatColor.RED + "Wrong argument count !")
+            player.sendMessage(ChatColor.RED + "Wrong argument count !");
         }
         return true;
     }
