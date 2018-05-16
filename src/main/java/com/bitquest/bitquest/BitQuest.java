@@ -186,8 +186,6 @@ public class  BitQuest extends JavaPlugin {
         // Removes all entities on server restart. This is a workaround for when large numbers of entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this will be unnecesary.
         //     removeAllEntities();
         killAllVillagers();
-        createScheduledTimers();
-
 
         // creates scheduled timers (update balances, etc)
         createScheduledTimers();
@@ -835,4 +833,3 @@ public class  BitQuest extends JavaPlugin {
         rate_limit=false;
     }
 }
-
