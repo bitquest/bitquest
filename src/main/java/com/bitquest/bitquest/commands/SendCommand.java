@@ -21,8 +21,8 @@ public class SendCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-        if(bitQuest.rate_limit==false) {
-            bitQuest.rate_limit=true;
+        if (bitQuest.rate_limit == false) {
+            bitQuest.rate_limit = true;
 
             /***********************************************************
              /send
@@ -30,7 +30,7 @@ public class SendCommand extends CommandAction {
              ***********************************************************/
             int MAX_SEND = 10000; // to be multiplied by DENOMINATION_FACTOR
             if (args.length == 2) {
-                for (char c : args[0].toCharArray()) {
+                for (char c: args[0].toCharArray()) {
                     if (!Character.isDigit(c))
                         return false;
                 }
@@ -42,7 +42,7 @@ public class SendCommand extends CommandAction {
                 final Long sat = amount * BitQuest.DENOMINATION_FACTOR;
 
                 if (amount != 0 && amount <= MAX_SEND) {
-                    for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+                    for (final Player onlinePlayer: Bukkit.getOnlinePlayers()) {
                         if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                             if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
                                 final User user;
@@ -111,7 +111,7 @@ public class SendCommand extends CommandAction {
                 return false;
             }
         } else {
-            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+            player.sendMessage(ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
             return true;
         }
     }

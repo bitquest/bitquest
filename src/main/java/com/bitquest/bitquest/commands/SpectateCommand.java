@@ -18,7 +18,7 @@ public class SpectateCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if (args.length == 1) {
 
-            if(Bukkit.getPlayer(args[0]) != null) {
+            if (Bukkit.getPlayer(args[0]) != null) {
                 ((Player) sender).setGameMode(GameMode.SPECTATOR);
                 ((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
                 bitQuest.success(((Player) sender), "You're now spectating " + args[0] + ".");

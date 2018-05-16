@@ -20,15 +20,15 @@ public class TransferCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
-        if(bitQuest.rate_limit==false) {
-            bitQuest.rate_limit=true;
+        if (bitQuest.rate_limit == false) {
+            bitQuest.rate_limit = true;
 
             if (args.length == 2) {
-                if(args[0].length()>8) {
+                if (args[0].length() > 8) {
                     // maximum transfer is 8 digits
                     return false;
                 }
-                for (char c : args[0].toCharArray()) {
+                for (char c: args[0].toCharArray()) {
                     if (!Character.isDigit(c))
                         return false;
                 }
@@ -50,8 +50,8 @@ public class TransferCommand extends CommandAction {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
-                if (sendAmount < (BitQuest.MINIMUM_TRANSACTION*BitQuest.DENOMINATION_FACTOR)) {
-                    player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MINIMUM_TRANSACTION + " "+BitQuest.DENOMINATION_NAME+".");
+                if (sendAmount < (BitQuest.MINIMUM_TRANSACTION * BitQuest.DENOMINATION_FACTOR)) {
+                    player.sendMessage(ChatColor.RED + "Minimum transaction is " + BitQuest.MINIMUM_TRANSACTION + " " + BitQuest.DENOMINATION_NAME + ".");
                     return true;
                 } else {
                     if (fromWallet != null) {
@@ -60,18 +60,18 @@ public class TransferCommand extends CommandAction {
                         fromWallet.getBalance(0, new Wallet.GetBalanceCallback() {
                             @Override
                             public void run(final Long unconfirmed_balance) {
-                                if(unconfirmed_balance<sendAmoutFinal) {
+                                if (unconfirmed_balance < sendAmoutFinal) {
                                     player.sendMessage(ChatColor.RED + "Insufficient balance.");
                                 } else {
                                     fromWalletFinal.getBalance(5, new Wallet.GetBalanceCallback() {
                                         @Override
                                         public void run(Long balance) {
-                                            if(unconfirmed_balance != balance) {
-                                                player.sendMessage(ChatColor.YELLOW + "Sending " + args[0] + " "+BitQuest.DENOMINATION_NAME+" to " + args[1] + "...");
+                                            if (unconfirmed_balance != balance) {
+                                                player.sendMessage(ChatColor.YELLOW + "Sending " + args[0] + " " + BitQuest.DENOMINATION_NAME + " to " + args[1] + "...");
                                                 try {
-                                                    String txid=fromWalletFinal.sendFrom(args[1], sendAmoutFinal);
-                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " "+BitQuest.DENOMINATION_NAME+" to external address.");
-                                                    player.sendMessage(ChatColor.BLUE+" "+ChatColor.UNDERLINE+ "https://live.blockcypher.com/btc-main/tx/"+txid);
+                                                    String txid = fromWalletFinal.sendFrom(args[1], sendAmoutFinal);
+                                                    player.sendMessage(ChatColor.GREEN + "Succesfully sent " + args[0] + " " + BitQuest.DENOMINATION_NAME + " to external address.");
+                                                    player.sendMessage(ChatColor.BLUE + " " + ChatColor.UNDERLINE + "https://live.blockcypher.com/btc-main/tx/" + txid);
                                                     bitQuest.updateScoreboard(player);
 
                                                 } catch (IOException e) {
@@ -104,11 +104,10 @@ public class TransferCommand extends CommandAction {
                 return false;
             }
         } else {
-            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+            player.sendMessage(ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
             return true;
 
         }
 
     }
 }
-

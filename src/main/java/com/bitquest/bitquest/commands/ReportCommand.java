@@ -32,8 +32,8 @@ public class ReportCommand extends CommandAction {
                     if (channel != null) {
                         bitQuest.slackBotSession.sendMessage(channel, slackMessage);
                         String playerMessage = ChatColor.GREEN + "The report has been send to a moderator. Thanks for making " +
-                                ChatColor.GOLD + ChatColor.BOLD +"Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" +
-                                ChatColor.RESET + ChatColor.GREEN + " a better place.";
+                            ChatColor.GOLD + ChatColor.BOLD + "Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" +
+                            ChatColor.RESET + ChatColor.GREEN + " a better place.";
                         player.sendMessage(playerMessage);
                         return true;
                     } else {
