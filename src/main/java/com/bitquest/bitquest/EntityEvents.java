@@ -219,7 +219,7 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerGameModeChange(PlayerGameModeChangeEvent event) throws ParseException, org.json.simple.parser.ParseException, IOException {
-        event.getPlayer().sendMessage("Sorry changing gamemode are not allowed.");
+        event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
         event.setCancelled(true);
     }
 
@@ -347,24 +347,7 @@ public class EntityEvents implements Listener {
             if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.COMPASS) {
 
                 if (event.getAction() == Action.RIGHT_CLICK_AIR || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-                    // TODO: open the tps inventory
-                    player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
-                    player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-                    World world = Bukkit.getWorld("world");
-
-                    final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
-
-                    Chunk c = spawn.getChunk();
-                    if (!c.isLoaded()) {
-                        c.load();
-                    }
-                    bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
-
-                        public void run() {
-                            player.teleport(spawn);
-                            player.removeMetadata("teleporting", bitQuest);
-                        }
-                    }, 60L);
+                    bitQuest.teleportToSpawn(player);
 
                 }
             }

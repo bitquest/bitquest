@@ -287,29 +287,23 @@ public class BitQuest extends JavaPlugin {
         });
     }
     public void teleportToSpawn(Player player) {
-        if (!player.hasMetadata("teleporting")) {
-            player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
-            player.setMetadata("teleporting", new FixedMetadataValue(this, true));
-            World world = Bukkit.getWorld("world");
+      if (!player.hasMetadata("teleporting")) {
+          // TODO: open the tps inventory
+          player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
+          player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
+          World world = Bukkit.getWorld("world");
 
-            Location location = world.getSpawnLocation();
-            location.setX(location.getX() + BitQuest.rand(0, 64) - 32);
-            location.setZ(location.getZ() + BitQuest.rand(0, 64) - 32);
-            location.setY(location.getWorld().getHighestBlockYAt(location.getBlockX(), location.getBlockY()));
+          final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
 
-            final Location spawn = location;
+          Chunk c = spawn.getChunk();
+          if (!c.isLoaded()) {
+              c.load();
+          }
+          bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
 
-            Chunk c = spawn.getChunk();
-            if (!c.isLoaded()) {
-                c.load();
-            }
-            BitQuest plugin = this;
-            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            scheduler.scheduleSyncDelayedTask(this, new Runnable() {
-
-                public void run() {
-                    player.teleport(spawn);
-                    player.removeMetadata("teleporting", plugin);
+              public void run() {
+                  player.teleport(spawn);
+                  player.removeMetadata("teleporting", bitQuest);
                 }
             }, 60L);
         }
