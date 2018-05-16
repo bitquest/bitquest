@@ -16,11 +16,13 @@ public class ProfessionCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        if (args.length > 0) {
+        if (args.length == 1) {
             String profession = args[0];
             if (profession.equals("rogue")) {
                 bitQuest.REDIS.set("profession:" + player.getUniqueId(), profession);
             }
+        } else {
+            player.sendMessage(ChatColor.RED + "Wrong argument count !")
         }
         return true;
     }
