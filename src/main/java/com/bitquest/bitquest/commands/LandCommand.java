@@ -32,7 +32,7 @@ public class LandCommand extends CommandAction {
 
                 Location location = player.getLocation();
                 if (!location.getWorld().getEnvironment().equals(World.Environment.NORMAL)) {
-                    player.sendMessage(ChatColor.RED + "You cannot claim land here.");
+                    player.sendMessage(ChatColor.DARK_RED + "You cannot claim land here.");
                     return true;
                 }
 
@@ -63,22 +63,22 @@ public class LandCommand extends CommandAction {
 
                     if (args[1].equalsIgnoreCase("public")) {
                         BitQuest.REDIS.set("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "p");
-                        player.sendMessage(ChatColor.GREEN + "the land " + landname + " is now public");
+                        player.sendMessage(ChatColor.GREEN + "the land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN + " is now public");
                         return true;
                     } else if (args[1].equalsIgnoreCase("clan")) {
                         BitQuest.REDIS.set("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "c");
-                        player.sendMessage(ChatColor.GREEN + "the land " + landname + " is now clan-owned");
+                        player.sendMessage(ChatColor.GREEN + "the land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN + " is now clan-owned");
                         return true;
                     } else if (args[1].equalsIgnoreCase("private")) {
                         BitQuest.REDIS.del("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions");
-                        player.sendMessage(ChatColor.GREEN + "the land " + landname + " is now private");
+                        player.sendMessage(ChatColor.GREEN + "the land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN + " is now private");
                         return true;
                     } else {
                         return false;
-                    }
+                    }//GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name, DARK_BLUE UNDERLINE : Link, RED : Server error, DARK_RED : User error, GRAY : Info, DARK_GRAY : Clan, DARK_GREEN : Landname
 
                 } else {
-                    player.sendMessage(ChatColor.RED + "Only the owner of this location can change its permissions.");
+                    player.sendMessage(ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");
                     return true;
                 }
             }
