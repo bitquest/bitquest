@@ -235,7 +235,7 @@ public class  BitQuest extends JavaPlugin {
             con.setRequestProperty("Authorization", "Basic " + encoding);
 
             con.setRequestMethod("POST");
-            con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+            con.setRequestProperty("User-Agent", "bitquest plugin");
             con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
             con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
             con.setDoOutput(true);
