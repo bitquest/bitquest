@@ -296,7 +296,7 @@ public class Wallet {
             params.add(to);
             Double double_sat = new Double(sat);
 
-            params.add(double_sat / 100000000 L);
+            params.add(double_sat / 100000000L);
             jsonObject.put("params", params);
             URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -346,7 +346,7 @@ public class Wallet {
         Double double_sat = new Double(sat);
         System.out.println(double_sat);
 
-        params.add(double_sat / 100000000 L);
+        params.add(double_sat / 100000000L);
         System.out.println(params);
         jsonObject.put("params", params);
         System.out.println("Checking blockchain info...");

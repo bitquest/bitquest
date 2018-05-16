@@ -311,7 +311,7 @@ public class BitQuest extends JavaPlugin {
                     player.teleport(spawn);
                     player.removeMetadata("teleporting", plugin);
                 }
-            }, 60 L);
+            }, 60L);
         }
     }
     public void createScheduledTimers() {
@@ -343,7 +343,7 @@ public class BitQuest extends JavaPlugin {
                 World world = Bukkit.getWorld("world");
                 world.spawnEntity(world.getHighestBlockAt(world.getSpawnLocation()).getLocation(), EntityType.VILLAGER);
             }
-        }, 0, 72000 L);
+        }, 0, 72000L);
 
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
@@ -352,19 +352,19 @@ public class BitQuest extends JavaPlugin {
                     updateMetrics();
                 }
             }
-        }, 0, 12000 L);
+        }, 0, 12000L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 run_season_events();
             }
-        }, 0, 1200 L);
+        }, 0, 1200L);
         scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
             @Override
             public void run() {
                 reset_rate_limits();
             }
-        }, 0, 100 L);
+        }, 0, 100L);
 
 
     }
