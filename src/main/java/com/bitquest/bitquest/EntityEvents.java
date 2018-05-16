@@ -333,7 +333,7 @@ public class EntityEvents implements Listener {
                                     player.teleport(spawn);
                                     player.removeMetadata("teleporting", bitQuest);
                                 }
-                            }, 60 L);
+                            }, 60L);
                         } else {
                             player.sendMessage(ChatColor.RED + "You must sleep in a bed before using the ender eye teleport");
                         }
@@ -363,7 +363,7 @@ public class EntityEvents implements Listener {
                             player.teleport(spawn);
                             player.removeMetadata("teleporting", bitQuest);
                         }
-                    }, 60 L);
+                    }, 60L);
 
                 }
             }

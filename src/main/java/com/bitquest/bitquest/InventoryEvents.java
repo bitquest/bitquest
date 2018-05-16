@@ -331,7 +331,7 @@ public class InventoryEvents implements Listener {
                         player.teleport(location);
                         player.removeMetadata("teleporting", bitQuest);
                     }
-                }, 60 L);
+                }, 60L);
 
             }
 
