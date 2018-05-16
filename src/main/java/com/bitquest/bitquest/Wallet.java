@@ -106,7 +106,7 @@ public class Wallet {
                         response.append(inputLine);
                     } in .close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    Double d = Double.parseDouble(response_object.get("result").toString().trim()) * 100000000 L;
+                    Double d = Double.parseDouble(response_object.get("result").toString().trim()) * 100000000L;
 
                     if (bitQuest.BITQUEST_ENV == "development")
                         System.out.println(response_object);

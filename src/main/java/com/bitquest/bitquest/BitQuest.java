@@ -61,7 +61,7 @@ public class BitQuest extends JavaPlugin {
     public final static String WORLD_PUBLIC_KEY = System.getenv("WORLD_PUBLIC_KEY") != null ? System.getenv("WORLD_PUBLIC_KEY") : "76e8a7eb479256c68f59f66c7b744891bc2f632ff3c7a3f69a5c4aeccda687e3";
     public final static String BITCOIN_NODE_HOST = System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : "localhost";
     public final static int BITCOIN_NODE_PORT = System.getenv("BITCOIN_NODE_PORT") != null ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT")) : 18332;
-    public final static Long DENOMINATION_FACTOR = System.getenv("DENOMINATION_FACTOR") != null ? Long.parseLong(System.getenv("DENOMINATION_FACTOR")) : 100 L;
+    public final static Long DENOMINATION_FACTOR = System.getenv("DENOMINATION_FACTOR") != null ? Long.parseLong(System.getenv("DENOMINATION_FACTOR")) : 100L;
     public final static String DENOMINATION_NAME = System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
     public final static String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
     public final static String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
@@ -99,7 +99,7 @@ public class BitQuest extends JavaPlugin {
     // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST, REDIS_PORT);
     public final static Long LAND_PRICE = DENOMINATION_FACTOR * 10;
     // Minimum transaction by default is 2000 bits
-    public final static Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION")) : 2000 L;
+    public final static Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION")) : 2000L;
     // utilities: distance and rand
     public static int distance(Location location1, Location location2) {
         return (int) location1.distance(location2);
@@ -118,7 +118,7 @@ public class BitQuest extends JavaPlugin {
     public HashMap < String, String > land_owner_cache = new HashMap();
     public HashMap < String, String > land_permission_cache = new HashMap();
     public HashMap < String, String > land_name_cache = new HashMap();
-    public Long wallet_balance_cache = 0 L;
+    public Long wallet_balance_cache = 0L;
     public ArrayList < ItemStack > books = new ArrayList < ItemStack > ();
     // when true, server is closed for maintenance and not allowing players to join in.
     public boolean maintenance_mode = false;
