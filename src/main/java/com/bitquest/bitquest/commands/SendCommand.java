@@ -72,8 +72,8 @@ public class SendCommand extends CommandAction {
                                                 if (user.wallet.move(user_tip.player.getUniqueId().toString(), sat)) {
                                                     bitQuest.updateScoreboard(onlinePlayer);
                                                     bitQuest.updateScoreboard(player);
-                                                    player.sendMessage(ChatColor.GREEN + "You sent " + amount + " " + BitQuest.DENOMINATION_NAME + " to user " + onlinePlayer.getName());
-                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + amount + " " + BitQuest.DENOMINATION_NAME + " from user " + player.getName());
+                                                    player.sendMessage(ChatColor.GREEN + "You sent " + ChatColor.LIGHT_PURPLE  + amount + ChatColor.GREEN + " " + BitQuest.DENOMINATION_NAME + " to user " + ChatColor.BLUE + onlinePlayer.getName());
+                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + ChatColor.LIGHT_PURPLE + amount + ChatColor.GREEN + " " + BitQuest.DENOMINATION_NAME + " from user " + ChatColor.BLUE + player.getName());
                                                 } else {
                                                     player.sendMessage(ChatColor.RED + "Tip failed.");
                                                 }
@@ -88,23 +88,23 @@ public class SendCommand extends CommandAction {
                                                 player.sendMessage(ChatColor.RED + "Tip failed.");
                                             }
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "Not enough balance");
+                                            player.sendMessage(ChatColor.DARK_RED + "Not enough balance");
                                         }
                                     }
                                 });
                                 return true;
 
                             } else {
-                                player.sendMessage(ChatColor.RED + "You cannot send to yourself!");
+                                player.sendMessage(ChatColor.DARK_RED + "You cannot send to yourself!");
                                 return true;
                             }
                         }
                     }
-                    player.sendMessage(ChatColor.RED + "Player " + args[1] + " is not online");
+                    player.sendMessage(ChatColor.DARK_RED + "Player " + ChatColor.BLUE + args[1] + ChatColor.DARK_RED + " is not online");
 
                     return true;
                 } else {
-                    player.sendMessage("Minimum tip is 1 bit. Maximum is " + MAX_SEND);
+                    player.sendMessage(ChatColor.DARK_RED + "Minimum tip is 1 bit. Maximum is " + MAX_SEND);
                     return true;
                 }
             } else {
