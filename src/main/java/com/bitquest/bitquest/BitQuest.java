@@ -429,14 +429,7 @@ public class BitQuest extends JavaPlugin {
     public void log(String msg) {
         Bukkit.getLogger().info(msg);
     }
-
-    public void success(Player recipient, String msg) {
-        recipient.sendMessage(ChatColor.GREEN + msg);
-    }
-
-    public void error(Player recipient, String msg) {
-        recipient.sendMessage(ChatColor.RED + msg);
-    }
+    
     public int getLevel(int exp) {
         return (int) Math.floor(Math.sqrt(exp / (float) 256));
     }
