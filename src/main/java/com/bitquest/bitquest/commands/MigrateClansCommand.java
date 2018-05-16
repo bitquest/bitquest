@@ -41,14 +41,14 @@ public class MigrateClansCommand extends CommandAction {
                 BitQuest.REDIS.srem("clans", clan);
                 BitQuest.REDIS.del("invitations:" + clan);
                 player.sendMessage(ChatColor.GRAY + "Clan " + ChatColor.DARK_GRAY + clan + ChatColor.GRAY + " is empty. Deleted");
-            } //GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name, DARK_BLUE UNDERLINE : Link, RED : Server error, DARK_RED : User error, GRAY : Info, DARK_GRAY : Clan
+            }
         }
 
         for (Map.Entry < String, List < String >> entry: clansMembers.entrySet()) {
             String clan = entry.getKey();
             for (String member: entry.getValue()) {
                 BitQuest.REDIS.sadd("clan:" + clan + ":members", member);
-                player.sendMessage(ChatColor.GREEN + "Player " + ChatColor.BLUE + member + ChatColor.GREEN + " added to clan " + ChatColor.DARK_GRAY + clan);
+                player.sendMessage(ChatColor.GRAY + "Player " + ChatColor.BLUE + member + ChatColor.GREEN + " added to clan " + ChatColor.DARK_GRAY + clan);
             }
         }
 
