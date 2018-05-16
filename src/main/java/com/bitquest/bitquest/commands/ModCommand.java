@@ -18,11 +18,11 @@ public class ModCommand extends CommandAction {
             if (BitQuest.REDIS.exists("uuid:" + args[1])) {
                 UUID uuid = UUID.fromString(BitQuest.REDIS.get("uuid:" + args[1]));
                 BitQuest.REDIS.sadd("moderators", uuid.toString());
-                sender.sendMessage(ChatColor.GREEN + BitQuest.REDIS.get("name:" + uuid) + " added to moderators group");
+                sender.sendMessage(ChatColor.BLUE + BitQuest.REDIS.get("name:" + uuid) + ChatColor.GREEN + " added to moderators group");
 
                 return true;
             } else {
-                sender.sendMessage(ChatColor.RED + "Cannot find player " + args[1]);
+                sender.sendMessage(ChatColor.DARK_RED + "Cannot find player " + ChatColor.BLUE + args[1]);
                 return true;
             }
         } else if (args[0].equals("remove")) {
@@ -37,7 +37,7 @@ public class ModCommand extends CommandAction {
             // Sub-command: /mod list
             Set < String > moderators = BitQuest.REDIS.smembers("moderators");
             for (String uuid: moderators) {
-                sender.sendMessage(ChatColor.YELLOW + BitQuest.REDIS.get("name:" + uuid));
+                sender.sendMessage(ChatColor.BLUE + BitQuest.REDIS.get("name:" + uuid));
             }
             return true;
         } else {
