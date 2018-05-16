@@ -14,11 +14,11 @@ public class UnbanCommand extends CommandAction {
             if (BitQuest.REDIS.exists("uuid:" + playerName)) {
                 String uuid = BitQuest.REDIS.get("uuid:" + playerName);
                 BitQuest.REDIS.srem("banlist", uuid);
-                sender.sendMessage(ChatColor.GREEN + "Player " + playerName + " has been unbanned.");
+                sender.sendMessage(ChatColor.GREEN + "Player " + ChatColor.BLUE + playerName + ChatColor.GREEN + " has been unbanned.");
 
                 return true;
             } else {
-                sender.sendMessage(ChatColor.RED + "Can't find player " + playerName);
+                sender.sendMessage(ChatColor.RED + "Can't find player " + ChatColor.BLUE + playerName);
                 return true;
             }
 

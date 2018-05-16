@@ -288,6 +288,7 @@ public class BitQuest extends JavaPlugin {
     }
     public void teleportToSpawn(Player player) {
       if (!player.hasMetadata("teleporting")) {
+          BitQuest bitQuest = this;
           // TODO: open the tps inventory
           player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
           player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));

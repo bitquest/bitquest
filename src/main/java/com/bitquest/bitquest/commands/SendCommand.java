@@ -72,8 +72,8 @@ public class SendCommand extends CommandAction {
                                                 if (user.wallet.move(user_tip.player.getUniqueId().toString(), sat)) {
                                                     bitQuest.updateScoreboard(onlinePlayer);
                                                     bitQuest.updateScoreboard(player);
-                                                    player.sendMessage(ChatColor.GREEN + "You sent " + ChatColor.LIGHT_PURPLE  + amount + ChatColor.GREEN + " " + BitQuest.DENOMINATION_NAME + " to user " + ChatColor.BLUE + onlinePlayer.getName());
-                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + ChatColor.LIGHT_PURPLE + amount + ChatColor.GREEN + " " + BitQuest.DENOMINATION_NAME + " from user " + ChatColor.BLUE + player.getName());
+                                                    player.sendMessage(ChatColor.GREEN + "You sent " + ChatColor.LIGHT_PURPLE  + amount + " " + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + " to user " + ChatColor.BLUE + onlinePlayer.getName());
+                                                    onlinePlayer.sendMessage(ChatColor.GREEN + "You got " + ChatColor.LIGHT_PURPLE + amount + " " + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + " from user " + ChatColor.BLUE + player.getName());
                                                 } else {
                                                     player.sendMessage(ChatColor.RED + "Tip failed.");
                                                 }
