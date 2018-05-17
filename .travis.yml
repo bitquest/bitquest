@@ -1,9 +1,24 @@
 language: java
 jdk:
   - oraclejdk8
+os: linux
 
-install:
-  - ./gradlew setupWorkspace
+env:
 
-script:
-  - ./gradlew shadowJar
+matrix:
+  fast_finish: true
+  include:
+    - script: mvn checkstyle:check -B
+  allow_failures:
+    - script: mvn checkstyle:check -B
+
+
+cache:
+  directories:
+    $HOME/.m2/
+
+script: mvn package -B
+
+addons:
+  apt:
+    update: true
