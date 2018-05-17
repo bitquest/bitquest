@@ -5,3 +5,4 @@ out
 .gradle
 target/*
 log/*
+google-java-format-1.5-all-deps.jar*
