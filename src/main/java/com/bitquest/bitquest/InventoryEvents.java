@@ -156,7 +156,7 @@ public class InventoryEvents implements Listener {
                                                     meta.setLore(null);
                                                     item.setItemMeta(meta);
                                                     player.getInventory().addItem(item);
-                                                    player.sendMessage(ChatColor.GREEN + "You bought " + clicked.getType() + " for " + satFinal / 100);
+                                                    player.sendMessage(ChatColor.GREEN + "You bought " + clicked.getType() + " for " + ChatColor.LIGHT_PURPLE + satFinal / 100);
 
 
                                                     bitQuest.updateScoreboard(player);
@@ -180,10 +180,10 @@ public class InventoryEvents implements Listener {
                                                     player.sendMessage(ChatColor.RED + "Transaction failed. Please try again in a few moments (ERROR 1)");
                                                 }
                                             } else {
-                                                player.sendMessage(ChatColor.RED + "You don't have space in your inventory");
+                                                player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
                                             }
                                         } else {
-                                            player.sendMessage(ChatColor.RED + "You don't have enough bits");
+                                            player.sendMessage(ChatColor.DARK_RED + "You don't have enough bits");
 
                                         }
                                     } catch (Exception e) {
@@ -265,7 +265,7 @@ public class InventoryEvents implements Listener {
                             //                                if (bitQuest.wallet.payment(sat, user.wallet.address)) {
                             //                                    player.getInventory().removeItem(trade.itemStack);
                             //
-                            //                                    player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + sat / 100);
+                            //                                    player.sendMessage(ChatColor.GREEN + "You sold " + clicked.getType() + " for " + ChatColor.LIGHT_PURPLE + sat / 100);
                             //                                    bitQuest.REDIS.incr("stock:" + trade.itemStack.getType());
                             //                                    System.out.println("[sell] stock: " + bitQuest.REDIS.get("stock:" + trade.itemStack.getType()));
                             //                                    bitQuest.updateScoreboard(player);
@@ -282,7 +282,7 @@ public class InventoryEvents implements Listener {
                             //                            event.setCancelled(true);
                             //                            player.closeInventory();
                             //                            player.updateInventory();
-                            //                            player.sendMessage(ChatColor.RED + "I'm not buying " + clicked.getType() + "...");
+                            //                            player.sendMessage(ChatColor.DARK_RED + "I'm not buying " + clicked.getType() + "...");
                             //                        }
 
                         });
