@@ -3,7 +3,6 @@ package com.bitquest.bitquest;
 import com.google.gson.JsonObject;
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.Overridden;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
