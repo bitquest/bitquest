@@ -9,7 +9,7 @@ matrix:
   include:
     - script:
       mvn checkstyle:check -B
-  allow_failure:
+  allow_failures:
     - script:
       mvn checkstyle:check -B
 
