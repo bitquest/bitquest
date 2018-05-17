@@ -6,6 +6,7 @@ os: linux
 env:
 
 matrix:
+  fast_finish: true
   include:
     - script: mvn checkstyle:check -B
   allow_failures:
