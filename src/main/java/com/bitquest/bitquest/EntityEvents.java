@@ -127,14 +127,14 @@ public class EntityEvents implements Listener {
                 if (bitQuest.BITQUEST_ENV.equals("development") == true) {
                     player.setOp(true);
                 }
-                player.sendMessage(ChatColor.YELLOW + "You are a moderator on this server.");
+                player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
                 bitQuest.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                     @Override
                     public void run(Long balance) {
-                        player.sendMessage(ChatColor.YELLOW + "The world wallet balance is: " + balance / BitQuest.DENOMINATION_FACTOR + " " + BitQuest.DENOMINATION_NAME);
+                        player.sendMessage(ChatColor.GRAY + "The world wallet balance is: " + ChatColor.LIGHT_PURPLE + balance / BitQuest.DENOMINATION_FACTOR + " " + BitQuest.DENOMINATION_NAME);
                     }
                 });
-                player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + "blockchain.info/address/" + bitQuest.wallet.address);
+                player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + "http://blockchain.info/address/" + bitQuest.wallet.address);
             }
 
             String welcome = rawwelcome.toString();
@@ -158,9 +158,7 @@ public class EntityEvents implements Listener {
             player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
             player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
 
-            player.sendMessage(ChatColor.BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
-            player.sendMessage("");
-
+            player.sendMessage(ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
 
             if (bitQuest.messageBuilder != null) {
                 final BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
@@ -754,7 +752,7 @@ public class EntityEvents implements Listener {
             // If player doesn't have permission, disallow the player to interact with it.
             if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
                 event.setCancelled(true);
-                p.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+                p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
             }
         }
 
@@ -764,7 +762,7 @@ public class EntityEvents implements Listener {
     void onPlayerBucketFill(PlayerBucketFillEvent event) {
         Player p = event.getPlayer();
         if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+            p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
             event.setCancelled(true);
         }
     }
@@ -773,7 +771,7 @@ public class EntityEvents implements Listener {
     void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
         Player p = event.getPlayer();
         if (!bitQuest.canBuild(event.getBlockClicked().getLocation(), event.getPlayer())) {
-            p.sendMessage(ChatColor.RED + "You don't have permission to do that!");
+            p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
             event.setCancelled(true);
         }
     }
