@@ -310,9 +310,9 @@ public class  BitQuest extends JavaPlugin {
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             scheduler.scheduleSyncDelayedTask(this, new Runnable() {
 
-                public void run() {
-                    player.teleport(spawn);
-                    player.removeMetadata("teleporting", plugin);
+                public void run(Player p) {
+                    p.teleport(spawn);
+                    p.removeMetadata("teleporting", plugin);
                 }
             }, 60L);
         }
@@ -835,4 +835,3 @@ public class  BitQuest extends JavaPlugin {
         rate_limit=false;
     }
 }
-
