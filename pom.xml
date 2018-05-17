@@ -15,9 +15,9 @@
         <id>spigot-repo</id>
         <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository>
-</repositories>
+  </repositories>
 
-<dependencies>
+  <dependencies>
     <!--Spigot API-->
     <dependency>
         <groupId>org.spigotmc</groupId>
@@ -42,5 +42,25 @@
       <artifactId>commons-pool2</artifactId>
       <version>2.3</version>
     </dependency>
-</dependencies>
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20180130</version>
+    </dependency>
+    <dependency>
+        <groupId>com.mixpanel</groupId>
+        <artifactId>mixpanel-java</artifactId>
+        <version>1.4.4</version>
+    </dependency>
+    <dependency>
+        <groupId>com.ullink.slack</groupId>
+        <artifactId>simpleslackapi</artifactId>
+        <version>1.2.0</version>
+    </dependency>
+    <dependency>
+        <groupId>com.timgroup</groupId>
+        <artifactId>java-statsd-client</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+  </dependencies>
 </project>
