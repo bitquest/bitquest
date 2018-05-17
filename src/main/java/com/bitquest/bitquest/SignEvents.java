@@ -45,9 +45,9 @@ public class SignEvents implements Listener {
             }
 
         } else if (event.getBlock().getWorld().getName().endsWith("_nether")) {
-            player.sendMessage(ChatColor.RED + "No claiming in the nether!");
+            player.sendMessage(ChatColor.DARK_RED + "No claiming in the nether!");
         } else if (event.getBlock().getWorld().getName().endsWith("_end")) {
-            player.sendMessage(ChatColor.RED + "No claiming in the end!");
+            player.sendMessage(ChatColor.DARK_RED + "No claiming in the end!");
         }
 
     }
