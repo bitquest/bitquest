@@ -37,7 +37,7 @@ public class BlockEvents implements Listener {
             if (event.getPlayer() != null) {
                 if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
                     event.setCancelled(true);
-                    event.getPlayer().sendMessage(ChatColor.RED + "You don't have permission to do that!");
+                    event.getPlayer().sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
                 }
             }
         } else if (event.getCause().equals(IgniteCause.SPREAD)) {
