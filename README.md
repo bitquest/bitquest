@@ -65,6 +65,21 @@ There is a maven project that will download the spigot 1.12.2 (downloading the l
 ```sh
 maven compile -B
 ```
+
+## 3.1 Compile BitQuest and generate a JAR file (FOR DEV)
+You can easly compile the code by doing (the script will format the code using ./format.sh and) (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
+
+```sh
+./build.sh
+```
+
+### 3.2 format the code to google java style (FOR DEV)
+You can easly format the code by doing (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
+
+```sh
+./format.sh
+```
+
 # Requirements for running
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
