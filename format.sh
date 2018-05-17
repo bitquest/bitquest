@@ -16,11 +16,11 @@ else
   fi
 fi
 
-java -jar google-java-format-1.5-all-deps.jar -r src/main/java/bitquest/bitquest/*
+java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/*
 if [ $? != 0 ] ; then
   exit 20
 fi
-java -jar google-java-format-1.5-all-deps.jar -r src/main/java/bitquest/bitquest/commands/*
+java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/commands/*
 if [ $? != 0 ] ; then
   exit 30
 fi
