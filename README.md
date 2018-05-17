@@ -69,7 +69,7 @@ maven compile -B
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
 
-# Running a local BitQuest test server (NOT WORK YET (the plugin work but not with our docker actual configuration (someone is working on that)))
+# Running a local BitQuest test server with docker (OUTADED)
 
 Running locally via Docker is the fastest way to develop and test code. [Docker](http://docker.com) and [Docker Compose](https://docs.docker.com/compose/) can be used for testing the compiled plugin on spigot.
 
