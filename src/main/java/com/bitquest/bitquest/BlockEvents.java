@@ -49,10 +49,12 @@ public class BlockEvents implements Listener {
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
         // If block is bedrock, cancel the event
-        if (event.getBlock().getType().equals(Material.BEDROCK) || event.getBlock().getType().equals(Material.END_BRICKS) || event.getBlock().getType().equals(Material.ENDER_STONE)) {
+        Block b = event.getBlock()
+        Material m = b.getType();
+        if (m.equals(Material.BEDROCK) || m.equals(Material.END_BRICKS) || m.equals(Material.ENDER_STONE || m.equals(Material.COMMAND) || m.equals(Material.COMMAND_CHAIN) || m.equals(Material.COMMAND_REPEATING))) {
             event.setCancelled(true);
             // If player is in a no-build zone, cancel the event
-        } else if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+        } else if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_RED +  "You may not break blocks here!");
         } else {
@@ -61,14 +63,15 @@ public class BlockEvents implements Listener {
     }
     @EventHandler
     void onBlockPlace(BlockPlaceEvent event) {
-
         // set clan
         // first, we check if the player has permission to build
-        if (!bitQuest.canBuild(event.getBlock().getLocation(), event.getPlayer())) {
+        Block b = event.getBlock()
+        Material m = b.getType();
+        if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
             event.setCancelled(true);
             event.getPlayer().sendMessage(ChatColor.DARK_RED + "You may not place blocks here!");
-        } else if (event.getBlock().getType().equals(Material.BEDROCK)) {
-            event.getPlayer().sendMessage(ChatColor.DARK_RED + "Placing bedrock is not allowed!");
+        } else if (m.equals(Material.BEDROCK) || m.equals(Material.COMMAND) || m.equals(Material.COMMAND_CHAIN) || m.equals(Material.COMMAND_REPEATING)) {
+            event.getPlayer().sendMessage(ChatColor.DARK_RED + "Placing that block is not allowed!");
             event.setCancelled(true);
         } else {
             event.setCancelled(false);
