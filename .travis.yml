@@ -5,13 +5,14 @@ os:
   linux
 
 env:
+
 matrix:
   include:
-    - script:
-      mvn checkstyle:check -B
+    - script: mvn checkstyle:check -B
+mvn checkstyle:check -B
   allow_failures:
-    - script:
-      mvn checkstyle:check -B
+    - script: mvn checkstyle:check -B
+
 
 cache:
   directories:
