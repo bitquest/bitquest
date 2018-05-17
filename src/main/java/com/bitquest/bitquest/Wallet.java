@@ -22,9 +22,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-/**
- * Created by cristian on 12/15/15.
- */
 public class Wallet {
     public int balance;
     public int unconfirmedBalance;

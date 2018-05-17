@@ -12,7 +12,6 @@ import java.text.ParseException;
 
 import java.io.IOException;
 
-
 public class UpgradeWallet extends CommandAction {
     private BitQuest bitQuest;
 

@@ -45,10 +45,6 @@ import redis.clients.jedis.JedisPoolConfig;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by explodi on 11/1/15.
- */
-
 //Color Table :
 //GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name, DARK_BLUE UNDERLINE : Link, RED : Server error, DARK_RED : User error, GRAY : Info, DARK_GRAY : Clan, DARK_GREEN : Landname
 

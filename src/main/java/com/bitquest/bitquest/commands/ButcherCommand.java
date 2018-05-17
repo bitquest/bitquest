@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-
 public class ButcherCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         Chunk c = player.getLocation().getChunk();

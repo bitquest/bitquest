@@ -19,9 +19,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 
-/**
- * Created by explodi on 11/6/15.
- */
 public class User {
     public Wallet wallet;
     private String clan;

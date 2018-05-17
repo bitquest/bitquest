@@ -32,9 +32,6 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by cristian on 11/27/15.
- */
 public class InventoryEvents implements Listener {
     BitQuest bitQuest;
     ArrayList < Trade > trades;

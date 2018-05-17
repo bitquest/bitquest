@@ -18,9 +18,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.UUID;
 
-/**
- * Created by cristian on 12/17/15.
- */
 public class SignEvents implements Listener {
     BitQuest bitQuest;
     public SignEvents(BitQuest plugin) {

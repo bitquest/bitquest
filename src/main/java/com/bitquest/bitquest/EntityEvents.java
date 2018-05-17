@@ -49,14 +49,10 @@ import org.json.simple.parser.JSONParser;
 
 import javax.net.ssl.HttpsURLConnection;
 
-/**
- * Created by explodi on 11/7/15.
- */
 public class EntityEvents implements Listener {
     BitQuest bitQuest;
     StringBuilder rawwelcome = new StringBuilder();
     String PROBLEM_MESSAGE = "Can't join right now. Come back later";
-
 
     private static final List < Material > PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR,
         Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,

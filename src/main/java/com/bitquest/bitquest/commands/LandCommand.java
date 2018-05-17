@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
 
-
 public class LandCommand extends CommandAction {
     private BitQuest bitQuest;
 

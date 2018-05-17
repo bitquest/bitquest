@@ -17,10 +17,6 @@ import org.bukkit.event.block.*;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
-/**
- * Created by explodi on 11/1/15.
- * Edited by Xeyler on 11/2/15
- */
 public class BlockEvents implements Listener {
 
     BitQuest bitQuest;

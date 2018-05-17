@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.text.ParseException;
 
-
 public class SendCommand extends CommandAction {
     private BitQuest bitQuest;
 
