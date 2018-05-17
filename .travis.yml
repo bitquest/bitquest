@@ -4,6 +4,15 @@ jdk:
 os:
   linux
 
+env:
+matrix:
+  include:
+    - script:
+      mvn checkstyle:check -B
+  allow_failure:
+    - script:
+      mvn checkstyle:check -B
+
 cache:
   directories:
     $HOME/.m2/
