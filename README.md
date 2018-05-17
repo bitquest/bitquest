@@ -3,7 +3,7 @@
 [BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements. This repository is the open source code running on the server.
 
 # Play BitQuest
-To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address: 
+To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address:
 ```sh
 play.bitquest.co
 ```
@@ -41,7 +41,7 @@ The BitQuest server has it's own address, used for giving Loot to players
 
 ## About the back-end technology
 
-All persistent data is saved in a redis database so the server can respond as quick as possible. 
+All persistent data is saved in a redis database so the server can respond as quick as possible.
 
 Everybody is welcome to contribute. :D
 
@@ -59,19 +59,12 @@ You must install Java JRE and JDK
 sudo apt install default-jre default-jdk
 ```
 
-## 2. Setup Workspace
-There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
+## 2. Compile BitQuest and generate a JAR file
+There is a maven project that will download the spigot 1.12.2 (downloading the latest version will be automated in future):
 
-````
-./gradlew setupWorkspace
-````
-
-## 3. Compile BitQuest and generate a JAR file
-After the workspace is set up, we can compile using the shadowJar task that will create a file under build/libs. This should be dropped on the plugins folder of your Spigot server, but you can automate the process for testing using Docker (instructions below)
-
-````
-./gradlew shadowJar
-````
+```
+maven compile -B
+```
 # Requirements for running
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
@@ -80,11 +73,11 @@ A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or 
 
 Running locally via Docker is the fastest way to develop and test code. [Docker](http://docker.com) and [Docker Compose](https://docs.docker.com/compose/) can be used for testing the compiled plugin on spigot.
 
-1. Build BitQuest using the instructions above (./gradlew shadowJar).
+1. Build BitQuest using the instructions above (maven compile).
 2. Install [Docker](https://docs.docker.com/engine/installation/), and [Docker Compose](https://docs.docker.com/compose/install/) if you haven't yet.
 3. Create a docker-compose.yml file with your configuration. A good idea is to create a volume on spigot's 'plugins' pointing to the local directory where .jar files are compiled. Or you can use the following example:
 
-````
+```
 spigot:
   container_name: bitquest
   environment:
