@@ -250,7 +250,7 @@ public class BitQuest extends JavaPlugin {
 
             while ((inputLine = in.readLine()) != null) {
                 response.append(inputLine);
-            } in .close();
+            } in.close();
             System.out.println(response.toString());
             return (JSONObject) parser.parse(response.toString());
         } catch (IOException e) {
@@ -799,9 +799,9 @@ public class BitQuest extends JavaPlugin {
                 String inputLine;
                 StringBuffer response = new StringBuffer();
 
-                while ((inputLine = in .readLine()) != null) {
+                while ((inputLine = in.readLine()) != null) {
                     response.append(inputLine);
-                } in .close();
+                } in.close();
                 System.out.println(response.toString());
                 return true;
             } catch (IOException e) {

@@ -51,7 +51,7 @@ public class BlockEvents implements Listener {
         // If block is bedrock, cancel the event
         Block b = event.getBlock();
         Material m = b.getType();
-        if (m.equals(Material.BEDROCK) || m.equals(Material.END_BRICKS) || m.equals(Material.ENDER_STONE || m.equals(Material.COMMAND) || m.equals(Material.COMMAND_CHAIN) || m.equals(Material.COMMAND_REPEATING))) {
+        if (m.equals(Material.BEDROCK) || m.equals(Material.END_BRICKS) || m.equals(Material.ENDER_STONE) || m.equals(Material.COMMAND) || m.equals(Material.COMMAND_CHAIN) || m.equals(Material.COMMAND_REPEATING)) {
             event.setCancelled(true);
             // If player is in a no-build zone, cancel the event
         } else if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
