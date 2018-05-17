@@ -1,12 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-os: linux
-
-# blocklist
-branches:
-  except:
-    - botDiscord
 
 install:
   - ./gradlew setupWorkspace
