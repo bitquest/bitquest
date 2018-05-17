@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#Setting pwd to our path
+DIR=$0
+if [[ $DIR != /* ]] ; then
+  cd $(pwd)/$(dirname $0)
+fi
+
 # First step check if user have google format downloaded
 if [ -e google-java-format-1.5-all-deps.jar ] ; then
   echo "google java format all ready downloaded"

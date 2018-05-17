@@ -1,5 +1,6 @@
 #!/bin/bash
 
+#Setting pwd to our path
 DIR=$0
 if [[ $DIR != /* ]] ; then
   cd $(pwd)/$(dirname $0)
