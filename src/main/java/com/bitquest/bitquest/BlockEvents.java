@@ -49,7 +49,7 @@ public class BlockEvents implements Listener {
     @EventHandler
     void onBlockBreak(BlockBreakEvent event) {
         // If block is bedrock, cancel the event
-        Block b = event.getBlock()
+        Block b = event.getBlock();
         Material m = b.getType();
         if (m.equals(Material.BEDROCK) || m.equals(Material.END_BRICKS) || m.equals(Material.ENDER_STONE || m.equals(Material.COMMAND) || m.equals(Material.COMMAND_CHAIN) || m.equals(Material.COMMAND_REPEATING))) {
             event.setCancelled(true);
@@ -65,7 +65,7 @@ public class BlockEvents implements Listener {
     void onBlockPlace(BlockPlaceEvent event) {
         // set clan
         // first, we check if the player has permission to build
-        Block b = event.getBlock()
+        Block b = event.getBlock();
         Material m = b.getType();
         if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
             event.setCancelled(true);
