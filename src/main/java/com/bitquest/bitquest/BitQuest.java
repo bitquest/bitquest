@@ -835,4 +835,3 @@ public class  BitQuest extends JavaPlugin {
         rate_limit=false;
     }
 }
-

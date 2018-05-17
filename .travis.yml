@@ -8,11 +8,8 @@ cache:
   directories:
     $HOME/.m2/
 
-install:
-  - ./gradlew setupWorkspace
-
 script:
-  - ./gradlew shadowJar
+  mvn package -B
 
 addons:
   apt:
