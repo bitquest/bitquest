@@ -311,8 +311,8 @@ public class  BitQuest extends JavaPlugin {
             scheduler.scheduleSyncDelayedTask(this, new Runnable() {
 
                 public void run() {
-                    player.teleport(spawn); //Must be fixed
-                    player.removeMetadata("teleporting", plugin); //Must be fixed
+                    player.teleport(spawn);
+                    player.removeMetadata("teleporting", plugin);
                 }
             }, 60L);
         }
