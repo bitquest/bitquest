@@ -27,3 +27,7 @@ common.cab
 out
 build
 tmp
+
+# discordBot
+src/discordBot/nohup.out
+src/discordBot/key.txt
