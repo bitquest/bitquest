@@ -160,6 +160,7 @@ public class EntityEvents implements Listener {
 
             player.sendMessage(ChatColor.BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
             player.sendMessage("");
+            BitQuest.REDIS.zincrby("player:login",1,player.getUniqueId().toString());
 
 
             if(bitQuest.messageBuilder != null) {

@@ -514,7 +514,7 @@ public class  BitQuest extends JavaPlugin {
                                 try {
                                     if (balance >= LAND_PRICE) {
                                         if (user.wallet.move("land", LAND_PRICE)) {
-
+                                            BitQuest.REDIS.zincrby("player:tx",LAND_PRICE,player.getUniqueId().toString());
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "owner", player.getUniqueId().toString());
                                             BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
                                             land_owner_cache=new HashMap();
