@@ -20,8 +20,9 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
-RUN cd /bitquest/ && ./gradlew shadowJar
+RUN apt-get install -y gradle
+RUN export SHELL=/bin/bash && cd /bitquest/ && gradle setupWorkspace
+RUN cd /bitquest/ && gradle shadowJar
 RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
