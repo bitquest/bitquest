@@ -5,6 +5,9 @@ os: linux
 
 env:
 
+git:
+  depth: 1
+
 matrix:
   fast_finish: true
   include:
