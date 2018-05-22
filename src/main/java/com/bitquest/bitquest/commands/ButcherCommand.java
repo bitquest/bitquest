@@ -11,23 +11,22 @@ import org.bukkit.entity.Player;
 
 import java.util.List;
 
-
 public class ButcherCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        Chunk c=player.getLocation().getChunk();
-        for(World w: Bukkit.getWorlds()) {
-            List<Entity> entities = w.getEntities();
-            int killed=0;
-            for ( Entity entity : entities){
-                if(entity instanceof Player) {
+        Chunk c = player.getLocation().getChunk();
+        for (World w: Bukkit.getWorlds()) {
+            List < Entity > entities = w.getEntities();
+            int killed = 0;
+            for (Entity entity: entities) {
+                if (entity instanceof Player) {
 
-                } else if (entity.getLocation().getChunk().getX()==c.getX()&&entity.getLocation().getChunk().getZ()==c.getZ()) {
-                    killed=killed+1;
+                } else if (entity.getLocation().getChunk().getX() == c.getX() && entity.getLocation().getChunk().getZ() == c.getZ()) {
+                    killed = killed + 1;
                     entity.remove();
-                    System.out.println("[butcher] removed "+entity.getName());
+                    System.out.println("[butcher] removed " + entity.getName());
                 }
             }
-            player.sendMessage(ChatColor.GREEN+"Killed "+killed+" entities");
+            player.sendMessage(ChatColor.GREEN + "Killed " + killed + " entities");
 
         }
         return false;

@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class ReportCommand extends CommandAction {
     private BitQuest bitQuest;
 
@@ -31,21 +30,18 @@ public class ReportCommand extends CommandAction {
                     SlackChannel channel = bitQuest.slackBotSession.findChannelByName(BitQuest.SLACK_BOT_REPORTS_CHANNEL);
                     if (channel != null) {
                         bitQuest.slackBotSession.sendMessage(channel, slackMessage);
-                        String playerMessage = ChatColor.GREEN + "The report has been send to a moderator. Thanks for making " +
-                                ChatColor.GOLD + ChatColor.BOLD +"Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" +
-                                ChatColor.RESET + ChatColor.GREEN + " a better place.";
-                        player.sendMessage(playerMessage);
+                        player.sendMessage(ChatColor.GREEN + "The report has been send to a moderator. Thanks for making " + ChatColor.GOLD + ChatColor.BOLD + "Bit" + ChatColor.GRAY + ChatColor.BOLD + "Quest" + ChatColor.RESET + ChatColor.GREEN + " a better place.");
                         return true;
                     } else {
                         player.sendMessage(ChatColor.RED + "There was a problem sending the report. Please try again later.");
                         return true;
                     }
                 } else {
-                    player.sendMessage(ChatColor.RED + "Player " + badPlayer + " does not play on this server.");
+                    player.sendMessage(ChatColor.DARK_RED + "Player " + ChatColor.BLUE + badPlayer + ChatColor.DARK_RED + " does not play on this server.");
                     return true;
                 }
             } else {
-                player.sendMessage(ChatColor.RED + "Usage: /report <player> <reason>");
+                player.sendMessage(ChatColor.DARK_RED + "Usage: /report <player> <reason>");
                 return true;
             }
         } else {

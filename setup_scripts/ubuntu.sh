@@ -3,16 +3,16 @@
 # make sure we're running from the scripts directory
 if [ $(echo `pwd` | grep setup_scripts | wc -l) -ne 0 ]; then
 
-	echo 'Installing gradle and redis if necessary'
-	sudo apt-get install -y gradle redis-server
+	echo 'Installing maven and redis if necessary'
+	sudo apt-get install -y maven redis-server
 
-	echo 'Running gradle'
+	echo 'Running maven'
 	cd ..
 	bitquest_dir=`pwd`
-	./gradlew shadowJar
+	mvn package -B
 
-	spigot_file='spigot-1.8.8-R0.1-SNAPSHOT.jar'
-	
+	spigot_file='spigot-1.12.2-R0.1-SNAPSHOT.jar'
+
 	echo 'Downloading $spigot_file'
 
 	# place spigot alongside bitquest
@@ -36,12 +36,12 @@ if [ $(echo `pwd` | grep setup_scripts | wc -l) -ne 0 ]; then
 
 	echo 'First time setup is complete'
 
-	echo 'Starting spigot and redis to finish file population and check the environment'	
+	echo 'Starting spigot and redis to finish file population and check the environment'
 	java -jar $spigot_file &
 	cd ../bitquest
 	redis-server &
 
-	echo "Done. Don't forget to kill spigot and redis when you are finished."
+	echo "Done. Don't forget to kill spigot (code 3 on *nix to quit) and redis when you are finished."
 	cd setup_scripts
 
 else

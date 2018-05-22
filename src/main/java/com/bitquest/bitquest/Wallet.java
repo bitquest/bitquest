@@ -3,7 +3,6 @@ package com.bitquest.bitquest;
 import com.google.gson.JsonObject;
 import org.apache.commons.codec.binary.Base64;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_12_R1.Overridden;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -22,9 +21,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.UUID;
 
-/**
- * Created by cristian on 12/15/15.
- */
 public class Wallet {
     public int balance;
     public int unconfirmedBalance;
@@ -49,7 +45,7 @@ public class Wallet {
     }
 
     public Wallet(BitQuest plugin, String account_id) {
-        this.account_id=account_id;
+        this.account_id = account_id;
         this.bitQuest = plugin;
         getAccountAddress(new GetAccountAddressCallback() {
             @Override
@@ -77,8 +73,8 @@ public class Wallet {
                     JSONArray params = new JSONArray();
                     params.add(account_id);
                     params.add(confirmations);
-                    if(bitQuest.BITQUEST_ENV=="development")
-                        System.out.println("[getbalance] "+account_id+" "+confirmations);
+                    if (bitQuest.BITQUEST_ENV == "development")
+                        System.out.println("[getbalance] " + account_id + " " + confirmations);
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -102,14 +98,13 @@ public class Wallet {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
 
-                    while ((inputLine = in.readLine()) != null) {
+                    while ((inputLine = in .readLine()) != null) {
                         response.append(inputLine);
-                    }
-                    in.close();
+                    } in .close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    Double d = Double.parseDouble(response_object.get("result").toString().trim())*100000000L;
+                    Double d = Double.parseDouble(response_object.get("result").toString().trim()) * 100000000L;
 
-                    if(bitQuest.BITQUEST_ENV=="development")
+                    if (bitQuest.BITQUEST_ENV == "development")
                         System.out.println(response_object);
                     final Long balance = d.longValue();
                     Bukkit.getScheduler().runTask(bitQuest, new Runnable() {
@@ -142,8 +137,8 @@ public class Wallet {
                     jsonObject.put("method", "getaccountaddress");
                     JSONArray params = new JSONArray();
                     params.add(account_id);
-                    if(bitQuest.BITQUEST_ENV=="development")
-                        System.out.println("[getaccountaddress] "+account_id);
+                    if (bitQuest.BITQUEST_ENV == "development")
+                        System.out.println("[getaccountaddress] " + account_id);
                     jsonObject.put("params", params);
                     URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -166,12 +161,11 @@ public class Wallet {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
 
-                    while ((inputLine = in.readLine()) != null) {
+                    while ((inputLine = in .readLine()) != null) {
                         response.append(inputLine);
-                    }
-                    in.close();
+                    } in .close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    if(bitQuest.BITQUEST_ENV=="development")
+                    if (bitQuest.BITQUEST_ENV == "development")
                         System.out.println(response_object);
                     callback.run(response_object.get("result").toString());
                 } catch (Exception e) {
@@ -182,7 +176,7 @@ public class Wallet {
         });
     }
 
-    void addWitnessAddress(String address,final AddWitnessAddressCallback callback) {
+    void addWitnessAddress(String address, final AddWitnessAddressCallback callback) {
         Bukkit.getScheduler().runTaskAsynchronously(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -218,12 +212,11 @@ public class Wallet {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
 
-                    while ((inputLine = in.readLine()) != null) {
+                    while ((inputLine = in .readLine()) != null) {
                         response.append(inputLine);
-                    }
-                    in.close();
+                    } in .close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    if(bitQuest.BITQUEST_ENV=="development")
+                    if (bitQuest.BITQUEST_ENV == "development")
                         System.out.println(response_object);
                     callback.run(response_object.get("result").toString());
                 } catch (Exception e) {
@@ -234,7 +227,7 @@ public class Wallet {
         });
     }
 
-    void setAccount(String address,final SetAccountCallback callback) {
+    void setAccount(String address, final SetAccountCallback callback) {
         Bukkit.getScheduler().runTaskAsynchronously(bitQuest, new Runnable() {
             @Override
             public void run() {
@@ -270,12 +263,11 @@ public class Wallet {
                     String inputLine;
                     StringBuffer response = new StringBuffer();
 
-                    while ((inputLine = in.readLine()) != null) {
+                    while ((inputLine = in .readLine()) != null) {
                         response.append(inputLine);
-                    }
-                    in.close();
+                    } in .close();
                     JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    if(bitQuest.BITQUEST_ENV=="development")
+                    if (bitQuest.BITQUEST_ENV == "development")
                         System.out.println(response_object);
                     callback.run(true);
                 } catch (Exception e) {
@@ -286,23 +278,23 @@ public class Wallet {
         });
     }
 
-    public boolean move(String to,Long sat) throws IOException, ParseException {
+    public boolean move(String to, Long sat) throws IOException, ParseException {
 
-        if(sat>=100&&sat<=Long.MAX_VALUE) {
+        if (sat >= 100 && sat <= Long.MAX_VALUE) {
             JSONParser parser = new JSONParser();
 
-            final JSONObject jsonObject=new JSONObject();
-            jsonObject.put("jsonrpc","1.0");
-            jsonObject.put("id","bitquest");
-            jsonObject.put("method","move");
-            JSONArray params=new JSONArray();
+            final JSONObject jsonObject = new JSONObject();
+            jsonObject.put("jsonrpc", "1.0");
+            jsonObject.put("id", "bitquest");
+            jsonObject.put("method", "move");
+            JSONArray params = new JSONArray();
             params.add(this.account_id);
             params.add(to);
-            Double double_sat=new Double(sat);
+            Double double_sat = new Double(sat);
 
-            params.add(double_sat/100000000L);
-            jsonObject.put("params",params);
-            URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+            params.add(double_sat / 100000000L);
+            jsonObject.put("params", params);
+            URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
             String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
@@ -323,39 +315,38 @@ public class Wallet {
             String inputLine;
             StringBuffer response = new StringBuffer();
 
-            while ((inputLine = in.readLine()) != null) {
+            while ((inputLine = in .readLine()) != null) {
                 response.append(inputLine);
-            }
-            in.close();
-            JSONObject response_object= (JSONObject) parser.parse(response.toString());
-            if(bitQuest.BITQUEST_ENV=="development")
+            } in .close();
+            JSONObject response_object = (JSONObject) parser.parse(response.toString());
+            if (bitQuest.BITQUEST_ENV == "development")
                 System.out.println(response_object);
-            return (boolean)response_object.get("result");
+            return (boolean) response_object.get("result");
         } else {
-            System.out.println("[move] "+this.account_id+"-> "+sat+" --> "+to+": FAIL (must be between 100 & "+Long.MAX_VALUE+")");
+            System.out.println("[move] " + this.account_id + "-> " + sat + " --> " + to + ": FAIL (must be between 100 & " + Long.MAX_VALUE + ")");
             return false;
         }
     }
 
-    public String sendFrom(String address,Long sat) throws IOException, ParseException {
+    public String sendFrom(String address, Long sat) throws IOException, ParseException {
         JSONParser parser = new JSONParser();
 
-        final JSONObject jsonObject=new JSONObject();
-        jsonObject.put("jsonrpc","1.0");
-        jsonObject.put("id","bitquest");
-        jsonObject.put("method","sendfrom");
-        JSONArray params=new JSONArray();
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("jsonrpc", "1.0");
+        jsonObject.put("id", "bitquest");
+        jsonObject.put("method", "sendfrom");
+        JSONArray params = new JSONArray();
         params.add(this.account_id);
         params.add(address);
         System.out.println(sat);
-        Double double_sat=new Double(sat);
+        Double double_sat = new Double(sat);
         System.out.println(double_sat);
 
-        params.add(double_sat/100000000L);
+        params.add(double_sat / 100000000L);
         System.out.println(params);
-        jsonObject.put("params",params);
+        jsonObject.put("params", params);
         System.out.println("Checking blockchain info...");
-        URL url = new URL("http://"+BitQuest.BITCOIN_NODE_HOST+":"+BitQuest.BITCOIN_NODE_PORT);
+        URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
         System.out.println(url.toString());
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
@@ -377,24 +368,24 @@ public class Wallet {
         String inputLine;
         StringBuffer response = new StringBuffer();
 
-        while ((inputLine = in.readLine()) != null) {
+        while ((inputLine = in .readLine()) != null) {
             response.append(inputLine);
-        }
-        in.close();
+        } in .close();
         System.out.println(response.toString());
-        JSONObject response_object= (JSONObject) parser.parse(response.toString());
+        JSONObject response_object = (JSONObject) parser.parse(response.toString());
         System.out.println(response_object);
-        return (String)response_object.get("result");
+        return (String) response_object.get("result");
     }
 
 
     public String url() {
-        if(address.substring(0,1).equals("N")||address.substring(0,1).equals("n")) {
+        if (address.substring(0, 1).equals("N") || address.substring(0, 1).equals("n")) {
             return "live.blockcypher.com/btc-testnet/address/" + address;
-        } if(address.substring(0,1).equals("D")) {
-            return "live.blockcypher.com/doge/address/"+address;
+        }
+        if (address.substring(0, 1).equals("D")) {
+            return "live.blockcypher.com/doge/address/" + address;
         } else {
-            return "live.blockcypher.com/btc/address/"+address;
+            return "live.blockcypher.com/btc/address/" + address;
         }
     }
 }
