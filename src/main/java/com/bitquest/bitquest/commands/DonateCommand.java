@@ -12,7 +12,6 @@ import org.bukkit.entity.Player;
 import java.io.IOException;
 import java.text.ParseException;
 
-
 public class DonateCommand extends CommandAction {
     private BitQuest bitQuest;
 
@@ -21,11 +20,11 @@ public class DonateCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-        if(args.length == 1) {
+        if (args.length == 1) {
             try {
-                final Long bits=Long.parseLong(args[0]);
-                final Long sat=bits*bitQuest.DENOMINATION_FACTOR;
-                final User user=new User(bitQuest, player);
+                final Long bits = Long.parseLong(args[0]);
+                final Long sat = bits * bitQuest.DENOMINATION_FACTOR;
+                final User user = new User(bitQuest, player);
                 user.wallet.getBalance(0, new Wallet.GetBalanceCallback() {
                     @Override
                     public void run(Long balance) {
@@ -38,7 +37,7 @@ public class DonateCommand extends CommandAction {
                                     player.sendMessage(ChatColor.RED + "Donation failed");
                                 }
                             } else {
-                                player.sendMessage(ChatColor.RED + "Not enough balance to donate " + bits);
+                                player.sendMessage(ChatColor.DARK_RED + "Not enough balance to donate " + ChatColor.LIGHT_PURPLE + "" + bits + " " + BitQuest.DENOMINATION_NAME);
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -59,7 +58,7 @@ public class DonateCommand extends CommandAction {
             }
 
         } else {
-            player.sendMessage(ChatColor.RED + "Usage: /donate <amount>");
+            player.sendMessage(ChatColor.DARK_RED + "Usage: /donate <amount>");
             return true;
         }
     }

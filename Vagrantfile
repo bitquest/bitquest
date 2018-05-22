@@ -6,5 +6,5 @@ Vagrant.configure("2") do |config|
     v.memory = 1024
     v.cpus = 2
   end
-  config.vm.synced_folder "build/libs/", "/minecraft/plugins/"
+  config.vm.synced_folder "target/", "/minecraft/plugins/"
 end

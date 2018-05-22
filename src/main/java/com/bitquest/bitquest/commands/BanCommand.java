@@ -7,10 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class BanCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        if (args.length==1) {
+        if (args.length == 1) {
             String playerName = args[0];
             if (BitQuest.REDIS.exists("uuid:" + playerName)) {
                 String uuid = BitQuest.REDIS.get("uuid:" + playerName);

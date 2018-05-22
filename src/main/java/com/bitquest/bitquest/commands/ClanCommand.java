@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class ClanCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if (args.length > 0) {
@@ -73,7 +72,7 @@ public class ClanCommand extends CommandAction {
                                     if (Bukkit.getPlayerExact(invitedName) != null) {
                                         Player invitedplayer = Bukkit.getPlayerExact(invitedName);
                                         invitedplayer.sendMessage(ChatColor.GREEN + player.getName() + " invited you to the " + clan + " clan");
-                                        invitedplayer.sendMessage(ChatColor.GREEN + player.getName() + " to join, enter: /clan join " + clan );
+                                        invitedplayer.sendMessage(ChatColor.GREEN + player.getName() + " to join, enter: /clan join " + clan);
                                     }
                                     return true;
                                 } else {

@@ -18,28 +18,28 @@ public class WalletCommand extends CommandAction {
     }
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        if(bitQuest.rate_limit==false) {
-            bitQuest.rate_limit=true;
+        if (bitQuest.rate_limit == false) {
+            bitQuest.rate_limit = true;
             try {
-                User user=new User(bitQuest, player);
+                User user = new User(bitQuest, player);
                 bitQuest.sendWalletInfo(user);
                 bitQuest.updateScoreboard(player);
             } catch (ParseException e) {
                 e.printStackTrace();
-                player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
+                player.sendMessage(ChatColor.RED + "There was a problem reading your wallet.");
             } catch (org.json.simple.parser.ParseException e) {
                 e.printStackTrace();
-                player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
+                player.sendMessage(ChatColor.RED + "There was a problem reading your wallet.");
 
             } catch (IOException e) {
                 e.printStackTrace();
-                player.sendMessage(ChatColor.RED+"There was a problem reading your wallet.");
+                player.sendMessage(ChatColor.RED + "There was a problem reading your wallet.");
 
             }
 
             return true;
         } else {
-            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+            player.sendMessage(ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
             return true;
 
         }
