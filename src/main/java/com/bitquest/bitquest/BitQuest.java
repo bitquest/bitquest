@@ -30,6 +30,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
+import java.util.Base64;
 
 // Color Table :
 // GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name,
@@ -267,7 +268,7 @@ public class BitQuest extends JavaPlugin {
       System.out.println(url.toString());
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       String userPassword = BITCOIN_NODE_USERNAME + ":" + BITCOIN_NODE_PASSWORD;
-      String encoding = new sun.misc.BASE64Encoder().encode(userPassword.getBytes());
+      String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
       con.setRequestProperty("Authorization", "Basic " + encoding);
 
       con.setRequestMethod("POST");
