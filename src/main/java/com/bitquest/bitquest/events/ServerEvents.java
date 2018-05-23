@@ -1,6 +1,6 @@
 package com.bitquest.bitquest.events;
 
-import com.bitquest.bitquest;
+import com.bitquest.bitquest.BitQuest;
 import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
