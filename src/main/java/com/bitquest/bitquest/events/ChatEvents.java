@@ -1,5 +1,6 @@
 package com.bitquest.bitquest.events;
 
+import com.bitquest.bitquest;
 import java.util.HashSet;
 import java.util.Set;
 import org.bukkit.ChatColor;
