@@ -23,5 +23,5 @@ rem   fi
 rem fi
 
 format.bat
-mvn package -B
+mvn package -B -T 1C
 exit /b 0
