@@ -72,7 +72,7 @@ commands:
     usage: "/donate <amount>"
   fixabandonland:
     description: "Fixes chunks with no owners that still have permissions"
-    usage: "/fixabandonland"
+    usage: "/fixabandonland [true|yes]"
   migrateclans:
     description: "Migrate clans to keep track of members"
     usage: "/migrateclans"
