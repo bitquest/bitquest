@@ -2,7 +2,9 @@
 
 #Exit code :
 # 0 work
+# 1x google java format download error
 # 10 fail google java format download
+# 2x formating error
 # 20 fail src/.../bitquest/ format
 # 21 fail src/.../bitquest/commands/ format
 # 22 fail src/.../bitquest/events/ format
