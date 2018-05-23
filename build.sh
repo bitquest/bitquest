@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#Exit code :
+# 0 work
+# 1x fail building
+# 10 fail formating
+# 11 fail building
+# 2x fail clean
+# 20 fail removing google java format
+# 21 fail mvn clean
+
 #Setting pwd to our path
 DIR=$0
 if [[ $DIR != /* ]] ; then
@@ -11,11 +20,11 @@ if [ $# == 1 ] ; then
   if [ $1 == "clean" ] ; then
     rm -f google-java-format-1.5-all-deps.jar*
     if [ $? != 0 ] ; then
-      exit 30
+      exit 20
     fi
-    mvn clean -B
+    mvn clean -B -T 1C
     if [ $? != 0 ] ; then
-      exit 31
+      exit 21
     fi
     exit 0
   fi
