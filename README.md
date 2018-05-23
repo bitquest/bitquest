@@ -63,7 +63,13 @@ sudo apt install -y openjdk-8-jre openjdk-8-jdk maven
 There is a maven project that will download the spigot 1.12.2 (downloading the latest version will be automated in future):
 
 ```sh
-maven compile -B
+maven package -B
+```
+
+Or using all of your cpu core (fastest)
+(If you have low ram your build can crash)
+```sh
+maven package -B -T 1C
 ```
 
 ## 3.1 Compile BitQuest and generate a JAR file (FOR DEV)

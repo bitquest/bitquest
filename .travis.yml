@@ -1,23 +1,28 @@
 language: java
 jdk:
   - oraclejdk8
+
+dist: trusty
 os: linux
 
 env:
 
+git:
+  depth: 1
+
 matrix:
   fast_finish: true
   include:
-    - script: mvn checkstyle:check -B
+    - script: mvn checkstyle:check -B -T 1C
   allow_failures:
-    - script: mvn checkstyle:check -B
+    - script: mvn checkstyle:check -B -T 1C
 
 
 cache:
   directories:
     $HOME/.m2/
 
-script: mvn package -B
+script: mvn package -B -T 1C
 
 addons:
   apt:

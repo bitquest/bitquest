@@ -1,5 +1,7 @@
-package com.bitquest.bitquest;
+package com.bitquest.bitquest.events;
 
+import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.Wallet;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
 import java.io.IOException;
@@ -681,8 +683,12 @@ public class EntityEvents implements Listener {
     // Gives random SWORD
     if (!(entity instanceof Skeleton)) {
       Material sword_material = null;
-      if (BitQuest.rand(0, 16) < level) sword_material = Material.IRON_AXE;
+      if (BitQuest.rand(0, 4) < level) sword_material = Material.WOOD_AXE;
+      if (BitQuest.rand(0, 6) < level) sword_material = Material.GOLD_AXE;
+      if (BitQuest.rand(0, 8) < level) sword_material = Material.IRON_AXE;
+      if (BitQuest.rand(0, 16) < level) sword_material = Material.DIAMOND_AXE;
       if (BitQuest.rand(0, 32) < level) sword_material = Material.WOOD_SWORD;
+      if (BitQuest.rand(0, 56) < level) sword_material = Material.GOLD_SWORD;
       if (BitQuest.rand(0, 64) < level) sword_material = Material.IRON_SWORD;
       if (BitQuest.rand(0, 128) < level) sword_material = Material.DIAMOND_SWORD;
       if (sword_material != null) {
@@ -758,12 +764,12 @@ public class EntityEvents implements Listener {
     ItemMeta meta = item.getItemMeta();
     Enchantment enchantment = null;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.ARROW_FIRE;
-    if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DAMAGE_ALL;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.ARROW_DAMAGE;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.ARROW_INFINITE;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.ARROW_KNOCKBACK;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DAMAGE_ARTHROPODS;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DAMAGE_UNDEAD;
+    if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DAMAGE_ALL;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DIG_SPEED;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DURABILITY;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.FIRE_ASPECT;
@@ -781,6 +787,7 @@ public class EntityEvents implements Listener {
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.SILK_TOUCH;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.THORNS;
     if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.WATER_WORKER;
+    if (BitQuest.rand(0, 128) < level) enchantment = Enchantment.DEPTH_STRIDER;
 
     if (enchantment != null) {
       meta.addEnchant(

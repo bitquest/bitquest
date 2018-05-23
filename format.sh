@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#Exit code :
+# 0 work
+# 1x google java format download error
+# 10 fail google java format download
+# 2x formating error
+# 20 fail src/.../bitquest/ format
+# 21 fail src/.../bitquest/commands/ format
+# 22 fail src/.../bitquest/events/ format
+
 #Setting pwd to our path
 DIR=$0
 if [[ $DIR != /* ]] ; then
@@ -22,6 +31,10 @@ if [ $? != 0 ] ; then
 fi
 java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/commands/*
 if [ $? != 0 ] ; then
-  exit 30
+  exit 21
+fi
+java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/events/*
+if [ $? != 0 ] ; then
+  exit 22
 fi
 exit 0
