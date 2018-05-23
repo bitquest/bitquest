@@ -54,11 +54,16 @@ Here are the instructions to modify, install and run the server as localhost.
 
 You must install Java JRE, JDK and Maven
 
+### 1.1 Linux
+
 ```sh
 sudo apt install -y openjdk-8-jre openjdk-8-jdk maven
 ```
 
-On windows, follow the instructions [here](https://tecadmin.net/install-apache-maven-on-windows/) to correctly install maven.
+### 1.2 Windows
+
+1. [Install JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+2. [Install Maven and set paths](https://tecadmin.net/install-apache-maven-on-windows/)
 
 ## 2. Compile BitQuest and generate a JAR file
 There is a maven project that will download the spigot 1.12.2 (downloading the latest version will be automated in future):
