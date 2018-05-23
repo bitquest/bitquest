@@ -7,7 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-//this is an old command proposed by AltQuest, I re add it here.
+// this is an old command proposed by AltQuest, I re add it here.
 
 // created by @BitcoinJake09 5/14/18 THIS IS TESTED!!!! and seems to be correct!! i added an extra
 // feature also, you can now just run /fixabandonland to see list of land with owners and
