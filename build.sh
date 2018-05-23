@@ -27,7 +27,7 @@ if [ $? != 0 ] ; then
   exit 10
 fi
 #Code build
-mvn package -B
+mvn package -B -T 1C
 if [ $? != 0 ] ; then
   exit 11
 fi
