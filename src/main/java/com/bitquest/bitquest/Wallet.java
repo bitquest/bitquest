@@ -7,6 +7,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import java.util.Base64;
 
 public class Wallet {
   public int balance;
@@ -76,7 +77,7 @@ public class Wallet {
                   con.setConnectTimeout(5000);
                   String userPassword =
                       BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-                  String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+                  String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
                   con.setRequestProperty("Authorization", "Basic " + encoding);
 
                   con.setRequestMethod("POST");
@@ -155,7 +156,7 @@ public class Wallet {
                   HttpURLConnection con = (HttpURLConnection) url.openConnection();
                   String userPassword =
                       BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-                  String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+                  String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
                   con.setRequestProperty("Authorization", "Basic " + encoding);
                   con.setConnectTimeout(5000);
                   con.setRequestMethod("POST");
@@ -217,7 +218,7 @@ public class Wallet {
                   HttpURLConnection con = (HttpURLConnection) url.openConnection();
                   String userPassword =
                       BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-                  String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+                  String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
                   con.setRequestProperty("Authorization", "Basic " + encoding);
                   con.setConnectTimeout(5000);
                   con.setRequestMethod("POST");
@@ -279,7 +280,7 @@ public class Wallet {
                   HttpURLConnection con = (HttpURLConnection) url.openConnection();
                   String userPassword =
                       BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-                  String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+                  String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
                   con.setRequestProperty("Authorization", "Basic " + encoding);
                   con.setConnectTimeout(5000);
                   con.setRequestMethod("POST");
@@ -333,7 +334,7 @@ public class Wallet {
       URL url = new URL("http://" + BitQuest.BITCOIN_NODE_HOST + ":" + BitQuest.BITCOIN_NODE_PORT);
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-      String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+      String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
       con.setRequestProperty("Authorization", "Basic " + encoding);
       con.setConnectTimeout(5000);
       con.setRequestMethod("POST");
@@ -395,7 +396,7 @@ public class Wallet {
     System.out.println(url.toString());
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     String userPassword = BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-    String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
+    String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
     con.setRequestProperty("Authorization", "Basic " + encoding);
 
     con.setRequestMethod("POST");
