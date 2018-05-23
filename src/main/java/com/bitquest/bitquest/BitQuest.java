@@ -266,7 +266,7 @@ public class BitQuest extends JavaPlugin {
       System.out.println(url.toString());
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       String userPassword = BITCOIN_NODE_USERNAME + ":" + BITCOIN_NODE_PASSWORD;
-      String encoding = Base64.getEncoder().encode(userPassword.getBytes());
+      String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
       con.setRequestProperty("Authorization", "Basic " + encoding);
 
       con.setRequestMethod("POST");
