@@ -17,3 +17,4 @@ if exist google-java-format-1.5-all-deps.jar (
 java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/*
 java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/commands/*
 java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/events/*
+exit /b 0
