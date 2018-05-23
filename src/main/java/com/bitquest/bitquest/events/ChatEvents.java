@@ -1,4 +1,4 @@
-package com.bitquest.bitquest;
+package com.bitquest.bitquest.events;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.bitquest.bitquest;
+package com.bitquest.bitquest.events;
 
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
