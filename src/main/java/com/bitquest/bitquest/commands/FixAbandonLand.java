@@ -23,7 +23,7 @@ public class FixAbandonLand extends CommandAction {
     for (String tempOwnerList : ownerList) {
       XYs[XYsSize] = tempOwnerList.substring(0, tempOwnerList.length() - 5);
       sender.sendMessage(
-          ChatColor.RED
+          ChatColor.DARK_RED
               + BitQuest.REDIS.get(XYs[XYsSize] + "name")
               + " is owned by: "
               + (BitQuest.REDIS.get(tempOwnerList)));
