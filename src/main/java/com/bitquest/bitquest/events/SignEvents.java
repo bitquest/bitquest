@@ -1,5 +1,6 @@
 package com.bitquest.bitquest.events;
 
+import com.bitquest.bitquest;
 import java.io.IOException;
 import java.text.ParseException;
 import org.bukkit.ChatColor;

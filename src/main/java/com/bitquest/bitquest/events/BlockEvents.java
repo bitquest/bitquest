@@ -1,5 +1,6 @@
 package com.bitquest.bitquest.events;
 
+import com.bitquest.bitquest;
 import java.util.List;
 import org.bukkit.*;
 import org.bukkit.block.Block;
