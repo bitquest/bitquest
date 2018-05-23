@@ -66,6 +66,12 @@ There is a maven project that will download the spigot 1.12.2 (downloading the l
 maven package -B
 ```
 
+Or using all of your cpu core (fastest)
+(If you have low ram your build can crash)
+```sh
+maven package -B -T 1C
+```
+
 ## 3.1 Compile BitQuest and generate a JAR file (FOR DEV)
 You can easly compile the code by doing (the script will format the code using ./format.sh and) (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
 
