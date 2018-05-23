@@ -51,13 +51,14 @@ Here are the instructions to modify, install and run the server as localhost.
 # Building the BitQuest Java Plugin
 
 ## 1. Install Requirements
-Windows: The Windows Subsystem for Linux enables the bash shell which will be used to download the Spigot API. After [installing WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) you can follow the Linux instructions below.
 
 You must install Java JRE, JDK and Maven
 
 ```sh
 sudo apt install -y openjdk-8-jre openjdk-8-jdk maven
 ```
+
+On windows, follow the instructions [here](https://tecadmin.net/install-apache-maven-on-windows/) to correctly install maven.
 
 ## 2. Compile BitQuest and generate a JAR file
 There is a maven project that will download the spigot 1.12.2 (downloading the latest version will be automated in future):
@@ -72,14 +73,7 @@ Or using all of your cpu core (fastest)
 maven package -B -T 1C
 ```
 
-## 3.1 Compile BitQuest and generate a JAR file (FOR DEV)
-You can easly compile the code by doing (the script will format the code using ./format.sh and) (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
-
-```sh
-./build.sh
-```
-
-### 3.2 format the code to google java style (FOR DEV)
+## 3. format the code to google java style
 You can easly format the code by doing (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
 
 ```sh
@@ -90,39 +84,17 @@ You can easly format the code by doing (you can exec this script from anywhere (
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
 
-# Running a local BitQuest test server with docker (OUTADED)
+# Running a BitQuest server with Docker
 
-Running locally via Docker is the fastest way to develop and test code. [Docker](http://docker.com) and [Docker Compose](https://docs.docker.com/compose/) can be used for testing the compiled plugin on spigot.
+Tou can use Docker to run a BitQuest server. There's also an [official BitQuest docker image](https://hub.docker.com/r/bitquest/bitquest/). The recommended way to configure the image is using a docker-compose.yml file that can link to a directory where the worlds are stored. An example is included here. Configuration can be done via enviroment variables:
 
-1. Build BitQuest using the instructions above (maven compile).
-2. Install [Docker](https://docs.docker.com/engine/installation/), and [Docker Compose](https://docs.docker.com/compose/install/) if you haven't yet.
-3. Create a docker-compose.yml file with your configuration. A good idea is to create a volume on spigot's 'plugins' pointing to the local directory where .jar files are compiled. Or you can use the following example:
+| environment variable   | description                                          |
+|------------------------|------------------------------------------------------|
+| BITQUEST_NODE_USERNAME | username for Bitcoin node                            |
+| BITCOIN_NODE_PASSWORD  | password for Bitcoin node                            |
+| BITQUEST_NODE_HOST     | IP to a bitcoin node with JSON-RPC interface enabled |
+| ADMIN_UUID             | Minecraft user ID for the main administrator         |
 
-```yalm
-spigot:
-  container_name: bitquest
-  environment:
-    - BITQUEST_ENV=development
-    - BITCOIN_NODE_HOST=127.0.0.1 # or the IP of your Bitcoin Core node
-    - BITCOIN_NODE_USERNAME=alice # the username for the RPC-JSON interface
-    - BITCOIN_NODE_PASSWORD=secret # the password for RPC-JSON
-  build: .
-  volumes:
-    - "./build/libs/:/spigot/plugins"
-    - ".:/bitquest"
-  ports:
-    - "25565:25565"
-  links:
-    - redis
-redis:
-  image: redis
-````
-
-4. Use docker-compose to spawn a test server
-
-```sh
-docker-compose up
-```
 # Troubleshooting
 ## I'm getting a JedisConnectionException error when starting
 Please make sure you have redis installed. If you are running via docker please make sure you have a redis container linked to the bitquest container.

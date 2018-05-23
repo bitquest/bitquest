@@ -1,0 +1,2 @@
+jar:
+   maven package -B
