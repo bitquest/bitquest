@@ -1,4 +1,4 @@
-package com.bitquest.bitquest;
+package com.bitquest.bitquest.events;
 
 import java.util.List;
 import org.bukkit.*;

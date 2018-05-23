@@ -1,4 +1,4 @@
-package com.bitquest.bitquest;
+package com.bitquest.bitquest.events;
 
 import java.io.IOException;
 import java.text.ParseException;
