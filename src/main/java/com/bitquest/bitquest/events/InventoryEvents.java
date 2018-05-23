@@ -1,8 +1,6 @@
 package com.bitquest.bitquest.events;
 
-import com.bitquest.bitquest.BitQuest;
-import com.bitquest.bitquest.Trade;
-import com.bitquest.bitquest.User;
+import com.bitquest.bitquest.*;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
 import java.io.IOException;
