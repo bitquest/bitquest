@@ -65,6 +65,7 @@ public class BitQuest extends JavaPlugin {
       System.getenv("BITCOIN_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT"))
           : 18332;
+  public final static String SERVERDISPLAY_NAME = System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
   public static final Long DENOMINATION_FACTOR =
       System.getenv("DENOMINATION_FACTOR") != null
           ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
@@ -320,13 +321,9 @@ public class BitQuest extends JavaPlugin {
 
             walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-            walletScoreboardObjective.setDisplayName(
-                ChatColor.GOLD
-                    + ChatColor.BOLD.toString()
-                    + "Bit"
-                    + ChatColor.GRAY
-                    + ChatColor.BOLD.toString()
-                    + "Quest");
+            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+
 
             Score score =
                 walletScoreboardObjective.getScore(
