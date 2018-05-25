@@ -1,17 +1,17 @@
 class:
-   maven compile -B -T 1C
+	maven compile -B -T 1C
 jar:
-   maven package -B -T 1C
+	maven package -B -T 1C
 
 format:
-   ./format.sh
+	./format.sh
 
 clean:
-   ./maven clean -B -T 1C
+	./maven clean -B -T 1C
 full-clean:
-   ./format_and_build.sh clean
+	./format_and_build.sh clean
 
 all: jar
 
 format-build:
-   make format && make jar
+	make format && make jar
