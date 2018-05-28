@@ -371,6 +371,8 @@ public class EntityEvents implements Listener {
                   ChatColor.RED + "You must sleep in a bed before using the ender eye teleport");
             }
           }
+        } else {
+          player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, false));
         }
         event.setCancelled(true);
       }
