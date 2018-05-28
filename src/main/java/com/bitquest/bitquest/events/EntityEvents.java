@@ -375,6 +375,7 @@ public class EntityEvents implements Listener {
           }
         } else {
           player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, false));
+          player.sendMessage(ChatColor.DARK_RED + "You cancelled your teleport.");
         }
         event.setCancelled(true);
       }
