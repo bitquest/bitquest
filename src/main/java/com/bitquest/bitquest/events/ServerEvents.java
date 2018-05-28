@@ -16,6 +16,15 @@ public class ServerEvents implements Listener {
   @EventHandler
   public void onServerListPing(ServerListPingEvent event) {
 
-    event.setMotd(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest"+ChatColor.RESET+" - The server that runs on "+BitQuest.DENOMINATION_NAME);
+    event.setMotd(
+        ChatColor.GOLD
+            + ChatColor.BOLD.toString()
+            + BitQuest.SERVERDISPLAY_NAME
+            + ChatColor.GRAY
+            + ChatColor.BOLD.toString()
+            + "Quest"
+            + ChatColor.RESET
+            + " - The server that runs on "
+            + BitQuest.DENOMINATION_NAME);
   }
 }

@@ -361,8 +361,10 @@ public class EntityEvents implements Listener {
                       new Runnable() {
 
                         public void run() {
-                          player.teleport(spawn);
-                          player.removeMetadata("teleporting", bitQuest);
+                          if (player.hasMetadata("teleporting")) {
+                            player.teleport(spawn);
+                            player.removeMetadata("teleporting", bitQuest);
+                          }
                         }
                       },
                       60L);
