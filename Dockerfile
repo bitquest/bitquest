@@ -20,7 +20,6 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-COPY build.sh /bitquest/
 RUN export SHELL=/bin/bash && cd /bitquest/ && mvn package -B
 RUN cp /bitquest/target/BitQuest-2.0.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
