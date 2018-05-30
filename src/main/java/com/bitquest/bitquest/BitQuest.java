@@ -780,7 +780,9 @@ public class BitQuest extends JavaPlugin {
   }
 
   public boolean isModerator(Player player) {
-    if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
+    if (BITQUEST_ENV.equals("development") == true) {
+      return true;
+    } else if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
       return true;
     } else if (ADMIN_UUID != null
         && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {

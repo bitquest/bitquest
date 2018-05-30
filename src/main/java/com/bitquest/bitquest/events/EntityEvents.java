@@ -237,8 +237,13 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerGameModeChange(PlayerGameModeChangeEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
-    event.setCancelled(true);
+    if(bitQuest.BITQUEST_ENV.equals("production")) {
+      event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
+      event.setCancelled(true);
+    } else {
+      event.setCancelled(false);
+    }
+
   }
 
   @EventHandler
