@@ -21,7 +21,7 @@ COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
 RUN export SHELL=/bin/bash && cd /bitquest/ && mvn package -B
-RUN cp /bitquest/target/BitQuest-2.0.jar /spigot/plugins/
+RUN cp /bitquest/target/BitQuest-2.0-jar-with-dependencies.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
 
