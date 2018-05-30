@@ -30,3 +30,4 @@ tmp
 
 # format.sh
 google-java-format-1.5-all-deps.jar*
+.vscode/settings.json
