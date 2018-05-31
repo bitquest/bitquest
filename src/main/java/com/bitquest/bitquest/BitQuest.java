@@ -336,34 +336,53 @@ public class BitQuest extends JavaPlugin {
   }
 
   public void teleportToSpawn(Player player) {
-    if (!player.hasMetadata("teleporting")) {
-      BitQuest bitQuest = this;
-      // TODO: open the tps inventory
-      player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
-      player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-      World world = Bukkit.getWorld("world");
+    BitQuest bitQuest = this;
+    // TODO: open the tps inventory
+    player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
+    player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
+    World world = Bukkit.getWorld("world");
 
-      final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
+    final Location spawn = world.getSpawnLocation();
 
-      Chunk c = spawn.getChunk();
-      if (!c.isLoaded()) {
-        c.load();
-      }
-      bitQuest
-          .getServer()
-          .getScheduler()
-          .scheduleSyncDelayedTask(
-              bitQuest,
-              new Runnable() {
-
-                public void run() {
-                  player.teleport(spawn);
-                  player.removeMetadata("teleporting", bitQuest);
-                }
-              },
-              60L);
+    Chunk c = spawn.getChunk();
+    if (!c.isLoaded()) {
+      c.load();
     }
+    bitQuest
+        .getServer()
+        .getScheduler()
+        .scheduleSyncDelayedTask(
+            bitQuest,
+            new Runnable() {
+
+              public void run() {
+                player.teleport(spawn);
+                boolean cat_is_found=false;
+                for (World w : Bukkit.getWorlds()) {
+                  List<Entity> entities = w.getEntities();
+                  for (Entity entity : entities) {
+                    if(entity instanceof Ocelot) {
+                      if(entity.getCustomName()!=null&&entity.getCustomName().equals("cookie")) {
+                        entity.teleport(spawn);
+                        
+                        cat_is_found=true;
+                      }
+                    }
+                  }
+                }
+                if(cat_is_found==false) {
+                  final Ocelot ocelot = (Ocelot)world.spawnEntity(spawn, EntityType.OCELOT);
+                  ocelot.setCustomName("cookie");
+                  ocelot.setCustomNameVisible(true);
+                }
+
+
+                player.removeMetadata("teleporting", bitQuest);
+              }
+            },
+            60L);
   }
+
 
   public void createScheduledTimers() {
     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
