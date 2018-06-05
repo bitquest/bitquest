@@ -271,7 +271,6 @@ public class EntityEvents implements Listener {
           if(entity instanceof Ocelot) {
             if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
               entity.teleport(event.getPlayer().getLocation());
-              ((Ocelot) entity).setTarget(event.getPlayer());
             }
           }
         }
