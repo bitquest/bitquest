@@ -350,6 +350,8 @@ public class BitQuest extends JavaPlugin {
                     try {
                       if(user.wallet.move("pets",PET_PRICE)==true) {
                         REDIS.sadd("pet:names",pet_name);
+                        BitQuest.REDIS.zincrby(
+                                "player:tx", PET_PRICE, player.getUniqueId().toString());
                         long unixTime = System.currentTimeMillis() / 1000L;
                         REDIS.set("pet:"+player.getUniqueId()+":timestamp",Long.toString(unixTime));
                         player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
