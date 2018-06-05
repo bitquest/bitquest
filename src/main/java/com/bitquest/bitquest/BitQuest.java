@@ -239,6 +239,7 @@ public class BitQuest extends JavaPlugin {
     commands.put("donate", new DonateCommand(this));
     commands.put("profession", new ProfessionCommand(this));
     commands.put("spawn", new SpawnCommand(this));
+    commands.put("pet", new PetCommand(this));
     modCommands = new HashMap<String, CommandAction>();
     modCommands.put("butcher", new ButcherCommand());
     modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
@@ -334,36 +335,108 @@ public class BitQuest extends JavaPlugin {
           }
         });
   }
+  public void adoptPet(Player player, String pet_name) {
+    long PET_PRICE=30000L;
 
-  public void teleportToSpawn(Player player) {
-    if (!player.hasMetadata("teleporting")) {
-      BitQuest bitQuest = this;
-      // TODO: open the tps inventory
-      player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
-      player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-      World world = Bukkit.getWorld("world");
+    try {
+      final User user = new User(this, player);
 
-      final Location spawn = world.getHighestBlockAt(world.getSpawnLocation()).getLocation();
-
-      Chunk c = spawn.getChunk();
-      if (!c.isLoaded()) {
-        c.load();
-      }
-      bitQuest
-          .getServer()
-          .getScheduler()
-          .scheduleSyncDelayedTask(
-              bitQuest,
-              new Runnable() {
-
-                public void run() {
-                  player.teleport(spawn);
-                  player.removeMetadata("teleporting", bitQuest);
+      user.wallet.getBalance(
+              0,
+              new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(Long balance) {
+                  if(balance>=PET_PRICE) {
+                    try {
+                      if(user.wallet.move("pets",PET_PRICE)==true) {
+                        REDIS.sadd("pet:names",pet_name);
+                        long unixTime = System.currentTimeMillis() / 1000L;
+                        REDIS.set("pet:"+player.getUniqueId()+":timestamp",Long.toString(unixTime));
+                        player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
+                        REDIS.set("pet:"+player.getUniqueId(),pet_name);
+                        spawnPet(player);
+                      }
+                    } catch (IOException e) {
+                      e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                      e.printStackTrace();
+                    }
+                  } else {
+                    player.sendMessage(ChatColor.RED+"You need 300 bits to adopt a pet.");
+                  }
                 }
-              },
-              60L);
+              });
+
+
+
+
+
+    } catch (ParseException e) {
+      e.printStackTrace();
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
+  }
+  public void spawnPet(Player player) {
+    boolean cat_is_found=false;
+    String cat_name=REDIS.get("pet:"+player.getUniqueId());
+    for (World w : Bukkit.getWorlds()) {
+      List<Entity> entities = w.getEntities();
+      for (Entity entity : entities) {
+        if(entity instanceof Ocelot) {
+          if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+            entity.teleport(player.getLocation());
+
+            cat_is_found=true;
+          }
+        }
+      }
+    }
+    if(cat_is_found==false) {
+      final Ocelot ocelot = (Ocelot)player.getWorld().spawnEntity(player.getLocation(), EntityType.OCELOT);
+      ocelot.setCustomName(cat_name);
+      ocelot.setCustomNameVisible(true);
     }
   }
+  public void teleportToSpawn(Player player) {
+    BitQuest bitQuest = this;
+    // TODO: open the tps inventory
+    player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
+    player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
+    World world = Bukkit.getWorld("world");
+
+    final Location spawn = world.getSpawnLocation();
+
+    Chunk c = spawn.getChunk();
+    if (!c.isLoaded()) {
+      c.load();
+    }
+    bitQuest
+        .getServer()
+        .getScheduler()
+        .scheduleSyncDelayedTask(
+            bitQuest,
+            new Runnable() {
+
+              public void run() {
+                player.teleport(spawn);
+                if(REDIS.exists("pet:"+player.getUniqueId())==true) {
+                  spawnPet(player);
+
+                }
+
+
+
+                player.removeMetadata("teleporting", bitQuest);
+              }
+            },
+            60L);
+  }
+
 
   public void createScheduledTimers() {
     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
