@@ -264,6 +264,18 @@ public class EntityEvents implements Listener {
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
+      if(event.getPlayer().hasMetadata("pet")) {
+        String cat_name=bitQuest.REDIS.get("pet:"+event.getPlayer().getUniqueId());
+        List<Entity> entities = event.getPlayer().getWorld().getEntities();
+        for (Entity entity : entities) {
+          if(entity instanceof Ocelot) {
+            if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+              entity.teleport(event.getPlayer().getLocation());
+              ((Ocelot) entity).setTarget(event.getPlayer());
+            }
+          }
+        }
+      }
       if (!event.getFrom().getWorld().getName().endsWith("_nether")
           && !event.getFrom().getWorld().getName().endsWith("_end")) {
         // announce new area
@@ -294,6 +306,7 @@ public class EntityEvents implements Listener {
         }
 
         if (!name1.equals(name2)) {
+
           if (name2.equals("the wilderness")) {
             event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
           } else {

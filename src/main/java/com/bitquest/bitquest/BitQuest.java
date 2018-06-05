@@ -403,6 +403,7 @@ public class BitQuest extends JavaPlugin {
       ocelot.setCustomName(cat_name);
       ocelot.setCustomNameVisible(true);
     }
+    player.setMetadata("pet",new FixedMetadataValue(this,cat_name));
   }
   public void teleportToSpawn(Player player) {
     BitQuest bitQuest = this;
