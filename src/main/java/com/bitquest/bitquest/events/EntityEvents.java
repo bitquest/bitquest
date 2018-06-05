@@ -133,6 +133,9 @@ public class EntityEvents implements Listener {
       BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
       BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
+      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
+        bitQuest.spawnPet(player);
+      }
       if (bitQuest.isModerator(player)) {
         if (bitQuest.BITQUEST_ENV.equals("development") == true) {
           player.setOp(true);

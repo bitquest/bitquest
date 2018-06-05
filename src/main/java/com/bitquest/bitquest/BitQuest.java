@@ -239,6 +239,7 @@ public class BitQuest extends JavaPlugin {
     commands.put("donate", new DonateCommand(this));
     commands.put("profession", new ProfessionCommand(this));
     commands.put("spawn", new SpawnCommand(this));
+    commands.put("pet", new PetCommand(this));
     modCommands = new HashMap<String, CommandAction>();
     modCommands.put("butcher", new ButcherCommand());
     modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
@@ -334,7 +335,73 @@ public class BitQuest extends JavaPlugin {
           }
         });
   }
+  public void adoptPet(Player player, String pet_name) {
+    long PET_PRICE=30000L;
 
+    try {
+      final User user = new User(this, player);
+
+      user.wallet.getBalance(
+              0,
+              new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(Long balance) {
+                  if(balance>=PET_PRICE) {
+                    try {
+                      if(user.wallet.move("pets",PET_PRICE)==true) {
+                        REDIS.sadd("pet:names",pet_name);
+                        long unixTime = System.currentTimeMillis() / 1000L;
+                        REDIS.set("pet:"+player.getUniqueId()+":timestamp",Long.toString(unixTime));
+                        player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
+                        REDIS.set("pet:"+player.getUniqueId(),pet_name);
+                        spawnPet(player);
+                      }
+                    } catch (IOException e) {
+                      e.printStackTrace();
+                    } catch (org.json.simple.parser.ParseException e) {
+                      e.printStackTrace();
+                    }
+                  } else {
+                    player.sendMessage(ChatColor.RED+"You need 300 bits to adopt a pet.");
+                  }
+                }
+              });
+
+
+
+
+
+    } catch (ParseException e) {
+      e.printStackTrace();
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
+
+  }
+  public void spawnPet(Player player) {
+    boolean cat_is_found=false;
+    String cat_name=REDIS.get("pet:"+player.getUniqueId());
+    for (World w : Bukkit.getWorlds()) {
+      List<Entity> entities = w.getEntities();
+      for (Entity entity : entities) {
+        if(entity instanceof Ocelot) {
+          if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+            entity.teleport(player.getLocation());
+
+            cat_is_found=true;
+          }
+        }
+      }
+    }
+    if(cat_is_found==false) {
+      final Ocelot ocelot = (Ocelot)player.getWorld().spawnEntity(player.getLocation(), EntityType.OCELOT);
+      ocelot.setCustomName(cat_name);
+      ocelot.setCustomNameVisible(true);
+    }
+  }
   public void teleportToSpawn(Player player) {
     BitQuest bitQuest = this;
     // TODO: open the tps inventory
@@ -357,24 +424,11 @@ public class BitQuest extends JavaPlugin {
 
               public void run() {
                 player.teleport(spawn);
-                boolean cat_is_found=false;
-                for (World w : Bukkit.getWorlds()) {
-                  List<Entity> entities = w.getEntities();
-                  for (Entity entity : entities) {
-                    if(entity instanceof Ocelot) {
-                      if(entity.getCustomName()!=null&&entity.getCustomName().equals("cookie")) {
-                        entity.teleport(spawn);
-                        
-                        cat_is_found=true;
-                      }
-                    }
-                  }
+                if(REDIS.exists("pet:"+player.getUniqueId())==true) {
+                  spawnPet(player);
+
                 }
-                if(cat_is_found==false) {
-                  final Ocelot ocelot = (Ocelot)world.spawnEntity(spawn, EntityType.OCELOT);
-                  ocelot.setCustomName("cookie");
-                  ocelot.setCustomNameVisible(true);
-                }
+
 
 
                 player.removeMetadata("teleporting", bitQuest);
