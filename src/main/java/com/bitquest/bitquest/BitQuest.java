@@ -333,7 +333,7 @@ public class BitQuest extends JavaPlugin {
         });
   }
   public void adoptPet(Player player, String pet_name) {
-    long PET_PRICE=30000L;
+    long PET_PRICE=10000L;
 
     try {
       final User user = new User(this, player);
