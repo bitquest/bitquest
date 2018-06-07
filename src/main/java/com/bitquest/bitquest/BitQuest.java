@@ -163,94 +163,100 @@ public class BitQuest extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    log("BitQuest starting");
-
-    REDIS.set("STARTUP", "1");
-    REDIS.expire("STARTUP", 300);
-    if (ADMIN_UUID == null) {
-      log(
-          "Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
-    }
-    if (STATSD_HOST != null && STATSD_PORT != null) {
-      statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
-      System.out.println("StatsD support is on.");
-    }
-    // registers listener classes
-    getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
-    getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
-    getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
-    getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
-    getServer().getPluginManager().registerEvents(new SignEvents(this), this);
-    getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
-
-    // player does not lose inventory on death
-    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
-
-    // loads config file. If it doesn't exist, creates it.
-    getDataFolder().mkdir();
-    if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
-      saveDefaultConfig();
-    }
-
-    // loads world wallet
-    wallet = new Wallet(this, "bitquest_market");
     try {
-      getBlockChainInfo();
-    } catch (org.json.simple.parser.ParseException e) {
+      log("BitQuest starting");
+
+      REDIS.set("STARTUP", "1");
+      REDIS.expire("STARTUP", 300);
+      if (ADMIN_UUID == null) {
+        log(
+                "Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
+      }
+      if (STATSD_HOST != null && STATSD_PORT != null) {
+        statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
+        System.out.println("StatsD support is on.");
+      }
+      // registers listener classes
+      getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
+      getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
+      getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
+      getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+      getServer().getPluginManager().registerEvents(new SignEvents(this), this);
+      getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+
+      // player does not lose inventory on death
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
+
+      // loads config file. If it doesn't exist, creates it.
+      getDataFolder().mkdir();
+      if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
+        saveDefaultConfig();
+      }
+
+      // loads world wallet
+      wallet = new Wallet(this, "bitquest_market");
+      try {
+        getBlockChainInfo();
+      } catch (org.json.simple.parser.ParseException e) {
+        e.printStackTrace();
+        Bukkit.shutdown();
+      }
+      // sets the redis save intervals
+      REDIS.configSet("SAVE", "900 1 300 10 60 10000");
+
+      // initialize mixpanel (optional)
+      if (MIXPANEL_TOKEN != null) {
+        messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
+        System.out.println("Mixpanel support is on");
+      }
+      if (SLACK_BOT_AUTH_TOKEN != null) {
+        slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
+        try {
+          slackBotSession.connect();
+        } catch (IOException e) {
+          System.out.println("Slack bot connection failed with error: " + e.getMessage());
+        }
+      }
+      // Removes all entities on server restart. This is a workaround for when large numbers of
+      // entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this
+      // will be unnecesary.
+      //     removeAllEntities();
+      killAllVillagers();
+
+      // creates scheduled timers (update balances, etc)
+      createScheduledTimers();
+
+      commands = new HashMap<String, CommandAction>();
+      commands.put("wallet", new WalletCommand(this));
+      commands.put("land", new LandCommand(this));
+      commands.put("clan", new ClanCommand());
+      commands.put("transfer", new TransferCommand(this));
+      commands.put("report", new ReportCommand(this));
+      commands.put("send", new SendCommand(this));
+      commands.put("upgradewallet", new UpgradeWallet(this));
+      commands.put("donate", new DonateCommand(this));
+      commands.put("profession", new ProfessionCommand(this));
+      commands.put("spawn", new SpawnCommand(this));
+      commands.put("pet", new PetCommand(this));
+      modCommands = new HashMap<String, CommandAction>();
+      modCommands.put("butcher", new ButcherCommand());
+      modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
+      modCommands.put("crashTest", new CrashtestCommand(this));
+      modCommands.put("mod", new ModCommand());
+      modCommands.put("ban", new BanCommand());
+      modCommands.put("unban", new UnbanCommand());
+      modCommands.put("banlist", new BanlistCommand());
+      modCommands.put("spectate", new SpectateCommand(this));
+      modCommands.put("emergencystop", new EmergencystopCommand());
+      modCommands.put("fixabandonland", new FixAbandonLand());
+      // TODO: Remove this command after migrate.
+      modCommands.put("migrateclans", new MigrateClansCommand());
+      sendDiscordMessage("bitquest started");
+    } catch (Exception e) {
       e.printStackTrace();
       Bukkit.shutdown();
     }
-    // sets the redis save intervals
-    REDIS.configSet("SAVE", "900 1 300 10 60 10000");
 
-    // initialize mixpanel (optional)
-    if (MIXPANEL_TOKEN != null) {
-      messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
-      System.out.println("Mixpanel support is on");
-    }
-    if (SLACK_BOT_AUTH_TOKEN != null) {
-      slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
-      try {
-        slackBotSession.connect();
-      } catch (IOException e) {
-        System.out.println("Slack bot connection failed with error: " + e.getMessage());
-      }
-    }
-    // Removes all entities on server restart. This is a workaround for when large numbers of
-    // entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this
-    // will be unnecesary.
-    //     removeAllEntities();
-    killAllVillagers();
-
-    // creates scheduled timers (update balances, etc)
-    createScheduledTimers();
-
-    commands = new HashMap<String, CommandAction>();
-    commands.put("wallet", new WalletCommand(this));
-    commands.put("land", new LandCommand(this));
-    commands.put("clan", new ClanCommand());
-    commands.put("transfer", new TransferCommand(this));
-    commands.put("report", new ReportCommand(this));
-    commands.put("send", new SendCommand(this));
-    commands.put("upgradewallet", new UpgradeWallet(this));
-    commands.put("donate", new DonateCommand(this));
-    commands.put("profession", new ProfessionCommand(this));
-    commands.put("spawn", new SpawnCommand(this));
-    commands.put("pet", new PetCommand(this));
-    modCommands = new HashMap<String, CommandAction>();
-    modCommands.put("butcher", new ButcherCommand());
-    modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
-    modCommands.put("crashTest", new CrashtestCommand(this));
-    modCommands.put("mod", new ModCommand());
-    modCommands.put("ban", new BanCommand());
-    modCommands.put("unban", new UnbanCommand());
-    modCommands.put("banlist", new BanlistCommand());
-    modCommands.put("spectate", new SpectateCommand(this));
-    modCommands.put("emergencystop", new EmergencystopCommand());
-    modCommands.put("fixabandonland", new FixAbandonLand());
-    // TODO: Remove this command after migrate.
-    modCommands.put("migrateclans", new MigrateClansCommand());
-    sendDiscordMessage("bitquest started");
   }
   // @todo: make this just accept the endpoint name and (optional) parameters
   public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
