@@ -859,15 +859,15 @@ public class BitQuest extends JavaPlugin {
   }
 
   public boolean isModerator(Player player) {
-    if (BITQUEST_ENV.equals("development") == true) {
+    if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
       return true;
-    } else if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
+    } else if (ADMIN_UUID != null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
       return true;
-    } else if (ADMIN_UUID != null
-        && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+    } else if (ADMIN_UUID==null) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   public void sendWalletInfo(final User user) {
