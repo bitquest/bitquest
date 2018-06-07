@@ -88,7 +88,6 @@ public class BitQuest extends JavaPlugin {
   public static final String MINER_FEE_ADDRESS =
       System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
 
-  public static final boolean SEGWIT = System.getenv("SEGWIT") != null ? true : false;
 
   // Support for the bitcore full node and insight-api.
   public static final String BITCORE_HOST =
@@ -165,9 +164,7 @@ public class BitQuest extends JavaPlugin {
   @Override
   public void onEnable() {
     log("BitQuest starting");
-    if (SEGWIT) {
-      log("Segwit (experimental) is enabled");
-    }
+
     REDIS.set("STARTUP", "1");
     REDIS.expire("STARTUP", 300);
     if (ADMIN_UUID == null) {
@@ -874,123 +871,66 @@ public class BitQuest extends JavaPlugin {
           @Override
           public void run(final Long unconfirmedBalance) {
             user.wallet.getBalance(
-                5,
-                new Wallet.GetBalanceCallback() {
-                  @Override
-                  public void run(final Long balance) {
-                    user.wallet.getAccountAddress(
-                        new Wallet.GetAccountAddressCallback() {
-                          @Override
-                          public void run(String accountAddress) {
-                            if (SEGWIT) {
-                              user.wallet.addWitnessAddress(
-                                  accountAddress,
-                                  new Wallet.AddWitnessAddressCallback() {
-                                    @Override
-                                    public void run(String witnessAddress) {
-                                      user.wallet.setAccount(
-                                          witnessAddress,
-                                          new Wallet.SetAccountCallback() {
-                                            public void run(Boolean set_account_success) {
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Wallet address: "
-                                                      + ChatColor.BOLD
-                                                      + witnessAddress);
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Unconfirmed Balance: "
-                                                      + ChatColor.LIGHT_PURPLE
-                                                      + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                                      + " "
-                                                      + DENOMINATION_NAME);
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Confirmed Balance: "
-                                                      + ChatColor.LIGHT_PURPLE
-                                                      + (balance / DENOMINATION_FACTOR)
-                                                      + " "
-                                                      + DENOMINATION_NAME);
-                                              if (user.wallet.url() != null) {
-                                                user.player.sendMessage(
-                                                    ChatColor.DARK_BLUE
-                                                        + ""
-                                                        + ChatColor.UNDERLINE
-                                                        + user.wallet.url());
-                                              }
+                    0,
+                    new Wallet.GetBalanceCallback() {
+                              @Override
+                              public void run(final Long balance) {
+                                user.wallet.getAccountAddress(
+                                    new Wallet.GetAccountAddressCallback() {
+                                      @Override
+                                      public void run(String accountAddress) {
 
-                                              // This callback is called with runTask. I think this
-                                              // call it form the main thread.
-                                              // If I'm wrong this REDIS call can cause problems.
-                                              if (REDIS.exists(
-                                                  "hd:address:"
-                                                      + user.player.getUniqueId().toString())) {
-                                                String address =
-                                                    REDIS.get(
-                                                        "hd:address:"
-                                                            + user.player.getUniqueId().toString());
-                                                user.player.sendMessage(
-                                                    ChatColor.GREEN
-                                                        + "You have an old wallet: "
-                                                        + ChatColor.BOLD
-                                                        + address);
-                                              }
+                                          try {
+                                            user.player.sendMessage(
+                                                ChatColor.GREEN
+                                                    + "Wallet address: "
+                                                    + ChatColor.BOLD
+                                                    + accountAddress);
+                                            user.player.sendMessage(
+                                                ChatColor.GREEN
+                                                    + "Unconfirmed Balance: "
+                                                    + ChatColor.LIGHT_PURPLE
+                                                    + (unconfirmedBalance / DENOMINATION_FACTOR)
+                                                    + " "
+                                                    + DENOMINATION_NAME);
+                                            user.player.sendMessage(
+                                                ChatColor.GREEN
+                                                    + "Confirmed Balance: "
+                                                    + ChatColor.LIGHT_PURPLE
+                                                    + (balance / DENOMINATION_FACTOR)
+                                                    + " "
+                                                    + DENOMINATION_NAME);
+                                            if (user.wallet.url() != null) {
+                                              user.player.sendMessage(
+                                                  ChatColor.DARK_BLUE
+                                                      + ""
+                                                      + ChatColor.UNDERLINE
+                                                      + user.wallet.url());
                                             }
-                                          });
-                                    }
-                                  });
-                            } else {
-                              try {
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Wallet address: "
-                                        + ChatColor.BOLD
-                                        + accountAddress);
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Unconfirmed Balance: "
-                                        + ChatColor.LIGHT_PURPLE
-                                        + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                        + " "
-                                        + DENOMINATION_NAME);
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Confirmed Balance: "
-                                        + ChatColor.LIGHT_PURPLE
-                                        + (balance / DENOMINATION_FACTOR)
-                                        + " "
-                                        + DENOMINATION_NAME);
-                                if (user.wallet.url() != null) {
-                                  user.player.sendMessage(
-                                      ChatColor.DARK_BLUE
-                                          + ""
-                                          + ChatColor.UNDERLINE
-                                          + user.wallet.url());
-                                }
 
-                                // This callback is called with runTask. I think this call it form
-                                // the main thread.
-                                // If I'm wrong this REDIS call can cause problems.
-                                if (REDIS.exists(
-                                    "hd:address:" + user.player.getUniqueId().toString())) {
-                                  String address =
-                                      REDIS.get(
-                                          "hd:address:" + user.player.getUniqueId().toString());
-                                  user.player.sendMessage(
-                                      ChatColor.GREEN
-                                          + "You have an old wallet: "
-                                          + ChatColor.WHITE
-                                          + address);
-                                }
-                              } catch (Exception e) {
-                                System.out.println("Error on sending wallet info");
-                                e.printStackTrace();
+                                            // This callback is called with runTask. I think this call it form
+                                            // the main thread.
+                                            // If I'm wrong this REDIS call can cause problems.
+                                            if (REDIS.exists(
+                                                "hd:address:" + user.player.getUniqueId().toString())) {
+                                              String address =
+                                                  REDIS.get(
+                                                      "hd:address:" + user.player.getUniqueId().toString());
+                                              user.player.sendMessage(
+                                                  ChatColor.GREEN
+                                                      + "You have an old wallet: "
+                                                      + ChatColor.WHITE
+                                                      + address);
+                                            }
+                                          } catch (Exception e) {
+                                            System.out.println("Error on sending wallet info");
+                                            e.printStackTrace();
+                                          }
+                                        }
+
+                                    });
                               }
-                            }
-                          }
-                        });
-                  }
-                });
+                            });
           }
         });
   };
