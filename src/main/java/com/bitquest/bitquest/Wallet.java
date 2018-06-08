@@ -37,13 +37,16 @@ public class Wallet {
   public Wallet(BitQuest plugin, String account_id) {
     this.account_id = account_id;
     this.bitQuest = plugin;
-    getAccountAddress(
-        new GetAccountAddressCallback() {
-          @Override
-          public void run(String accountAddress) {
-            address = accountAddress;
-          }
-        });
+    if(this.bitQuest.BITCOIN_NODE_HOST!=null) {
+      getAccountAddress(
+              new GetAccountAddressCallback() {
+                @Override
+                public void run(String accountAddress) {
+                  address = accountAddress;
+                }
+              });
+    }
+
   }
 
   public void getBalance(int confirmations, final GetBalanceCallback callback) {

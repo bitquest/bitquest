@@ -160,6 +160,7 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
+  public static long PET_PRICE=10000L;
 
   @Override
   public void onEnable() {
@@ -308,110 +309,51 @@ public class BitQuest extends JavaPlugin {
   public void updateScoreboard(final Player player)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     final User user = new User(this, player);
+    if(BITCOIN_NODE_HOST!=null) {
+      user.wallet.getBalance(
+              0,
+              new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(Long balance) {
+                  ScoreboardManager scoreboardManager;
+                  Scoreboard walletScoreboard;
+                  Objective walletScoreboardObjective;
+                  scoreboardManager = Bukkit.getScoreboardManager();
+                  walletScoreboard = scoreboardManager.getNewScoreboard();
+                  walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
 
-    user.wallet.getBalance(
-        0,
-        new Wallet.GetBalanceCallback() {
-          @Override
-          public void run(Long balance) {
-            ScoreboardManager scoreboardManager;
-            Scoreboard walletScoreboard;
-            Objective walletScoreboardObjective;
-            scoreboardManager = Bukkit.getScoreboardManager();
-            walletScoreboard = scoreboardManager.getNewScoreboard();
-            walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
+                  walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-            walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+                  walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
 
 
 
-            Score score =
-                walletScoreboardObjective.getScore(
-                    ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
+                  Score score =
+                          walletScoreboardObjective.getScore(
+                                  ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
 
-            score.setScore((int) (balance / DENOMINATION_FACTOR));
-            player.setScoreboard(walletScoreboard);
-          }
-        });
+                  score.setScore((int) (balance / DENOMINATION_FACTOR));
+                  player.setScoreboard(walletScoreboard);
+                }
+              });
+    } else {
+      // TODO: See Emerald Balance???
+    }
   }
   public void createPet(User user, String pet_name) {
-
-    user.wallet.getBalance(
-            0,
-            new Wallet.GetBalanceCallback() {
-              @Override
-              public void run(final Long unconfirmedBalance) {
-                user.wallet.getBalance(
-                        0,
-                        new Wallet.GetBalanceCallback() {
-                          @Override
-                          public void run(final Long balance) {
-                            user.wallet.getAccountAddress(
-                                    new Wallet.GetAccountAddressCallback() {
-                                      @Override
-                                      public void run(String accountAddress) {
-
-                                        try {
-                                          user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                          + "Wallet address: "
-                                                          + ChatColor.BOLD
-                                                          + accountAddress);
-                                          user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                          + "Unconfirmed Balance: "
-                                                          + ChatColor.LIGHT_PURPLE
-                                                          + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                                          + " "
-                                                          + DENOMINATION_NAME);
-                                          user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                          + "Confirmed Balance: "
-                                                          + ChatColor.LIGHT_PURPLE
-                                                          + (balance / DENOMINATION_FACTOR)
-                                                          + " "
-                                                          + DENOMINATION_NAME);
-                                          if (user.wallet.url() != null) {
-                                            user.player.sendMessage(
-                                                    ChatColor.DARK_BLUE
-                                                            + ""
-                                                            + ChatColor.UNDERLINE
-                                                            + user.wallet.url());
-                                          }
-
-                                          // This callback is called with runTask. I think this call it form
-                                          // the main thread.
-                                          // If I'm wrong this REDIS call can cause problems.
-                                          if (REDIS.exists(
-                                                  "hd:address:" + user.player.getUniqueId().toString())) {
-                                            String address =
-                                                    REDIS.get(
-                                                            "hd:address:" + user.player.getUniqueId().toString());
-                                            user.player.sendMessage(
-                                                    ChatColor.GREEN
-                                                            + "You have an old wallet: "
-                                                            + ChatColor.WHITE
-                                                            + address);
-                                          }
-                                        } catch (Exception e) {
-                                          System.out.println("Error on sending wallet info");
-                                          e.printStackTrace();
-                                        }
-                                      }
-
-                                    });
-                          }
-                        });
-              }
-            });
+    REDIS.sadd("pet:names",pet_name);
+    BitQuest.REDIS.zincrby(
+            "player:tx", PET_PRICE, user.player.getUniqueId().toString());
+    long unixTime = System.currentTimeMillis() / 1000L;
+    REDIS.set("pet:"+user.player.getUniqueId()+":timestamp",Long.toString(unixTime));
+    user.player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
+    REDIS.set("pet:"+user.player.getUniqueId(),pet_name);
+    spawnPet(user.player);
   }
   public void adoptPet(Player player, String pet_name) {
     try {
       final User user = new User(this, player);
 
-      long PET_PRICE=10000L;
       if(BITCOIN_NODE_HOST!=null) {
 
 
@@ -435,12 +377,6 @@ public class BitQuest extends JavaPlugin {
                     }
                   }
                 });
-
-
-
-
-
-
       } else {
         if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
           createPet(user,pet_name);
@@ -449,13 +385,11 @@ public class BitQuest extends JavaPlugin {
 
         }
       }
+
     } catch (Exception e) {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED+"Adoption failed. Sorry.");
     }
-
-
-
 
   }
   public void spawnPet(Player player) {
