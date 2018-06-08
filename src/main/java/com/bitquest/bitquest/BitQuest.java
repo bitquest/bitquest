@@ -162,7 +162,7 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
-  public static long PET_PRICE=10000L;
+  public static long PET_PRICE=100*DENOMINATION_FACTOR;
 
   @Override
   public void onEnable() {
@@ -381,6 +381,9 @@ public class BitQuest extends JavaPlugin {
                 });
       } else {
         if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
+          player.getInventory().removeItem(new ItemStack[] {
+                  new ItemStack(Material.EMERALD, 100) });
+
           createPet(user,pet_name);
         } else {
           player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" emeralds to adopt a pet.");
