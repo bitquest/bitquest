@@ -875,62 +875,63 @@ public class BitQuest extends JavaPlugin {
   }
 
   public void sendWalletInfo(final User user) {
-    user.wallet.getBalance(
-        0,
-        new Wallet.GetBalanceCallback() {
-          @Override
-          public void run(final Long unconfirmedBalance) {
-            user.wallet.getBalance(
-                    0,
-                    new Wallet.GetBalanceCallback() {
-                              @Override
-                              public void run(final Long balance) {
-                                user.wallet.getAccountAddress(
-                                    new Wallet.GetAccountAddressCallback() {
-                                      @Override
-                                      public void run(String accountAddress) {
+    if(BITCOIN_NODE_HOST!=null) {
+      user.wallet.getBalance(
+              0,
+              new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(final Long unconfirmedBalance) {
+                  user.wallet.getBalance(
+                          0,
+                          new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(final Long balance) {
+                              user.wallet.getAccountAddress(
+                                      new Wallet.GetAccountAddressCallback() {
+                                        @Override
+                                        public void run(String accountAddress) {
 
                                           try {
                                             user.player.sendMessage(
-                                                ChatColor.GREEN
-                                                    + "Wallet address: "
-                                                    + ChatColor.BOLD
-                                                    + accountAddress);
+                                                    ChatColor.GREEN
+                                                            + "Wallet address: "
+                                                            + ChatColor.BOLD
+                                                            + accountAddress);
                                             user.player.sendMessage(
-                                                ChatColor.GREEN
-                                                    + "Unconfirmed Balance: "
-                                                    + ChatColor.LIGHT_PURPLE
-                                                    + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                                    + " "
-                                                    + DENOMINATION_NAME);
+                                                    ChatColor.GREEN
+                                                            + "Unconfirmed Balance: "
+                                                            + ChatColor.LIGHT_PURPLE
+                                                            + (unconfirmedBalance / DENOMINATION_FACTOR)
+                                                            + " "
+                                                            + DENOMINATION_NAME);
                                             user.player.sendMessage(
-                                                ChatColor.GREEN
-                                                    + "Confirmed Balance: "
-                                                    + ChatColor.LIGHT_PURPLE
-                                                    + (balance / DENOMINATION_FACTOR)
-                                                    + " "
-                                                    + DENOMINATION_NAME);
+                                                    ChatColor.GREEN
+                                                            + "Confirmed Balance: "
+                                                            + ChatColor.LIGHT_PURPLE
+                                                            + (balance / DENOMINATION_FACTOR)
+                                                            + " "
+                                                            + DENOMINATION_NAME);
                                             if (user.wallet.url() != null) {
                                               user.player.sendMessage(
-                                                  ChatColor.DARK_BLUE
-                                                      + ""
-                                                      + ChatColor.UNDERLINE
-                                                      + user.wallet.url());
+                                                      ChatColor.DARK_BLUE
+                                                              + ""
+                                                              + ChatColor.UNDERLINE
+                                                              + user.wallet.url());
                                             }
 
                                             // This callback is called with runTask. I think this call it form
                                             // the main thread.
                                             // If I'm wrong this REDIS call can cause problems.
                                             if (REDIS.exists(
-                                                "hd:address:" + user.player.getUniqueId().toString())) {
+                                                    "hd:address:" + user.player.getUniqueId().toString())) {
                                               String address =
-                                                  REDIS.get(
-                                                      "hd:address:" + user.player.getUniqueId().toString());
+                                                      REDIS.get(
+                                                              "hd:address:" + user.player.getUniqueId().toString());
                                               user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "You have an old wallet: "
-                                                      + ChatColor.WHITE
-                                                      + address);
+                                                      ChatColor.GREEN
+                                                              + "You have an old wallet: "
+                                                              + ChatColor.WHITE
+                                                              + address);
                                             }
                                           } catch (Exception e) {
                                             System.out.println("Error on sending wallet info");
@@ -938,11 +939,15 @@ public class BitQuest extends JavaPlugin {
                                           }
                                         }
 
-                                    });
-                              }
-                            });
-          }
-        });
+                                      });
+                            }
+                          });
+                }
+              });
+    } else {
+      user.player.sendMessage("You are using emeralds for currency");
+    }
+
   };
 
   public boolean landIsClaimed(Location location) {
