@@ -55,80 +55,75 @@ public class Wallet {
             new Runnable() {
               @Override
               public void run() {
-                if(bitQuest.BITCOIN_NODE_HOST!=null) {
-                  try {
-                    JSONParser parser = new JSONParser();
-                    final JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("jsonrpc", "1.0");
-                    jsonObject.put("id", "bitquest");
-                    jsonObject.put("method", "getbalance");
-                    JSONArray params = new JSONArray();
-                    params.add(account_id);
-                    params.add(confirmations);
-                    if (bitQuest.BITQUEST_ENV == "development")
-                      System.out.println("[getbalance] " + account_id + " " + confirmations);
-                    jsonObject.put("params", params);
-                    URL url =
-                            new URL(
-                                    "http://"
-                                            + BitQuest.BITCOIN_NODE_HOST
-                                            + ":"
-                                            + BitQuest.BITCOIN_NODE_PORT);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                    con.setConnectTimeout(5000);
-                    String userPassword =
-                            BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
-                    String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
-                    con.setRequestProperty("Authorization", "Basic " + encoding);
+                try {
+                  JSONParser parser = new JSONParser();
+                  final JSONObject jsonObject = new JSONObject();
+                  jsonObject.put("jsonrpc", "1.0");
+                  jsonObject.put("id", "bitquest");
+                  jsonObject.put("method", "getbalance");
+                  JSONArray params = new JSONArray();
+                  params.add(account_id);
+                  params.add(confirmations);
+                  if (bitQuest.BITQUEST_ENV == "development")
+                    System.out.println("[getbalance] " + account_id + " " + confirmations);
+                  jsonObject.put("params", params);
+                  URL url =
+                      new URL(
+                          "http://"
+                              + BitQuest.BITCOIN_NODE_HOST
+                              + ":"
+                              + BitQuest.BITCOIN_NODE_PORT);
+                  HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                  con.setConnectTimeout(5000);
+                  String userPassword =
+                      BitQuest.BITCOIN_NODE_USERNAME + ":" + BitQuest.BITCOIN_NODE_PASSWORD;
+                  String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
+                  con.setRequestProperty("Authorization", "Basic " + encoding);
 
-                    con.setRequestMethod("POST");
-                    con.setRequestProperty(
-                            "User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-                    con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-                    con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-                    con.setDoOutput(true);
-                    OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-                    out.write(jsonObject.toString());
-                    out.close();
+                  con.setRequestMethod("POST");
+                  con.setRequestProperty(
+                      "User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+                  con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+                  con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                  con.setDoOutput(true);
+                  OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+                  out.write(jsonObject.toString());
+                  out.close();
 
-                    int responseCode = con.getResponseCode();
+                  int responseCode = con.getResponseCode();
 
-                    BufferedReader in =
-                            new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    String inputLine;
-                    StringBuffer response = new StringBuffer();
+                  BufferedReader in =
+                      new BufferedReader(new InputStreamReader(con.getInputStream()));
+                  String inputLine;
+                  StringBuffer response = new StringBuffer();
 
-                    while ((inputLine = in.readLine()) != null) {
-                      response.append(inputLine);
-                    }
-                    in.close();
-                    JSONObject response_object = (JSONObject) parser.parse(response.toString());
-                    Double d =
-                            Double.parseDouble(response_object.get("result").toString().trim())
-                                    * 100000000L;
-
-                    if (bitQuest.BITQUEST_ENV == "development") System.out.println(response_object);
-                    final Long balance = d.longValue();
-                    Bukkit.getScheduler()
-                            .runTask(
-                                    bitQuest,
-                                    new Runnable() {
-                                      @Override
-                                      public void run() {
-                                        callback.run(balance);
-                                      }
-                                    });
-                  } catch (IOException e) {
-                    System.out.println("Error on getBalance");
-                    e.printStackTrace();
-                  } catch (ParseException e) {
-                    System.out.println("Error on getBalance");
-                    e.printStackTrace();
+                  while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
                   }
-                } else {
-                  callback.run(0L);
-                }
+                  in.close();
+                  JSONObject response_object = (JSONObject) parser.parse(response.toString());
+                  Double d =
+                      Double.parseDouble(response_object.get("result").toString().trim())
+                          * 100000000L;
 
+                  if (bitQuest.BITQUEST_ENV == "development") System.out.println(response_object);
+                  final Long balance = d.longValue();
+                  Bukkit.getScheduler()
+                      .runTask(
+                          bitQuest,
+                          new Runnable() {
+                            @Override
+                            public void run() {
+                              callback.run(balance);
+                            }
+                          });
+                } catch (IOException e) {
+                  System.out.println("Error on getBalance");
+                  e.printStackTrace();
+                } catch (ParseException e) {
+                  System.out.println("Error on getBalance");
+                  e.printStackTrace();
+                }
               }
             });
   }

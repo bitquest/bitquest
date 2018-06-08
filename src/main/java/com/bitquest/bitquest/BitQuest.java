@@ -336,51 +336,57 @@ public class BitQuest extends JavaPlugin {
           }
         });
   }
+  public void createPet(Player player, String pet_name) {
+
+  }
   public void adoptPet(Player player, String pet_name) {
     long PET_PRICE=10000L;
+    if(BITCOIN_NODE_HOST!=null) {
+      try {
 
-    try {
-      final User user = new User(this, player);
+        final User user = new User(this, player);
 
-      user.wallet.getBalance(
-              0,
-              new Wallet.GetBalanceCallback() {
-                @Override
-                public void run(Long balance) {
-                  if(balance>=PET_PRICE) {
-                    try {
-                      if(user.wallet.move("pets",PET_PRICE)==true) {
-                        REDIS.sadd("pet:names",pet_name);
-                        BitQuest.REDIS.zincrby(
-                                "player:tx", PET_PRICE, player.getUniqueId().toString());
-                        long unixTime = System.currentTimeMillis() / 1000L;
-                        REDIS.set("pet:"+player.getUniqueId()+":timestamp",Long.toString(unixTime));
-                        player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
-                        REDIS.set("pet:"+player.getUniqueId(),pet_name);
-                        spawnPet(player);
+        user.wallet.getBalance(
+                0,
+                new Wallet.GetBalanceCallback() {
+                  @Override
+                  public void run(Long balance) {
+                    if(balance>=PET_PRICE) {
+                      try {
+                        if(user.wallet.move("pets",PET_PRICE)==true) {
+                          createPet(player,pet_name);
+                        }
+                      } catch (IOException e) {
+                        e.printStackTrace();
+                      } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
                       }
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                      e.printStackTrace();
+                    } else {
+                      player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" "+DENOMINATION_NAME+" to adopt a pet.");
                     }
-                  } else {
-                    player.sendMessage(ChatColor.RED+"You need 300 bits to adopt a pet.");
                   }
-                }
-              });
+                });
 
 
 
 
 
-    } catch (ParseException e) {
-      e.printStackTrace();
-    } catch (org.json.simple.parser.ParseException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+      } catch (ParseException e) {
+        e.printStackTrace();
+      } catch (org.json.simple.parser.ParseException e) {
+        e.printStackTrace();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    } else {
+      if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
+        createPet(player,pet_name);
+      } else {
+        player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" emeralds to adopt a pet.");
+
+      }
     }
+
 
 
   }
