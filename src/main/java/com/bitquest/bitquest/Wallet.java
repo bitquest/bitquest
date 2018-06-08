@@ -443,4 +443,93 @@ public class Wallet {
       return "live.blockcypher.com/btc/address/" + address;
     }
   }
+  
+  	// the isPvP function by @bitcoinjake09
+public boolean isPvP(Location location) {
+		if ((landPermissionCode(location).equals("v")==true)||(landPermissionCode(location).equals("pv")==true))
+		//if(SET_PvP.equals("true"))
+    {return true;}// returns true. it is a pvp or public pvp and if SET_PvP is true
+
+               return false;//not pvp
+    }
+// end isPvP by @bitcoinjake09
+public static int countEmeralds(Player player) {
+
+        ItemStack[] items = player.getInventory().getContents();
+        int amount = 0;
+        for (int i=0; i<player.getInventory().getSize(); i++) {
+	ItemStack TempStack = items[i];	
+	if ((TempStack != null) && (TempStack.getType() != Material.AIR)){          
+	if (TempStack.getType().toString() == "EMERALD_BLOCK") {
+                amount += (TempStack.getAmount()*9);
+            }
+	else if (TempStack.getType().toString() == "EMERALD") {
+                amount += TempStack.getAmount();
+            }
+		}
+        }
+        return amount;
+    }//end count emerald in player inventory by @bitcoinjake09
+public boolean removeEmeralds(Player player,int amount){
+	 int EmCount = countEmeralds(player);
+	 int LessEmCount = countEmeralds(player)-amount;
+	 double TempAmount=(double)amount;
+	int EmsBack=0;
+	ItemStack[] items = player.getInventory().getContents();
+	if (countEmeralds(player)>=amount){	
+		while(TempAmount>0){		
+		for (int i=0; i<player.getInventory().getSize(); i++) {
+			ItemStack TempStack = items[i];	
+			
+			if ((TempStack != null) && (TempStack.getType() != Material.AIR)){          	
+			
+			if ((TempStack.getType().toString() == "EMERALD_BLOCK")&&(TempAmount>=9)) {
+		    player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));	
+        			TempAmount=TempAmount-9;
+				}
+			if ((TempStack.getType().toString() == "EMERALD_BLOCK")&&(TempAmount<9)) {
+		    player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));	
+				EmsBack=(9-(int)TempAmount);  //if 8, ems back = 1      		
+				TempAmount=TempAmount-TempAmount;
+				if (EmsBack>0) {player.getInventory().addItem(new ItemStack(Material.EMERALD, EmsBack));}
+				}
+			if ((TempStack.getType().toString() == "EMERALD")&&(TempAmount>=1)) {
+      		          player.getInventory().removeItem(new ItemStack(Material.EMERALD, 1));		
+        			TempAmount=TempAmount-1;
+				}
+			
+			}//end if != Material.AIR
+			
+		
+	}// end for loop
+	}//end while loop
+	}//end (EmCount>=amount)
+	EmCount = countEmeralds(player);
+	if ((EmCount==LessEmCount)||(TempAmount==0))
+	return true;	
+	return false;
+}//end of remove emeralds
+//start addemeralds to inventory
+public boolean addEmeralds(Player player,int amount){
+	int EmCount = countEmeralds(player);
+	 int moreEmCount = countEmeralds(player)+amount;
+	 double bits = (double)amount;
+	 double TempAmount=(double)amount;
+	int EmsBack=0;
+		while(TempAmount>=0){		
+			    	if (TempAmount>=9){		
+				TempAmount=TempAmount-9;
+				player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+				}
+				if (TempAmount<9){	
+				TempAmount=TempAmount-1;
+				player.getInventory().addItem(new ItemStack(Material.EMERALD, 1));
+				}
+			EmCount = countEmeralds(player);
+			if ((EmCount==moreEmCount))
+			return true;
+			}//end while loop
+	return false;
+}
+  
 }
