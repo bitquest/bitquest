@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -883,7 +884,13 @@ public class EntityEvents implements Listener {
       event.setCancelled(true);
     }
   }
-
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerRespawn(final PlayerRespawnEvent event)
+  {
+    if(bitQuest.REDIS.exists("pet:"+event.getPlayer().getUniqueId())) {
+      bitQuest.spawnPet(event.getPlayer());
+    }
+  }
   @EventHandler
   void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     Player p = event.getPlayer();
