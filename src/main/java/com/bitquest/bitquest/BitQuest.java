@@ -336,15 +336,84 @@ public class BitQuest extends JavaPlugin {
           }
         });
   }
-  public void createPet(Player player, String pet_name) {
+  public void createPet(User user, String pet_name) {
 
+    user.wallet.getBalance(
+            0,
+            new Wallet.GetBalanceCallback() {
+              @Override
+              public void run(final Long unconfirmedBalance) {
+                user.wallet.getBalance(
+                        0,
+                        new Wallet.GetBalanceCallback() {
+                          @Override
+                          public void run(final Long balance) {
+                            user.wallet.getAccountAddress(
+                                    new Wallet.GetAccountAddressCallback() {
+                                      @Override
+                                      public void run(String accountAddress) {
+
+                                        try {
+                                          user.player.sendMessage(
+                                                  ChatColor.GREEN
+                                                          + "Wallet address: "
+                                                          + ChatColor.BOLD
+                                                          + accountAddress);
+                                          user.player.sendMessage(
+                                                  ChatColor.GREEN
+                                                          + "Unconfirmed Balance: "
+                                                          + ChatColor.LIGHT_PURPLE
+                                                          + (unconfirmedBalance / DENOMINATION_FACTOR)
+                                                          + " "
+                                                          + DENOMINATION_NAME);
+                                          user.player.sendMessage(
+                                                  ChatColor.GREEN
+                                                          + "Confirmed Balance: "
+                                                          + ChatColor.LIGHT_PURPLE
+                                                          + (balance / DENOMINATION_FACTOR)
+                                                          + " "
+                                                          + DENOMINATION_NAME);
+                                          if (user.wallet.url() != null) {
+                                            user.player.sendMessage(
+                                                    ChatColor.DARK_BLUE
+                                                            + ""
+                                                            + ChatColor.UNDERLINE
+                                                            + user.wallet.url());
+                                          }
+
+                                          // This callback is called with runTask. I think this call it form
+                                          // the main thread.
+                                          // If I'm wrong this REDIS call can cause problems.
+                                          if (REDIS.exists(
+                                                  "hd:address:" + user.player.getUniqueId().toString())) {
+                                            String address =
+                                                    REDIS.get(
+                                                            "hd:address:" + user.player.getUniqueId().toString());
+                                            user.player.sendMessage(
+                                                    ChatColor.GREEN
+                                                            + "You have an old wallet: "
+                                                            + ChatColor.WHITE
+                                                            + address);
+                                          }
+                                        } catch (Exception e) {
+                                          System.out.println("Error on sending wallet info");
+                                          e.printStackTrace();
+                                        }
+                                      }
+
+                                    });
+                          }
+                        });
+              }
+            });
   }
   public void adoptPet(Player player, String pet_name) {
-    long PET_PRICE=10000L;
-    if(BITCOIN_NODE_HOST!=null) {
-      try {
+    try {
+      final User user = new User(this, player);
 
-        final User user = new User(this, player);
+      long PET_PRICE=10000L;
+      if(BITCOIN_NODE_HOST!=null) {
+
 
         user.wallet.getBalance(
                 0,
@@ -354,7 +423,7 @@ public class BitQuest extends JavaPlugin {
                     if(balance>=PET_PRICE) {
                       try {
                         if(user.wallet.move("pets",PET_PRICE)==true) {
-                          createPet(player,pet_name);
+                          createPet(user,pet_name);
                         }
                       } catch (IOException e) {
                         e.printStackTrace();
@@ -371,21 +440,20 @@ public class BitQuest extends JavaPlugin {
 
 
 
-      } catch (ParseException e) {
-        e.printStackTrace();
-      } catch (org.json.simple.parser.ParseException e) {
-        e.printStackTrace();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    } else {
-      if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
-        createPet(player,pet_name);
-      } else {
-        player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" emeralds to adopt a pet.");
 
+      } else {
+        if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
+          createPet(user,pet_name);
+        } else {
+          player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" emeralds to adopt a pet.");
+
+        }
       }
+    } catch (Exception e) {
+      e.printStackTrace();
+      player.sendMessage(ChatColor.RED+"Adoption failed. Sorry.");
     }
+
 
 
 
