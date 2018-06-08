@@ -60,7 +60,7 @@ public class BitQuest extends JavaPlugin {
           ? System.getenv("WORLD_PUBLIC_KEY")
           : "76e8a7eb479256c68f59f66c7b744891bc2f632ff3c7a3f69a5c4aeccda687e3";
   public static final String BITCOIN_NODE_HOST =
-      System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : "localhost";
+      System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : null;
   public static final int BITCOIN_NODE_PORT =
       System.getenv("BITCOIN_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT"))
@@ -195,12 +195,10 @@ public class BitQuest extends JavaPlugin {
 
       // loads world wallet
       wallet = new Wallet(this, "bitquest_market");
-      try {
+      if(BITCOIN_NODE_HOST!=null) {
         getBlockChainInfo();
-      } catch (org.json.simple.parser.ParseException e) {
-        e.printStackTrace();
-        Bukkit.shutdown();
       }
+
       // sets the redis save intervals
       REDIS.configSet("SAVE", "900 1 300 10 60 10000");
 
