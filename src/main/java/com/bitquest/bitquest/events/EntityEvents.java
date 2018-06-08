@@ -693,6 +693,20 @@ public class EntityEvents implements Listener {
           } else {
             event.setCancelled(true);
           }
+        } else if(event.getEntity() instanceof LivingEntity) {
+          // Player Vs Mob
+          if(player.hasMetadata("pet")==true) {
+            World w = player.getWorld();
+            List<Entity> entities = w.getEntities();
+            String cat_name=bitQuest.REDIS.get("pet:"+player.getUniqueId());
+            for (Entity entity : entities) {
+              if(entity instanceof Ocelot) {
+                if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+                  ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
+                }
+              }
+            }
+          }
         }
       }
     }

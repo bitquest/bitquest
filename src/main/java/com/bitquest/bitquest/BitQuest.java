@@ -24,6 +24,8 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
 import org.json.simple.JSONArray;
@@ -400,9 +402,14 @@ public class BitQuest extends JavaPlugin {
       for (Entity entity : entities) {
         if(entity instanceof Ocelot) {
           if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
-            entity.teleport(player.getLocation());
+            if(cat_is_found==false) {
+              entity.teleport(player.getLocation());
               ((Ocelot) entity).setOwner(player);
-            cat_is_found=true;
+              cat_is_found=true;
+            } else {
+              entity.remove();
+            }
+
           }
         }
       }
@@ -618,7 +625,7 @@ public class BitQuest extends JavaPlugin {
     // lower factor, experience is easier to get. you can increase to get the opposite effect
     int level = getLevel(rawxp);
     float progress = getExpProgress(rawxp);
-
+    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,1, true));
     player.setLevel(level);
     player.setExp(progress);
     setPlayerMaxHealth(player);
