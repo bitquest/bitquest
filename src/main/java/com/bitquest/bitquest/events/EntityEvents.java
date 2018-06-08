@@ -133,9 +133,7 @@ public class EntityEvents implements Listener {
       BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
       BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
-        bitQuest.spawnPet(player);
-      }
+
       if (bitQuest.isModerator(player)) {
         if (bitQuest.BITQUEST_ENV.equals("development") == true) {
           player.setOp(true);
@@ -181,7 +179,9 @@ public class EntityEvents implements Listener {
       player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
       player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
       player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
-
+      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
+        bitQuest.spawnPet(player);
+      }
       player.sendMessage(
           ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
       player.sendMessage("");
@@ -269,8 +269,9 @@ public class EntityEvents implements Listener {
         List<Entity> entities = event.getPlayer().getWorld().getEntities();
         for (Entity entity : entities) {
           if(entity instanceof Ocelot) {
-            if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+            if(entity.getLocation().distance(event.getPlayer().getLocation())<1000 && entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
               entity.teleport(event.getPlayer().getLocation());
+              ((Ocelot) entity).setOwner(event.getPlayer());
             }
           }
         }
