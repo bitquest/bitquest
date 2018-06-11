@@ -24,6 +24,8 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scoreboard.*;
 import org.json.simple.JSONArray;
@@ -60,7 +62,7 @@ public class BitQuest extends JavaPlugin {
           ? System.getenv("WORLD_PUBLIC_KEY")
           : "76e8a7eb479256c68f59f66c7b744891bc2f632ff3c7a3f69a5c4aeccda687e3";
   public static final String BITCOIN_NODE_HOST =
-      System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : "localhost";
+      System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : null;
   public static final int BITCOIN_NODE_PORT =
       System.getenv("BITCOIN_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT"))
@@ -88,7 +90,6 @@ public class BitQuest extends JavaPlugin {
   public static final String MINER_FEE_ADDRESS =
       System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
 
-  public static final boolean SEGWIT = System.getenv("SEGWIT") != null ? true : false;
 
   // Support for the bitcore full node and insight-api.
   public static final String BITCORE_HOST =
@@ -161,99 +162,102 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
+  public static long PET_PRICE=100*DENOMINATION_FACTOR;
 
   @Override
   public void onEnable() {
-    log("BitQuest starting");
-    if (SEGWIT) {
-      log("Segwit (experimental) is enabled");
-    }
-    REDIS.set("STARTUP", "1");
-    REDIS.expire("STARTUP", 300);
-    if (ADMIN_UUID == null) {
-      log(
-          "Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
-    }
-    if (STATSD_HOST != null && STATSD_PORT != null) {
-      statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
-      System.out.println("StatsD support is on.");
-    }
-    // registers listener classes
-    getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
-    getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
-    getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
-    getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
-    getServer().getPluginManager().registerEvents(new SignEvents(this), this);
-    getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
-
-    // player does not lose inventory on death
-    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
-
-    // loads config file. If it doesn't exist, creates it.
-    getDataFolder().mkdir();
-    if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
-      saveDefaultConfig();
-    }
-
-    // loads world wallet
-    wallet = new Wallet(this, "bitquest_market");
     try {
-      getBlockChainInfo();
-    } catch (org.json.simple.parser.ParseException e) {
+      log("BitQuest starting");
+
+      REDIS.set("STARTUP", "1");
+      REDIS.expire("STARTUP", 300);
+      if (ADMIN_UUID == null) {
+        log(
+                "Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
+      }
+      if (STATSD_HOST != null && STATSD_PORT != null) {
+        statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
+        System.out.println("StatsD support is on.");
+      }
+      // registers listener classes
+      getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
+      getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
+      getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
+      getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+      getServer().getPluginManager().registerEvents(new SignEvents(this), this);
+      getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+
+      // player does not lose inventory on death
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
+
+      // loads config file. If it doesn't exist, creates it.
+      getDataFolder().mkdir();
+      if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
+        saveDefaultConfig();
+      }
+
+      // loads world wallet
+      wallet = new Wallet(this, "bitquest_market");
+      if(BITCOIN_NODE_HOST!=null) {
+        getBlockChainInfo();
+      }
+
+      // sets the redis save intervals
+      REDIS.configSet("SAVE", "900 1 300 10 60 10000");
+
+      // initialize mixpanel (optional)
+      if (MIXPANEL_TOKEN != null) {
+        messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
+        System.out.println("Mixpanel support is on");
+      }
+      if (SLACK_BOT_AUTH_TOKEN != null) {
+        slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
+        try {
+          slackBotSession.connect();
+        } catch (IOException e) {
+          System.out.println("Slack bot connection failed with error: " + e.getMessage());
+        }
+      }
+      // Removes all entities on server restart. This is a workaround for when large numbers of
+      // entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this
+      // will be unnecesary.
+      //     removeAllEntities();
+      killAllVillagers();
+
+      // creates scheduled timers (update balances, etc)
+      createScheduledTimers();
+
+      commands = new HashMap<String, CommandAction>();
+      commands.put("wallet", new WalletCommand(this));
+      commands.put("land", new LandCommand(this));
+      commands.put("clan", new ClanCommand());
+      commands.put("transfer", new TransferCommand(this));
+      commands.put("report", new ReportCommand(this));
+      commands.put("send", new SendCommand(this));
+      commands.put("upgradewallet", new UpgradeWallet(this));
+      commands.put("donate", new DonateCommand(this));
+      commands.put("profession", new ProfessionCommand(this));
+      commands.put("spawn", new SpawnCommand(this));
+      commands.put("pet", new PetCommand(this));
+      modCommands = new HashMap<String, CommandAction>();
+      modCommands.put("butcher", new ButcherCommand());
+      modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
+      modCommands.put("crashTest", new CrashtestCommand(this));
+      modCommands.put("mod", new ModCommand());
+      modCommands.put("ban", new BanCommand());
+      modCommands.put("unban", new UnbanCommand());
+      modCommands.put("banlist", new BanlistCommand());
+      modCommands.put("spectate", new SpectateCommand(this));
+      modCommands.put("emergencystop", new EmergencystopCommand());
+      modCommands.put("fixabandonland", new FixAbandonLand());
+      // TODO: Remove this command after migrate.
+      modCommands.put("migrateclans", new MigrateClansCommand());
+      sendDiscordMessage("bitquest started");
+    } catch (Exception e) {
       e.printStackTrace();
       Bukkit.shutdown();
     }
-    // sets the redis save intervals
-    REDIS.configSet("SAVE", "900 1 300 10 60 10000");
 
-    // initialize mixpanel (optional)
-    if (MIXPANEL_TOKEN != null) {
-      messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
-      System.out.println("Mixpanel support is on");
-    }
-    if (SLACK_BOT_AUTH_TOKEN != null) {
-      slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
-      try {
-        slackBotSession.connect();
-      } catch (IOException e) {
-        System.out.println("Slack bot connection failed with error: " + e.getMessage());
-      }
-    }
-    // Removes all entities on server restart. This is a workaround for when large numbers of
-    // entities grash the server. With the release of Minecraft 1.11 and "max entity cramming" this
-    // will be unnecesary.
-    //     removeAllEntities();
-    killAllVillagers();
-
-    // creates scheduled timers (update balances, etc)
-    createScheduledTimers();
-
-    commands = new HashMap<String, CommandAction>();
-    commands.put("wallet", new WalletCommand(this));
-    commands.put("land", new LandCommand(this));
-    commands.put("clan", new ClanCommand());
-    commands.put("transfer", new TransferCommand(this));
-    commands.put("report", new ReportCommand(this));
-    commands.put("send", new SendCommand(this));
-    commands.put("upgradewallet", new UpgradeWallet(this));
-    commands.put("donate", new DonateCommand(this));
-    commands.put("profession", new ProfessionCommand(this));
-    commands.put("spawn", new SpawnCommand(this));
-    commands.put("pet", new PetCommand(this));
-    modCommands = new HashMap<String, CommandAction>();
-    modCommands.put("butcher", new ButcherCommand());
-    modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
-    modCommands.put("crashTest", new CrashtestCommand(this));
-    modCommands.put("mod", new ModCommand());
-    modCommands.put("ban", new BanCommand());
-    modCommands.put("unban", new UnbanCommand());
-    modCommands.put("banlist", new BanlistCommand());
-    modCommands.put("spectate", new SpectateCommand(this));
-    modCommands.put("emergencystop", new EmergencystopCommand());
-    modCommands.put("fixabandonland", new FixAbandonLand());
-    // TODO: Remove this command after migrate.
-    modCommands.put("migrateclans", new MigrateClansCommand());
-    sendDiscordMessage("bitquest started");
   }
   // @todo: make this just accept the endpoint name and (optional) parameters
   public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
@@ -307,80 +311,90 @@ public class BitQuest extends JavaPlugin {
   public void updateScoreboard(final Player player)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     final User user = new User(this, player);
-
-    user.wallet.getBalance(
-        0,
-        new Wallet.GetBalanceCallback() {
-          @Override
-          public void run(Long balance) {
-            ScoreboardManager scoreboardManager;
-            Scoreboard walletScoreboard;
-            Objective walletScoreboardObjective;
-            scoreboardManager = Bukkit.getScoreboardManager();
-            walletScoreboard = scoreboardManager.getNewScoreboard();
-            walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
-
-            walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
-            walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
-
-
-
-            Score score =
-                walletScoreboardObjective.getScore(
-                    ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
-
-            score.setScore((int) (balance / DENOMINATION_FACTOR));
-            player.setScoreboard(walletScoreboard);
-          }
-        });
-  }
-  public void adoptPet(Player player, String pet_name) {
-    long PET_PRICE=30000L;
-
-    try {
-      final User user = new User(this, player);
-
+    if(BITCOIN_NODE_HOST!=null) {
       user.wallet.getBalance(
               0,
               new Wallet.GetBalanceCallback() {
                 @Override
                 public void run(Long balance) {
-                  if(balance>=PET_PRICE) {
-                    try {
-                      if(user.wallet.move("pets",PET_PRICE)==true) {
-                        REDIS.sadd("pet:names",pet_name);
-                        BitQuest.REDIS.zincrby(
-                                "player:tx", PET_PRICE, player.getUniqueId().toString());
-                        long unixTime = System.currentTimeMillis() / 1000L;
-                        REDIS.set("pet:"+player.getUniqueId()+":timestamp",Long.toString(unixTime));
-                        player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
-                        REDIS.set("pet:"+player.getUniqueId(),pet_name);
-                        spawnPet(player);
-                      }
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                    } catch (org.json.simple.parser.ParseException e) {
-                      e.printStackTrace();
-                    }
-                  } else {
-                    player.sendMessage(ChatColor.RED+"You need 300 bits to adopt a pet.");
-                  }
+                  ScoreboardManager scoreboardManager;
+                  Scoreboard walletScoreboard;
+                  Objective walletScoreboardObjective;
+                  scoreboardManager = Bukkit.getScoreboardManager();
+                  walletScoreboard = scoreboardManager.getNewScoreboard();
+                  walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
+
+                  walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+
+                  walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVERDISPLAY_NAME + ChatColor.GRAY + ChatColor.BOLD.toString() + "Quest");
+
+
+
+                  Score score =
+                          walletScoreboardObjective.getScore(
+                                  ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
+
+                  score.setScore((int) (balance / DENOMINATION_FACTOR));
+                  player.setScoreboard(walletScoreboard);
                 }
               });
-
-
-
-
-
-    } catch (ParseException e) {
-      e.printStackTrace();
-    } catch (org.json.simple.parser.ParseException e) {
-      e.printStackTrace();
-    } catch (IOException e) {
-      e.printStackTrace();
+    } else {
+      // TODO: See Emerald Balance???
     }
+  }
+  public void createPet(User user, String pet_name) {
+    REDIS.sadd("pet:names",pet_name);
+    BitQuest.REDIS.zincrby(
+            "player:tx", PET_PRICE, user.player.getUniqueId().toString());
+    long unixTime = System.currentTimeMillis() / 1000L;
+    REDIS.set("pet:"+user.player.getUniqueId()+":timestamp",Long.toString(unixTime));
+    user.player.sendMessage(ChatColor.GREEN+"Congratulations, you just adopted "+pet_name);
+    REDIS.set("pet:"+user.player.getUniqueId(),pet_name);
+    spawnPet(user.player);
+  }
+  public void adoptPet(Player player, String pet_name) {
+    try {
+      final User user = new User(this, player);
 
+      if(BITCOIN_NODE_HOST!=null) {
+
+
+        user.wallet.getBalance(
+                0,
+                new Wallet.GetBalanceCallback() {
+                  @Override
+                  public void run(Long balance) {
+                    if(balance>=PET_PRICE) {
+                      try {
+                        if(user.wallet.move("pets",PET_PRICE)==true) {
+                          createPet(user,pet_name);
+                        }
+                      } catch (IOException e) {
+                        e.printStackTrace();
+                      } catch (org.json.simple.parser.ParseException e) {
+                        e.printStackTrace();
+                      }
+                    } else {
+                      player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" "+DENOMINATION_NAME+" to adopt a pet.");
+                    }
+                  }
+                });
+      } else {
+        if(player.getInventory().containsAtLeast(new ItemStack(Material.EMERALD),new Double(PET_PRICE/DENOMINATION_FACTOR).intValue())) {
+          player.getInventory().removeItem(new ItemStack[] {
+                  new ItemStack(Material.EMERALD, 100) });
+
+          createPet(user,pet_name);
+        } else {
+          player.sendMessage(ChatColor.RED+"You need "+PET_PRICE/DENOMINATION_FACTOR+" emeralds to adopt a pet.");
+
+        }
+      }
+
+    } catch (Exception e) {
+      e.printStackTrace();
+      player.sendMessage(ChatColor.RED+"Adoption failed. Sorry.");
+    }
 
   }
   public void spawnPet(Player player) {
@@ -391,9 +405,14 @@ public class BitQuest extends JavaPlugin {
       for (Entity entity : entities) {
         if(entity instanceof Ocelot) {
           if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
-            entity.teleport(player.getLocation());
+            if(cat_is_found==false) {
+              entity.teleport(player.getLocation());
+              ((Ocelot) entity).setOwner(player);
+              cat_is_found=true;
+            } else {
+              entity.remove();
+            }
 
-            cat_is_found=true;
           }
         }
       }
@@ -609,7 +628,7 @@ public class BitQuest extends JavaPlugin {
     // lower factor, experience is easier to get. you can increase to get the opposite effect
     int level = getLevel(rawxp);
     float progress = getExpProgress(rawxp);
-
+    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,1, true));
     player.setLevel(level);
     player.setExp(progress);
     setPlayerMaxHealth(player);
@@ -856,143 +875,91 @@ public class BitQuest extends JavaPlugin {
   }
 
   public boolean isModerator(Player player) {
-    if (BITQUEST_ENV.equals("development") == true) {
+    if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
       return true;
-    } else if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
+    } else if (ADMIN_UUID != null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
       return true;
-    } else if (ADMIN_UUID != null
-        && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
+    } else if (ADMIN_UUID==null) {
       return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   public void sendWalletInfo(final User user) {
-    user.wallet.getBalance(
-        0,
-        new Wallet.GetBalanceCallback() {
-          @Override
-          public void run(final Long unconfirmedBalance) {
-            user.wallet.getBalance(
-                5,
-                new Wallet.GetBalanceCallback() {
-                  @Override
-                  public void run(final Long balance) {
-                    user.wallet.getAccountAddress(
-                        new Wallet.GetAccountAddressCallback() {
-                          @Override
-                          public void run(String accountAddress) {
-                            if (SEGWIT) {
-                              user.wallet.addWitnessAddress(
-                                  accountAddress,
-                                  new Wallet.AddWitnessAddressCallback() {
-                                    @Override
-                                    public void run(String witnessAddress) {
-                                      user.wallet.setAccount(
-                                          witnessAddress,
-                                          new Wallet.SetAccountCallback() {
-                                            public void run(Boolean set_account_success) {
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Wallet address: "
-                                                      + ChatColor.BOLD
-                                                      + witnessAddress);
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Unconfirmed Balance: "
-                                                      + ChatColor.LIGHT_PURPLE
-                                                      + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                                      + " "
-                                                      + DENOMINATION_NAME);
-                                              user.player.sendMessage(
-                                                  ChatColor.GREEN
-                                                      + "Confirmed Balance: "
-                                                      + ChatColor.LIGHT_PURPLE
-                                                      + (balance / DENOMINATION_FACTOR)
-                                                      + " "
-                                                      + DENOMINATION_NAME);
-                                              if (user.wallet.url() != null) {
-                                                user.player.sendMessage(
-                                                    ChatColor.DARK_BLUE
-                                                        + ""
-                                                        + ChatColor.UNDERLINE
-                                                        + user.wallet.url());
-                                              }
+    if(BITCOIN_NODE_HOST!=null) {
+      user.wallet.getBalance(
+              0,
+              new Wallet.GetBalanceCallback() {
+                @Override
+                public void run(final Long unconfirmedBalance) {
+                  user.wallet.getBalance(
+                          0,
+                          new Wallet.GetBalanceCallback() {
+                            @Override
+                            public void run(final Long balance) {
+                              user.wallet.getAccountAddress(
+                                      new Wallet.GetAccountAddressCallback() {
+                                        @Override
+                                        public void run(String accountAddress) {
 
-                                              // This callback is called with runTask. I think this
-                                              // call it form the main thread.
-                                              // If I'm wrong this REDIS call can cause problems.
-                                              if (REDIS.exists(
-                                                  "hd:address:"
-                                                      + user.player.getUniqueId().toString())) {
-                                                String address =
-                                                    REDIS.get(
-                                                        "hd:address:"
-                                                            + user.player.getUniqueId().toString());
-                                                user.player.sendMessage(
+                                          try {
+                                            user.player.sendMessage(
                                                     ChatColor.GREEN
-                                                        + "You have an old wallet: "
-                                                        + ChatColor.BOLD
-                                                        + address);
-                                              }
+                                                            + "Wallet address: "
+                                                            + ChatColor.BOLD
+                                                            + accountAddress);
+                                            user.player.sendMessage(
+                                                    ChatColor.GREEN
+                                                            + "Unconfirmed Balance: "
+                                                            + ChatColor.LIGHT_PURPLE
+                                                            + (unconfirmedBalance / DENOMINATION_FACTOR)
+                                                            + " "
+                                                            + DENOMINATION_NAME);
+                                            user.player.sendMessage(
+                                                    ChatColor.GREEN
+                                                            + "Confirmed Balance: "
+                                                            + ChatColor.LIGHT_PURPLE
+                                                            + (balance / DENOMINATION_FACTOR)
+                                                            + " "
+                                                            + DENOMINATION_NAME);
+                                            if (user.wallet.url() != null) {
+                                              user.player.sendMessage(
+                                                      ChatColor.DARK_BLUE
+                                                              + ""
+                                                              + ChatColor.UNDERLINE
+                                                              + user.wallet.url());
                                             }
-                                          });
-                                    }
-                                  });
-                            } else {
-                              try {
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Wallet address: "
-                                        + ChatColor.BOLD
-                                        + accountAddress);
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Unconfirmed Balance: "
-                                        + ChatColor.LIGHT_PURPLE
-                                        + (unconfirmedBalance / DENOMINATION_FACTOR)
-                                        + " "
-                                        + DENOMINATION_NAME);
-                                user.player.sendMessage(
-                                    ChatColor.GREEN
-                                        + "Confirmed Balance: "
-                                        + ChatColor.LIGHT_PURPLE
-                                        + (balance / DENOMINATION_FACTOR)
-                                        + " "
-                                        + DENOMINATION_NAME);
-                                if (user.wallet.url() != null) {
-                                  user.player.sendMessage(
-                                      ChatColor.DARK_BLUE
-                                          + ""
-                                          + ChatColor.UNDERLINE
-                                          + user.wallet.url());
-                                }
 
-                                // This callback is called with runTask. I think this call it form
-                                // the main thread.
-                                // If I'm wrong this REDIS call can cause problems.
-                                if (REDIS.exists(
-                                    "hd:address:" + user.player.getUniqueId().toString())) {
-                                  String address =
-                                      REDIS.get(
-                                          "hd:address:" + user.player.getUniqueId().toString());
-                                  user.player.sendMessage(
-                                      ChatColor.GREEN
-                                          + "You have an old wallet: "
-                                          + ChatColor.WHITE
-                                          + address);
-                                }
-                              } catch (Exception e) {
-                                System.out.println("Error on sending wallet info");
-                                e.printStackTrace();
-                              }
+                                            // This callback is called with runTask. I think this call it form
+                                            // the main thread.
+                                            // If I'm wrong this REDIS call can cause problems.
+                                            if (REDIS.exists(
+                                                    "hd:address:" + user.player.getUniqueId().toString())) {
+                                              String address =
+                                                      REDIS.get(
+                                                              "hd:address:" + user.player.getUniqueId().toString());
+                                              user.player.sendMessage(
+                                                      ChatColor.GREEN
+                                                              + "You have an old wallet: "
+                                                              + ChatColor.WHITE
+                                                              + address);
+                                            }
+                                          } catch (Exception e) {
+                                            System.out.println("Error on sending wallet info");
+                                            e.printStackTrace();
+                                          }
+                                        }
+
+                                      });
                             }
-                          }
-                        });
-                  }
-                });
-          }
-        });
+                          });
+                }
+              });
+    } else {
+      user.player.sendMessage("You are using emeralds for currency");
+    }
+
   };
 
   public boolean landIsClaimed(Location location) {

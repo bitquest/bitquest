@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -133,9 +134,7 @@ public class EntityEvents implements Listener {
       BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
       BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
-        bitQuest.spawnPet(player);
-      }
+
       if (bitQuest.isModerator(player)) {
         if (bitQuest.BITQUEST_ENV.equals("development") == true) {
           player.setOp(true);
@@ -181,7 +180,9 @@ public class EntityEvents implements Listener {
       player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
       player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
       player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
-
+      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
+        bitQuest.spawnPet(player);
+      }
       player.sendMessage(
           ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
       player.sendMessage("");
@@ -269,8 +270,9 @@ public class EntityEvents implements Listener {
         List<Entity> entities = event.getPlayer().getWorld().getEntities();
         for (Entity entity : entities) {
           if(entity instanceof Ocelot) {
-            if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+            if(entity.getLocation().distance(event.getPlayer().getLocation())<1000 && entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
               entity.teleport(event.getPlayer().getLocation());
+              ((Ocelot) entity).setOwner(event.getPlayer());
             }
           }
         }
@@ -693,6 +695,20 @@ public class EntityEvents implements Listener {
           } else {
             event.setCancelled(true);
           }
+        } else if(event.getEntity() instanceof LivingEntity) {
+          // Player Vs Mob
+          if(player.hasMetadata("pet")==true) {
+            World w = player.getWorld();
+            List<Entity> entities = w.getEntities();
+            String cat_name=bitQuest.REDIS.get("pet:"+player.getUniqueId());
+            for (Entity entity : entities) {
+              if(entity instanceof Ocelot) {
+                if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+                  ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -868,7 +884,13 @@ public class EntityEvents implements Listener {
       event.setCancelled(true);
     }
   }
-
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerRespawn(final PlayerRespawnEvent event)
+  {
+    if(bitQuest.REDIS.exists("pet:"+event.getPlayer().getUniqueId())) {
+      bitQuest.spawnPet(event.getPlayer());
+    }
+  }
   @EventHandler
   void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     Player p = event.getPlayer();
