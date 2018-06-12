@@ -4,7 +4,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 RUN apt-get install -y wget
 RUN apt-get install -y git
-RUN apt-get install -y software-properties-common dirmngr default-jdk default-jre
+RUN apt-get install -y software-properties-common dirmngr openjdk-8-jre openjdk-8-jdk maven
 
 RUN mkdir /bitquest
 COPY . /bitquest/
@@ -20,9 +20,8 @@ RUN cd /spigot && echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-RUN export SHELL=/bin/bash && cd /bitquest/ && ./gradlew setupWorkspace
-RUN cd /bitquest/ && ./gradlew shadowJar
-RUN cp /bitquest/build/libs/bitquest-2.0-all.jar /spigot/plugins/
+RUN export SHELL=/bin/bash && cd /bitquest/ && mvn package -B
+RUN cp /bitquest/target/BitQuest-2.0-jar-with-dependencies.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
 

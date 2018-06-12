@@ -1,6 +1,9 @@
 package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.HashMap;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -8,17 +11,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.HashMap;
-
-
 public class LandCommand extends CommandAction {
-    private BitQuest bitQuest;
-
-    public LandCommand(BitQuest plugin) {
-        this.bitQuest = plugin;
-    }
+  private BitQuest bitQuest;
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if(bitQuest.rate_limit==false) {
@@ -110,10 +104,18 @@ public class LandCommand extends CommandAction {
                 player.sendMessage(ChatColor.RED + "Usage: /land <claim|transfer|permissions>");
                 return true;
             }
-        } else {
-            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
-            return true;
-        }
 
+        } else {
+          player.sendMessage(
+              ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");
+          return true;
+        }
+      }
+      return false;
+    } else {
+      player.sendMessage(
+          ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+      return true;
     }
+  }
 }

@@ -8,16 +8,12 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class SpectateCommand extends CommandAction {
-    private BitQuest bitQuest;
+  private BitQuest bitQuest;
 
-    public SpectateCommand(BitQuest plugin) {
-        this.bitQuest = plugin;
-    }
-
-    public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-        if (args.length == 1) {
+  public SpectateCommand(BitQuest plugin) {
+    this.bitQuest = plugin;
+  }
 
             if(Bukkit.getPlayer(args[0]) != null) {
                 ((Player) sender).setGameMode(GameMode.SPECTATOR);
@@ -31,5 +27,8 @@ public class SpectateCommand extends CommandAction {
             player.sendMessage(ChatColor.RED + "Usage: /spectate <player>");
             return true;
         }
+
     }
+    return false;
+  }
 }

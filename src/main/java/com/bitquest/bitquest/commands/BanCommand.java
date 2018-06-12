@@ -7,7 +7,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-
 public class BanCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if (args.length==1) {
@@ -31,5 +30,8 @@ public class BanCommand extends CommandAction {
             player.sendMessage(ChatColor.RED + "Usage: /ban <player>");
             return true;
         }
+
     }
+    return false;
+  }
 }

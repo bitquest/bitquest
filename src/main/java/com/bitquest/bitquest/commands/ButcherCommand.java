@@ -1,5 +1,6 @@
 package com.bitquest.bitquest.commands;
 
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
@@ -8,9 +9,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-
-import java.util.List;
-
 
 public class ButcherCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
@@ -29,7 +27,16 @@ public class ButcherCommand extends CommandAction {
             }
             player.sendMessage(ChatColor.GREEN+"Killed "+killed+" entities on " + w.getName());
 
+
+        } else if (entity.getLocation().getChunk().getX() == c.getX()
+            && entity.getLocation().getChunk().getZ() == c.getZ()) {
+          killed = killed + 1;
+          entity.remove();
+          System.out.println("[butcher] removed " + entity.getName());
         }
-        return false;
+      }
+      player.sendMessage(ChatColor.GREEN + "Killed " + killed + " entities");
     }
+    return false;
+  }
 }

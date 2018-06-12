@@ -3,8 +3,8 @@
 [BitQuest](http://bitquest.co/) is a Minecraft server with a Bitcoin-denominated currency and MMORPG elements. This repository is the open source code running on the server.
 
 # Play BitQuest
-To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address: 
-```sh
+To play in the official BitQuest server you must own the official Minecraft game for PC/Mac/Linux and add this server address:
+```
 play.bitquest.co
 ```
 
@@ -24,7 +24,7 @@ Every time a player kills an enemy (mob) there is a chance to get loot. If that 
 
 ## Everyone can send money anywhere
 You can send Bitcoin to an external wallet with /transfer:
-```sh
+```
 /transfer <amount> <recipient-bitcoin-address>
 ```
 ![Player using transfer command](http://i.imgur.com/Vlf9C1F.png)
@@ -32,7 +32,7 @@ You can send Bitcoin to an external wallet with /transfer:
 ![Player's public transaction](http://i.imgur.com/JPO4AXt.png)  
 
 Additionally, players can send Bitcoin to other players via /send:
-```sh
+```
 /send <amount> <username>
 ```
 
@@ -41,7 +41,7 @@ The BitQuest server has it's own address, used for giving Loot to players
 
 ## About the back-end technology
 
-All persistent data is saved in a redis database so the server can respond as quick as possible. 
+All persistent data is saved in a redis database so the server can respond as quick as possible.
 
 Everybody is welcome to contribute. :D
 
@@ -51,66 +51,55 @@ Here are the instructions to modify, install and run the server as localhost.
 # Building the BitQuest Java Plugin
 
 ## 1. Install Requirements
-Windows: The Windows Subsystem for Linux enables the bash shell which will be used to download the Spigot API. After [installing WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10) you can follow the Linux instructions below.
 
-You must install Java JRE and JDK
+You must install Java JRE, JDK and Maven
 
+### 1.1 Linux
+
+```sh
+sudo apt install -y openjdk-8-jre openjdk-8-jdk maven
 ```
-sudo apt install default-jre default-jdk
+
+### 1.2 Windows
+
+1. [Install JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+2. [Install Maven and set paths](https://tecadmin.net/install-apache-maven-on-windows/)
+
+## 2. Compile BitQuest and generate a JAR file
+There is a maven project that will download the spigot 1.12.2 (downloading the latest version will be automated in future):
+
+```sh
+mvn package -B
 ```
 
-## 2. Setup Workspace
-There is a gradle task that will download and compile the latest Spigot API and other tools needed to compile the project. Using a terminal, go to the project directory and run:
+Or using all of your cpu core (fastest)
+(If you have low ram your build can crash)
+```sh
+mvn package -B -T 1C
+```
 
-````
-./gradlew setupWorkspace
-````
+## 3. format the code to google java style
+You can easly format the code by doing (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
 
-## 3. Compile BitQuest and generate a JAR file
-After the workspace is set up, we can compile using the shadowJar task that will create a file under build/libs. This should be dropped on the plugins folder of your Spigot server, but you can automate the process for testing using Docker (instructions below)
+```sh
+./format.sh
+```
 
-````
-./gradlew shadowJar
-````
 # Requirements for running
 
 A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or local network with the json-rpc interface activated.
 
-# Running a local BitQuest test server
+# Running a BitQuest server with Docker
 
-Running locally via Docker is the fastest way to develop and test code. [Docker](http://docker.com) and [Docker Compose](https://docs.docker.com/compose/) can be used for testing the compiled plugin on spigot.
+Tou can use Docker to run a BitQuest server. There's also an [official BitQuest docker image](https://hub.docker.com/r/bitquest/bitquest/). The recommended way to configure the image is using a docker-compose.yml file that can link to a directory where the worlds are stored. An example is included here. Configuration can be done via enviroment variables:
 
-1. Build BitQuest using the instructions above (./gradlew shadowJar).
-2. Install [Docker](https://docs.docker.com/engine/installation/), and [Docker Compose](https://docs.docker.com/compose/install/) if you haven't yet.
-3. Create a docker-compose.yml file with your configuration. A good idea is to create a volume on spigot's 'plugins' pointing to the local directory where .jar files are compiled. Or you can use the following example:
+| environment variable   | description                                          |
+|------------------------|------------------------------------------------------|
+| BITQUEST_NODE_USERNAME | username for Bitcoin node                            |
+| BITCOIN_NODE_PASSWORD  | password for Bitcoin node                            |
+| BITQUEST_NODE_HOST     | IP to a bitcoin node with JSON-RPC interface enabled |
+| ADMIN_UUID             | Minecraft user ID for the main administrator         |
 
-````
-spigot:
-  container_name: bitquest
-  environment:
-    - BITQUEST_ENV=development
-    - BITCOIN_NODE_HOST=127.0.0.1 # or the IP of your Bitcoin Core node
-    - BITCOIN_NODE_USERNAME=alice # the username for the RPC-JSON interface
-    - BITCOIN_NODE_PASSWORD=secret # the password for RPC-JSON
-  build: .
-  volumes:
-    - "./build/libs/:/spigot/plugins"
-    - ".:/bitquest"
-  ports:
-    - "25565:25565"
-  links:
-    - redis
-redis:
-  image: redis
-
-
-````
-
-4. Use docker-compose to spawn a test server
-
-```
-docker-compose up
-```
 # Troubleshooting
 ## I'm getting a JedisConnectionException error when starting
 Please make sure you have redis installed. If you are running via docker please make sure you have a redis container linked to the bitquest container.

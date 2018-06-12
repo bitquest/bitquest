@@ -1,14 +1,12 @@
 package com.bitquest.bitquest.commands;
 
-
 import com.bitquest.bitquest.BitQuest;
+import java.util.Set;
+import java.util.UUID;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.Set;
-import java.util.UUID;
 
 public class ModCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
@@ -58,5 +56,7 @@ public class ModCommand extends CommandAction {
             player.sendMessage(ChatColor.RED + "Usage: /mod <add|remove>");
             return true;
         }
+
     }
+  }
 }

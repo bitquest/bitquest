@@ -22,6 +22,9 @@ commands:
   maintenance:
     description: "Enables maintenance mode and stops players from joining the server"
     usage: "/maintenance <seconds>"
+  pet:
+    description: "Adopt an ocelot for 300 bits"
+    usage: "/pet <name>"
   profession:
     description: "(EXPERIMENTAL) choose a profession"
     usage: "/profession rogue"
@@ -31,15 +34,15 @@ commands:
   spawn:
     description: "teleports to spawn"
     usage: "/spawn"
+  spectate:
+    description: "Allows moderators to spectate players' actions"
+    usage: "/spectate <player>"
   transfer:
     description: "Sends your BitQuest wallet balance to an external address of your own"
     usage: "/transfer <amount> <bitcoin address, e-mail or username>"
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"
-  spectate:
-    description: "Allows moderators to spectate players' actions"
-    usage: "/spectate <player>"
   mod:
     description: "Utility to add/remove/list moderators"
     usage: "/mod <add|remove|list>"
@@ -67,6 +70,9 @@ commands:
   donate:
     description: "Donate to BitQuest from your wallet"
     usage: "/donate <amount>"
+  fixabandonland:
+    description: "Fixes chunks with no owners that still have permissions"
+    usage: "/fixabandonland [true|yes]"
   migrateclans:
     description: "Migrate clans to keep track of members"
     usage: "/migrateclans"
