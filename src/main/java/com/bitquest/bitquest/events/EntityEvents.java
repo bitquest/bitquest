@@ -383,8 +383,10 @@ public class EntityEvents implements Listener {
                       new Runnable() {
 
                         public void run() {
-                          player.teleport(spawn);
-                          player.removeMetadata("teleporting", bitQuest);
+                          if (player.hasMetadata("teleporting")) {
+                            player.teleport(spawn);
+                            player.removeMetadata("teleporting", bitQuest);
+                          }
                         }
                       },
                       60L);
@@ -392,16 +394,19 @@ public class EntityEvents implements Listener {
               player.sendMessage(
                   ChatColor.RED + "You must sleep in a bed before using the ender eye teleport");
             }
+          } else {
+            if (event.getItem().getType() == Material.COMPASS) {
+              if (event.getAction() == Action.RIGHT_CLICK_AIR
+                  || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+                bitQuest.teleportToSpawn(player);
+              }
+            }
           }
+        } else {
+          player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, false));
+          player.sendMessage(ChatColor.DARK_RED + "You cancelled your teleport.");
         }
         event.setCancelled(true);
-      }
-      if (!player.hasMetadata("teleporting") && event.getItem().getType() == Material.COMPASS) {
-
-        if (event.getAction() == Action.RIGHT_CLICK_AIR
-            || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-          bitQuest.teleportToSpawn(player);
-        }
       }
     }
   }

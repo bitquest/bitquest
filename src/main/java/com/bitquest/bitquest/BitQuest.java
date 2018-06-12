@@ -3,9 +3,7 @@ package com.bitquest.bitquest;
 import com.bitquest.bitquest.commands.*;
 import com.bitquest.bitquest.events.*;
 import com.google.gson.JsonObject;
-import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MessageBuilder;
-import com.mixpanel.mixpanelapi.MixpanelAPI;
 import com.timgroup.statsd.NonBlockingStatsDClient;
 import com.timgroup.statsd.StatsDClient;
 import com.ullink.slack.simpleslackapi.SlackSession;
@@ -32,7 +30,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
-import java.util.Base64;
 
 // Color Table :
 // GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name,
@@ -67,7 +64,8 @@ public class BitQuest extends JavaPlugin {
       System.getenv("BITCOIN_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT"))
           : 18332;
-  public final static String SERVERDISPLAY_NAME = System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
+  public static final String SERVERDISPLAY_NAME =
+      System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
   public static final Long DENOMINATION_FACTOR =
       System.getenv("DENOMINATION_FACTOR") != null
           ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
@@ -129,7 +127,8 @@ public class BitQuest extends JavaPlugin {
   // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST,
   // REDIS_PORT);
   // Default price: 10,000 satoshis or 100 bits
-  public static final Long LAND_PRICE = System.getenv("LAND_PRICE") != null ? Long.parseLong(System.getenv("LAND_PRICE")) : 10000;
+  public static final Long LAND_PRICE =
+      System.getenv("LAND_PRICE") != null ? Long.parseLong(System.getenv("LAND_PRICE")) : 10000;
   // Minimum transaction by default is 2000 bits
   public static final Long MINIMUM_TRANSACTION =
       System.getenv("MINIMUM_TRANSACTION") != null
@@ -330,6 +329,7 @@ public class BitQuest extends JavaPlugin {
 
 
 
+
                   Score score =
                           walletScoreboardObjective.getScore(
                                   ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
@@ -417,6 +417,22 @@ public class BitQuest extends JavaPlugin {
           }
         }
       }
+      bitQuest
+          .getServer()
+          .getScheduler()
+          .scheduleSyncDelayedTask(
+              bitQuest,
+              new Runnable() {
+
+                public void run() {
+                  if (player.hasMetadata("teleporting")) {
+                    player.teleport(spawn);
+                    player.removeMetadata("teleporting", bitQuest);
+                  }
+                }
+              },
+              60L);
+
     }
     if(cat_is_found==false) {
       final Ocelot ocelot = (Ocelot)player.getWorld().spawnEntity(player.getLocation(), EntityType.OCELOT);
@@ -701,14 +717,17 @@ public class BitQuest extends JavaPlugin {
                                   + ChatColor.GREEN
                                   + "!");
                           updateScoreboard(player);
-                          
+
                         } else {
                           if (balance < BitQuest.LAND_PRICE) {
                             player.sendMessage(
                                 ChatColor.DARK_RED
                                     + "You don't have enough money! You need "
                                     + ChatColor.LIGHT_PURPLE
-                                    + (int) Math.ceil((BitQuest.LAND_PRICE - balance) / BitQuest.DENOMINATION_FACTOR)
+                                    + (int)
+                                        Math.ceil(
+                                            (BitQuest.LAND_PRICE - balance)
+                                                / BitQuest.DENOMINATION_FACTOR)
                                     + ChatColor.DARK_RED
                                     + " more "
                                     + BitQuest.DENOMINATION_NAME);
@@ -722,10 +741,11 @@ public class BitQuest extends JavaPlugin {
                             ChatColor.DARK_RED
                                 + "You don't have enough money! You need "
                                 + ChatColor.LIGHT_PURPLE
-                                + (int) Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
+                                + (int)
+                                    Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
                                 + ChatColor.DARK_RED
                                 + BitQuest.DENOMINATION_NAME);
-                              }
+                      }
                     } catch (Exception e) {
                       System.out.println("Error on claiming land");
                       player.sendMessage(ChatColor.RED + "Error on claiming land");
