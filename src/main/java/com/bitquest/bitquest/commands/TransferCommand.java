@@ -136,8 +136,16 @@ public class TransferCommand extends CommandAction {
                             }
                           });
                     }
-                  }
-                });
+                    return true;
+
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "Usage: /transfer <amount> <bitcoin address, e-mail or username>");
+                return true;
+            }
+        } else {
+            player.sendMessage(ChatColor.RED+"Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+
             return true;
           }
           return true;
