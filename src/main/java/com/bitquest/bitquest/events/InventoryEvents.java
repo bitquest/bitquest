@@ -39,14 +39,13 @@ public class InventoryEvents implements Listener {
     trades.add(new Trade(new ItemStack(Material.OBSIDIAN, 8), 1));
     trades.add(new Trade(new ItemStack(Material.RAILS, 8), 1));
     trades.add(new Trade(new ItemStack(Material.POWERED_RAIL, 4), 1));
-    trades.add(new Trade(new ItemStack(Material.SANDSTONE, 16), 1));
+    trades.add(new Trade(new ItemStack(Material.SAND, 64), 1));
     trades.add(new Trade(new ItemStack(Material.RED_SANDSTONE, 8), 1));
     trades.add(new Trade(new ItemStack(Material.SMOOTH_BRICK, 16), 1));
     trades.add(new Trade(new ItemStack(Material.BLAZE_ROD, 1), 2));
     trades.add(new Trade(new ItemStack(Material.CHORUS_FLOWER, 1), 5));
     trades.add(new Trade(new ItemStack(Material.DIAMOND, 4), 1));
     trades.add(new Trade(new ItemStack(Material.ENDER_STONE, 1), 4));
-    trades.add(new Trade(new ItemStack(Material.IRON_BLOCK, 1), 8));
     trades.add(new Trade(new ItemStack(Material.IRON_INGOT, 8), 1));
     trades.add(new Trade(new ItemStack(Material.NETHERRACK, 1), 2));
     trades.add(new Trade(new ItemStack(Material.QUARTZ, 8), 1));
@@ -57,7 +56,6 @@ public class InventoryEvents implements Listener {
     trades.add(new Trade(new ItemStack(Material.PAPER, 1), 4));
     trades.add(new Trade(new ItemStack(Material.PACKED_ICE, 1), 2));
     trades.add(new Trade(new ItemStack(Material.GOLD_BLOCK, 1), 2));
-    trades.add(new Trade(new ItemStack(Material.GOLDEN_APPLE, 1), 5));
     trades.add(new Trade(new ItemStack(Material.ARROW, 32), 1));
     trades.add(new Trade(new ItemStack(Material.PRISMARINE, 2), 1));
     trades.add(new Trade(new ItemStack(Material.QUARTZ_BLOCK, 2), 1));

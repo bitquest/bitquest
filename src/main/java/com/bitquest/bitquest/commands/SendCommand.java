@@ -113,10 +113,15 @@ public class SendCommand extends CommandAction {
                     });
                 return true;
 
-              } else {
-                player.sendMessage(ChatColor.DARK_RED + "You cannot send to yourself!");
+                    return true;
+                } else {
+                    player.sendMessage("Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + MAX_SEND);
+                    return true;
+                }
+            } else {
+                player.sendMessage(ChatColor.RED + "Usage: /send <amount> <player>");
                 return true;
-              }
+
             }
           }
           player.sendMessage(

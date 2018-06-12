@@ -22,11 +22,11 @@ public class UnbanCommand extends CommandAction {
                 + ChatColor.GREEN
                 + " has been unbanned.");
 
-        return true;
-      } else {
-        sender.sendMessage(ChatColor.RED + "Can't find player " + ChatColor.BLUE + playerName);
-        return true;
-      }
+        } else {
+            player.sendMessage(ChatColor.RED + "Usage: /unban <player>");
+            return true;
+        }
+
     }
     return false;
   }

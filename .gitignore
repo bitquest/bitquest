@@ -8,16 +8,15 @@
 *.iml
 *.iws
 
+# vscode
+.vscode
+
 # Mac
 .DS_Store
 
 # Maven
 log/
 target/
-
-# docker-compose.yml is ignored to prevent leaks of api keys
-docker-compose.yml
-development.yml
 
 # Other stuff
 install.log
@@ -30,3 +29,4 @@ tmp
 
 # format.sh
 google-java-format-1.5-all-deps.jar*
+

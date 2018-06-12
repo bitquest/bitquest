@@ -17,6 +17,7 @@ import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.enchantment.EnchantItemEvent;
@@ -133,6 +134,7 @@ public class EntityEvents implements Listener {
       BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
       BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
+
       if (bitQuest.isModerator(player)) {
         if (bitQuest.BITQUEST_ENV.equals("development") == true) {
           player.setOp(true);
@@ -178,7 +180,9 @@ public class EntityEvents implements Listener {
       player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
       player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
       player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
-
+      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
+        bitQuest.spawnPet(player);
+      }
       player.sendMessage(
           ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
       player.sendMessage("");
@@ -237,8 +241,13 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerGameModeChange(PlayerGameModeChangeEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
-    event.setCancelled(true);
+    if(bitQuest.BITQUEST_ENV.equals("production")) {
+      event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
+      event.setCancelled(true);
+    } else {
+      event.setCancelled(false);
+    }
+
   }
 
   @EventHandler
@@ -256,6 +265,18 @@ public class EntityEvents implements Listener {
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
+      if(event.getPlayer().hasMetadata("pet")) {
+        String cat_name=bitQuest.REDIS.get("pet:"+event.getPlayer().getUniqueId());
+        List<Entity> entities = event.getPlayer().getWorld().getEntities();
+        for (Entity entity : entities) {
+          if(entity instanceof Ocelot) {
+            if(entity.getLocation().distance(event.getPlayer().getLocation())<1000 && entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+              entity.teleport(event.getPlayer().getLocation());
+              ((Ocelot) entity).setOwner(event.getPlayer());
+            }
+          }
+        }
+      }
       if (!event.getFrom().getWorld().getName().endsWith("_nether")
           && !event.getFrom().getWorld().getName().endsWith("_end")) {
         // announce new area
@@ -286,6 +307,7 @@ public class EntityEvents implements Listener {
         }
 
         if (!name1.equals(name2)) {
+
           if (name2.equals("the wilderness")) {
             event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
           } else {
@@ -538,28 +560,28 @@ public class EntityEvents implements Listener {
                   WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
 
           // add potion effects
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 128) < level)
+          if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
           if (level > 64)
@@ -677,6 +699,20 @@ public class EntityEvents implements Listener {
             event.setCancelled(false);
           } else {
             event.setCancelled(true);
+          }
+        } else if(event.getEntity() instanceof LivingEntity) {
+          // Player Vs Mob
+          if(player.hasMetadata("pet")==true) {
+            World w = player.getWorld();
+            List<Entity> entities = w.getEntities();
+            String cat_name=bitQuest.REDIS.get("pet:"+player.getUniqueId());
+            for (Entity entity : entities) {
+              if(entity instanceof Ocelot) {
+                if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+                  ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
+                }
+              }
+            }
           }
         }
       }
@@ -853,7 +889,13 @@ public class EntityEvents implements Listener {
       event.setCancelled(true);
     }
   }
-
+  @EventHandler(priority = EventPriority.NORMAL)
+  public void onPlayerRespawn(final PlayerRespawnEvent event)
+  {
+    if(bitQuest.REDIS.exists("pet:"+event.getPlayer().getUniqueId())) {
+      bitQuest.spawnPet(event.getPlayer());
+    }
+  }
   @EventHandler
   void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     Player p = event.getPlayer();
