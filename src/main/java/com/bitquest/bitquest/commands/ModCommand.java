@@ -56,7 +56,6 @@ public class ModCommand extends CommandAction {
             player.sendMessage(ChatColor.RED + "Usage: /mod <add|remove>");
             return true;
         }
-
     }
-  }
-}
+ }
+

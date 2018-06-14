@@ -9,26 +9,37 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class SpectateCommand extends CommandAction {
-  private BitQuest bitQuest;
+    private BitQuest bitQuest;
 
-  public SpectateCommand(BitQuest plugin) {
-    this.bitQuest = plugin;
-  }
+    public SpectateCommand(BitQuest plugin) {
+        this.bitQuest = plugin;
+    }
 
-            if(Bukkit.getPlayer(args[0]) != null) {
-                ((Player) sender).setGameMode(GameMode.SPECTATOR);
-                ((Player) sender).setSpectatorTarget(Bukkit.getPlayer(args[0]));
-                bitQuest.success(((Player) sender), "You're now spectating " + args[0] + ".");
+    public boolean run(
+            CommandSender sender, Command cmd, String label, String[] args, Player player) {
+        if (args.length == 1) {
+            Player p = (Player) sender;
+            if (Bukkit.getPlayer(args[0]) != null) {
+                p.setGameMode(GameMode.SPECTATOR);
+                p.setSpectatorTarget(Bukkit.getPlayer(args[0]));
+                p.sendMessage(
+                        ChatColor.GREEN
+                                + "You're now spectating "
+                                + ChatColor.BLUE
+                                + args[0]
+                                + ChatColor.GREEN
+                                + ".");
             } else {
-                bitQuest.error(((Player) sender), "Player " + args[0] + " isn't online.");
+                p.sendMessage(
+                        ChatColor.DARK_RED
+                                + "Player "
+                                + ChatColor.BLUE
+                                + args[0]
+                                + ChatColor.DARK_RED
+                                + " isn't online.");
             }
             return true;
-        } else {
-            player.sendMessage(ChatColor.RED + "Usage: /spectate <player>");
-            return true;
         }
-
+        return false;
     }
-    return false;
-  }
 }
