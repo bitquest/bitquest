@@ -180,7 +180,7 @@ public class EntityEvents implements Listener {
       player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
       player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
       player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
-      if(BitQuest.REDIS.exists("pet:"+player.getUniqueId().toString())) {
+      if (BitQuest.REDIS.exists("pet:" + player.getUniqueId().toString())) {
         bitQuest.spawnPet(player);
       }
       player.sendMessage(
@@ -241,13 +241,12 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerGameModeChange(PlayerGameModeChangeEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    if(bitQuest.BITQUEST_ENV.equals("production")) {
+    if (bitQuest.BITQUEST_ENV.equals("production")) {
       event.getPlayer().sendMessage(ChatColor.RED + "Sorry changing gamemode are not allowed.");
       event.setCancelled(true);
     } else {
       event.setCancelled(false);
     }
-
   }
 
   @EventHandler
@@ -265,12 +264,14 @@ public class EntityEvents implements Listener {
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-      if(event.getPlayer().hasMetadata("pet")) {
-        String cat_name=bitQuest.REDIS.get("pet:"+event.getPlayer().getUniqueId());
+      if (event.getPlayer().hasMetadata("pet")) {
+        String cat_name = bitQuest.REDIS.get("pet:" + event.getPlayer().getUniqueId());
         List<Entity> entities = event.getPlayer().getWorld().getEntities();
         for (Entity entity : entities) {
-          if(entity instanceof Ocelot) {
-            if(entity.getLocation().distance(event.getPlayer().getLocation())<1000 && entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+          if (entity instanceof Ocelot) {
+            if (entity.getLocation().distance(event.getPlayer().getLocation()) < 1000
+                && entity.getCustomName() != null
+                && entity.getCustomName().equals(cat_name)) {
               entity.teleport(event.getPlayer().getLocation());
               ((Ocelot) entity).setOwner(event.getPlayer());
             }
@@ -700,15 +701,15 @@ public class EntityEvents implements Listener {
           } else {
             event.setCancelled(true);
           }
-        } else if(event.getEntity() instanceof LivingEntity) {
+        } else if (event.getEntity() instanceof LivingEntity) {
           // Player Vs Mob
-          if(player.hasMetadata("pet")==true) {
+          if (player.hasMetadata("pet") == true) {
             World w = player.getWorld();
             List<Entity> entities = w.getEntities();
-            String cat_name=bitQuest.REDIS.get("pet:"+player.getUniqueId());
+            String cat_name = bitQuest.REDIS.get("pet:" + player.getUniqueId());
             for (Entity entity : entities) {
-              if(entity instanceof Ocelot) {
-                if(entity.getCustomName()!=null&&entity.getCustomName().equals(cat_name)) {
+              if (entity instanceof Ocelot) {
+                if (entity.getCustomName() != null && entity.getCustomName().equals(cat_name)) {
                   ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
                 }
               }
@@ -889,13 +890,14 @@ public class EntityEvents implements Listener {
       event.setCancelled(true);
     }
   }
+
   @EventHandler(priority = EventPriority.NORMAL)
-  public void onPlayerRespawn(final PlayerRespawnEvent event)
-  {
-    if(bitQuest.REDIS.exists("pet:"+event.getPlayer().getUniqueId())) {
+  public void onPlayerRespawn(final PlayerRespawnEvent event) {
+    if (bitQuest.REDIS.exists("pet:" + event.getPlayer().getUniqueId())) {
       bitQuest.spawnPet(event.getPlayer());
     }
   }
+
   @EventHandler
   void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
     Player p = event.getPlayer();

@@ -11,10 +11,11 @@ public class User {
   private BitQuest bitQuest;
   public Player player;
 
-  public User(BitQuest plugin, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException {
-      this.player = player;
-      this.bitQuest = plugin;
-      this.wallet = new Wallet(this.bitQuest, this.player.getUniqueId().toString());
+  public User(BitQuest plugin, Player player)
+      throws ParseException, org.json.simple.parser.ParseException, IOException {
+    this.player = player;
+    this.bitQuest = plugin;
+    this.wallet = new Wallet(this.bitQuest, this.player.getUniqueId().toString());
   }
 
   // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
