@@ -25,6 +25,9 @@ else
   fi
 fi
 
+# google java format need to be executed with pwd bitquest/ or it will change import in a way to create compilation error.
+chmod u+x google-java-format-1.5-all-deps.jar
+
 java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/*
 if [ $? != 0 ] ; then
   exit 20
@@ -37,4 +40,8 @@ java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitq
 if [ $? != 0 ] ; then
   exit 22
 fi
+
+# google java format need to be executed with pwd bitquest/ or it will change import in a way to create compilation error.
+chmod u-x google-java-format-1.5-all-deps.jar
+
 exit 0
