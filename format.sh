@@ -32,11 +32,11 @@ java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitq
 if [ $? != 0 ] ; then
   exit 20
 fi
-java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/commands/*
+java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/commands/*.java
 if [ $? != 0 ] ; then
   exit 21
 fi
-java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/events/*
+java -jar google-java-format-1.5-all-deps.jar -r src/main/java/com/bitquest/bitquest/events/*.java
 if [ $? != 0 ] ; then
   exit 22
 fi
