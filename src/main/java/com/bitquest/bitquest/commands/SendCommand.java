@@ -113,7 +113,6 @@ public class SendCommand extends CommandAction {
                     });
                 return true;
 
-                return true;
               } else {
                 player.sendMessage(
                     "Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + MAX_SEND);
