@@ -2,7 +2,10 @@ package com.bitquest.bitquest;
 
 import java.io.IOException;
 import java.text.ParseException;
+
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.*;
 
 public class User {
@@ -36,6 +39,84 @@ public class User {
     }
   }
 
+  public int countEmeralds() {
+
+    ItemStack[] items = this.player.getInventory().getContents();
+    int amount = 0;
+    for (int i=0; i<this.player.getInventory().getSize(); i++) {
+      ItemStack TempStack = items[i];
+      if ((TempStack != null) && (TempStack.getType() != Material.AIR)){
+        if (TempStack.getType().toString() == "EMERALD_BLOCK") {
+          amount += (TempStack.getAmount()*9);
+        }
+        else if (TempStack.getType().toString() == "EMERALD") {
+          amount += TempStack.getAmount();
+        }
+      }
+    }
+    return amount;
+  }
+  public boolean removeEmeralds(int amount){
+    int EmCount = this.countEmeralds();
+    int LessEmCount = countEmeralds()-amount;
+    double TempAmount=(double)amount;
+    int EmsBack=0;
+    ItemStack[] items = this.player.getInventory().getContents();
+    if (countEmeralds()>=amount){
+      while(TempAmount>0){
+        for (int i=0; i<this.player.getInventory().getSize(); i++) {
+          ItemStack TempStack = items[i];
+
+          if ((TempStack != null) && (TempStack.getType() != Material.AIR)){
+
+            if ((TempStack.getType().toString() == "EMERALD_BLOCK")&&(TempAmount>=9)) {
+              this.player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+              TempAmount=TempAmount-9;
+            }
+            if ((TempStack.getType().toString() == "EMERALD_BLOCK")&&(TempAmount<9)) {
+              this.player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+              EmsBack=(9-(int)TempAmount);  //if 8, ems back = 1
+              TempAmount=TempAmount-TempAmount;
+              if (EmsBack>0) {player.getInventory().addItem(new ItemStack(Material.EMERALD, EmsBack));}
+            }
+            if ((TempStack.getType().toString() == "EMERALD")&&(TempAmount>=1)) {
+              player.getInventory().removeItem(new ItemStack(Material.EMERALD, 1));
+              TempAmount=TempAmount-1;
+            }
+
+          }//end if != Material.AIR
+
+
+        }// end for loop
+      }//end while loop
+    }//end (EmCount>=amount)
+    EmCount = countEmeralds();
+    if ((EmCount==LessEmCount)||(TempAmount==0))
+      return true;
+    return false;
+  }//end of remove emeralds
+  //start addemeralds to inventory
+  public boolean addEmeralds(int amount){
+    int EmCount = countEmeralds();
+    int moreEmCount = countEmeralds()+amount;
+    double bits = (double)amount;
+    double TempAmount=(double)amount;
+    int EmsBack=0;
+    while(TempAmount>=0){
+      if (TempAmount>=9){
+        TempAmount=TempAmount-9;
+        this.player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+      }
+      if (TempAmount<9){
+        TempAmount=TempAmount-1;
+        this.player.getInventory().addItem(new ItemStack(Material.EMERALD, 1));
+      }
+      EmCount = countEmeralds();
+      if ((EmCount==moreEmCount))
+        return true;
+    }//end while loop
+    return false;
+  }
   //
   //    public int getLevel(int exp) {
   //        return (int) Math.floor(Math.sqrt(exp / (float)expFactor));

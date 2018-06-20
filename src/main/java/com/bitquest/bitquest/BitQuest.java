@@ -644,7 +644,24 @@ public class BitQuest extends JavaPlugin {
     // player.getLevel(), true));
     player.setMaxHealth(health);
   }
-
+  public void saveLandData(Player player, String name, int x,  int z) throws ParseException, org.json.simple.parser.ParseException, IOException {
+    BitQuest.REDIS.zincrby(
+            "player:tx", LAND_PRICE, player.getUniqueId().toString());
+    BitQuest.REDIS.set(
+            "chunk" + x + "," + z + "owner", player.getUniqueId().toString());
+    BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
+    land_owner_cache = new HashMap();
+    land_name_cache = new HashMap();
+    land_unclaimed_cache = new HashMap();
+    player.sendMessage(
+            ChatColor.GREEN
+                    + "Congratulations! You're now the owner of "
+                    + ChatColor.DARK_GREEN
+                    + name
+                    + ChatColor.GREEN
+                    + "!");
+    updateScoreboard(player);
+  }
   public void claimLand(final String name, Chunk chunk, final Player player)
           throws ParseException, org.json.simple.parser.ParseException, IOException {
     // check that land actually has a name
@@ -676,67 +693,66 @@ public class BitQuest extends JavaPlugin {
             player.sendMessage(ChatColor.YELLOW + "Claiming land...");
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             final BitQuest bitQuest = this;
+            if(BITCOIN_NODE_HOST!=null) {
+              user.wallet.getBalance(
+                      0,
+                      new Wallet.GetBalanceCallback() {
+                        @Override
+                        public void run(Long balance) {
+                          try {
+                            if (balance >= LAND_PRICE) {
+                              if (user.wallet.move("land", LAND_PRICE)) {
+                                saveLandData(player,name,x,z);
 
-            user.wallet.getBalance(
-                    0,
-                    new Wallet.GetBalanceCallback() {
-                      @Override
-                      public void run(Long balance) {
-                        try {
-                          if (balance >= LAND_PRICE) {
-                            if (user.wallet.move("land", LAND_PRICE)) {
-                              BitQuest.REDIS.zincrby(
-                                      "player:tx", LAND_PRICE, player.getUniqueId().toString());
-                              BitQuest.REDIS.set(
-                                      "chunk" + x + "," + z + "owner", player.getUniqueId().toString());
-                              BitQuest.REDIS.set("chunk" + x + "," + z + "name", name);
-                              land_owner_cache = new HashMap();
-                              land_name_cache = new HashMap();
-                              land_unclaimed_cache = new HashMap();
-                              player.sendMessage(
-                                      ChatColor.GREEN
-                                              + "Congratulations! You're now the owner of "
-                                              + ChatColor.DARK_GREEN
-                                              + name
-                                              + ChatColor.GREEN
-                                              + "!");
-                              updateScoreboard(player);
-
-                            } else {
-                              if (balance < BitQuest.LAND_PRICE) {
-                                player.sendMessage(
-                                        ChatColor.DARK_RED
-                                                + "You don't have enough money! You need "
-                                                + ChatColor.LIGHT_PURPLE
-                                                + (int)
-                                                Math.ceil(
-                                                        (BitQuest.LAND_PRICE - balance)
-                                                                / BitQuest.DENOMINATION_FACTOR)
-                                                + ChatColor.DARK_RED
-                                                + " more "
-                                                + BitQuest.DENOMINATION_NAME);
                               } else {
-                                player.sendMessage(
-                                        ChatColor.RED + "Claim payment failed. Please try again later.");
+                                if (balance < BitQuest.LAND_PRICE) {
+                                  player.sendMessage(
+                                          ChatColor.DARK_RED
+                                                  + "You don't have enough money! You need "
+                                                  + ChatColor.LIGHT_PURPLE
+                                                  + (int)
+                                                  Math.ceil(
+                                                          (BitQuest.LAND_PRICE - balance)
+                                                                  / BitQuest.DENOMINATION_FACTOR)
+                                                  + ChatColor.DARK_RED
+                                                  + " more "
+                                                  + BitQuest.DENOMINATION_NAME);
+                                } else {
+                                  player.sendMessage(
+                                          ChatColor.RED + "Claim payment failed. Please try again later.");
+                                }
                               }
+                            } else {
+                              player.sendMessage(
+                                      ChatColor.DARK_RED
+                                              + "You don't have enough money! You need "
+                                              + ChatColor.LIGHT_PURPLE
+                                              + (int)
+                                              Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
+                                              + ChatColor.DARK_RED
+                                              + BitQuest.DENOMINATION_NAME);
                             }
-                          } else {
-                            player.sendMessage(
-                                    ChatColor.DARK_RED
-                                            + "You don't have enough money! You need "
-                                            + ChatColor.LIGHT_PURPLE
-                                            + (int)
-                                            Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
-                                            + ChatColor.DARK_RED
-                                            + BitQuest.DENOMINATION_NAME);
+                          } catch (Exception e) {
+                            System.out.println("Error on claiming land");
+                            player.sendMessage(ChatColor.RED + "Error on claiming land");
+                            e.printStackTrace();
                           }
-                        } catch (Exception e) {
-                          System.out.println("Error on claiming land");
-                          player.sendMessage(ChatColor.RED + "Error on claiming land");
-                          e.printStackTrace();
                         }
-                      }
-                    });
+                      });
+            } else {
+              int land_price_in_emeralds=(int)(LAND_PRICE/BitQuest.DENOMINATION_FACTOR);
+              if(user.countEmeralds()>land_price_in_emeralds) {
+                if(user.removeEmeralds(land_price_in_emeralds)) {
+                  saveLandData(player,name,x,z);
+                } else {
+                  player.sendMessage(ChatColor.RED+"There was an error.");
+                }
+
+              } else {
+                player.sendMessage(ChatColor.RED+"You have "+user.countEmeralds()+". To buy land you need "+land_price_in_emeralds);
+              }
+            }
+
           } else if (REDIS
                   .get("chunk" + x + "," + z + "owner")
                   .equals(player.getUniqueId().toString())
