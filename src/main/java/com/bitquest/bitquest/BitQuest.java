@@ -629,7 +629,6 @@ public class BitQuest extends JavaPlugin {
     // lower factor, experience is easier to get. you can increase to get the opposite effect
     int level = getLevel(rawxp);
     float progress = getExpProgress(rawxp);
-    player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,1, true));
     player.setLevel(level);
     player.setExp(progress);
     setPlayerMaxHealth(player);

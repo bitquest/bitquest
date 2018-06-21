@@ -263,7 +263,10 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
+
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
+      event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,0, false));
+
       if (event.getPlayer().hasMetadata("pet")) {
         String cat_name = bitQuest.REDIS.get("pet:" + event.getPlayer().getUniqueId());
         List<Entity> entities = event.getPlayer().getWorld().getEntities();
