@@ -803,7 +803,7 @@ public class BitQuest extends JavaPlugin {
             }
           }
         } else {
-          player.sendMessage(ChatColor.DARK_RED + "Your land name must be 16 characters max");
+          player.sendMessage(ChatColor.DARK_RED + "Your land name must be 27 characters max");
         }
       } else {
         player.sendMessage(
