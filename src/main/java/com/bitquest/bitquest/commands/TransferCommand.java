@@ -18,7 +18,7 @@ public class TransferCommand extends CommandAction {
   }
 
   public boolean run(
-      CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
+          CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
     if (bitQuest.rate_limit == false) {
       bitQuest.rate_limit = true;
 
@@ -27,7 +27,7 @@ public class TransferCommand extends CommandAction {
           // maximum transfer is 8 digits
           return false;
         }
-        for (char c : args[0].toCharArray()) {
+        for (char c: args[0].toCharArray()) {
           if (!Character.isDigit(c)) return false;
         }
         Long sendAmount;
@@ -50,94 +50,61 @@ public class TransferCommand extends CommandAction {
         }
         if (sendAmount < (BitQuest.MINIMUM_TRANSACTION * BitQuest.DENOMINATION_FACTOR)) {
           player.sendMessage(
-              ChatColor.DARK_RED
-                  + "Minimum transaction is "
-                  + ChatColor.LIGHT_PURPLE
-                  + BitQuest.MINIMUM_TRANSACTION
-                  + " "
-                  + BitQuest.DENOMINATION_NAME
-                  + ChatColor.GREEN
-                  + ".");
+                  ChatColor.DARK_RED + "Minimum transaction is " + ChatColor.LIGHT_PURPLE + BitQuest.MINIMUM_TRANSACTION + " " + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + ".");
           return true;
         } else {
           if (fromWallet != null) {
             final Wallet fromWalletFinal = fromWallet;
             final Long sendAmountFinal = sendAmount;
             fromWallet.getBalance(
-                0,
-                new Wallet.GetBalanceCallback() {
-                  @Override
-                  public void run(final Long unconfirmed_balance) {
-                    if (unconfirmed_balance < sendAmountFinal) {
-                      player.sendMessage(ChatColor.DARK_RED + "Insufficient balance.");
-                    } else {
-                      fromWalletFinal.getBalance(
-                          5,
-                          new Wallet.GetBalanceCallback() {
-                            @Override
-                            public void run(Long balance) {
-                              if (unconfirmed_balance != balance) {
-                                player.sendMessage(
-                                    ChatColor.YELLOW
-                                        + "Sending "
-                                        + ChatColor.LIGHT_PURPLE
-                                        + args[0]
-                                        + " "
-                                        + BitQuest.DENOMINATION_NAME
-                                        + ChatColor.YELLOW
-                                        + " to "
-                                        + ChatColor.BLUE
-                                        + args[1]
-                                        + ChatColor.YELLOW
-                                        + "...");
-                                try {
-                                  String txid = fromWalletFinal.sendFrom(args[1], sendAmountFinal);
-                                  player.sendMessage(
-                                      ChatColor.GREEN
-                                          + "Succesfully sent "
-                                          + ChatColor.LIGHT_PURPLE
-                                          + args[0]
-                                          + " "
-                                          + BitQuest.DENOMINATION_NAME
-                                          + ChatColor.GREEN
-                                          + " to external address.");
-                                  player.sendMessage(
-                                      ChatColor.DARK_BLUE
-                                          + " "
-                                          + ChatColor.UNDERLINE
-                                          + "https://live.blockcypher.com/btc-main/tx/"
-                                          + txid);
-                                  bitQuest.updateScoreboard(player);
+                    0,
+                    new Wallet.GetBalanceCallback() {
+                      @Override
+                      public void run(final Long unconfirmed_balance) {
+                        if (unconfirmed_balance < sendAmountFinal) {
+                          player.sendMessage(ChatColor.DARK_RED + "Insufficient balance.");
+                        } else {
+                          fromWalletFinal.getBalance(
+                                  5,
+                                  new Wallet.GetBalanceCallback() {
+                                    @Override
+                                    public void run(Long balance) {
+                                      if (unconfirmed_balance != balance) {
+                                        player.sendMessage(
+                                                ChatColor.YELLOW + "Sending " + ChatColor.LIGHT_PURPLE + args[0] + " " + BitQuest.DENOMINATION_NAME + ChatColor.YELLOW + " to " + ChatColor.BLUE + args[1] + ChatColor.YELLOW + "...");
+                                        try {
+                                          String txid = fromWalletFinal.sendFrom(args[1], sendAmountFinal);
+                                          player.sendMessage(
+                                                  ChatColor.GREEN + "Succesfully sent " + ChatColor.LIGHT_PURPLE + args[0] + " " + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + " to external address.");
+                                          player.sendMessage(
+                                                  ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "https://live.blockcypher.com/btc-main/tx/" + txid);
+                                          bitQuest.updateScoreboard(player);
 
-                                } catch (IOException e) {
-                                  player.sendMessage(
-                                      ChatColor.RED
-                                          + "Transaction failed. Please try again in a few moments.");
+                                        } catch (IOException e) {
+                                          player.sendMessage(
+                                                  ChatColor.RED + "Transaction failed. Please try again in a few moments.");
 
-                                  e.printStackTrace();
-                                } catch (org.json.simple.parser.ParseException e) {
-                                  player.sendMessage(
-                                      ChatColor.RED
-                                          + "Transaction failed. Please try again in a few moments.");
+                                          e.printStackTrace();
+                                        } catch (org.json.simple.parser.ParseException e) {
+                                          player.sendMessage(
+                                                  ChatColor.RED + "Transaction failed. Please try again in a few moments.");
 
-                                  e.printStackTrace();
-                                } catch (ParseException e) {
-                                  player.sendMessage(
-                                      ChatColor.RED
-                                          + "Transaction failed. Please try again in a few moments.");
+                                          e.printStackTrace();
+                                        } catch (ParseException e) {
+                                          player.sendMessage(
+                                                  ChatColor.RED + "Transaction failed. Please try again in a few moments.");
 
-                                  e.printStackTrace();
-                                }
-                              } else {
-                                player.sendMessage(
-                                    ChatColor.RED
-                                        + "You have unconfirmed transactions. please try again later.");
-                              }
-                            }
-                          });
-                    }
-                  }
-                });
+                                          e.printStackTrace();
+                                        }
+                                      } else {
+                                        player.sendMessage(
+                                                ChatColor.RED + "You have unconfirmed transactions. please try again later.");
+                                      }
+                                    }
+                                  });
+                        }
+                      }
+                    });
             return true;
           }
           return true;
@@ -147,7 +114,7 @@ public class TransferCommand extends CommandAction {
       }
     } else {
       player.sendMessage(
-          ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+              ChatColor.RED + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
       return true;
     }
   }

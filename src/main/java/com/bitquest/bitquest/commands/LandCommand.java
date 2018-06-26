@@ -18,11 +18,12 @@ public class LandCommand extends CommandAction {
         this.bitQuest = plugin;
     }
 
-    public boolean run(
+    public boolean run (
             CommandSender sender, Command cmd, String label, String[] args, Player player) {
         if (args.length == 0) {
             player.sendMessage(ChatColor.RED + "If you are trying to buy a land, the command is: /land claim nameofyourland");
             return true;
+
         } else if (bitQuest.rate_limit == false) {
             bitQuest.rate_limit = true;
             if (args[0].equalsIgnoreCase("claim")) {
@@ -132,6 +133,10 @@ public class LandCommand extends CommandAction {
 
                     return true;
                 }
+            } else {
+                player.sendMessage(
+                        ChatColor.RED +
+                                "If you want buy claim a land, use /land claim landname. For permissions, use /land permission [public,private,clan]");
             }
         }
         return false;
