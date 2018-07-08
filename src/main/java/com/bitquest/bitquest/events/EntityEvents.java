@@ -115,14 +115,15 @@ public class EntityEvents implements Listener {
     Player player = event.getPlayer();
 	
     if(!(BitQuest.REDIS.exists("name:"+player.getUniqueId().toString()))) {
-	//give new players a compass and set currency flag.
+	//give new players a compass @BitcoinJake09
 	player.getInventory().addItem(new ItemStack(Material.COMPASS,1));
-	if (BitQuest.BITCORE_HOST != null) { 
-		BitQuest.REDIS.set("currency"+player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
-	} else {
+	}
+	//sets currency flag if not set. @BitcoinJake09
+	if ((BitQuest.BITCORE_HOST != null)&&(BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==null)) { 
+	BitQuest.REDIS.set("currency"+player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
+	} else if((BitQuest.BITCORE_HOST == null)&&(BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==null)) {
 	BitQuest.REDIS.set("currency"+player.getUniqueId().toString(), "emerald");
 		}
-	}
 
     BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
     BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
@@ -181,7 +182,14 @@ public class EntityEvents implements Listener {
         String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
         player.setPlayerListName(
             ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
-      }
+	if (bitQuest.isModerator(player)) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" +
+            ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
+	}
+      } else if ((!BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString()))&&(bitQuest.isModerator(player))) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
+	
+	}
 
       // Prints the user balance
       bitQuest.setTotalExperience(player);
