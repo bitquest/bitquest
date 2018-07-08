@@ -31,6 +31,9 @@ commands:
   send:
     description: "sends bits to other player"
     usage: "/send <amount> <player>"
+  currency:
+    description: "change player currency"
+    usage: "/currency <ems|bits>"
   spawn:
     description: "teleports to spawn"
     usage: "/spawn"

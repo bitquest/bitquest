@@ -16,10 +16,13 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryInteractEvent;
 import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
+
 
 public class InventoryEvents implements Listener {
   BitQuest bitQuest;
@@ -62,7 +65,7 @@ public class InventoryEvents implements Listener {
     trades.add(new Trade(new ItemStack(Material.SEA_LANTERN, 2), 1));
     trades.add(new Trade(new ItemStack(Material.GLOWSTONE, 2), 1));
     trades.add(new Trade(new ItemStack(Material.ANVIL, 1), 2));
-    trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK, 1), 1));
+    //trades.add(new Trade(new ItemStack(Material.EMERALD_BLOCK, 1), 1));
     trades.add(new Trade(new ItemStack(Material.NETHER_STALK, 2), 1));
     trades.add(new Trade(new ItemStack(Material.LAPIS_ORE, 2), 1));
     trades.add(new Trade(new ItemStack(Material.SADDLE, 1), 2));
@@ -99,7 +102,7 @@ public class InventoryEvents implements Listener {
             player.closeInventory();
             event.setCancelled(true);
 
-            try {
+            
               int sat = 0;
               Trade trade = null;
 
@@ -121,6 +124,7 @@ public class InventoryEvents implements Listener {
               }
               final boolean hasOpenSlotsFinal = hasOpenSlots;
               final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
+		if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME)){
               user.wallet.getBalance(
                   0,
                   new Wallet.GetBalanceCallback() {
@@ -177,25 +181,76 @@ public class InventoryEvents implements Listener {
                                 ChatColor.DARK_RED + "You don't have space in your inventory");
                           }
                         } else {
-                          player.sendMessage(ChatColor.DARK_RED + "You don't have enough bits");
+                          player.sendMessage(ChatColor.DARK_RED + "You don't have enough "+BitQuest.DENOMINATION_NAME);
                         }
                       } catch (Exception e) {
                         e.printStackTrace();
                       }
                     }
                   });
+		} //end BitQuest.DENOMINATION_NAME start Ems
+		else if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")){ 
+                      try {
+                        if (user.countEmeralds() >= satFinal/100) {
 
-            } catch (IllegalArgumentException e) {
-              e.printStackTrace();
-              player.sendMessage(
-                  ChatColor.RED
-                      + "Transaction failed. Please try again in a few moments (ERROR 2)");
-            }
-          }
+                          if (hasOpenSlotsFinal) {
+                            if (user.removeEmeralds((int) satFinal/100)) {
+                              if (clicked.getType() == Material.ENCHANTED_BOOK)
+                                bitQuest.books.remove(0);
 
+                              ItemStack item = event.getCurrentItem();
+                              ItemMeta meta = item.getItemMeta();
+                              ArrayList<String> Lore = new ArrayList<String>();
+                              meta.setLore(null);
+                              item.setItemMeta(meta);
+                              player.getInventory().addItem(item);
+                              player.sendMessage(
+                                  ChatColor.GREEN
+                                      + "You bought "
+                                      + clicked.getType()
+                                      + " for "
+                                      + ChatColor.LIGHT_PURPLE
+                                      + satFinal / 100);
+
+                              bitQuest.updateScoreboard(player);
+                              if (bitQuest.messageBuilder != null) {
+
+                                // Create an event
+                                org.json.JSONObject sentEvent =
+                                    bitQuest.messageBuilder.event(
+                                        player.getUniqueId().toString(), "Purchase", null);
+                                org.json.JSONObject sentCharge =
+                                    bitQuest.messageBuilder.trackCharge(
+                                        player.getUniqueId().toString(), satFinal / 100, null);
+
+                                ClientDelivery delivery = new ClientDelivery();
+                                delivery.addMessage(sentEvent);
+                                delivery.addMessage(sentCharge);
+
+                                MixpanelAPI mixpanel = new MixpanelAPI();
+                                mixpanel.deliver(delivery);
+                              }
+
+                            } else {
+                              player.sendMessage(
+                                  ChatColor.RED
+                                      + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                            }
+                          } else {
+                            player.sendMessage(
+                                ChatColor.DARK_RED + "You don't have space in your inventory");
+                          }
+                        } else {
+                          player.sendMessage(ChatColor.DARK_RED + "You don't have enough ems");
+                        }
+                      } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+		  }
+		}//end emerald
         } else {
           // player sells (experimental)
-
+	  //@BitcoinJake09 thinks @Explodi should change sell to emerald only?
           final ItemStack clicked = event.getCurrentItem();
           if (clicked != null && clicked.getType() == Material.ENCHANTED_BOOK) {
             event.setCancelled(true);
@@ -412,4 +467,26 @@ public class InventoryEvents implements Listener {
   public void onInventoryInteract(InventoryInteractEvent event) {
     event.setCancelled(false);
   }
+	//@bitcoinjake09 updates scoreboard if emeralds
+    @EventHandler
+    public void OnPlayerPickup(PlayerPickupItemEvent event)
+    {  
+        Player player = event.getPlayer();
+        ItemStack item = event.getItem().getItemStack();
+        Material itemType = item.getType();
+        if(((itemType == Material.EMERALD_BLOCK)||(itemType == Material.EMERALD))&&(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")))
+        {
+            try { bitQuest.updateScoreboard(player); } catch (Exception e){}
+        }
+    }
+	/*
+    @EventHandler
+    public void OnPlayerDropItem(PlayerDropItemEvent event)
+    {  
+        Player player = event.getPlayer();
+        if(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
+        {
+            try { bitQuest.updateScoreboard(player); } catch (Exception e){}
+        }
+    } */
 }
