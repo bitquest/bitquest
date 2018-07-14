@@ -8,6 +8,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class ClanCommand extends CommandAction {
+  private BitQuest bitQuest;
+
+  public ClanCommand(BitQuest plugin) {
+    bitQuest = plugin;
+  }
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
     if (args.length > 0) {
@@ -33,6 +38,10 @@ public class ClanCommand extends CommandAction {
                           + " clan");
                   player.setPlayerListName(
                       ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+			if (bitQuest.isModerator(player)) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" +
+            ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+	}
                   return true;
                 } else {
                   player.sendMessage(
@@ -153,6 +162,10 @@ public class ClanCommand extends CommandAction {
                   ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
               player.setPlayerListName(
                   ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+		if (bitQuest.isModerator(player)) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" +
+            ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
+	}
               return true;
             } else {
               player.sendMessage(

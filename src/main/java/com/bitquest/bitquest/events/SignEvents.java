@@ -23,8 +23,7 @@ public class SignEvents implements Listener {
 
     final Player player = event.getPlayer();
     // Check that the world is overworld
-    if (!event.getBlock().getWorld().getName().endsWith("_nether")
-        && !event.getBlock().getWorld().getName().endsWith("_end")) {
+    if (!event.getBlock().getWorld().getName().endsWith("_end")) {
       final String specialCharacter = "^";
       final String[] lines = event.getLines();
       final String signText = lines[0] + lines[1] + lines[2] + lines[3];
@@ -38,8 +37,6 @@ public class SignEvents implements Listener {
         bitQuest.claimLand(name, chunk, player);
       }
 
-    } else if (event.getBlock().getWorld().getName().endsWith("_nether")) {
-      player.sendMessage(ChatColor.DARK_RED + "No claiming in the nether!");
     } else if (event.getBlock().getWorld().getName().endsWith("_end")) {
       player.sendMessage(ChatColor.DARK_RED + "No claiming in the end!");
     }

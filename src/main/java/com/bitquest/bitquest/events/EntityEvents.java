@@ -89,6 +89,8 @@ public class EntityEvents implements Listener {
           EntityType.PAINTING,
           EntityType.ENDER_CRYSTAL);
 
+  private int pvar = 0; //pvp area variable @bitcoinjake09
+
   public EntityEvents(BitQuest plugin) {
     bitQuest = plugin;
 
@@ -111,6 +113,17 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerLogin(PlayerLoginEvent event) {
     Player player = event.getPlayer();
+	
+    if(!(BitQuest.REDIS.exists("name:"+player.getUniqueId().toString()))) {
+	//give new players a compass @BitcoinJake09
+	player.getInventory().addItem(new ItemStack(Material.COMPASS,1));
+	}
+	//sets currency flag if not set. @BitcoinJake09
+	if ((BitQuest.BITCORE_HOST != null)&&(BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==null)) { 
+	BitQuest.REDIS.set("currency"+player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
+	} else if((BitQuest.BITCORE_HOST == null)&&(BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==null)) {
+	BitQuest.REDIS.set("currency"+player.getUniqueId().toString(), "emerald");
+		}
 
     BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
     BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
@@ -169,7 +182,14 @@ public class EntityEvents implements Listener {
         String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
         player.setPlayerListName(
             ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
-      }
+	if (bitQuest.isModerator(player)) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" +
+            ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
+	}
+      } else if ((!BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString()))&&(bitQuest.isModerator(player))) {
+	player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
+	
+	}
 
       // Prints the user balance
       bitQuest.setTotalExperience(player);
@@ -263,9 +283,12 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
+	if((bitQuest.isPvP(event.getPlayer().getLocation())==true)&&(pvar==0)) {event.getPlayer().sendMessage(ChatColor.RED+"IN PVP ZONE");pvar++;}
 
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-      event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,0, false));
+      event
+          .getPlayer()
+          .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
       if (event.getPlayer().hasMetadata("pet")) {
         String cat_name = bitQuest.REDIS.get("pet:" + event.getPlayer().getUniqueId());
@@ -281,9 +304,15 @@ public class EntityEvents implements Listener {
           }
         }
       }
-      if (!event.getFrom().getWorld().getName().endsWith("_nether")
-          && !event.getFrom().getWorld().getName().endsWith("_end")) {
+	pvar = 0;
+      if (!event.getFrom().getWorld().getName().endsWith("_end")) {
         // announce new area
+	String chunkname = "";
+	if (event.getPlayer().getWorld().getName().equals("world")){
+	 chunkname="chunk";
+	} else if (event.getPlayer().getWorld().getName().equals("world_nether")) {
+chunkname="netherchunk"; }
+
         int x1 = event.getFrom().getChunk().getX();
         int z1 = event.getFrom().getChunk().getZ();
 
@@ -291,8 +320,8 @@ public class EntityEvents implements Listener {
         int z2 = event.getTo().getChunk().getZ();
         String name1 = "the wilderness";
         String name2 = "the wilderness";
-        String key1 = "chunk" + x1 + "," + z1 + "name";
-        String key2 = "chunk" + x2 + "," + z2 + "name";
+        String key1 = chunkname+""+ x1 + "," + z1 + "name";
+        String key2 = chunkname+""+ x2 + "," + z2 + "name";
         if (bitQuest.landIsClaimed(event.getFrom())) {
           if (bitQuest.land_name_cache.containsKey(key1)) {
             name1 = bitQuest.land_name_cache.get(key1);
@@ -699,7 +728,7 @@ public class EntityEvents implements Listener {
         } else if (event.getEntity() instanceof Player) {
           // PvP is off in overworld and nether
 
-          if (event.getEntity().getWorld().getName().endsWith("_end")) {
+          if ((event.getEntity().getWorld().getName().endsWith("_end"))||(bitQuest.landPermissionCode(event.getEntity().getLocation()).equals("v"))||(bitQuest.landPermissionCode(event.getEntity().getLocation()).equals("pv"))) {
             event.setCancelled(false);
           } else {
             event.setCancelled(true);
