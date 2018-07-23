@@ -2,6 +2,7 @@ package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.Wallet;
+import com.bitquest.bitquest.User;
 import com.mixpanel.mixpanelapi.ClientDelivery;
 import com.mixpanel.mixpanelapi.MixpanelAPI;
 import java.io.IOException;
@@ -474,6 +475,7 @@ chunkname="netherchunk"; }
             dice = BitQuest.rand(1, 20);
           if (bitQuest.wallet_balance_cache > 1000 * bitQuest.DENOMINATION_FACTOR) dice = 7;
           final Player player = (Player) damage.getDamager();
+          if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString())=="emeralds") dice = BitQuest.rand(1, 20);
           boolean loot_limit = false;
           if (bitQuest.last_loot_player != null
               && bitQuest
@@ -487,12 +489,16 @@ chunkname="netherchunk"; }
           bitQuest.setTotalExperience(player);
           if (dice == 7) {
 
-            if (loot_limit == false
+            if ((loot_limit == false
                 && bitQuest.rate_limit == false
-                && bitQuest.wallet_balance_cache > money) {
+                && bitQuest.wallet_balance_cache > money)||(loot_limit == false
+                && bitQuest.rate_limit == false && BitQuest.REDIS.get("currency"+player.getUniqueId().toString())=="emeralds")) {
               try {
-                if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
+	    	final User user = new User(bitQuest, player);
+		int emloot =(int) (money / bitQuest.DENOMINATION_FACTOR);
+                if ((BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME) && bitQuest.wallet.move(player.getUniqueId().toString(), money))||(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emeralds") && user.addEmeralds(emloot))) {
                   bitQuest.last_loot_player = player;
+		  if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==BitQuest.DENOMINATION_NAME)
                   bitQuest.wallet_balance_cache -= money;
                   System.out.println("[loot] " + player.getDisplayName() + ": " + money);
                   System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
@@ -503,7 +509,7 @@ chunkname="netherchunk"; }
                           + money / bitQuest.DENOMINATION_FACTOR
                           + ChatColor.GREEN
                           + " "
-                          + bitQuest.DENOMINATION_NAME
+                          + BitQuest.REDIS.get("currency"+player.getUniqueId().toString())
                           + " of loot!");
                   player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
                   if (bitQuest.messageBuilder != null) {
@@ -944,3 +950,4 @@ chunkname="netherchunk"; }
     event.setCancelled(true);
   }
 }
+
