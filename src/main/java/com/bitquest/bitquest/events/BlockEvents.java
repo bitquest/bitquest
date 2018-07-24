@@ -46,8 +46,6 @@ public class BlockEvents implements Listener {
     Block b = event.getBlock();
     Material m = b.getType();
     if (m.equals(Material.BEDROCK)
-        || m.equals(Material.END_BRICKS)
-        || m.equals(Material.ENDER_STONE)
         || m.equals(Material.COMMAND)
         || m.equals(Material.COMMAND_CHAIN)
         || m.equals(Material.COMMAND_REPEATING)) {
@@ -87,6 +85,14 @@ public class BlockEvents implements Listener {
     List<Block> blocks = event.getBlocks();
     BlockFace direction = event.getDirection();
 
+	String tempchunk="";
+	if (event.getBlock().getLocation().getWorld().getName().equals("world")){
+        tempchunk="chunk";
+	}//end world lmao @bitcoinjake09
+	else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")){
+	tempchunk="netherchunk";
+	}//end nether @bitcoinjake09
+
     if (!blocks.isEmpty()) {
       Block lastBlock = blocks.get(blocks.size() - 1);
       Block nextBlock = lastBlock.getRelative(direction);
@@ -96,11 +102,11 @@ public class BlockEvents implements Listener {
 
       String owner1, owner2;
       if ((owner2 =
-              BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner"))
+              BitQuest.REDIS.get(tempchunk+"" + blockChunk.getX() + "," + blockChunk.getZ() + "owner"))
           != null) {
         if ((owner1 =
                 BitQuest.REDIS.get(
-                    "chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner"))
+                    tempchunk+"" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner"))
             != null) {
           if (!owner1.equals(owner2)) {
             event.setCancelled(true);
@@ -117,6 +123,13 @@ public class BlockEvents implements Listener {
     Block piston = event.getBlock();
     BlockFace direction = event.getDirection();
     Block nextBlock = piston.getRelative(direction, -2); // Direction is inverted?
+	String tempchunk="";
+	if (event.getBlock().getLocation().getWorld().getName().equals("world")){
+        tempchunk="chunk";
+	}//end world lmao @bitcoinjake09
+	else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")){
+	tempchunk="netherchunk";
+	}//end nether @bitcoinjake09
 
     if (event.isSticky()) {
       Chunk pistonChunk = piston.getChunk();
@@ -124,11 +137,11 @@ public class BlockEvents implements Listener {
 
       String owner1, owner2;
       if ((owner2 =
-              BitQuest.REDIS.get("chunk" + blockChunk.getX() + "," + blockChunk.getZ() + "owner"))
+              BitQuest.REDIS.get(tempchunk+"" + blockChunk.getX() + "," + blockChunk.getZ() + "owner"))
           != null) {
         if ((owner1 =
                 BitQuest.REDIS.get(
-                    "chunk" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner"))
+                    tempchunk+"" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner"))
             != null) {
           if (!owner1.equals(owner2)) {
             event.setCancelled(true);

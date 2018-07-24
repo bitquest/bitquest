@@ -471,11 +471,12 @@ chunkname="netherchunk"; }
               Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level))
                   * bitQuest.DENOMINATION_FACTOR;
           int dice = BitQuest.rand(1, 100);
+ final Player player = (Player) damage.getDamager();
+	 if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME))
           if (bitQuest.wallet_balance_cache > 100 * bitQuest.DENOMINATION_FACTOR)
             dice = BitQuest.rand(1, 20);
+if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME))
           if (bitQuest.wallet_balance_cache > 1000 * bitQuest.DENOMINATION_FACTOR) dice = 7;
-          final Player player = (Player) damage.getDamager();
-          if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString())=="emeralds") dice = BitQuest.rand(1, 20);
           boolean loot_limit = false;
           if (bitQuest.last_loot_player != null
               && bitQuest
@@ -488,17 +489,13 @@ chunkname="netherchunk"; }
           bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
           bitQuest.setTotalExperience(player);
           if (dice == 7) {
-
-            if ((loot_limit == false
+if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME)) {
+            if (loot_limit == false
                 && bitQuest.rate_limit == false
-                && bitQuest.wallet_balance_cache > money)||(loot_limit == false
-                && bitQuest.rate_limit == false && BitQuest.REDIS.get("currency"+player.getUniqueId().toString())=="emeralds")) {
+                && bitQuest.wallet_balance_cache > money) {
               try {
-	    	final User user = new User(bitQuest, player);
-		int emloot =(int) (money / bitQuest.DENOMINATION_FACTOR);
-                if ((BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME) && bitQuest.wallet.move(player.getUniqueId().toString(), money))||(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emeralds") && user.addEmeralds(emloot))) {
+                if (bitQuest.wallet.move(player.getUniqueId().toString(), money)) {
                   bitQuest.last_loot_player = player;
-		  if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString())==BitQuest.DENOMINATION_NAME)
                   bitQuest.wallet_balance_cache -= money;
                   System.out.println("[loot] " + player.getDisplayName() + ": " + money);
                   System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
@@ -509,7 +506,7 @@ chunkname="netherchunk"; }
                           + money / bitQuest.DENOMINATION_FACTOR
                           + ChatColor.GREEN
                           + " "
-                          + BitQuest.REDIS.get("currency"+player.getUniqueId().toString())
+                          + bitQuest.DENOMINATION_NAME
                           + " of loot!");
                   player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
                   if (bitQuest.messageBuilder != null) {
@@ -529,7 +526,41 @@ chunkname="netherchunk"; }
               } catch (Exception e1) {
                 e1.printStackTrace();
               }
-            }
+            } //end if btc start emerald?
+		} else {
+		try {
+		final User user = new User(bitQuest, player);
+                if (user.addEmeralds((int)(money / bitQuest.DENOMINATION_FACTOR))) {
+                  bitQuest.last_loot_player = player;
+                  System.out.println("[loot] " + player.getDisplayName() + ": " + (money / bitQuest.DENOMINATION_FACTOR) + "Emeralds");
+                  player.sendMessage(
+                      ChatColor.GREEN
+                          + "You got "
+                          + ChatColor.BOLD
+                          + money / bitQuest.DENOMINATION_FACTOR
+                          + ChatColor.GREEN
+                          + " "
+                          + "Emeralds"
+                          + " of loot!");
+                  player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
+                  if (bitQuest.messageBuilder != null) {
+
+                    // Create an event
+                    org.json.JSONObject sentEvent =
+                        bitQuest.messageBuilder.event(
+                            player.getUniqueId().toString(), "Loot", null);
+
+                    ClientDelivery delivery = new ClientDelivery();
+                    delivery.addMessage(sentEvent);
+
+                    MixpanelAPI mixpanel = new MixpanelAPI();
+                    mixpanel.deliver(delivery);
+                  }
+                }
+              } catch (Exception e1) {
+                e1.printStackTrace();
+              }
+		}
           }
         }
 
@@ -734,7 +765,7 @@ chunkname="netherchunk"; }
         } else if (event.getEntity() instanceof Player) {
           // PvP is off in overworld and nether
 
-          if ((event.getEntity().getWorld().getName().endsWith("_end"))||(bitQuest.landPermissionCode(event.getEntity().getLocation()).equals("v"))||(bitQuest.landPermissionCode(event.getEntity().getLocation()).equals("pv"))) {
+          if ((event.getEntity().getWorld().getName().endsWith("_end"))||(bitQuest.isPvP(event.getEntity().getLocation()))) {
             event.setCancelled(false);
           } else {
             event.setCancelled(true);
