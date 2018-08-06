@@ -26,12 +26,13 @@
             <maven.compiler.target>1.8</maven.compiler.target>
         </properties>
         <build>
+            <directory>./plugins</directory>
             <plugins>
             <plugin>
             <artifactId>maven-assembly-plugin</artifactId>
             <version>3.0.0</version>
             <configuration>
-            <finalName>test</finalName>
+            <finalName>BitQuest</finalName>
             <descriptorRefs>
                 <descriptorRef>jar-with-dependencies</descriptorRef>
             </descriptorRefs>

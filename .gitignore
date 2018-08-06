@@ -30,3 +30,8 @@ tmp
 # format.sh
 google-java-format-1.5-all-deps.jar*
 
+
+# running locally on the project root
+plugins
+server.jar
+world
