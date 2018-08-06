@@ -80,16 +80,6 @@ public class BitQuest extends JavaPlugin {
   public static final String SERVER_NAME =
       System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
 
-  public static final String LAND_ADDRESS =
-      System.getenv("LAND_ADDRESS") != null ? System.getenv("LAND_ADDRESS") : null;
-
-  public static final String MINER_FEE_ADDRESS =
-      System.getenv("MINER_FEE_ADDRESS") != null ? System.getenv("MINER_FEE_ADDRESS") : null;
-
-  // Support for the bitcore full node and insight-api.
-  public static final String BITCORE_HOST =
-      System.getenv("BITCORE_HOST") != null ? System.getenv("BITCORE_HOST") : null;
-
   // Support for statsd is optional but really cool
   public static final String STATSD_HOST =
       System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
@@ -101,14 +91,6 @@ public class BitQuest extends JavaPlugin {
   public static final String MIXPANEL_TOKEN =
       System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
   public MessageBuilder messageBuilder;
-  // Support for slack bot
-  public static final String SLACK_BOT_AUTH_TOKEN =
-      System.getenv("SLACK_BOT_AUTH_TOKEN") != null ? System.getenv("SLACK_BOT_AUTH_TOKEN") : null;
-  public static final String SLACK_BOT_REPORTS_CHANNEL =
-      System.getenv("SLACK_BOT_REPORTS_CHANNEL") != null
-          ? System.getenv("SLACK_BOT_REPORTS_CHANNEL")
-          : "reports";
-  public SlackSession slackBotSession;
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
   // localhost:6379
   public static final String REDIS_HOST =
@@ -206,21 +188,8 @@ public class BitQuest extends JavaPlugin {
         messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
         System.out.println("Mixpanel support is on");
       }
-      if (SLACK_BOT_AUTH_TOKEN != null) {
-        slackBotSession = SlackSessionFactory.createWebSocketSlackSession(SLACK_BOT_AUTH_TOKEN);
-        try {
-          slackBotSession.connect();
-        } catch (IOException e) {
-          System.out.println("Slack bot connection failed with error: " + e.getMessage());
-        }
-      }
-      // Removes all entities on server restart. This is a workaround for when large numbers of
-      // entities grash the server. With the release of Minecraft 1.11 and "max entity cramming"
-      // this
-      // will be unnecesary.
-      //     removeAllEntities();
-      killAllVillagers();
 
+   
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
 
