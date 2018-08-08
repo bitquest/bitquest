@@ -33,5 +33,16 @@ google-java-format-1.5-all-deps.jar*
 
 # running locally on the project root
 plugins
-server.jar
 world
+*.jar
+eula.txt
+logs
+banned-ips.json
+uid.dat
+world_the_end
+world_nether
+whitelist.json
+banned-players.json
+ops.json
+permissions.yml
+usercache.json

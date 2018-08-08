@@ -97,16 +97,18 @@
                 <artifactId>mixpanel-java</artifactId>
                 <version>1.4.4</version>
             </dependency>
-            <dependency>
-                <groupId>com.ullink.slack</groupId>
-                <artifactId>simpleslackapi</artifactId>
-                <version>1.2.0</version>
-            </dependency>
+
             <dependency>
                 <groupId>com.timgroup</groupId>
                 <artifactId>java-statsd-client</artifactId>
                 <version>3.0.1</version>
             </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.2.0</version>
+            </dependency>
+
             <!-- https://mvnrepository.com/artifact/junit/junit -->
             <dependency>
                 <groupId>junit</groupId>

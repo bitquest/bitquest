@@ -1,6 +1,10 @@
 package com.bitquest.bitquest;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -13,11 +17,19 @@ public class User {
   private BitQuest bitQuest;
   public Player player;
 
-  public User(BitQuest plugin, Player player)
-      throws ParseException, org.json.simple.parser.ParseException, IOException {
+  public User(BitQuest _bitQuest, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
     this.player = player;
-    this.bitQuest = plugin;
-    this.wallet = new Wallet(this.bitQuest, this.player.getUniqueId().toString());
+    this.bitQuest = _bitQuest;
+    // this.wallet = new Wallet(this.player.getUniqueId().toString());
+
+    PreparedStatement pst = this.bitQuest.db_con.prepareStatement("SELECT * FROM users");
+    ResultSet rs = pst.executeQuery();
+
+      while (rs.next()) {
+        System.out.print(rs.getInt(1));
+        System.out.print(": ");
+        System.out.println(rs.getString(2));
+      }
   }
 
   // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");

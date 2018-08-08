@@ -31,7 +31,13 @@ public class PetCommand extends CommandAction {
       if (bitQuest.REDIS.sismember("pet:names", args[0])) {
         player.sendMessage(ChatColor.RED + "A pet with that name already exists.");
       } else {
-        bitQuest.adoptPet(player, args[0]);
+        try {
+          bitQuest.adoptPet(player, args[0]);
+
+        } catch(Exception e) {
+          System.out.println(e);
+          player.sendMessage(ChatColor.DARK_RED+"FAIL. Please try again later.");
+        }
       }
 
       return true;
