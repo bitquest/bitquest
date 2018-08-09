@@ -37,25 +37,23 @@ public class Wallet {
         final JSONArray inputs = new JSONArray();
         final JSONArray input_addresses = new JSONArray();
         final JSONObject input = new JSONObject();
-        input.put("address",this.address);
-        input_addresses.add(input);
-        inputs.add(input_addresses);
-        input.put("inputs",inputs);
+        input_addresses.add(this.address);
+        input.put("addresses",input_addresses);
+        inputs.add(input);
 
         // outputs
         final JSONArray outputs = new JSONArray();
         final JSONArray output_addresses = new JSONArray();
         final JSONObject output = new JSONObject();
-        output.put("address",_address);
-        output_addresses.add(output);
-        outputs.add(output_addresses);
-        output.put("inputs",outputs);
+        output_addresses.add(_address);;
+        output.put("addresses",output_addresses);
+        output.put("value",sat);
+        outputs.add(output);
 
         // parameters to be sent to API
         final JSONObject blockcypher_params = new JSONObject();
         blockcypher_params.put("inputs", inputs);
         blockcypher_params.put("outputs", outputs);
-        blockcypher_params.put("value",sat);
 
         // create skeleton tx to be signed
         URL url = new URL("https://api.blockcypher.com/v1/btc/test3/txs/new");
