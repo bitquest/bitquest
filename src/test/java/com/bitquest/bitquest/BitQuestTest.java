@@ -33,7 +33,7 @@ public class BitQuestTest {
         }
         DBMigrationCheck migration = new DBMigrationCheck(db_con);
         Wallet test_user_wallet=BitQuest.generateNewWallet();
-        Wallet test_world_wallet=new Wallet("0859d87dc0944296de8e2fd49e911491484d802f400308ccf885c4c514815697","034cd558fb702a6ce3e1c010523a3b1d146f5ebb85535ea89488bae8ac2d5aa05f","minenaq7DrYKbWw9yUhR7DA9t16YN3JFss","cMrwAyDwRwRpQzMvB5C6aws9K6sFh748oagZuDKM9Zcpg5nVtetF");
+        Wallet test_world_wallet=new Wallet("d6918becd01bfaa50a848eb346c38739fb8b9ce6d10124f8758a94498bd21bb8","03870b86fbdee06f9104ac4ece5435d4d9283366508cee764df84e7b5747605ec0","mysVa261EMDtnUYDLY54TEaVAoEbHudY8D","cUmo47gffcGAePgvLY97nwqd5y1KPTnAi5S7soVio5PYzFayBfhf");
         assertTrue(test_world_wallet.payment(test_user_wallet.address, Long.valueOf(10)));
 
     }

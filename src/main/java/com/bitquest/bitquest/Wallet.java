@@ -1,21 +1,24 @@
 package com.bitquest.bitquest;
 
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
+import org.bitcoinj.core.DumpedPrivateKey;
+import org.bitcoinj.core.ECKey;
+import org.bitcoinj.core.ECKey.ECDSASignature;
+import org.bitcoinj.core.NetworkParameters;
+import org.bitcoinj.core.Sha256Hash;
+import org.bitcoinj.params.MainNetParams;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.util.Base64;
 
 public class Wallet {
     public String address;
@@ -30,9 +33,7 @@ public class Wallet {
         this.wif = _wif;
         this.private_key = _private_key;
     }
-
-    public boolean payment(String _address,Long sat) throws IOException, ParseException {
-
+    JSONObject txSkeleton(String _address, Long sat) throws IOException, ParseException {
         // inputs
         final JSONArray inputs = new JSONArray();
         final JSONArray input_addresses = new JSONArray();
@@ -54,8 +55,6 @@ public class Wallet {
         final JSONObject blockcypher_params = new JSONObject();
         blockcypher_params.put("inputs", inputs);
         blockcypher_params.put("outputs", outputs);
-
-        // create skeleton tx to be signed
         URL url = new URL("https://api.blockcypher.com/v1/btc/test3/txs/new");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setConnectTimeout(5000);
@@ -78,8 +77,80 @@ public class Wallet {
         in.close();
         JSONParser parser = new JSONParser();
 
-        JSONObject response_object = (JSONObject) parser.parse(response.toString());
-        return false;
+        return (JSONObject) parser.parse(response.toString());
+    }
+    public boolean payment(String _address,Long sat) throws IOException, ParseException {
+
+
+
+        // create skeleton tx to be signed
+        JSONObject tx = txSkeleton(_address,sat);
+
+        System.out.println(tx.toString());
+
+        JSONArray tosign= (JSONArray) tx.get("tosign");
+        System.out.println(tosign.get(0));
+
+
+        // message (hash) to be signed with private key
+        String msg = tosign.get(0).toString();
+
+        // create raw transaction with in full node
+
+        // creating a key object from WiF
+        DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
+        ECKey key = dpk.getKey();
+
+        // checking our key object
+        NetworkParameters main =  MainNetParams.get();
+        String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(NetworkParameters.testNet());
+        System.out.println(wif.equals(check));  // true
+
+        // creating Sha object from string
+        Sha256Hash hash = Sha256Hash.wrap(msg);
+
+        // creating signature
+        ECDSASignature sig = key.sign(hash);
+
+        // encoding
+        byte[] res = sig.encodeToDER();
+
+        // converting to hex
+        String hex = DatatypeConverter.printHexBinary(res);
+        JSONArray signatures=new JSONArray();
+        signatures.add(hex);
+        tx.put("signatures",signatures);
+        JSONArray pubkeys = new JSONArray();
+        pubkeys.add(this.public_key);
+        tx.put("pubkeys",pubkeys);
+        System.out.println(tx.toJSONString());
+
+        System.out.println(hex);
+        URL url = new URL("https://api.blockcypher.com/v1/btc/test3/txs/send");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setConnectTimeout(5000);
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        System.out.println(tx.toString());
+        out.write(tx.toString());
+        out.close();
+
+        int responseCode = con.getResponseCode();
+
+        BufferedReader in =
+                new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        JSONParser parser = new JSONParser();
+
+        System.out.println(response.toString());
+
+        return true;
     }
     public Long getBalance(int confirmations) {
         return Long.valueOf(0);
