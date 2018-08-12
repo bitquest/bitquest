@@ -29,6 +29,7 @@ public class User {
       System.out.println(rs.getString(2));
     } else {
       System.out.println("[user not found] "+this.uuid);
+      this.wallet=BitQuest.generateNewWallet();
     }
   }
 

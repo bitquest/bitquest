@@ -115,7 +115,13 @@ public class Wallet {
         pubkeys.add(this.public_key);
         tx.put("pubkeys",pubkeys);
         // go back to blockcypher with signed transaction
-        URL url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCYPHER_CHAIN+"/txs/send");
+        URL url;
+        if(System.getenv("BLOCKCYPHER_TOKEN")!=null) {
+            url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCYPHER_CHAIN+"/txs/send?token="+System.getenv("BLOCKCYPHER_TOKEN"));
+        } else {
+            url = new URL("https://api.blockcypher.com/v1/"+BitQuest.BLOCKCYPHER_CHAIN+"/txs/send");
+        }
+
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setConnectTimeout(5000);
         con.setDoOutput(true);

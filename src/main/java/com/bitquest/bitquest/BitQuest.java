@@ -84,9 +84,7 @@ public class BitQuest extends JavaPlugin {
             System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
 
     public static final int MAX_STOCK = 100;
-    public static final String SERVER_NAME =
-            System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
-
+    public static final String SERVER_NAME = System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
     // Support for statsd is optional but really cool
     public static final String STATSD_HOST =
             System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
