@@ -155,6 +155,7 @@ public class BitQuest extends JavaPlugin {
             db_con = DriverManager.getConnection(db_url, db_user, db_password);
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println("[fatal] database connection failed. Shutting down.");
             Bukkit.shutdown();
         }
     }
@@ -233,6 +234,7 @@ public class BitQuest extends JavaPlugin {
             sendDiscordMessage("bitquest started");
         } catch (Exception e) {
             e.printStackTrace();
+            System.out.println("[fatal] plugin enable fails");
             Bukkit.shutdown();
         }
     }
@@ -355,7 +357,6 @@ public class BitQuest extends JavaPlugin {
             }//end emerald here
         } catch(Exception e) {
             e.printStackTrace();
-            Bukkit.shutdown();
         }
     }
 
