@@ -92,9 +92,11 @@ public class Wallet {
         ECKey key = dpk.getKey();
         // checking our key object
         NetworkParameters params =  TestNet3Params.get();
-        if(System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
-            System.out.println("[transaction] main net transaction start");
-            params = MainNetParams.get();
+        if(System.getenv("BITQUEST_ENV")!=null) {
+            if(System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
+                System.out.println("[transaction] main net transaction start");
+                params = MainNetParams.get();
+            }
         }
         String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
         System.out.println(wif.equals(check));  // true
