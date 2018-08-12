@@ -443,8 +443,8 @@ public class EntityEvents implements Listener {
                             }
                         } else {
                             // emeralds
-                            final User user = new User(bitQuest.db_con, player.toString());
-                            if (user.addEmeralds((int) (money / bitQuest.DENOMINATION_FACTOR))) {
+                            final User user = new User(bitQuest.db_con, player.getUniqueId());
+                            if (user.addEmeralds((int) (money / bitQuest.DENOMINATION_FACTOR),player)) {
                                 bitQuest.last_loot_player = player;
                                 System.out.println("[loot] " + player.getDisplayName() + ": " + (money / bitQuest.DENOMINATION_FACTOR) + "Emeralds");
                                 player.sendMessage(

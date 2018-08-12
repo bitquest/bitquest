@@ -86,7 +86,7 @@ public class InventoryEvents implements Listener {
     void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException, SQLException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
-        final User user = new User(bitQuest.db_con, player.getUniqueId().toString());
+        final User user = new User(bitQuest.db_con, player.getUniqueId());
 
         // Merchant inventory
         if (inventory.getName().equalsIgnoreCase("Market")) {
@@ -160,10 +160,10 @@ public class InventoryEvents implements Listener {
                     } else {
                         // emeralds
                         try {
-                            if (user.countEmeralds() >= satFinal / 100) {
+                            if (user.countEmeralds(player.getInventory()) >= satFinal / 100) {
 
                                 if (hasOpenSlotsFinal) {
-                                    if (user.removeEmeralds((int) satFinal / 100)) {
+                                    if (user.removeEmeralds((int) satFinal / 100,player)) {
                                         if (clicked.getType() == Material.ENCHANTED_BOOK)
                                             bitQuest.books.remove(0);
 

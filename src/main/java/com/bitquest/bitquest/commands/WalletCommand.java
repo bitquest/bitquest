@@ -21,7 +21,7 @@ public class WalletCommand extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
 
         try {
-            User user = new User(bitQuest.db_con, player.getUniqueId().toString());
+            User user = new User(bitQuest.db_con, player.getUniqueId());
             bitQuest.sendWalletInfo(user);
             bitQuest.updateScoreboard(player);
         } catch (Exception e) {

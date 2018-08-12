@@ -317,7 +317,7 @@ public class BitQuest extends JavaPlugin {
 
     public void updateScoreboard(final Player player) {
         try {
-            final User user = new User(this.db_con, player.getUniqueId().toString());
+            final User user = new User(this.db_con, player.getUniqueId());
             ScoreboardManager scoreboardManager;
             Scoreboard walletScoreboard;
             Objective walletScoreboardObjective;
@@ -347,7 +347,7 @@ public class BitQuest extends JavaPlugin {
                         try {
                             Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Ems:"); //Get a fake offline player
 
-                            score.setScore(user.countEmeralds());
+                            score.setScore(user.countEmeralds(player.getInventory()));
                             player.setScoreboard(walletScoreboard);
                         } catch (Exception e) {
                             System.out.println("problems in updatescoreboard");
@@ -363,21 +363,20 @@ public class BitQuest extends JavaPlugin {
 
     public void createPet(User user, String pet_name) {
         REDIS.sadd("pet:names", pet_name);
-        BitQuest.REDIS.zincrby("player:tx", PET_PRICE, user.player.getUniqueId().toString());
+        BitQuest.REDIS.zincrby("player:tx", PET_PRICE, user.uuid.toString());
         long unixTime = System.currentTimeMillis() / 1000L;
-        REDIS.set("pet:" + user.player.getUniqueId() + ":timestamp", Long.toString(unixTime));
-        user.player.sendMessage(ChatColor.GREEN + "Congratulations, you just adopted " + pet_name);
-        REDIS.set("pet:" + user.player.getUniqueId(), pet_name);
-        spawnPet(user.player);
+        REDIS.set("pet:" + user.uuid.toString() + ":timestamp", Long.toString(unixTime));
+        REDIS.set("pet:" + user.uuid.toString(), pet_name);
     }
 
     public void adoptPet(Player player, String pet_name) {
         try {
-            final User user = new User(this.db_con, player.getUniqueId().toString());
+            final User user = new User(this.db_con, player.getUniqueId());
             if (user.wallet.getBalance(3) >= PET_PRICE) {
                 try {
                     if (user.wallet.payment(this.wallet.address, PET_PRICE) == true) {
                         createPet(user, pet_name);
+                        spawnPet(player);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -671,7 +670,7 @@ public class BitQuest extends JavaPlugin {
                         try {
 
 
-                            final User user = new User(this.db_con, player.getUniqueId().toString());
+                            final User user = new User(this.db_con, player.getUniqueId());
                             player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                             final BitQuest bitQuest = this;
@@ -715,8 +714,8 @@ public class BitQuest extends JavaPlugin {
                                     landxprice = 4;
                                 }
                                 int land_price_in_emeralds = (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
-                                if (user.countEmeralds() > land_price_in_emeralds) {
-                                    if (user.removeEmeralds(land_price_in_emeralds)) {
+                                if (user.countEmeralds(player.getInventory()) > land_price_in_emeralds) {
+                                    if (user.removeEmeralds(land_price_in_emeralds,player)) {
                                         saveLandData(player, name, x, z);
                                     } else {
                                         player.sendMessage(ChatColor.RED + "There was an error.");
@@ -726,7 +725,7 @@ public class BitQuest extends JavaPlugin {
                                     player.sendMessage(
                                             ChatColor.RED
                                                     + "You have "
-                                                    + user.countEmeralds()
+                                                    + user.countEmeralds(player.getInventory())
                                                     + ". To buy land you need "
                                                     + land_price_in_emeralds);
                                 }
@@ -884,8 +883,6 @@ public class BitQuest extends JavaPlugin {
     public void sendWalletInfo(final User user) {
         if (BITCOIN_NODE_HOST != null) {
             // TODO: Rewrite send wallet info
-        } else {
-            user.player.sendMessage("You are using emeralds for currency");
         }
     }
 
