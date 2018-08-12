@@ -104,12 +104,13 @@ A [Bitcoin Core](https://bitcoin.org/) testnet node running in your computer or 
 
 Tou can use Docker to run a BitQuest server. There's also an [official BitQuest docker image](https://hub.docker.com/r/bitquest/bitquest/). The recommended way to configure the image is using a docker-compose.yml file that can link to a directory where the worlds are stored. An example is included here. Configuration can be done via enviroment variables:
 
-| environment variable   | description                                          |
-|------------------------|------------------------------------------------------|
-| BITQUEST_NODE_USERNAME | username for Bitcoin node                            |
-| BITCOIN_NODE_PASSWORD  | password for Bitcoin node                            |
-| BITQUEST_NODE_HOST     | IP to a bitcoin node with JSON-RPC interface enabled |
-| ADMIN_UUID             | Minecraft user ID for the main administrator         |
+| environment variable    | description                                          |
+|-------------------------|------------------------------------------------------|
+| BITQUEST_NODE_USERNAME  | username for Bitcoin node                            |
+| BITQUEST_NODE_PASSWORD  | password for Bitcoin node                            |
+| BITQUEST_NODE_HOST      | IP to a bitcoin node with JSON-RPC interface enabled |
+| BITQUEST_NODE_PORT      | Port of node                                         |
+| ADMIN_UUID              | Minecraft user ID for the main administrator         |
 
 # Troubleshooting
 ## I'm getting a JedisConnectionException error when starting
