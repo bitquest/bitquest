@@ -67,7 +67,7 @@ public class LegacyWallet {
         System.out.println(response_object);
         return (String) response_object.get("result");
     }
-    public String getAccountAddress(String account_id) throws IOException, ParseException {
+    public String getAccountAddress() throws IOException, ParseException {
 
         JSONParser parser = new JSONParser();
 
@@ -130,9 +130,8 @@ public class LegacyWallet {
             jsonObject.put("id", "bitquest");
             jsonObject.put("method", "getbalance");
             JSONArray params = new JSONArray();
-            params.add(account_id);
+            params.add(this.account_id);
             params.add(confirmations);
-            System.out.println("[getbalance] " + account_id + " " + confirmations);
             jsonObject.put("params", params);
             URL url = new URL(
                     "http://"

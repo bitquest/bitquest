@@ -61,7 +61,6 @@ public class Wallet {
         con.setConnectTimeout(5000);
         con.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        System.out.println(blockcypher_params.toString());
         out.write(blockcypher_params.toString());
         out.close();
 
@@ -99,7 +98,7 @@ public class Wallet {
             }
         }
         String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
-        System.out.println(wif.equals(check));  // true
+        // System.out.println(wif.equals(check));  // true
         // creating Sha object from string
         Sha256Hash hash = Sha256Hash.wrap(msg);
         // creating signature
@@ -121,7 +120,6 @@ public class Wallet {
         con.setConnectTimeout(5000);
         con.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        System.out.println(tx.toString());
         out.write(tx.toString());
         out.close();
         int responseCode = con.getResponseCode();
@@ -134,7 +132,7 @@ public class Wallet {
         in.close();
         JSONParser parser = new JSONParser();
         JSONObject response_object = (JSONObject) parser.parse(response.toString());
-        System.out.println(response_object.get("tx").toString());
+        System.out.println("[payment] "+this.address+" -> "+sat+" -> "+_address);
         return true;
     }
     public Long getBalance(int confirmations) {
