@@ -24,9 +24,7 @@ public class User {
     PreparedStatement pst = db_con.prepareStatement("SELECT * FROM users WHERE uuid='"+this.uuid+"'");
     ResultSet rs = pst.executeQuery();
     if(rs.next()) {
-      System.out.print(rs.getInt(1));
-      System.out.print(": ");
-      System.out.println(rs.getString(2));
+      this.wallet=new Wallet(rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6));
     } else {
       System.out.println("[user not found] "+this.uuid);
       this.wallet=BitQuest.generateNewWallet();
