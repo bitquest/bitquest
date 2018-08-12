@@ -194,14 +194,12 @@ public class EntityEvents implements Listener {
         bitQuest.updateScoreboard(player);
 
         player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
-        player.sendMessage(ChatColor.YELLOW + "Don't forget to visit the Wiki");
-        player.sendMessage(ChatColor.YELLOW + "to learn more about this server");
+
+        BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
+        // spawn pet
         if (BitQuest.REDIS.exists("pet:" + player.getUniqueId().toString())) {
             bitQuest.spawnPet(player);
         }
-        player.sendMessage(ChatColor.DARK_BLUE + " " + ChatColor.UNDERLINE + "http://bitquest.co/wiki.html");
-        player.sendMessage("");
-        BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
     }
 
     @EventHandler
@@ -245,20 +243,7 @@ public class EntityEvents implements Listener {
                     .getPlayer()
                     .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
-            if (event.getPlayer().hasMetadata("pet")) {
-                String cat_name = bitQuest.REDIS.get("pet:" + event.getPlayer().getUniqueId());
-                List<Entity> entities = event.getPlayer().getWorld().getEntities();
-                for (Entity entity : entities) {
-                    if (entity instanceof Ocelot) {
-                        if (entity.getLocation().distance(event.getPlayer().getLocation()) < 1000
-                                && entity.getCustomName() != null
-                                && entity.getCustomName().equals(cat_name)) {
-                            entity.teleport(event.getPlayer().getLocation());
-                            ((Ocelot) entity).setOwner(event.getPlayer());
-                        }
-                    }
-                }
-            }
+
             pvar = 0;
             if (!event.getFrom().getWorld().getName().endsWith("_end")) {
                 // announce new area
