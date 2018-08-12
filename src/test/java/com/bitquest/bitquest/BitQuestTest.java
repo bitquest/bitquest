@@ -44,10 +44,10 @@ public class BitQuestTest {
         assertTrue(test_world_wallet.payment(user.wallet.address, Long.valueOf(10)));
         LegacyWallet legacy_wallet=new LegacyWallet(test_uuid.toString());
         test_world_wallet.payment(legacy_wallet.getAccountAddress(), Long.valueOf(10000));
-        System.out.println("legacy wallet balance: "+legacy_wallet.getBalance(5));
-
-        if(legacy_wallet.getBalance(5)>0) {
-            legacy_wallet.sendFrom(user.wallet.address,legacy_wallet.getBalance(5));
+        System.out.println("legacy wallet balance: "+legacy_wallet.getBalance(2));
+        System.out.println("legacy wallet address: "+legacy_wallet.getAccountAddress());
+        if(legacy_wallet.getBalance(2)>0) {
+            legacy_wallet.sendFrom(user.wallet.address,legacy_wallet.getBalance(2));
         }
     }
 }
