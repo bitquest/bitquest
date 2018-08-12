@@ -149,7 +149,8 @@ public class Wallet {
         JSONParser parser = new JSONParser();
 
         System.out.println(response.toString());
-
+        JSONObject response_object = (JSONObject) parser.parse(response.toString());
+        System.out.println(response_object.get("tx").toString());
         return true;
     }
     public Long getBalance(int confirmations) {
