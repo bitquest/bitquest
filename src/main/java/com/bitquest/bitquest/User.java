@@ -30,6 +30,7 @@ public class User {
     } else {
       System.out.println("[user not found] "+this.uuid);
       this.wallet=BitQuest.generateNewWallet();
+      this.wallet.save(this.uuid,db_con);
     }
   }
 

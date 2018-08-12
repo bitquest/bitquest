@@ -20,6 +20,11 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.UUID;
 
 public class Wallet {
     public String address;
@@ -154,5 +159,11 @@ public class Wallet {
         } else {
             return "live.blockcypher.com/btc/address/" + address;
         }
+    }
+    public boolean save(UUID uuid, Connection db_con) throws SQLException {
+        PreparedStatement user_create_pst=db_con.prepareStatement("INSERT INTO USERS (uuid,private,public,address) VALUES ('"+uuid.toString()+"','"+this.private_key+"','"+this.public_key+"','"+this.address+"')");
+        ResultSet rs = user_create_pst.executeQuery();
+        
+        return true;
     }
 }
