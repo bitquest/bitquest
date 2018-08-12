@@ -86,7 +86,7 @@ public class InventoryEvents implements Listener {
     void onInventoryClick(final InventoryClickEvent event) throws IOException, ParseException, org.json.simple.parser.ParseException, SQLException {
         final Player player = (Player) event.getWhoClicked();
         final Inventory inventory = event.getInventory();
-        final User user = new User(bitQuest, player);
+        final User user = new User(bitQuest.db_con, player.getUniqueId().toString());
 
         // Merchant inventory
         if (inventory.getName().equalsIgnoreCase("Market")) {

@@ -39,12 +39,12 @@ public class SendCommand extends CommandAction {
                     if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                         if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
                             try {
-                                final User user = new User(bitQuest, player);
+                                final User user = new User(bitQuest.db_con, player.getUniqueId().toString());
 
                                 Long balance = user.wallet.getBalance(0);
 
                                 if (balance >= sat) {
-                                    User user_tip = new User(bitQuest, onlinePlayer);
+                                    User user_tip = new User(bitQuest.db_con, onlinePlayer.getUniqueId().toString());
                                     // TODO: Pay to user address
                                     if (user.wallet.payment(user_tip.player.getUniqueId().toString(), sat)) {
                                         bitQuest.updateScoreboard(onlinePlayer);

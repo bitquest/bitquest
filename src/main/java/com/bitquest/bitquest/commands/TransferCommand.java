@@ -36,7 +36,7 @@ public class TransferCommand extends CommandAction {
 
                 System.out.println(sendAmount);
                 Wallet fromWallet = null;
-                fromWallet = new User(bitQuest, player).wallet;
+                fromWallet = new User(bitQuest.db_con, player.getUniqueId().toString()).wallet;
 
                 if (sendAmount < (BitQuest.MINIMUM_TRANSACTION * BitQuest.DENOMINATION_FACTOR)) {
                     player.sendMessage(

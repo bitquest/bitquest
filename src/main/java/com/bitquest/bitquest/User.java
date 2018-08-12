@@ -14,15 +14,14 @@ import org.bukkit.scoreboard.*;
 public class User {
   public Wallet wallet;
   private String clan;
-  private BitQuest bitQuest;
   public Player player;
 
-  public User(BitQuest _bitQuest, Player player) throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
+  public User(Connection db_con,String uuid) throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
     this.player = player;
-    this.bitQuest = _bitQuest;
     // this.wallet = new Wallet(this.player.getUniqueId().toString());
 
-    PreparedStatement pst = this.bitQuest.db_con.prepareStatement("SELECT * FROM users");
+
+    PreparedStatement pst = db_con.prepareStatement("SELECT * FROM users");
     ResultSet rs = pst.executeQuery();
 
       while (rs.next()) {

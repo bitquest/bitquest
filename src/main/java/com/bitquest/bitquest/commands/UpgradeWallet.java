@@ -22,7 +22,7 @@ public class UpgradeWallet extends CommandAction {
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
         LegacyWallet legacyWallet=new LegacyWallet(player.getUniqueId().toString());
         try {
-            User user=new User(bitQuest,player);
+            User user=new User(bitQuest.db_con,player.getUniqueId().toString());
         } catch (Exception e) {
             e.printStackTrace();
             player.sendMessage(ChatColor.RED+"Command failed. This incident was logged. Please try again later.");

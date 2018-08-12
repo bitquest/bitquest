@@ -317,7 +317,7 @@ public class BitQuest extends JavaPlugin {
 
     public void updateScoreboard(final Player player) {
         try {
-            final User user = new User(this, player);
+            final User user = new User(this.db_con, player.getUniqueId().toString());
             ScoreboardManager scoreboardManager;
             Scoreboard walletScoreboard;
             Objective walletScoreboardObjective;
@@ -373,7 +373,7 @@ public class BitQuest extends JavaPlugin {
 
     public void adoptPet(Player player, String pet_name) {
         try {
-            final User user = new User(this, player);
+            final User user = new User(this.db_con, player.getUniqueId().toString());
             if (user.wallet.getBalance(3) >= PET_PRICE) {
                 try {
                     if (user.wallet.payment(this.wallet.address, PET_PRICE) == true) {
@@ -671,7 +671,7 @@ public class BitQuest extends JavaPlugin {
                         try {
 
 
-                            final User user = new User(this, player);
+                            final User user = new User(this.db_con, player.getUniqueId().toString());
                             player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                             final BitQuest bitQuest = this;
