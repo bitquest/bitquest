@@ -3,10 +3,10 @@ package com.bitquest.bitquest.events;
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.Wallet;
 import com.bitquest.bitquest.User;
-import com.mixpanel.mixpanelapi.ClientDelivery;
-import com.mixpanel.mixpanelapi.MixpanelAPI;
+
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
@@ -408,8 +408,7 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    void onEntityDeath(EntityDeathEvent e)
-            throws IOException, ParseException, org.json.simple.parser.ParseException {
+    void onEntityDeath(EntityDeathEvent e) throws IOException, ParseException, org.json.simple.parser.ParseException, SQLException {
         final LivingEntity entity = e.getEntity();
 
         final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
@@ -425,107 +424,63 @@ public class EntityEvents implements Listener {
                     Long money =
                             Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level))
                                     * bitQuest.DENOMINATION_FACTOR;
-                    int dice = BitQuest.rand(1, 100);
+                    int dice = BitQuest.rand(1, 20);
                     final Player player = (Player) damage.getDamager();
-                    if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME))
-                        if (bitQuest.wallet_balance_cache > 100 * bitQuest.DENOMINATION_FACTOR)
-                            dice = BitQuest.rand(1, 20);
-                    if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME))
-                        if (bitQuest.wallet_balance_cache > 1000 * bitQuest.DENOMINATION_FACTOR) dice = 7;
-                    boolean loot_limit = false;
-                    if (bitQuest.last_loot_player != null
-                            && bitQuest
-                            .last_loot_player
-                            .getUniqueId()
-                            .toString()
-                            .equals(player.getUniqueId().toString())) loot_limit = true;
+
                     // Add EXP
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    if (dice == 7) {
-                        if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME)) {
-                            if (loot_limit == false
-                                    && bitQuest.wallet_balance_cache > money) {
-                                try {
-                                    // TODO: Pay to user's address
-                                    if (bitQuest.wallet.payment(player.getUniqueId().toString(), money)) {
-                                        bitQuest.last_loot_player = player;
-                                        bitQuest.wallet_balance_cache -= money;
-                                        System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                                        System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
-                                        player.sendMessage(
-                                                ChatColor.GREEN
-                                                        + "You got "
-                                                        + ChatColor.BOLD
-                                                        + money / bitQuest.DENOMINATION_FACTOR
-                                                        + ChatColor.GREEN
-                                                        + " "
-                                                        + bitQuest.DENOMINATION_NAME
-                                                        + " of loot!");
-                                        player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
-                                        if (bitQuest.messageBuilder != null) {
-
-                                            // Create an event
-                                            org.json.JSONObject sentEvent =
-                                                    bitQuest.messageBuilder.event(
-                                                            player.getUniqueId().toString(), "Loot", null);
-
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
-                                    }
-                                } catch (Exception e1) {
-                                    e1.printStackTrace();
-                                }
-                            } //end if btc start emerald?
+                    if (dice == 20) {
+                        if (BitQuest.BLOCKCYPHER_CHAIN != null) {
+                            // TODO: Pay to user's address
+                            if (bitQuest.wallet.payment(player.getUniqueId().toString(), money)) {
+                                bitQuest.last_loot_player = player;
+                                bitQuest.wallet_balance_cache -= money;
+                                System.out.println("[loot] " + player.getDisplayName() + ": " + money);
+                                System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
+                                player.sendMessage(
+                                        ChatColor.GREEN
+                                                + "You got "
+                                                + ChatColor.BOLD
+                                                + money / bitQuest.DENOMINATION_FACTOR
+                                                + ChatColor.GREEN
+                                                + " "
+                                                + bitQuest.DENOMINATION_NAME
+                                                + " of loot!");
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
+                            }
                         } else {
-                            try {
-                                final User user = new User(bitQuest, player);
-                                if (user.addEmeralds((int) (money / bitQuest.DENOMINATION_FACTOR))) {
-                                    bitQuest.last_loot_player = player;
-                                    System.out.println("[loot] " + player.getDisplayName() + ": " + (money / bitQuest.DENOMINATION_FACTOR) + "Emeralds");
-                                    player.sendMessage(
-                                            ChatColor.GREEN
-                                                    + "You got "
-                                                    + ChatColor.BOLD
-                                                    + money / bitQuest.DENOMINATION_FACTOR
-                                                    + ChatColor.GREEN
-                                                    + " "
-                                                    + "Emeralds"
-                                                    + " of loot!");
-                                    player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
-                                    if (bitQuest.messageBuilder != null) {
+                            // emeralds
+                            final User user = new User(bitQuest, player);
+                            if (user.addEmeralds((int) (money / bitQuest.DENOMINATION_FACTOR))) {
+                                bitQuest.last_loot_player = player;
+                                System.out.println("[loot] " + player.getDisplayName() + ": " + (money / bitQuest.DENOMINATION_FACTOR) + "Emeralds");
+                                player.sendMessage(
+                                        ChatColor.GREEN
+                                                + "You got "
+                                                + ChatColor.BOLD
+                                                + money / bitQuest.DENOMINATION_FACTOR
+                                                + ChatColor.GREEN
+                                                + " "
+                                                + "Emeralds"
+                                                + " of loot!");
+                                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
 
-                                        // Create an event
-                                        org.json.JSONObject sentEvent =
-                                                bitQuest.messageBuilder.event(
-                                                        player.getUniqueId().toString(), "Loot", null);
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
-                                    }
-                                }
-                            } catch (Exception e1) {
-                                e1.printStackTrace();
                             }
                         }
                     }
                 }
-
-            } else {
-                e.setDroppedExp(0);
             }
-        } else {
+
+        } else
+
+        {
             e.setDroppedExp(0);
         }
     }
+
+
 
     String spawnKey(Location location) {
         return location.getWorld().getName()
@@ -536,9 +491,9 @@ public class EntityEvents implements Listener {
     }
 
     // TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it
-    // would be better to
-    //          find a way to instead set the EntityType of the event. Is there any way to do that?
-    // TODO: Magma Cubes don't get levels or custom names for some reason...
+// would be better to
+//          find a way to instead set the EntityType of the event. Is there any way to do that?
+// TODO: Magma Cubes don't get levels or custom names for some reason...
     @EventHandler
     void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
         // e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);

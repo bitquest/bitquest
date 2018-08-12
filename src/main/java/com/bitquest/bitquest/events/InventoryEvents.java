@@ -144,23 +144,7 @@ public class InventoryEvents implements Listener {
                                                     + satFinal / 100);
 
                                     bitQuest.updateScoreboard(player);
-                                    if (bitQuest.messageBuilder != null) {
 
-                                        // Create an event
-                                        org.json.JSONObject sentEvent =
-                                                bitQuest.messageBuilder.event(
-                                                        player.getUniqueId().toString(), "Purchase", null);
-                                        org.json.JSONObject sentCharge =
-                                                bitQuest.messageBuilder.trackCharge(
-                                                        player.getUniqueId().toString(), satFinal / 100, null);
-
-                                        ClientDelivery delivery = new ClientDelivery();
-                                        delivery.addMessage(sentEvent);
-                                        delivery.addMessage(sentCharge);
-
-                                        MixpanelAPI mixpanel = new MixpanelAPI();
-                                        mixpanel.deliver(delivery);
-                                    }
 
                                 } else {
                                     player.sendMessage(
@@ -200,23 +184,7 @@ public class InventoryEvents implements Listener {
                                                         + satFinal / 100);
 
                                         bitQuest.updateScoreboard(player);
-                                        if (bitQuest.messageBuilder != null) {
 
-                                            // Create an event
-                                            org.json.JSONObject sentEvent =
-                                                    bitQuest.messageBuilder.event(
-                                                            player.getUniqueId().toString(), "Purchase", null);
-                                            org.json.JSONObject sentCharge =
-                                                    bitQuest.messageBuilder.trackCharge(
-                                                            player.getUniqueId().toString(), satFinal / 100, null);
-
-                                            ClientDelivery delivery = new ClientDelivery();
-                                            delivery.addMessage(sentEvent);
-                                            delivery.addMessage(sentCharge);
-
-                                            MixpanelAPI mixpanel = new MixpanelAPI();
-                                            mixpanel.deliver(delivery);
-                                        }
 
                                     } else {
                                         player.sendMessage(
