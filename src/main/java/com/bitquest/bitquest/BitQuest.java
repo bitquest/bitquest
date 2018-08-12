@@ -145,7 +145,7 @@ public class BitQuest extends JavaPlugin {
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
-    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_PORT") + "/bitquest";
+    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
     public static final String db_user = System.getenv("BITQUEST_POSTGRESQL_USERNAME");
     public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
@@ -184,17 +184,24 @@ public class BitQuest extends JavaPlugin {
             getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
 
             // player does not lose inventory on death
+            System.out.println("[startup] sending command gamerule keepInventory on");
+
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
 
             // loads config file. If it doesn't exist, creates it.
             getDataFolder().mkdir();
+            System.out.println("[startup] checking default config file");
+
             if (!new java.io.File(getDataFolder(), "config.yml").exists()) {
                 saveDefaultConfig();
+                System.out.println("[startup] config file does not exist. creating default.");
             }
 
             // loads world wallet
             wallet = this.generateNewWallet();
+
             if (BITCOIN_NODE_HOST != null) {
+                System.out.println("[startup] checking bitcoin node connection");
                 getBlockChainInfo();
             }
 
@@ -231,7 +238,7 @@ public class BitQuest extends JavaPlugin {
             modCommands.put("fixabandonland", new FixAbandonLand());
             // TODO: Remove this command after migrate.
             modCommands.put("migrateclans", new MigrateClansCommand());
-            sendDiscordMessage("bitquest started");
+            System.out.println("[startup] finished");
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("[fatal] plugin enable fails");
