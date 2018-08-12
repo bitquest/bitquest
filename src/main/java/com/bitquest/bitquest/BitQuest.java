@@ -203,7 +203,6 @@ public class BitQuest extends JavaPlugin {
             REDIS.configSet("SAVE", "900 1 300 10 60 10000");
 
 
-
             // creates scheduled timers (update balances, etc)
             createScheduledTimers();
 

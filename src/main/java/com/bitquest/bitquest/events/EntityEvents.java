@@ -1,6 +1,7 @@
 package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.LegacyWallet;
 import com.bitquest.bitquest.Wallet;
 import com.bitquest.bitquest.User;
 
@@ -199,6 +200,11 @@ public class EntityEvents implements Listener {
         // spawn pet
         if (BitQuest.REDIS.exists("pet:" + player.getUniqueId().toString())) {
             bitQuest.spawnPet(player);
+        }
+        // check if user has a legacy wallet
+        LegacyWallet legacyWallet=new LegacyWallet(player.getUniqueId().toString());
+        if(legacyWallet.getBalance(5)>0) {
+            player.sendMessage(ChatColor.RED+"You have "+legacyWallet.getBalance(5)+" SAT in your old wallet. Use the /upgradewallet command to send them to your new one.");
         }
     }
 
