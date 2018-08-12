@@ -7,5 +7,8 @@ spigot:
     - "25565:25565"
   links:
     - redis
+    - postgres
 redis:
   image: redis
+postgres:
+  image: postgres

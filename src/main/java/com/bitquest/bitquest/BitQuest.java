@@ -95,7 +95,6 @@ public class BitQuest extends JavaPlugin {
     // Support for mixpanel analytics
     public static final String MIXPANEL_TOKEN =
             System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
-    public MessageBuilder messageBuilder;
     // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
     // localhost:6379
     public static final String REDIS_HOST =
@@ -146,7 +145,7 @@ public class BitQuest extends JavaPlugin {
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
-    public static final String db_url = "jdbc:postgresql://" + System.getenv("BITQUEST_POSTGRESQL_HOST") + ":" + System.getenv("BITQUEST_POSTGRESQL_PORT") + "/bitquest";
+    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_PORT") + "/bitquest";
     public static final String db_user = System.getenv("BITQUEST_POSTGRESQL_USERNAME");
     public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
@@ -201,11 +200,6 @@ public class BitQuest extends JavaPlugin {
             // sets the redis save intervals
             REDIS.configSet("SAVE", "900 1 300 10 60 10000");
 
-            // initialize mixpanel (optional)
-            if (MIXPANEL_TOKEN != null) {
-                messageBuilder = new MessageBuilder(MIXPANEL_TOKEN);
-                System.out.println("Mixpanel support is on");
-            }
 
 
             // creates scheduled timers (update balances, etc)
