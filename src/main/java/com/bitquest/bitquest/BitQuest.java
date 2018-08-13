@@ -886,7 +886,6 @@ public class BitQuest extends JavaPlugin {
             player.sendMessage("Address: "+user.wallet.address);
             player.sendMessage("Balance: "+balance);
             player.sendMessage("URL: "+user.wallet.url());
-
             player.sendMessage("-----------");
 
         } catch(Exception e) {

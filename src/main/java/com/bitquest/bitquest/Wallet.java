@@ -7,6 +7,7 @@ import org.bitcoinj.core.NetworkParameters;
 import org.bitcoinj.core.Sha256Hash;
 import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
+import org.bukkit.Bukkit;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,7 +40,6 @@ public class Wallet {
         this.private_key = _private_key;
         this.address = _address;
         this.wif = _wif;
-        this.private_key = _private_key;
     }
 
     JSONObject txSkeleton(String _address, Long sat) throws IOException, ParseException {
@@ -90,6 +90,7 @@ public class Wallet {
     }
 
     public boolean payment(String _address, Long sat) throws IOException, ParseException {
+
         // create skeleton tx to be signed
         JSONObject tx = txSkeleton(_address, sat);
         // obtain message (hash) to be signed with private key
@@ -152,31 +153,42 @@ public class Wallet {
         return true;
     }
 
-    public Long getBalance(int confirmations) throws IOException {
-        HttpsURLConnection c = null;
-        URL u = new URL("https://api.blockcypher.com/v1/" + System.getenv("BLOCKCYPHER_CHAIN") + "/addrs/" + this.address + "/");
-        c = (HttpsURLConnection) u.openConnection();
-        c.setRequestMethod("GET");
-        c.setRequestProperty("Content-length", "0");
-        c.setUseCaches(false);
-        c.setAllowUserInteraction(false);
-        c.connect();
-        int status = c.getResponseCode();
+    public Long getBalance(int confirmations) throws IOException, ParseException {
+        if(System.getenv("BLOCKCYPHER_CHAIN")!=null) {
+            HttpsURLConnection c = null;
+            URL u = new URL("https://api.blockcypher.com/v1/" + System.getenv("BLOCKCYPHER_CHAIN") + "/addrs/" + this.address + "/");
+            c = (HttpsURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.setAllowUserInteraction(false);
+            c.connect();
+            int status = c.getResponseCode();
+            System.out.println("[balance] status:"+status);
+            switch (status) {
+                case 200:
+                case 201:
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    System.out.println(sb.toString());
+                    JSONParser parser = new JSONParser();
+                    JSONObject response_object = (JSONObject) parser.parse(sb.toString());
+                    return (Long) response_object.get("final_balance");
+            }
 
-        switch (status) {
-            case 200:
-            case 201:
-                BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-                StringBuilder sb = new StringBuilder();
-                String line;
-                while ((line = br.readLine()) != null) {
-                    sb.append(line + "\n");
-                }
-                br.close();
-                System.out.println(sb.toString());
+            return Long.valueOf(0);
+        } else {
+            System.out.println("[fatal] BLOCKCYPHER_CHAIN is not defined");
+            Bukkit.shutdown();
+            return Long.valueOf(0);
+
         }
 
-        return Long.valueOf(0);
     }
 
     public String url() {
@@ -191,7 +203,7 @@ public class Wallet {
     }
 
     public boolean save(UUID uuid, Connection db_con) throws SQLException {
-        PreparedStatement user_create_pst = db_con.prepareStatement("INSERT INTO USERS (uuid,private,public,address) VALUES ('" + uuid.toString() + "','" + this.private_key + "','" + this.public_key + "','" + this.address + "')");
+        PreparedStatement user_create_pst = db_con.prepareStatement("INSERT INTO USERS (uuid,private,public,address,wif) VALUES ('" + uuid.toString() + "','" + this.private_key + "','" + this.public_key + "','" + this.address + "','"+this.wif+"')");
         user_create_pst.executeQuery();
 
         return true;
