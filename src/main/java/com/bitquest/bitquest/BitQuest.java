@@ -1,3 +1,4 @@
+
 package com.bitquest.bitquest;
 
 import com.bitquest.bitquest.commands.*;
@@ -150,19 +151,15 @@ public class BitQuest extends JavaPlugin {
     public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
 
-    {
-        try {
-            db_con = DriverManager.getConnection(db_url, db_user, db_password);
-        } catch (SQLException e) {
-            e.printStackTrace();
-            Bukkit.shutdown();
-        }
-    }
+
 
     @Override
     public void onEnable() {
         try {
+            Class.forName("org.postgresql.Driver");
             log("BitQuest starting");
+
+            this.db_con = DriverManager.getConnection(this.db_url, this.db_user, this.db_password);
 
             REDIS.set("STARTUP", "1");
             REDIS.expire("STARTUP", 300);
