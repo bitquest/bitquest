@@ -147,8 +147,8 @@ public class BitQuest extends JavaPlugin {
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
     public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
-    public static final String db_user = System.getenv("BITQUEST_POSTGRESQL_USERNAME");
-    public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
+    public static final String db_user = System.getenv("POSTGRES_ENV_POSTGRES_USER");
+    public static final String db_password = System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD");
     public java.sql.Connection db_con;
 
 
