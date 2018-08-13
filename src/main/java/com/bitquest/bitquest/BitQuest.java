@@ -875,9 +875,23 @@ public class BitQuest extends JavaPlugin {
         }
     }
 
-    public void sendWalletInfo(final User user) {
+    public void sendWalletInfo(final Player player, final User user) {
         if (BITCOIN_NODE_HOST != null) {
             // TODO: Rewrite send wallet info
+        }
+        try {
+            Long balance = user.wallet.getBalance(0);
+            player.sendMessage("-----------");
+            player.sendMessage("Wallet info");
+            player.sendMessage("Address: "+user.wallet.address);
+            player.sendMessage("Balance: "+balance);
+            player.sendMessage("URL: "+user.wallet.url());
+
+            player.sendMessage("-----------");
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            player.sendMessage(ChatColor.RED+"Error reading wallet. Please try again later.");
         }
     }
 

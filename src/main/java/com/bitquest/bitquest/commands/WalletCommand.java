@@ -22,7 +22,7 @@ public class WalletCommand extends CommandAction {
 
         try {
             User user = new User(bitQuest.db_con, player.getUniqueId());
-            bitQuest.sendWalletInfo(user);
+            bitQuest.sendWalletInfo(player, user);
             bitQuest.updateScoreboard(player);
         } catch (Exception e) {
             e.printStackTrace();
