@@ -160,6 +160,7 @@ public class BitQuest extends JavaPlugin {
             log("BitQuest starting");
 
             this.db_con = DriverManager.getConnection(this.db_url, this.db_user, this.db_password);
+            DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
 
             REDIS.set("STARTUP", "1");
             REDIS.expire("STARTUP", 300);
