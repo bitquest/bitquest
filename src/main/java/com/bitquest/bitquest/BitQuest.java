@@ -353,7 +353,6 @@ public class BitQuest extends JavaPlugin {
             }//end emerald here
         } catch(Exception e) {
             e.printStackTrace();
-            Bukkit.shutdown();
         }
     }
 

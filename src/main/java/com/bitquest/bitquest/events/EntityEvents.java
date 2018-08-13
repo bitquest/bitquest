@@ -422,7 +422,8 @@ public class EntityEvents implements Listener {
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    if (dice == 20) {
+                    // if (dice == 20) {
+                    if (dice > 4) {
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                             // TODO: Pay to user's address
                             if (bitQuest.wallet.payment(player.getUniqueId().toString(), money)) {
