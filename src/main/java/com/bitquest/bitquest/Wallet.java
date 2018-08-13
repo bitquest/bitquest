@@ -156,7 +156,7 @@ public class Wallet {
     public Long getBalance(int confirmations) throws IOException, ParseException {
         if(System.getenv("BLOCKCYPHER_CHAIN")!=null) {
             HttpsURLConnection c = null;
-            URL u = new URL("https://api.blockcypher.com/v1/" + System.getenv("BLOCKCYPHER_CHAIN") + "/addrs/" + this.address + "/");
+            URL u = new URL("https://api.blockcypher.com/v1/" + System.getenv("BLOCKCYPHER_CHAIN") + "/addrs/" + this.address + "/balance");
             c = (HttpsURLConnection) u.openConnection();
             c.setRequestMethod("GET");
             c.setRequestProperty("Content-length", "0");
