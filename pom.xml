@@ -1,141 +1,141 @@
-    <project
+<project
         xmlns="http://maven.apache.org/POM/4.0.0"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-        <!--Compilation config-->
-        <modelVersion>4.0.0</modelVersion>
-        <groupId>com.bitquest.bitquest</groupId>
-        <artifactId>BitQuest</artifactId>
-        <packaging>jar</packaging>
-        <!--Version of bitQuest-->
-        <version>2.0</version>
-        <!--Package information-->
-        <name>BitQuest</name>
-        <url>http://bitquest.co</url>
-        <!--Other config-->
-        <repositories>
-            <!--Spigot API-->
-            <repository>
-                <id>spigot-repo</id>
-                <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
-            </repository>
-        </repositories>
-        <properties>
-            <!--Here is java version-->
-            <maven.compiler.source>1.8</maven.compiler.source>
-            <maven.compiler.target>1.8</maven.compiler.target>
-        </properties>
-        <build>
-            <directory>./plugins</directory>
-            <plugins>
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!--Compilation config-->
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.bitquest.bitquest</groupId>
+    <artifactId>BitQuest</artifactId>
+    <packaging>jar</packaging>
+    <!--Version of bitQuest-->
+    <version>2.0</version>
+    <!--Package information-->
+    <name>BitQuest</name>
+    <url>http://bitquest.co</url>
+    <!--Other config-->
+    <repositories>
+        <!--Spigot API-->
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+    <properties>
+        <!--Here is java version-->
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+    </properties>
+    <build>
+        <directory>./plugins</directory>
+        <plugins>
             <plugin>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>3.0.0</version>
-            <configuration>
-            <finalName>BitQuest</finalName>
-            <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-            </descriptorRefs>
-                            <appendAssemblyId>false</appendAssemblyId>
-            <archive>
-                <manifest>
-                <mainClass>com.bitquest.bitquest</mainClass>
-                </manifest>
-            </archive>
-            </configuration>
-            <executions>
-            <execution>
-                <id>make-assembly</id> <!-- this is used for inheritance merges -->
-                <phase>package</phase> <!-- bind to the packaging phase -->
-                <goals>
-                <goal>single</goal>
-                </goals>
-            </execution>
-            </executions>
-        </plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <finalName>BitQuest</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <appendAssemblyId>false</appendAssemblyId>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.bitquest.bitquest</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id> <!-- this is used for inheritance merges -->
+                        <phase>package</phase> <!-- bind to the packaging phase -->
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
                 <version>3.0.0</version>
                 <configuration>
-                <configLocation>google_checks.xml</configLocation>
+                    <configLocation>google_checks.xml</configLocation>
                 </configuration>
             </plugin>
-            </plugins>
-        </build>
-        <dependencies>
-            <dependency>
-                <groupId>org.bitcoinj</groupId>
-                <artifactId>bitcoinj-core</artifactId>
-                <version>0.14.7</version>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.spigotmc</groupId>
-                <artifactId>spigot-api</artifactId>
-                <version>1.12.2-R0.1-SNAPSHOT</version>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>redis.clients</groupId>
-                <artifactId>jedis</artifactId>
-                <version>2.7.3</version>
-                <type>jar</type>
-                <scope>compile</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.google.code.gson</groupId>
-                <artifactId>gson</artifactId>
-                <version>2.4</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-pool2</artifactId>
-                <version>2.3</version>
-            </dependency>
-            <dependency>
-                <groupId>org.json</groupId>
-                <artifactId>json</artifactId>
-                <version>20180130</version>
-            </dependency>
-            <dependency>
-                <groupId>com.mixpanel</groupId>
-                <artifactId>mixpanel-java</artifactId>
-                <version>1.4.4</version>
-            </dependency>
+        </plugins>
+    </build>
+    <dependencies>
+        <dependency>
+            <groupId>org.bitcoinj</groupId>
+            <artifactId>bitcoinj-core</artifactId>
+            <version>0.14.7</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>2.7.3</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20180130</version>
+        </dependency>
+        <dependency>
+            <groupId>com.mixpanel</groupId>
+            <artifactId>mixpanel-java</artifactId>
+            <version>1.4.4</version>
+        </dependency>
 
-            <dependency>
-                <groupId>com.timgroup</groupId>
-                <artifactId>java-statsd-client</artifactId>
-                <version>3.0.1</version>
-            </dependency>
-            <dependency>
-                <groupId>org.postgresql</groupId>
-                <artifactId>postgresql</artifactId>
-                <version>42.2.0</version>
-            </dependency>
+        <dependency>
+            <groupId>com.timgroup</groupId>
+            <artifactId>java-statsd-client</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.0</version>
+        </dependency>
 
-            <!-- https://mvnrepository.com/artifact/junit/junit -->
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-                <scope>test</scope>
-            </dependency>
+        <!-- https://mvnrepository.com/artifact/junit/junit -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
 
-            <dependency>
-                    <groupId>org.powermock</groupId>
-                    <artifactId>powermock-module-junit4</artifactId>
-                    <version>1.4.9</version>
-                    <type>jar</type>
-                    <scope>test</scope>
-                </dependency>
-                <dependency>
-                    <groupId>org.powermock</groupId>
-                    <artifactId>powermock-api-mockito</artifactId>
-                    <version>1.4.9</version>
-                    <type>jar</type>
-                    <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </project>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <version>1.4.9</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <version>1.4.9</version>
+            <type>jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

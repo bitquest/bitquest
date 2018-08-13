@@ -14,12 +14,15 @@ config-version: 11
 settings:
   debug: false
   save-user-cache-on-stop-only: false
-  moved-wrongly-threshold: 0.0625
-  moved-too-quickly-multiplier: 10.0
-  bungeecord: false
+  user-cache-size: 1000
+  late-bind: false
+  netty-threads: 4
+  player-shuffle: 0
   timeout-time: 60
   restart-on-crash: true
   restart-script: ./start.sh
+  sample-count: 12
+  bungeecord: false
   attribute:
     maxHealth:
       max: 2048.0
@@ -27,11 +30,8 @@ settings:
       max: 2048.0
     attackDamage:
       max: 2048.0
-  late-bind: false
-  netty-threads: 4
-  player-shuffle: 0
-  sample-count: 12
-  user-cache-size: 1000
+  moved-too-quickly-multiplier: 10.0
+  moved-wrongly-threshold: 0.0625
   filter-creative-items: true
   int-cache-limit: 1024
 messages:
@@ -41,15 +41,7 @@ messages:
   outdated-client: Outdated client! Please use {0}
   outdated-server: Outdated server! I'm still on {0}
   restart: Server is restarting
-advancements:
-  disable-saving: false
-  disabled:
-  - minecraft:story/disabled
 commands:
-  silent-commandblock-console: false
-  log: true
-  tab-complete: 0
-  send-namespaced: true
   replace-commands:
   - setblock
   - summon
@@ -57,22 +49,29 @@ commands:
   - tellraw
   spam-exclusions:
   - /skill
+  log: true
+  tab-complete: 0
+  send-namespaced: true
+  silent-commandblock-console: false
 stats:
   disable-saving: false
   forced-stats: {}
+advancements:
+  disable-saving: false
+  disabled:
+  - minecraft:story/disabled
 world-settings:
   default:
     verbose: true
+    hanging-tick-frequency: 100
     view-distance: 8
-    arrow-despawn-rate: 1200
-    item-despawn-rate: 1200
     merge-radius:
-      item: 4
       exp: 10
-    ticks-per:
-      hopper-transfer: 24
-      hopper-check: 1
-    hopper-amount: 3
+      item: 4
+    wither-spawn-sound-radius: 0
+    enable-zombie-pigmen-portal-spawns: true
+    item-despawn-rate: 1200
+    arrow-despawn-rate: 1200
     mob-spawn-range: 6
     entity-tracking-range:
       players: 32
@@ -80,12 +79,15 @@ world-settings:
       monsters: 64
       misc: 24
       other: 24
-    entity-activation-range:
-      animals: 8
-      monsters: 12
-      misc: 4
-      tick-inactive-villagers: true
-    random-light-updates: false
+    max-tnt-per-tick: 10
+    hunger:
+      jump-walk-exhaustion: 0.05
+      jump-sprint-exhaustion: 0.2
+      combat-exhaustion: 0.1
+      regen-exhaustion: 6.0
+      swim-multiplier: 0.01
+      sprint-multiplier: 0.1
+      other-multiplier: 0.0
     growth:
       cactus-modifier: 100
       cane-modifier: 100
@@ -97,26 +99,23 @@ world-settings:
       netherwart-modifier: 100
       vine-modifier: 100
       cocoa-modifier: 100
-    hunger:
-      jump-walk-exhaustion: 0.05
-      jump-sprint-exhaustion: 0.2
-      combat-exhaustion: 0.1
-      regen-exhaustion: 6.0
-      swim-multiplier: 0.01
-      sprint-multiplier: 0.1
-      other-multiplier: 0.0
-    squid-spawn-range:
-      min: 45.0
+    entity-activation-range:
+      animals: 8
+      monsters: 12
+      misc: 4
+      tick-inactive-villagers: true
+    ticks-per:
+      hopper-transfer: 24
+      hopper-check: 1
+    hopper-amount: 3
+    random-light-updates: false
     max-tick-time:
       tile: 8
       entity: 16
-    max-tnt-per-tick: 10
-    wither-spawn-sound-radius: 0
-    enable-zombie-pigmen-portal-spawns: true
-    hanging-tick-frequency: 100
-    zombie-aggressive-towards-villager: true
+    squid-spawn-range:
+      min: 45.0
     nerf-spawner-mobs: false
-    dragon-death-sound-radius: 0
+    zombie-aggressive-towards-villager: true
     seed-village: 10387312
     seed-desert: 14357617
     seed-igloo: 14357618
@@ -126,6 +125,7 @@ world-settings:
     seed-shipwreck: 165745295
     seed-ocean: 14357621
     seed-slime: 987234911
+    dragon-death-sound-radius: 0
     max-entity-collisions: 2
     seed-feature: 14357617
     save-structure-info: true
