@@ -43,8 +43,13 @@ public class PetCommand extends CommandAction {
       } else if ((args[0].equalsIgnoreCase("off"))||(args[0].equalsIgnoreCase("on"))) {
         player.sendMessage("You can not choose that as a name!");
       } else {
-        bitQuest.adoptPet(player, args[0]);
-        BitQuest.REDIS.set("petIsOn"+player.getUniqueId().toString(), "on");
+        try {
+          bitQuest.adoptPet(player, args[0]);
+
+        } catch(Exception e) {
+          System.out.println(e);
+          player.sendMessage(ChatColor.DARK_RED+"FAIL. Please try again later.");
+        }
       }
 
       return true;

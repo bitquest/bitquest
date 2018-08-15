@@ -1,23 +1,41 @@
 package com.bitquest.bitquest;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.UUID;
+
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scoreboard.*;
 
 public class User {
   public Wallet wallet;
   private String clan;
-  private BitQuest bitQuest;
-  public Player player;
+  public UUID uuid;
 
-  public User(BitQuest plugin, Player player)
-      throws ParseException, org.json.simple.parser.ParseException, IOException {
-    this.player = player;
-    this.bitQuest = plugin;
-    this.wallet = new Wallet(this.bitQuest, this.player.getUniqueId().toString());
+  public User(Connection db_con, UUID _uuid) throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
+    this.uuid = _uuid;
+    PreparedStatement pst = db_con.prepareStatement("SELECT * FROM users WHERE uuid='"+this.uuid+"'");
+    ResultSet rs = pst.executeQuery();
+    if(rs.next()) {
+      System.out.println("private: "+rs.getString(3));
+      System.out.println("public: "+rs.getString(4));
+      System.out.println("address: "+rs.getString(5));
+      System.out.println("wif: "+rs.getString(6));
+      System.out.println("experience: "+rs.getString(7));
+
+      this.wallet=new Wallet(rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6));
+    } else {
+      System.out.println("[user not found] "+this.uuid);
+      this.wallet=BitQuest.generateNewWallet();
+      this.wallet.save(this.uuid,db_con);
+    }
   }
 
   // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
@@ -30,19 +48,19 @@ public class User {
   //        System.out.println(exp);
   //    }
   public int experience() {
-    if (BitQuest.REDIS.get("experience.raw." + this.player.getUniqueId().toString()) == null) {
+    if (BitQuest.REDIS.get("experience.raw." + this.uuid.toString()) == null) {
       return 0;
     } else {
       return Integer.parseInt(
-          BitQuest.REDIS.get("experience.raw." + this.player.getUniqueId().toString()));
+          BitQuest.REDIS.get("experience.raw." + this.uuid.toString()));
     }
   }
 
-  public int countEmeralds() {
+  public int countEmeralds(Inventory inventory) {
 
-    ItemStack[] items = this.player.getInventory().getContents();
+    ItemStack[] items = inventory.getContents();
     int amount = 0;
-    for (int i = 0; i < this.player.getInventory().getSize(); i++) {
+    for (int i = 0; i < inventory.getSize(); i++) {
       ItemStack TempStack = items[i];
       if ((TempStack != null) && (TempStack.getType() != Material.AIR)) {
         if (TempStack.getType().toString() == "EMERALD_BLOCK") {
@@ -55,25 +73,25 @@ public class User {
     return amount;
   }
 
-  public boolean removeEmeralds(int amount) {
-    int EmCount = this.countEmeralds();
-    int LessEmCount = countEmeralds() - amount;
+  public boolean removeEmeralds(int amount, Player player) {
+    int EmCount = this.countEmeralds(player.getInventory());
+    int LessEmCount = countEmeralds(player.getInventory()) - amount;
     double TempAmount = (double) amount;
     int EmsBack = 0;
-    ItemStack[] items = this.player.getInventory().getContents();
-    if (countEmeralds() >= amount) {
+    ItemStack[] items = player.getInventory().getContents();
+    if (countEmeralds(player.getInventory()) >= amount) {
       while (TempAmount > 0) {
-        for (int i = 0; i < this.player.getInventory().getSize(); i++) {
+        for (int i = 0; i < player.getInventory().getSize(); i++) {
           ItemStack TempStack = items[i];
 
           if ((TempStack != null) && (TempStack.getType() != Material.AIR)) {
 
             if ((TempStack.getType().toString() == "EMERALD_BLOCK") && (TempAmount >= 9)) {
-              this.player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+              player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
               TempAmount = TempAmount - 9;
             }
             if ((TempStack.getType().toString() == "EMERALD_BLOCK") && (TempAmount < 9)) {
-              this.player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+              player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
               EmsBack = (9 - (int) TempAmount); // if 8, ems back = 1
               TempAmount = TempAmount - TempAmount;
               if (EmsBack > 0) {
@@ -88,27 +106,27 @@ public class User {
         } // end for loop
       } // end while loop
     } // end (EmCount>=amount)
-    EmCount = countEmeralds();
+    EmCount = countEmeralds(player.getInventory());
     if ((EmCount == LessEmCount) || (TempAmount == 0)) return true;
     return false;
   } // end of remove emeralds
   // start addemeralds to inventory
-  public boolean addEmeralds(int amount) {
-    int EmCount = countEmeralds();
-    int moreEmCount = countEmeralds() + amount;
+  public boolean addEmeralds(int amount, Player player) {
+    int EmCount = countEmeralds(player.getInventory());
+    int moreEmCount = countEmeralds(player.getInventory()) + amount;
     double bits = (double) amount;
     double TempAmount = (double) amount;
     int EmsBack = 0;
     while (TempAmount >= 0) {
       if (TempAmount >= 9) {
         TempAmount = TempAmount - 9;
-        this.player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 1));
+        player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 1));
       }
       if (TempAmount < 9) {
         TempAmount = TempAmount - 1;
-        this.player.getInventory().addItem(new ItemStack(Material.EMERALD, 1));
+        player.getInventory().addItem(new ItemStack(Material.EMERALD, 1));
       }
-      EmCount = countEmeralds();
+      EmCount = countEmeralds(player.getInventory());
       if ((EmCount == moreEmCount)) return true;
     } // end while loop
     return false;

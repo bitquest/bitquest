@@ -2,11 +2,13 @@ spigot:
   container_name: bitquest
   build: .
   volumes:
-    - "./target/BitQuest-2.0-jar-with-dependencies.jar:/spigot/plugins/BitQuest-2.0-jar-with-dependencies.jar"
-    - ".:/bitquest"
+    - "./plugins/BitQuest.jar:/spigot/plugins/BitQuest.jar"
   ports:
     - "25565:25565"
   links:
     - redis
+    - postgres
 redis:
   image: redis
+postgres:
+  image: postgres
