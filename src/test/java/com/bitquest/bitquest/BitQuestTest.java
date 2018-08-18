@@ -34,7 +34,7 @@ public class BitQuestTest {
 
             UUID test_uuid= UUID.fromString("123e4567-e89b-12d3-a456-42665544000");
 
-            Connection db_con = DriverManager.getConnection(BitQuest.db_url, BitQuest.db_user, BitQuest.db_password);
+            Connection db_con = DriverManager.getConnection(BitQuest.db_url, System.getenv("POSTGRES_ENV_POSTGRES_USER"), System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
             Statement st = db_con.createStatement();
             ResultSet rs = st.executeQuery("SELECT VERSION()");
 

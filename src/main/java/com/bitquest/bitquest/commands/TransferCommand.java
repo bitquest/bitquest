@@ -30,8 +30,7 @@ public class TransferCommand extends CommandAction {
                 for (char c : args[0].toCharArray()) {
                     if (!Character.isDigit(c)) return false;
                 }
-                Long sendAmount;
-                sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
+                final Long sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
 
 
                 System.out.println(sendAmount);
@@ -51,14 +50,13 @@ public class TransferCommand extends CommandAction {
                     return true;
                 } else {
                     if (fromWallet != null) {
-                        final LegacyWallet fromWalletFinal = new LegacyWallet(player.getUniqueId().toString());
-                        final Long sendAmountFinal = sendAmount;
+
                         final Long unconfirmed_balance = fromWallet.getBalance(0);
 
-                        if (unconfirmed_balance < sendAmountFinal) {
+                        if (unconfirmed_balance < sendAmount) {
                             player.sendMessage(ChatColor.DARK_RED + "Insufficient balance.");
                         } else {
-                            final long balance = fromWalletFinal.getBalance(5);
+                            final long balance = fromWallet.getBalance(5);
                             if (unconfirmed_balance != balance) {
                                 player.sendMessage(
                                         ChatColor.YELLOW
@@ -73,22 +71,20 @@ public class TransferCommand extends CommandAction {
                                                 + args[1]
                                                 + ChatColor.YELLOW
                                                 + "...");
-                                String txid = fromWalletFinal.sendFrom(args[1], sendAmountFinal);
-                                player.sendMessage(
-                                        ChatColor.GREEN
-                                                + "Succesfully sent "
-                                                + ChatColor.LIGHT_PURPLE
-                                                + args[0]
-                                                + " "
-                                                + BitQuest.DENOMINATION_NAME
-                                                + ChatColor.GREEN
-                                                + " to external address.");
-                                player.sendMessage(
-                                        ChatColor.DARK_BLUE
-                                                + " "
-                                                + ChatColor.UNDERLINE
-                                                + "https://live.blockcypher.com/btc-main/tx/"
-                                                + txid);
+                                if(fromWallet.payment(args[1],sendAmount)==true) {
+                                    player.sendMessage(
+                                            ChatColor.GREEN
+                                                    + "Succesfully sent "
+                                                    + ChatColor.LIGHT_PURPLE
+                                                    + args[0]
+                                                    + " "
+                                                    + BitQuest.DENOMINATION_NAME
+                                                    + ChatColor.GREEN
+                                                    + " to external address.");
+                                } else {
+                                    player.sendMessage(ChatColor.DARK_RED+"Transaction failed. Please try again later.");
+                                }
+
                                 bitQuest.updateScoreboard(player);
 
                             } else {

@@ -14,12 +14,17 @@ config-version: 11
 settings:
   debug: false
   save-user-cache-on-stop-only: false
-  player-shuffle: 0
+  moved-wrongly-threshold: 0.0625
+  moved-too-quickly-multiplier: 10.0
   bungeecord: false
-  user-cache-size: 1000
-  late-bind: false
   sample-count: 12
+  player-shuffle: 0
+  late-bind: false
+  user-cache-size: 1000
   netty-threads: 4
+  timeout-time: 60
+  restart-on-crash: true
+  restart-script: ./start.sh
   attribute:
     maxHealth:
       max: 2048.0
@@ -27,11 +32,6 @@ settings:
       max: 2048.0
     attackDamage:
       max: 2048.0
-  timeout-time: 60
-  restart-on-crash: true
-  restart-script: ./start.sh
-  moved-too-quickly-multiplier: 10.0
-  moved-wrongly-threshold: 0.0625
   filter-creative-items: true
   int-cache-limit: 1024
 messages:
@@ -42,53 +42,57 @@ messages:
   outdated-server: Outdated server! I'm still on {0}
   restart: Server is restarting
 commands:
+  silent-commandblock-console: false
+  log: true
   replace-commands:
   - setblock
   - summon
   - testforblock
   - tellraw
-  log: true
   tab-complete: 0
   send-namespaced: true
   spam-exclusions:
   - /skill
-  silent-commandblock-console: false
-stats:
-  disable-saving: false
-  forced-stats: {}
 advancements:
   disable-saving: false
   disabled:
   - minecraft:story/disabled
+stats:
+  disable-saving: false
+  forced-stats: {}
 world-settings:
   default:
     verbose: true
-    view-distance: 8
-    dragon-death-sound-radius: 0
-    seed-village: 10387312
-    seed-desert: 14357617
-    seed-igloo: 14357618
-    seed-jungle: 14357619
-    seed-swamp: 14357620
-    seed-monument: 10387313
-    seed-shipwreck: 165745295
-    seed-ocean: 14357621
-    seed-slime: 987234911
-    item-despawn-rate: 1200
-    merge-radius:
-      item: 4
-      exp: 10
-    hanging-tick-frequency: 100
-    nerf-spawner-mobs: false
-    enable-zombie-pigmen-portal-spawns: true
-    arrow-despawn-rate: 1200
-    zombie-aggressive-towards-villager: true
-    wither-spawn-sound-radius: 0
+    max-tick-time:
+      tile: 8
+      entity: 16
     ticks-per:
       hopper-transfer: 24
       hopper-check: 1
     hopper-amount: 3
     random-light-updates: false
+    hunger:
+      jump-walk-exhaustion: 0.05
+      jump-sprint-exhaustion: 0.2
+      combat-exhaustion: 0.1
+      regen-exhaustion: 6.0
+      swim-multiplier: 0.01
+      sprint-multiplier: 0.1
+      other-multiplier: 0.0
+    max-tnt-per-tick: 10
+    squid-spawn-range:
+      min: 45.0
+    entity-tracking-range:
+      players: 32
+      animals: 32
+      monsters: 64
+      misc: 24
+      other: 24
+    entity-activation-range:
+      animals: 8
+      monsters: 12
+      misc: 4
+      tick-inactive-villagers: true
     growth:
       cactus-modifier: 100
       cane-modifier: 100
@@ -100,32 +104,28 @@ world-settings:
       netherwart-modifier: 100
       vine-modifier: 100
       cocoa-modifier: 100
-    entity-activation-range:
-      animals: 8
-      monsters: 12
-      misc: 4
-      tick-inactive-villagers: true
-    hunger:
-      jump-walk-exhaustion: 0.05
-      jump-sprint-exhaustion: 0.2
-      combat-exhaustion: 0.1
-      regen-exhaustion: 6.0
-      swim-multiplier: 0.01
-      sprint-multiplier: 0.1
-      other-multiplier: 0.0
-    max-tnt-per-tick: 10
-    max-tick-time:
-      tile: 8
-      entity: 16
-    entity-tracking-range:
-      players: 32
-      animals: 32
-      monsters: 64
-      misc: 24
-      other: 24
     mob-spawn-range: 6
-    squid-spawn-range:
-      min: 45.0
+    wither-spawn-sound-radius: 0
+    merge-radius:
+      exp: 10
+      item: 4
+    view-distance: 8
+    hanging-tick-frequency: 100
+    item-despawn-rate: 1200
+    arrow-despawn-rate: 1200
+    enable-zombie-pigmen-portal-spawns: true
+    nerf-spawner-mobs: false
+    seed-village: 10387312
+    seed-desert: 14357617
+    seed-igloo: 14357618
+    seed-jungle: 14357619
+    seed-swamp: 14357620
+    seed-monument: 10387313
+    seed-shipwreck: 165745295
+    seed-ocean: 14357621
+    seed-slime: 987234911
+    dragon-death-sound-radius: 0
+    zombie-aggressive-towards-villager: true
     max-entity-collisions: 2
     seed-feature: 14357617
     save-structure-info: true
