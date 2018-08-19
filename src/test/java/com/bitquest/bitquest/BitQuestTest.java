@@ -24,17 +24,21 @@ public class BitQuestTest {
 
     @Test
     public void testWallet() throws SQLException, IOException, ParseException, java.text.ParseException {
-        if(BitQuest.BITCOIN_NODE_USERNAME!=null&&System.getenv("BITQUEST_POSTGRESQL_USERNAME")!=null&&System.getenv("BITQUEST_POSTGRESQL_PASSWORD")!=null) {
+        if(BitQuest.BITCOIN_NODE_USERNAME!=null&&System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR")!=null&&System.getenv("POSTGRES_ENV_POSTGRES_USER")!=null&&System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD")!=null) {
+            final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
+
             System.out.println("full node username: "+BitQuest.BITCOIN_NODE_USERNAME);
             System.out.println("full node host: "+BitQuest.BITCOIN_NODE_HOST);
             System.out.println("full node port: "+BitQuest.BITCOIN_NODE_PORT);
             System.out.println("full node password: "+BitQuest.BITCOIN_NODE_PASSWORD);
-            System.out.println("db username: "+System.getenv("BITQUEST_POSTGRESQL_USERNAME"));
-            System.out.println("db password: "+System.getenv("BITQUEST_POSTGRESQL_PASSWORD"));
+            System.out.println("db url: "+db_url);
+
+            System.out.println("db username: "+System.getenv("POSTGRES_ENV_POSTGRES_USER"));
+            System.out.println("db password: "+System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
 
             UUID test_uuid= UUID.fromString("123e4567-e89b-12d3-a456-42665544000");
 
-            Connection db_con = DriverManager.getConnection(BitQuest.db_url, System.getenv("POSTGRES_ENV_POSTGRES_USER"), System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
+            Connection db_con = DriverManager.getConnection(db_url, System.getenv("POSTGRES_ENV_POSTGRES_USER"), System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
             Statement st = db_con.createStatement();
             ResultSet rs = st.executeQuery("SELECT VERSION()");
 
