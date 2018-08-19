@@ -172,13 +172,13 @@ public class BitQuest extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        try {
-            log("[startup] BitQuest starting");
-            System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
-            if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
-            REDIS.set("STARTUP", "1");
-            REDIS.expire("STARTUP", 300);
+        log("[startup] BitQuest starting");
 
+        System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
+        if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
+
+        try {
+            Class.forName("org.postgresql.Driver");
             this.db_con = DriverManager.getConnection(this.db_url, System.getenv("POSTGRES_ENV_POSTGRES_USER"), System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
             DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
 
