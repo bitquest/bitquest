@@ -152,7 +152,13 @@ public class BitQuest extends JavaPlugin {
 
     {
         try {
-            db_con = DriverManager.getConnection(db_url, db_user, db_password);
+            if(db_user!=null&&db_password!=null) {
+                db_con = DriverManager.getConnection(db_url, db_user, db_password);
+
+            } else {
+                db_con = DriverManager.getConnection(db_url);
+
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("[fatal] database connection failed. Shutting down.");
@@ -163,8 +169,9 @@ public class BitQuest extends JavaPlugin {
     @Override
     public void onEnable() {
         try {
-            log("BitQuest starting");
-
+            log("[startup] BitQuest starting");
+            System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
+            if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
             REDIS.set("STARTUP", "1");
             REDIS.expire("STARTUP", 300);
             if (ADMIN_UUID == null) {

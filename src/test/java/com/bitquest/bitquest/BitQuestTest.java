@@ -29,6 +29,7 @@ public class BitQuestTest {
             System.out.println("full node host: "+BitQuest.BITCOIN_NODE_HOST);
             System.out.println("full node port: "+BitQuest.BITCOIN_NODE_PORT);
             System.out.println("full node password: "+BitQuest.BITCOIN_NODE_PASSWORD);
+            System.out.println("database url:"+BitQuest.db_url);
             UUID test_uuid= UUID.fromString("123e4567-e89b-12d3-a456-42665544000");
 
             Connection db_con = DriverManager.getConnection(BitQuest.db_url, BitQuest.db_user, BitQuest.db_password);
