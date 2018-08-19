@@ -23,6 +23,14 @@ public class UpgradeWallet extends CommandAction {
         LegacyWallet legacyWallet=new LegacyWallet(player.getUniqueId().toString());
         try {
             User user=new User(bitQuest.db_con,player.getUniqueId());
+            LegacyWallet legacy_wallet=new LegacyWallet(player.getUniqueId().toString());
+
+            Long balance=legacy_wallet.getBalance(2);
+            if(balance>0) {
+                legacy_wallet.sendFrom(user.wallet.address, balance);
+            } else {
+                player.sendMessage(ChatColor.RED+"Your old wallet balance is "+balance);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             player.sendMessage(ChatColor.RED+"Command failed. This incident was logged. Please try again later.");

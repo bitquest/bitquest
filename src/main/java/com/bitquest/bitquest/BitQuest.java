@@ -1,3 +1,4 @@
+
 package com.bitquest.bitquest;
 
 import com.bitquest.bitquest.commands.*;
@@ -146,6 +147,7 @@ public class BitQuest extends JavaPlugin {
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
     public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
+<<<<<<< HEAD
     public static final String db_user = System.getenv("BITQUEST_POSTGRESQL_USERNAME");
     public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
@@ -165,18 +167,31 @@ public class BitQuest extends JavaPlugin {
             Bukkit.shutdown();
         }
     }
+=======
+    public java.sql.Connection db_con;
+
+
+>>>>>>> 172052efb52eb8708dfb37628ff3bdd95f348993
 
     @Override
     public void onEnable() {
         try {
+<<<<<<< HEAD
             log("[startup] BitQuest starting");
             System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
             if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
             REDIS.set("STARTUP", "1");
             REDIS.expire("STARTUP", 300);
+=======
+            Class.forName("org.postgresql.Driver");
+            log("BitQuest starting");
+
+            this.db_con = DriverManager.getConnection(this.db_url, System.getenv("POSTGRES_ENV_POSTGRES_USER"), System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
+            DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
+
+>>>>>>> 172052efb52eb8708dfb37628ff3bdd95f348993
             if (ADMIN_UUID == null) {
-                log(
-                        "Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
+                log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
             }
             if (STATSD_HOST != null && STATSD_PORT != null) {
                 statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
@@ -893,9 +908,22 @@ public class BitQuest extends JavaPlugin {
         }
     }
 
-    public void sendWalletInfo(final User user) {
+    public void sendWalletInfo(final Player player, final User user) {
         if (BITCOIN_NODE_HOST != null) {
             // TODO: Rewrite send wallet info
+        }
+        try {
+            Long balance = user.wallet.getBalance(0);
+            player.sendMessage("-----------");
+            player.sendMessage("Wallet info");
+            player.sendMessage("Address: "+user.wallet.address);
+            player.sendMessage("Balance: "+balance);
+            player.sendMessage("URL: "+user.wallet.url());
+            player.sendMessage("-----------");
+
+        } catch(Exception e) {
+            e.printStackTrace();
+            player.sendMessage(ChatColor.RED+"Error reading wallet. Please try again later.");
         }
     }
 
