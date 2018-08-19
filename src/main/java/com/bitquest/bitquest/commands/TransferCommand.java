@@ -22,19 +22,19 @@ public class TransferCommand extends CommandAction {
 
     public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
         if (args.length == 2) {
+            if (args[0].length() > 8) {
+                // maximum transfer is 8 digits
+                return false;
+            }
+            for (char c : args[0].toCharArray()) {
+                if (!Character.isDigit(c)) return false;
+            }
+            final Long sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
+
+
+            System.out.println(sendAmount);
+            Wallet fromWallet = null;
             try {
-                if (args[0].length() > 8) {
-                    // maximum transfer is 8 digits
-                    return false;
-                }
-                for (char c : args[0].toCharArray()) {
-                    if (!Character.isDigit(c)) return false;
-                }
-                final Long sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
-
-
-                System.out.println(sendAmount);
-                Wallet fromWallet = null;
                 fromWallet = new User(bitQuest.db_con, player.getUniqueId()).wallet;
 
                 if (sendAmount < (BitQuest.MINIMUM_TRANSACTION * BitQuest.DENOMINATION_FACTOR)) {
@@ -51,59 +51,50 @@ public class TransferCommand extends CommandAction {
                 } else {
                     if (fromWallet != null) {
 
-                        final Long unconfirmed_balance = fromWallet.getBalance(0);
 
-                        if (unconfirmed_balance < sendAmount) {
-                            player.sendMessage(ChatColor.DARK_RED + "Insufficient balance.");
+                        player.sendMessage(
+                                ChatColor.YELLOW
+                                        + "Sending "
+                                        + ChatColor.LIGHT_PURPLE
+                                        + args[0]
+                                        + " "
+                                        + BitQuest.DENOMINATION_NAME
+                                        + ChatColor.YELLOW
+                                        + " to "
+                                        + ChatColor.BLUE
+                                        + args[1]
+                                        + ChatColor.YELLOW
+                                        + "...");
+
+                        if (fromWallet.payment(args[1], sendAmount) == true) {
+                            player.sendMessage(
+                                    ChatColor.GREEN
+                                            + "Succesfully sent "
+                                            + ChatColor.LIGHT_PURPLE
+                                            + args[0]
+                                            + " "
+                                            + BitQuest.DENOMINATION_NAME
+                                            + ChatColor.GREEN
+                                            + " to external address.");
                         } else {
-                            final long balance = fromWallet.getBalance(5);
-                            if (unconfirmed_balance != balance) {
-                                player.sendMessage(
-                                        ChatColor.YELLOW
-                                                + "Sending "
-                                                + ChatColor.LIGHT_PURPLE
-                                                + args[0]
-                                                + " "
-                                                + BitQuest.DENOMINATION_NAME
-                                                + ChatColor.YELLOW
-                                                + " to "
-                                                + ChatColor.BLUE
-                                                + args[1]
-                                                + ChatColor.YELLOW
-                                                + "...");
-                                if(fromWallet.payment(args[1],sendAmount)==true) {
-                                    player.sendMessage(
-                                            ChatColor.GREEN
-                                                    + "Succesfully sent "
-                                                    + ChatColor.LIGHT_PURPLE
-                                                    + args[0]
-                                                    + " "
-                                                    + BitQuest.DENOMINATION_NAME
-                                                    + ChatColor.GREEN
-                                                    + " to external address.");
-                                } else {
-                                    player.sendMessage(ChatColor.DARK_RED+"Transaction failed. Please try again later.");
-                                }
-
-                                bitQuest.updateScoreboard(player);
-
-                            } else {
-                                player.sendMessage(
-                                        ChatColor.RED
-                                                + "You have unconfirmed transactions. please try again later.");
-                            }
+                            player.sendMessage(ChatColor.DARK_RED + "Transaction failed. Please try again later.");
                         }
+
+                        bitQuest.updateScoreboard(player);
+
+
+                    } else {
+                        return false;
                     }
-                    ;
+                    return true;
                 }
+
             } catch (Exception e) {
-                player.sendMessage(ChatColor.DARK_RED+"FAIL");
-                System.out.println(e);
+                e.printStackTrace();
+                player.sendMessage(ChatColor.RED + "Transaction failed. Please try again later.");
+
             }
-        } else {
-            return false;
         }
         return true;
-    };
-
+    }
 }

@@ -112,7 +112,7 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 | BITQUEST_NODE_PORT            | Port of node                                                           |
 | ADMIN_UUID                    | Minecraft user ID for the main administrator                           |
 | BITQUEST_ENV                  | Set to 'production' to enable main net transactions.                   |
-| BLOCKCYPHER_CHAIN             | btc/main for bitcoin mainnet. defaults to btc/test3 (bitcoin testnet)  |
+| BLOCKCYPHER_CHAIN             | btc/main for bitcoin mainnet. btc/test3 for bitcoin testnet            |
 | POSTGRES_ENV_POSTGRES_USER    | Username for connecting to the PostgreSQL database                     |
 | POSTGRES_1_PORT_5432_TCP_ADDR | Address of DB server                                                   | 
 | POSTGRES_1_PORT_5432_TCP_PORT | Port for the DB server                                                 |
