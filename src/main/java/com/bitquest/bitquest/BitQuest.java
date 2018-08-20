@@ -151,21 +151,6 @@ public class BitQuest extends JavaPlugin {
     public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
 
-    {
-        try {
-            if(db_user!=null&&db_password!=null) {
-                db_con = DriverManager.getConnection(db_url, db_user, db_password);
-
-            } else {
-                db_con = DriverManager.getConnection(db_url);
-
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.out.println("[fatal] database connection failed. Shutting down.");
-            Bukkit.shutdown();
-        }
-    }
 
 
 

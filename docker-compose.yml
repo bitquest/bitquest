@@ -12,3 +12,6 @@ redis:
   image: redis
 postgres:
   image: postgres
+  environment:
+    - POSTGRES_USER=bitquest
+    - POSTGRES_PASSWORD=ORLY
