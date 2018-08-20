@@ -2,7 +2,7 @@ spigot:
   container_name: bitquest
   build: .
   volumes:
-    - "./plugins/BitQuest.jar:/spigot/plugins/BitQuest.jar"
+    - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
   ports:
     - "25565:25565"
   links:
