@@ -48,20 +48,7 @@ public class BitQuest extends JavaPlugin {
             System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public static final UUID ADMIN_UUID =
             System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
-    public static final String HD_ROOT_ADDRESS =
-            System.getenv("HD_ROOT_ADDRESS") != null ? System.getenv("HD_ROOT_ADDRESS") : null;
-    public static final String WORLD_ADDRESS =
-            System.getenv("WORLD_ADDRESS") != null
-                    ? System.getenv("WORLD_ADDRESS")
-                    : "n3hptFs8MBUa39gVjPnP5H1xQEt1ezbHCE";
-    public static final String WORLD_PRIVATE_KEY =
-            System.getenv("WORLD_PRIVATE_KEY") != null
-                    ? System.getenv("WORLD_PRIVATE_KEY")
-                    : null;
-    public static final String WORLD_PUBLIC_KEY =
-            System.getenv("WORLD_PUBLIC_KEY") != null
-                    ? System.getenv("WORLD_PUBLIC_KEY")
-                    : null;
+
     public static final String BITCOIN_NODE_HOST =
             System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : null;
     public static final int BITCOIN_NODE_PORT =
@@ -196,8 +183,15 @@ public class BitQuest extends JavaPlugin {
                 System.out.println("[startup] config file does not exist. creating default.");
             }
 
-            // loads world wallet
-            wallet = this.generateNewWallet();
+            // loads world wallet from env variables. If not present, generates a new one each time the server is run.
+            if(System.getenv("PRIVATE")!=null&&System.getenv("PUBLIC_KEY")!=null&&System.getenv("ADDRESS")!=null&&System.getenv("WIF")!=null) {
+                wallet = new Wallet(System.getenv("PRIVATE"),System.getenv("PUBLIC_KEY"),System.getenv("ADDRESS"),System.getenv("WIF"));
+                System.out.println("[world wallet] imported from environment");
+            } else {
+                wallet = this.generateNewWallet();
+                System.out.println("[world wallet] generated new wallet");
+
+            }
 
             if (BITCOIN_NODE_HOST != null) {
                 System.out.println("[startup] checking bitcoin node connection");
