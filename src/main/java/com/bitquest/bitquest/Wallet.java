@@ -204,7 +204,7 @@ public class Wallet {
 
     public boolean save(UUID uuid, Connection db_con) throws SQLException {
         PreparedStatement user_create_pst = db_con.prepareStatement("INSERT INTO USERS (uuid,private,public,address,wif) VALUES ('" + uuid.toString() + "','" + this.private_key + "','" + this.public_key + "','" + this.address + "','"+this.wif+"')");
-        user_create_pst.executeQuery();
+        user_create_pst.executeUpdate();
 
         return true;
     }
