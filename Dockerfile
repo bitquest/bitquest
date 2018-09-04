@@ -25,4 +25,4 @@ RUN cp /bitquest/target/BitQuest.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
 
-CMD java -jar spigot.jar -XMS4G -XMX4G
+CMD java -jar spigot.jar
