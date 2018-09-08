@@ -29,7 +29,7 @@ public class UpgradeWallet extends CommandAction {
             if(balance>0) {
                 legacy_wallet.sendFrom(user.wallet.address, balance);
             } else {
-                player.sendMessage(ChatColor.RED+"Your old wallet balance is "+balance);
+                player.sendMessage(ChatColor.RED+"You don't have balance in your old account or its already migrated.");
             }
         } catch (Exception e) {
             e.printStackTrace();
