@@ -236,7 +236,7 @@ public class BitQuest extends JavaPlugin {
         JSONParser parser = new JSONParser();
         final JSONObject jsonObject = new JSONObject();
 
-        URL url = new URL("https://api.blockcypher.com/v1/btc/test3/addrs");
+        URL url = new URL("https://api.blockcypher.com/v1/"+BLOCKCYPHER_CHAIN+"/addrs");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setConnectTimeout(5000);
         con.setRequestMethod("POST");
