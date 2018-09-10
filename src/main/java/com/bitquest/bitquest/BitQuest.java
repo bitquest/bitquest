@@ -86,7 +86,7 @@ public class BitQuest extends JavaPlugin {
     // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
     // localhost:6379
     public static final String REDIS_HOST =
-            System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null
+            System.getenv("REDIS_PORT_6379_TCP_ADDR") != null
                     ? System.getenv("REDIS_PORT_6379_TCP_ADDR")
                     : "localhost";
     public static final Integer REDIS_PORT =
