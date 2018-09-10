@@ -1,19 +1,17 @@
-version: "3"
-services:
-  spigot:
-    container_name: bitquest
-    build: .
-    volumes:
-      - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
-    ports:
-      - "25565:25565"
-    links:
-      - redis
-      - postgres
-  redis:
-    image: redis
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_USER=bitquest
-      - POSTGRES_PASSWORD=ORLY
+spigot:
+  container_name: bitquest
+  build: .
+  volumes:
+    - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
+  ports:
+    - "25565:25565"
+  links:
+    - redis
+    - postgres
+redis:
+  image: redis
+postgres:
+  image: postgres
+  environment:
+    - POSTGRES_USER=bitquest
+    - POSTGRES_PASSWORD=ORLY
