@@ -133,7 +133,7 @@ public class BitQuest extends JavaPlugin {
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
-    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
+    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_PORT_5432_TCP_PORT") + "/bitquest";
     public java.sql.Connection db_con;
 
 
@@ -144,8 +144,8 @@ public class BitQuest extends JavaPlugin {
     public void onEnable() {
         log("[startup] BitQuest starting");
 
-        System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
-        if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
+        System.out.println("Checking that POSTGRES_PORT_5432_TCP_PORT envoronment variable exists...");
+        if(System.getenv("POSTGRES_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_PORT_5432_TCP_PORT environment variable");};
 
         try {
             Class.forName("org.postgresql.Driver");
