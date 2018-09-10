@@ -134,8 +134,6 @@ public class BitQuest extends JavaPlugin {
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
     public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
-    public static final String db_user = System.getenv("BITQUEST_POSTGRESQL_USERNAME");
-    public static final String db_password = System.getenv("BITQUEST_POSTGRESQL_PASSWORD");
     public java.sql.Connection db_con;
 
 
@@ -197,10 +195,6 @@ public class BitQuest extends JavaPlugin {
                 System.out.println("[startup] checking bitcoin node connection");
                 getBlockChainInfo();
             }
-
-            // sets the redis save intervals
-            REDIS.configSet("SAVE", "900 1 300 10 60 10000");
-
 
             // creates scheduled timers (update balances, etc)
             createScheduledTimers();
