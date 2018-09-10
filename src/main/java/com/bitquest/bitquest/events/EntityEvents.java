@@ -251,15 +251,14 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event)
             throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0)) {
-            event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
-            pvar++;
-        }
+                // TODO: Check if zone is PvP only when chunks change
+        // if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0)) {
+        //     event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
+        //     pvar++;
+        // }
 
         if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-            event
-                    .getPlayer()
-                    .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
 
             pvar = 0;
@@ -685,21 +684,7 @@ public class EntityEvents implements Listener {
                     } else {
                         event.setCancelled(true);
                     }
-                } else if (event.getEntity() instanceof LivingEntity) {
-                    // Player Vs Mob
-                    if (player.hasMetadata("pet") == true) {
-                        World w = player.getWorld();
-                        List<Entity> entities = w.getEntities();
-                        String cat_name = bitQuest.REDIS.get("pet:" + player.getUniqueId());
-                        for (Entity entity : entities) {
-                            if (entity instanceof Ocelot) {
-                                if (entity.getCustomName() != null && entity.getCustomName().equals(cat_name)) {
-                                    ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
-                                }
-                            }
-                        }
-                    }
-                }
+                } 
             }
         }
     }
