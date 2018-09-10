@@ -142,7 +142,8 @@ public class EntityEvents implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
+    public void onPlayerJoin(PlayerJoinEvent event) {
+
         final Player player = event.getPlayer();
         // On dev environment, admin gets op. In production, nobody gets op.
 
@@ -160,7 +161,13 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-            Long balance = bitQuest.wallet.getBalance(0);
+            Long balance = null;
+            try {
+                balance = bitQuest.wallet.getBalance(0);
+            } catch (Exception e) {
+                // TODO: Better handling of a getBalance error when player is joining.
+                Bukkit.shutdown();
+            }
             player.sendMessage(
                     ChatColor.GRAY
                             + "The world wallet balance is: "

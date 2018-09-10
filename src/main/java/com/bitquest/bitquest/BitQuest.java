@@ -87,11 +87,11 @@ public class BitQuest extends JavaPlugin {
     // localhost:6379
     public static final String REDIS_HOST =
             System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null
-                    ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR")
+                    ? System.getenv("REDIS_PORT_6379_TCP_ADDR")
                     : "localhost";
     public static final Integer REDIS_PORT =
-            System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null
-                    ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT"))
+            System.getenv("REDIS_PORT_6379_TCP_PORT") != null
+                    ? Integer.parseInt(System.getenv("REDIS_PORT_6379_TCP_PORT"))
                     : 6379;
     public static final Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
     // FAILS
