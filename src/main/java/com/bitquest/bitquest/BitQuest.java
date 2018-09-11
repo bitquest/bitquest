@@ -182,8 +182,8 @@ public class BitQuest extends JavaPlugin {
             }
 
             // loads world wallet from env variables. If not present, generates a new one each time the server is run.
-            if(System.getenv("PRIVATE")!=null&&System.getenv("PUBLIC_KEY")!=null&&System.getenv("ADDRESS")!=null&&System.getenv("WIF")!=null) {
-                wallet = new Wallet(System.getenv("PRIVATE"),System.getenv("PUBLIC_KEY"),System.getenv("ADDRESS"),System.getenv("WIF"));
+            if(System.getenv("PRIVATE")!=null&&System.getenv("PUBLIC")!=null&&System.getenv("ADDRESS")!=null&&System.getenv("WIF")!=null) {
+                wallet = new Wallet(System.getenv("PRIVATE"),System.getenv("PUBLIC"),System.getenv("ADDRESS"),System.getenv("WIF"));
                 System.out.println("[world wallet] imported from environment");
             } else {
                 wallet = this.generateNewWallet();
