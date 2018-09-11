@@ -71,6 +71,7 @@ public class Wallet {
         con.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
         out.write(blockcypher_params.toString());
+        System.out.println(url.toString()+" --> "+blockcypher_params.toString());
         out.close();
 
         int responseCode = con.getResponseCode();
