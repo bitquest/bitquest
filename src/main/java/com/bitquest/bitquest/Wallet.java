@@ -47,7 +47,7 @@ public class Wallet {
         final JSONArray inputs = new JSONArray();
         final JSONArray input_addresses = new JSONArray();
         final JSONObject input = new JSONObject();
-        input_addresses.add(this.address);
+        input_addresses.add(address);
         input.put("addresses", input_addresses);
         inputs.add(input);
 
@@ -93,7 +93,7 @@ public class Wallet {
     public boolean payment(String _address, Long sat) throws IOException, ParseException {
 
         // create skeleton tx to be signed
-        JSONObject tx = txSkeleton(_address, sat);
+        JSONObject tx = this.txSkeleton(_address, sat);
         // obtain message (hash) to be signed with private key
         JSONArray tosign = (JSONArray) tx.get("tosign");
         String msg = tosign.get(0).toString();
