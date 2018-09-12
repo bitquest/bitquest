@@ -436,8 +436,9 @@ public class EntityEvents implements Listener {
                     // if (dice == 20) {
                     if (dice > 4) {
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
-                            // TODO: Pay to user's address
-                            if (bitQuest.wallet.payment(player.getUniqueId().toString(), money)) {
+                            final User user = new User(bitQuest.db_con, player.getUniqueId());
+
+                            if (bitQuest.wallet.payment(user.wallet.address, money)) {
                                 bitQuest.last_loot_player = player;
                                 bitQuest.wallet_balance_cache -= money;
                                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);
