@@ -185,11 +185,13 @@ public class BitQuest extends JavaPlugin {
             if(System.getenv("PRIVATE")!=null&&System.getenv("PUBLIC")!=null&&System.getenv("ADDRESS")!=null&&System.getenv("WIF")!=null) {
                 wallet = new Wallet(System.getenv("PRIVATE"),System.getenv("PUBLIC"),System.getenv("ADDRESS"),System.getenv("WIF"));
                 System.out.println("[world wallet] imported from environment");
+
             } else {
                 wallet = this.generateNewWallet();
                 System.out.println("[world wallet] generated new wallet");
 
             }
+            System.out.println("[world wallet] address: "+wallet.address);
 
             if (BITCOIN_NODE_HOST != null) {
                 System.out.println("[startup] checking bitcoin node connection");
