@@ -133,7 +133,8 @@ public class EntityEvents implements Listener {
             BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
             BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
             if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
-                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, PROBLEM_MESSAGE);
+                System.out.println("kicking banned player "+event.getPlayer().getDisplayName());
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "You are temporarily banned. Please contact bitquest@bitquest.co");
             }
         } catch(Exception e) {
             e.printStackTrace();
