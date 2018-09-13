@@ -124,7 +124,7 @@ public class InventoryEvents implements Listener {
               }
               final boolean hasOpenSlotsFinal = hasOpenSlots;
               final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-		if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME)){
+		if (itQuest.BLOCKCYPHER_CHAIN != null){
               user.wallet.getBalance(
                   0,
                   new Wallet.GetBalanceCallback() {
@@ -153,23 +153,7 @@ public class InventoryEvents implements Listener {
                                       + satFinal / 100);
 
                               bitQuest.updateScoreboard(player);
-                              if (bitQuest.messageBuilder != null) {
 
-                                // Create an event
-                                org.json.JSONObject sentEvent =
-                                    bitQuest.messageBuilder.event(
-                                        player.getUniqueId().toString(), "Purchase", null);
-                                org.json.JSONObject sentCharge =
-                                    bitQuest.messageBuilder.trackCharge(
-                                        player.getUniqueId().toString(), satFinal / 100, null);
-
-                                ClientDelivery delivery = new ClientDelivery();
-                                delivery.addMessage(sentEvent);
-                                delivery.addMessage(sentCharge);
-
-                                MixpanelAPI mixpanel = new MixpanelAPI();
-                                mixpanel.deliver(delivery);
-                              }
 
                             } else {
                               player.sendMessage(
@@ -188,8 +172,7 @@ public class InventoryEvents implements Listener {
                       }
                     }
                   });
-		} //end BitQuest.DENOMINATION_NAME start Ems
-		else if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")){
+		}  else {
                       try {
                         if (user.countEmeralds() >= satFinal/100) {
 
