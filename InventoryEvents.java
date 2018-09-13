@@ -102,7 +102,7 @@ public class InventoryEvents implements Listener {
             player.closeInventory();
             event.setCancelled(true);
 
-            
+
               int sat = 0;
               Trade trade = null;
 
@@ -134,7 +134,7 @@ public class InventoryEvents implements Listener {
                         if (balance >= satFinal) {
 
                           if (hasOpenSlotsFinal) {
-                            if (user.wallet.move("bitquest_market", satFinal)) {
+                            if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
                               if (clicked.getType() == Material.ENCHANTED_BOOK)
                                 bitQuest.books.remove(0);
 
@@ -189,7 +189,7 @@ public class InventoryEvents implements Listener {
                     }
                   });
 		} //end BitQuest.DENOMINATION_NAME start Ems
-		else if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")){ 
+		else if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")){
                       try {
                         if (user.countEmeralds() >= satFinal/100) {
 
@@ -470,7 +470,7 @@ public class InventoryEvents implements Listener {
 	//@bitcoinjake09 updates scoreboard if emeralds
     @EventHandler
     public void OnPlayerPickup(PlayerPickupItemEvent event)
-    {  
+    {
         Player player = event.getPlayer();
         ItemStack item = event.getItem().getItemStack();
         Material itemType = item.getType();
@@ -482,7 +482,7 @@ public class InventoryEvents implements Listener {
 	/*
     @EventHandler
     public void OnPlayerDropItem(PlayerDropItemEvent event)
-    {  
+    {
         Player player = event.getPlayer();
         if(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
         {
