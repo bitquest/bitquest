@@ -878,11 +878,10 @@ public class BitQuest extends JavaPlugin {
         }
         try {
             Long balance = user.wallet.getBalance(0);
-            player.sendMessage("-----------");
-            player.sendMessage("Wallet info");
+
             player.sendMessage("Address: "+user.wallet.address);
             player.sendMessage("Balance: "+balance);
-            player.sendMessage("URL: "+user.wallet.url());
+            player.sendMessage("URL: "+ChatColor.BLUE+ChatColor.UNDERLINE+ChatColor.BOLD+user.wallet.url());
             player.sendMessage("-----------");
 
         } catch(Exception e) {
