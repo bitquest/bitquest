@@ -4,23 +4,17 @@ package com.bitquest.bitquest;
 import com.bitquest.bitquest.commands.*;
 import com.bitquest.bitquest.events.*;
 import com.google.gson.JsonObject;
-import com.mixpanel.mixpanelapi.MessageBuilder;
-import com.timgroup.statsd.NonBlockingStatsDClient;
-import com.timgroup.statsd.StatsDClient;
+
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.Exchanger;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.bukkit.*;
-import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -32,7 +26,6 @@ import org.bukkit.scoreboard.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import redis.clients.jedis.Connection;
 import redis.clients.jedis.Jedis;
 
 // Color Table :
@@ -73,18 +66,11 @@ public class BitQuest extends JavaPlugin {
 
     public static final int MAX_STOCK = 100;
     public static final String SERVER_NAME = System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
-    // Support for statsd is optional but really cool
-    public static final String STATSD_HOST =
-            System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
-    public static final String STATSD_PREFIX =
-            System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : "bitquest";
-    public static final String STATSD_PORT =
-            System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : "8125";
-    // Support for mixpanel analytics
-    public static final String MIXPANEL_TOKEN =
-            System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
-    // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
-    // localhost:6379
+
+    // Can save world data in elasticsearch (optional)
+    public static final String ELASTICSEARCH_ENDPOINT =
+            System.getenv("ELASTICSEARCH_ENDPOINT") != null ? System.getenv("ELASTICSEARCH_ENDPOINT") : null;
+    // REDIS: Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public static final String REDIS_HOST =
             System.getenv("REDIS_PORT_6379_TCP_ADDR") != null
                     ? System.getenv("REDIS_PORT_6379_TCP_ADDR")
@@ -94,9 +80,7 @@ public class BitQuest extends JavaPlugin {
                     ? Integer.parseInt(System.getenv("REDIS_PORT_6379_TCP_PORT"))
                     : 6379;
     public static final Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
-    // FAILS
-    // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST,
-    // REDIS_PORT);
+
     // Default price: 10,000 satoshis or 100 bits
     public static final Long LAND_PRICE =
             System.getenv("LAND_PRICE") != null ? Long.parseLong(System.getenv("LAND_PRICE")) : 10000;
@@ -106,16 +90,12 @@ public class BitQuest extends JavaPlugin {
                     ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
                     : 2000L;
 
-    // utilities: distance and rand
-    public static int distance(Location location1, Location location2) {
-        return (int) location1.distance(location2);
-    }
+
 
     public static int rand(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
 
-    public StatsDClient statsd;
     public Wallet wallet = null;
     public Player last_loot_player;
     public boolean spookyMode = false;
@@ -155,10 +135,7 @@ public class BitQuest extends JavaPlugin {
             if (ADMIN_UUID == null) {
                 log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
             }
-            if (STATSD_HOST != null && STATSD_PORT != null) {
-                statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
-                System.out.println("StatsD support is on.");
-            }
+
             // registers listener classes
             getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
             getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -515,12 +492,6 @@ public class BitQuest extends JavaPlugin {
         }
     }
 
-    public void recordMetric(String name, int value) {
-        if (SERVER_NAME != null) {
-            statsd.gauge("bitquest." + SERVER_NAME + "." + name, value);
-        }
-        System.out.println("[" + name + "] " + value);
-    }
 
 
     public void removeAllEntities() {
