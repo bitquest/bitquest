@@ -124,7 +124,7 @@ public class InventoryEvents implements Listener {
               }
               final boolean hasOpenSlotsFinal = hasOpenSlots;
               final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-		if (itQuest.BLOCKCYPHER_CHAIN != null){
+		if (bitQuest.BLOCKCYPHER_CHAIN != null) {
               user.wallet.getBalance(
                   0,
                   new Wallet.GetBalanceCallback() {

@@ -90,68 +90,72 @@ public class Wallet {
         return (JSONObject) parser.parse(response.toString());
     }
 
-    public boolean payment(String _address, Long sat) throws IOException, ParseException {
-
-        // create skeleton tx to be signed
-        JSONObject tx = this.txSkeleton(_address, sat);
-        // obtain message (hash) to be signed with private key
-        JSONArray tosign = (JSONArray) tx.get("tosign");
-        String msg = tosign.get(0).toString();
-        // TODO: Create raw transaction with in full node
-        // creating a key object from WiF
-        DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
-        ECKey key = dpk.getKey();
-        // checking our key object
-        NetworkParameters params = TestNet3Params.get();
-        if (System.getenv("BITQUEST_ENV") != null) {
-            if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
-                System.out.println("[transaction] main net transaction start");
-                params = MainNetParams.get();
+    public boolean payment(String _address, Long sat)  {
+        try {
+            // create skeleton tx to be signed
+            JSONObject tx = this.txSkeleton(_address, sat);
+            // obtain message (hash) to be signed with private key
+            JSONArray tosign = (JSONArray) tx.get("tosign");
+            String msg = tosign.get(0).toString();
+            // TODO: Create raw transaction with in full node
+            // creating a key object from WiF
+            DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
+            ECKey key = dpk.getKey();
+            // checking our key object
+            NetworkParameters params = TestNet3Params.get();
+            if (System.getenv("BITQUEST_ENV") != null) {
+                if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
+                    System.out.println("[transaction] main net transaction start");
+                    params = MainNetParams.get();
+                }
             }
-        }
-        String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
-        // System.out.println(wif.equals(check));  // true
-        // creating Sha object from string
-        Sha256Hash hash = Sha256Hash.wrap(msg);
-        // creating signature
-        ECDSASignature sig = key.sign(hash);
-        // encoding
-        byte[] res = sig.encodeToDER();
-        // converting to hex
-        String hex = DatatypeConverter.printHexBinary(res);
-        JSONArray signatures = new JSONArray();
-        signatures.add(hex);
-        tx.put("signatures", signatures);
-        JSONArray pubkeys = new JSONArray();
-        // add my public key
-        pubkeys.add(this.public_key);
-        tx.put("pubkeys", pubkeys);
-        // go back to blockcypher with signed transaction
-        URL url;
-        if (System.getenv("BLOCKCYPHER_TOKEN") != null) {
-            url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send?token=" + System.getenv("BLOCKCYPHER_TOKEN"));
-        } else {
-            url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
-        }
+            String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
+            // System.out.println(wif.equals(check));  // true
+            // creating Sha object from string
+            Sha256Hash hash = Sha256Hash.wrap(msg);
+            // creating signature
+            ECDSASignature sig = key.sign(hash);
+            // encoding
+            byte[] res = sig.encodeToDER();
+            // converting to hex
+            String hex = DatatypeConverter.printHexBinary(res);
+            JSONArray signatures = new JSONArray();
+            signatures.add(hex);
+            tx.put("signatures", signatures);
+            JSONArray pubkeys = new JSONArray();
+            // add my public key
+            pubkeys.add(this.public_key);
+            tx.put("pubkeys", pubkeys);
+            // go back to blockcypher with signed transaction
+            URL url;
+            if (System.getenv("BLOCKCYPHER_TOKEN") != null) {
+                url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send?token=" + System.getenv("BLOCKCYPHER_TOKEN"));
+            } else {
+                url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
+            }
 
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setConnectTimeout(5000);
-        con.setDoOutput(true);
-        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        out.write(tx.toString());
-        out.close();
-        int responseCode = con.getResponseCode();
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setConnectTimeout(5000);
+            con.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+            out.write(tx.toString());
+            out.close();
+            int responseCode = con.getResponseCode();
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+            JSONParser parser = new JSONParser();
+            JSONObject response_object = (JSONObject) parser.parse(response.toString());
+            System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
+            return true;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return false;
         }
-        in.close();
-        JSONParser parser = new JSONParser();
-        JSONObject response_object = (JSONObject) parser.parse(response.toString());
-        System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
-        return true;
     }
 
     public Long getBalance(int confirmations) throws IOException, ParseException {

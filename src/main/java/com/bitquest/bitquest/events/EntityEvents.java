@@ -424,9 +424,7 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     // roll a D20
 
-                    Long money =
-                            Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level))
-                                    * bitQuest.DENOMINATION_FACTOR;
+                    Long money = Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level)) * 10 * bitQuest.DENOMINATION_FACTOR;
                     int dice = BitQuest.rand(1, 20);
                     final Player player = (Player) damage.getDamager();
 
