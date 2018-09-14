@@ -205,6 +205,7 @@ public class BitQuest extends JavaPlugin {
             // TODO: Remove this command after migrate.
             modCommands.put("migrateclans", new MigrateClansCommand());
             System.out.println("[startup] finished");
+            publish_stats();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("[fatal] plugin enable fails");
@@ -470,13 +471,53 @@ public class BitQuest extends JavaPlugin {
                     @Override
                     public void run() {
                         run_season_events();
+                        publish_stats();
                     }
                 },
                 0,
                 1200L);
 
     }
+    public void publish_stats() {
+        try {
+            if(System.getenv("ELASTICSEARCH_ENDPOINT")!=null) {
+                JSONParser parser = new JSONParser();
 
+                final JSONObject jsonObject = new JSONObject();
+                jsonObject.put("balance", wallet.getBalance(0));
+                jsonObject.put("time", new Date().getTime());
+                URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "/" + SERVER_NAME + "-stats/_doc");
+                System.out.println(url.toString());
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                con.setDoOutput(true);
+                OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+                out.write(jsonObject.toString());
+                out.close();
+
+                int responseCode = con.getResponseCode();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                System.out.println(response.toString());
+                JSONObject response_object = (JSONObject) parser.parse(response.toString());
+                System.out.println(response_object);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
     public void run_season_events() {
         java.util.Date date = new Date();
         Calendar cal = Calendar.getInstance();
