@@ -486,7 +486,7 @@ public class BitQuest extends JavaPlugin {
                 final JSONObject jsonObject = new JSONObject();
                 jsonObject.put("balance", wallet.getBalance(0));
                 jsonObject.put("time", new Date().getTime());
-                URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "/" + SERVER_NAME + "-stats/_doc");
+                URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "-stats/_doc");
                 System.out.println(url.toString());
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -515,8 +515,7 @@ public class BitQuest extends JavaPlugin {
         } catch(Exception e) {
             e.printStackTrace();
         }
-
-
+        
     }
     public void run_season_events() {
         java.util.Date date = new Date();
