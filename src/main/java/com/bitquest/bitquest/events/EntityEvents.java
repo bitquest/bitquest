@@ -195,6 +195,7 @@ public class EntityEvents implements Listener {
         bitQuest.updateScoreboard(player);
 
         player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
+        if(BitQuest.REDIS.exists("bitquest:motd")==true) player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
 
         BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
         // spawn pet
