@@ -83,10 +83,7 @@ public class TransferCommand extends CommandAction {
                         bitQuest.updateScoreboard(player);
 
 
-                    } else {
-                        return false;
                     }
-                    return true;
                 }
 
             } catch (Exception e) {
@@ -94,7 +91,10 @@ public class TransferCommand extends CommandAction {
                 player.sendMessage(ChatColor.RED + "Transaction failed. Please try again later.");
 
             }
+            return true;
+
+        } else {
+            return false;
         }
-        return true;
     }
 }

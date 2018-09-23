@@ -4,23 +4,17 @@ package com.bitquest.bitquest;
 import com.bitquest.bitquest.commands.*;
 import com.bitquest.bitquest.events.*;
 import com.google.gson.JsonObject;
-import com.mixpanel.mixpanelapi.MessageBuilder;
-import com.timgroup.statsd.NonBlockingStatsDClient;
-import com.timgroup.statsd.StatsDClient;
+
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.*;
-import java.util.concurrent.Exchanger;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.bukkit.*;
-import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
@@ -32,7 +26,6 @@ import org.bukkit.scoreboard.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import redis.clients.jedis.Connection;
 import redis.clients.jedis.Jedis;
 
 // Color Table :
@@ -48,20 +41,7 @@ public class BitQuest extends JavaPlugin {
             System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
     public static final UUID ADMIN_UUID =
             System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
-    public static final String HD_ROOT_ADDRESS =
-            System.getenv("HD_ROOT_ADDRESS") != null ? System.getenv("HD_ROOT_ADDRESS") : null;
-    public static final String WORLD_ADDRESS =
-            System.getenv("WORLD_ADDRESS") != null
-                    ? System.getenv("WORLD_ADDRESS")
-                    : "n3hptFs8MBUa39gVjPnP5H1xQEt1ezbHCE";
-    public static final String WORLD_PRIVATE_KEY =
-            System.getenv("WORLD_PRIVATE_KEY") != null
-                    ? System.getenv("WORLD_PRIVATE_KEY")
-                    : null;
-    public static final String WORLD_PUBLIC_KEY =
-            System.getenv("WORLD_PUBLIC_KEY") != null
-                    ? System.getenv("WORLD_PUBLIC_KEY")
-                    : null;
+
     public static final String BITCOIN_NODE_HOST =
             System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : null;
     public static final int BITCOIN_NODE_PORT =
@@ -86,30 +66,21 @@ public class BitQuest extends JavaPlugin {
 
     public static final int MAX_STOCK = 100;
     public static final String SERVER_NAME = System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
-    // Support for statsd is optional but really cool
-    public static final String STATSD_HOST =
-            System.getenv("STATSD_HOST") != null ? System.getenv("STATSD_HOST") : null;
-    public static final String STATSD_PREFIX =
-            System.getenv("STATSD_PREFIX") != null ? System.getenv("STATSD_PREFIX") : "bitquest";
-    public static final String STATSD_PORT =
-            System.getenv("STATSD_PORT") != null ? System.getenv("STATSD_PORT") : "8125";
-    // Support for mixpanel analytics
-    public static final String MIXPANEL_TOKEN =
-            System.getenv("MIXPANEL_TOKEN") != null ? System.getenv("MIXPANEL_TOKEN") : null;
-    // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
-    // localhost:6379
+
+    // Can save world data in elasticsearch (optional)
+    public static final String ELASTICSEARCH_ENDPOINT =
+            System.getenv("ELASTICSEARCH_ENDPOINT") != null ? System.getenv("ELASTICSEARCH_ENDPOINT") : null;
+    // REDIS: Look for Environment variables on hostname and port, otherwise defaults to localhost:6379
     public static final String REDIS_HOST =
-            System.getenv("REDIS_1_PORT_6379_TCP_ADDR") != null
-                    ? System.getenv("REDIS_1_PORT_6379_TCP_ADDR")
+            System.getenv("REDIS_PORT_6379_TCP_ADDR") != null
+                    ? System.getenv("REDIS_PORT_6379_TCP_ADDR")
                     : "localhost";
     public static final Integer REDIS_PORT =
-            System.getenv("REDIS_1_PORT_6379_TCP_PORT") != null
-                    ? Integer.parseInt(System.getenv("REDIS_1_PORT_6379_TCP_PORT"))
+            System.getenv("REDIS_PORT_6379_TCP_PORT") != null
+                    ? Integer.parseInt(System.getenv("REDIS_PORT_6379_TCP_PORT"))
                     : 6379;
     public static final Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
-    // FAILS
-    // public final static JedisPool REDIS_POOL = new JedisPool(new JedisPoolConfig(), REDIS_HOST,
-    // REDIS_PORT);
+
     // Default price: 10,000 satoshis or 100 bits
     public static final Long LAND_PRICE =
             System.getenv("LAND_PRICE") != null ? Long.parseLong(System.getenv("LAND_PRICE")) : 10000;
@@ -119,16 +90,12 @@ public class BitQuest extends JavaPlugin {
                     ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
                     : 2000L;
 
-    // utilities: distance and rand
-    public static int distance(Location location1, Location location2) {
-        return (int) location1.distance(location2);
-    }
+
 
     public static int rand(int min, int max) {
         return min + (int) (Math.random() * ((max - min) + 1));
     }
 
-    public StatsDClient statsd;
     public Wallet wallet = null;
     public Player last_loot_player;
     public boolean spookyMode = false;
@@ -146,8 +113,8 @@ public class BitQuest extends JavaPlugin {
     private Map<String, CommandAction> modCommands;
     private Player[] moderators;
     public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
-    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_1_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_1_PORT_5432_TCP_PORT") + "/bitquest";
 
+    public static final String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_PORT_5432_TCP_PORT") + "/bitquest";
     public java.sql.Connection db_con;
 
 
@@ -158,8 +125,8 @@ public class BitQuest extends JavaPlugin {
     public void onEnable() {
         log("[startup] BitQuest starting");
 
-        System.out.println("Checking that POSTGRES_1_PORT_5432_TCP_PORT envoronment variable exists...");
-        if(System.getenv("POSTGRES_1_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_1_PORT_5432_TCP_PORT environment variable");};
+        System.out.println("Checking that POSTGRES_PORT_5432_TCP_PORT envoronment variable exists...");
+        if(System.getenv("POSTGRES_PORT_5432_TCP_PORT")==null) {Bukkit.shutdown();System.out.println("Please set the POSTGRES_PORT_5432_TCP_PORT environment variable");};
 
         try {
             Class.forName("org.postgresql.Driver");
@@ -169,10 +136,7 @@ public class BitQuest extends JavaPlugin {
             if (ADMIN_UUID == null) {
                 log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
             }
-            if (STATSD_HOST != null && STATSD_PORT != null) {
-                statsd = new NonBlockingStatsDClient("bitquest", STATSD_HOST, new Integer(STATSD_PORT));
-                System.out.println("StatsD support is on.");
-            }
+
             // registers listener classes
             getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
             getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -195,17 +159,22 @@ public class BitQuest extends JavaPlugin {
                 System.out.println("[startup] config file does not exist. creating default.");
             }
 
-            // loads world wallet
-            wallet = this.generateNewWallet();
+            // loads world wallet from env variables. If not present, generates a new one each time the server is run.
+            if(System.getenv("PRIVATE")!=null&&System.getenv("PUBLIC")!=null&&System.getenv("ADDRESS")!=null&&System.getenv("WIF")!=null) {
+                wallet = new Wallet(System.getenv("PRIVATE"),System.getenv("PUBLIC"),System.getenv("ADDRESS"),System.getenv("WIF"));
+                System.out.println("[world wallet] imported from environment");
+
+            } else {
+                wallet = this.generateNewWallet();
+                System.out.println("[world wallet] generated new wallet");
+
+            }
+            System.out.println("[world wallet] address: "+wallet.address);
 
             if (BITCOIN_NODE_HOST != null) {
                 System.out.println("[startup] checking bitcoin node connection");
                 getBlockChainInfo();
             }
-
-            // sets the redis save intervals
-            REDIS.configSet("SAVE", "900 1 300 10 60 10000");
-
 
             // creates scheduled timers (update balances, etc)
             createScheduledTimers();
@@ -238,6 +207,7 @@ public class BitQuest extends JavaPlugin {
             // TODO: Remove this command after migrate.
             modCommands.put("migrateclans", new MigrateClansCommand());
             System.out.println("[startup] finished");
+            publish_stats();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("[fatal] plugin enable fails");
@@ -248,7 +218,7 @@ public class BitQuest extends JavaPlugin {
         JSONParser parser = new JSONParser();
         final JSONObject jsonObject = new JSONObject();
 
-        URL url = new URL("https://api.blockcypher.com/v1/btc/test3/addrs");
+        URL url = new URL("https://api.blockcypher.com/v1/"+BLOCKCYPHER_CHAIN+"/addrs");
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setConnectTimeout(5000);
         con.setRequestMethod("POST");
@@ -503,13 +473,52 @@ public class BitQuest extends JavaPlugin {
                     @Override
                     public void run() {
                         run_season_events();
+                        publish_stats();
                     }
                 },
                 0,
                 1200L);
 
     }
+    public void publish_stats() {
+        try {
+            if(System.getenv("ELASTICSEARCH_ENDPOINT")!=null) {
+                JSONParser parser = new JSONParser();
 
+                final JSONObject jsonObject = new JSONObject();
+                jsonObject.put("balance", wallet.getBalance(0));
+                jsonObject.put("time", new Date().getTime());
+                URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "-stats/_doc");
+                System.out.println(url.toString());
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                con.setDoOutput(true);
+                OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+                out.write(jsonObject.toString());
+                out.close();
+
+                int responseCode = con.getResponseCode();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                String inputLine;
+                StringBuffer response = new StringBuffer();
+
+                while ((inputLine = in.readLine()) != null) {
+                    response.append(inputLine);
+                }
+                in.close();
+                System.out.println(response.toString());
+                JSONObject response_object = (JSONObject) parser.parse(response.toString());
+                System.out.println(response_object);
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
     public void run_season_events() {
         java.util.Date date = new Date();
         Calendar cal = Calendar.getInstance();
@@ -525,12 +534,6 @@ public class BitQuest extends JavaPlugin {
         }
     }
 
-    public void recordMetric(String name, int value) {
-        if (SERVER_NAME != null) {
-            statsd.gauge("bitquest." + SERVER_NAME + "." + name, value);
-        }
-        System.out.println("[" + name + "] " + value);
-    }
 
 
     public void removeAllEntities() {
@@ -875,10 +878,7 @@ public class BitQuest extends JavaPlugin {
     public boolean isModerator(Player player) {
         if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
             return true;
-        } else if (ADMIN_UUID != null
-                && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
-            return true;
-        } else if (ADMIN_UUID == null) {
+        } else if (ADMIN_UUID != null && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
             return true;
         } else {
             return false;
@@ -891,11 +891,10 @@ public class BitQuest extends JavaPlugin {
         }
         try {
             Long balance = user.wallet.getBalance(0);
-            player.sendMessage("-----------");
-            player.sendMessage("Wallet info");
+
             player.sendMessage("Address: "+user.wallet.address);
             player.sendMessage("Balance: "+balance);
-            player.sendMessage("URL: "+user.wallet.url());
+            player.sendMessage("URL: "+ChatColor.BLUE+ChatColor.UNDERLINE+ChatColor.BOLD+user.wallet.url());
             player.sendMessage("-----------");
 
         } catch(Exception e) {

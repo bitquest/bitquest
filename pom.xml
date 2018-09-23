@@ -97,17 +97,7 @@
             <artifactId>json</artifactId>
             <version>20180130</version>
         </dependency>
-        <dependency>
-            <groupId>com.mixpanel</groupId>
-            <artifactId>mixpanel-java</artifactId>
-            <version>1.4.4</version>
-        </dependency>
 
-        <dependency>
-            <groupId>com.timgroup</groupId>
-            <artifactId>java-statsd-client</artifactId>
-            <version>3.0.1</version>
-        </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>

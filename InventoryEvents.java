@@ -102,7 +102,7 @@ public class InventoryEvents implements Listener {
             player.closeInventory();
             event.setCancelled(true);
 
-            
+
               int sat = 0;
               Trade trade = null;
 
@@ -124,7 +124,7 @@ public class InventoryEvents implements Listener {
               }
               final boolean hasOpenSlotsFinal = hasOpenSlots;
               final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-		if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase(BitQuest.DENOMINATION_NAME)){
+		if (bitQuest.BLOCKCYPHER_CHAIN != null) {
               user.wallet.getBalance(
                   0,
                   new Wallet.GetBalanceCallback() {
@@ -134,7 +134,7 @@ public class InventoryEvents implements Listener {
                         if (balance >= satFinal) {
 
                           if (hasOpenSlotsFinal) {
-                            if (user.wallet.move("bitquest_market", satFinal)) {
+                            if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
                               if (clicked.getType() == Material.ENCHANTED_BOOK)
                                 bitQuest.books.remove(0);
 
@@ -153,23 +153,7 @@ public class InventoryEvents implements Listener {
                                       + satFinal / 100);
 
                               bitQuest.updateScoreboard(player);
-                              if (bitQuest.messageBuilder != null) {
 
-                                // Create an event
-                                org.json.JSONObject sentEvent =
-                                    bitQuest.messageBuilder.event(
-                                        player.getUniqueId().toString(), "Purchase", null);
-                                org.json.JSONObject sentCharge =
-                                    bitQuest.messageBuilder.trackCharge(
-                                        player.getUniqueId().toString(), satFinal / 100, null);
-
-                                ClientDelivery delivery = new ClientDelivery();
-                                delivery.addMessage(sentEvent);
-                                delivery.addMessage(sentCharge);
-
-                                MixpanelAPI mixpanel = new MixpanelAPI();
-                                mixpanel.deliver(delivery);
-                              }
 
                             } else {
                               player.sendMessage(
@@ -188,8 +172,7 @@ public class InventoryEvents implements Listener {
                       }
                     }
                   });
-		} //end BitQuest.DENOMINATION_NAME start Ems
-		else if (BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald")){ 
+		}  else {
                       try {
                         if (user.countEmeralds() >= satFinal/100) {
 
@@ -470,7 +453,7 @@ public class InventoryEvents implements Listener {
 	//@bitcoinjake09 updates scoreboard if emeralds
     @EventHandler
     public void OnPlayerPickup(PlayerPickupItemEvent event)
-    {  
+    {
         Player player = event.getPlayer();
         ItemStack item = event.getItem().getItemStack();
         Material itemType = item.getType();
@@ -482,7 +465,7 @@ public class InventoryEvents implements Listener {
 	/*
     @EventHandler
     public void OnPlayerDropItem(PlayerDropItemEvent event)
-    {  
+    {
         Player player = event.getPlayer();
         if(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
         {

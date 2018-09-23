@@ -116,28 +116,35 @@ public class EntityEvents implements Listener {
 
     @EventHandler
     public void onPlayerLogin(PlayerLoginEvent event) {
-        Player player = event.getPlayer();
+        try {
+            Player player = event.getPlayer();
 
-        if (!(BitQuest.REDIS.exists("name:" + player.getUniqueId().toString()))) {
-            //give new players a compass @BitcoinJake09
-            player.getInventory().addItem(new ItemStack(Material.COMPASS, 1));
-        }
-        //sets currency flag if not set. @BitcoinJake09
-        if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null) {
-            BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
-        } else if ((BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null)) {
-            BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), "emerald");
-        }
+            if (!(BitQuest.REDIS.exists("name:" + player.getUniqueId().toString()))) {
+                //give new players a compass @BitcoinJake09
+                player.getInventory().addItem(new ItemStack(Material.COMPASS, 1));
+            }
+            //sets currency flag if not set. @BitcoinJake09
+            if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null) {
+                BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
+            } else if ((BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null)) {
+                BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), "emerald");
+            }
 
-        BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
-        BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-        if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER, PROBLEM_MESSAGE);
+            BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
+            BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
+            if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
+                System.out.println("kicking banned player "+event.getPlayer().getDisplayName());
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "You are temporarily banned. Please contact bitquest@bitquest.co");
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
+            Bukkit.shutdown();
         }
     }
 
     @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) throws IOException, org.json.simple.parser.ParseException, ParseException, JSONException {
+    public void onPlayerJoin(PlayerJoinEvent event) {
+
         final Player player = event.getPlayer();
         // On dev environment, admin gets op. In production, nobody gets op.
 
@@ -155,7 +162,13 @@ public class EntityEvents implements Listener {
                 player.setOp(true);
             }
             player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-            Long balance = bitQuest.wallet.getBalance(0);
+            Long balance = null;
+            try {
+                balance = bitQuest.wallet.getBalance(0);
+            } catch (Exception e) {
+                // TODO: Better handling of a getBalance error when player is joining.
+                Bukkit.shutdown();
+            }
             player.sendMessage(
                     ChatColor.GRAY
                             + "The world wallet balance is: "
@@ -240,15 +253,14 @@ public class EntityEvents implements Listener {
     @EventHandler
     public void onPlayerMove(PlayerMoveEvent event)
             throws ParseException, org.json.simple.parser.ParseException, IOException {
-        if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0)) {
-            event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
-            pvar++;
-        }
+                // TODO: Check if zone is PvP only when chunks change
+        // if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0)) {
+        //     event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
+        //     pvar++;
+        // }
 
         if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-            event
-                    .getPlayer()
-                    .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
+            event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
 
             pvar = 0;
@@ -413,9 +425,7 @@ public class EntityEvents implements Listener {
                 if (damage.getDamager() instanceof Player && level >= 1) {
                     // roll a D20
 
-                    Long money =
-                            Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level))
-                                    * bitQuest.DENOMINATION_FACTOR;
+                    Long money = Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level)) * 10 * bitQuest.DENOMINATION_FACTOR;
                     int dice = BitQuest.rand(1, 20);
                     final Player player = (Player) damage.getDamager();
 
@@ -426,8 +436,9 @@ public class EntityEvents implements Listener {
                     // if (dice == 20) {
                     if (dice > 4) {
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
-                            // TODO: Pay to user's address
-                            if (bitQuest.wallet.payment(player.getUniqueId().toString(), money)) {
+                            final User user = new User(bitQuest.db_con, player.getUniqueId());
+
+                            if (bitQuest.wallet.payment(user.wallet.address, money)) {
                                 bitQuest.last_loot_player = player;
                                 bitQuest.wallet_balance_cache -= money;
                                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);
@@ -674,21 +685,7 @@ public class EntityEvents implements Listener {
                     } else {
                         event.setCancelled(true);
                     }
-                } else if (event.getEntity() instanceof LivingEntity) {
-                    // Player Vs Mob
-                    if (player.hasMetadata("pet") == true) {
-                        World w = player.getWorld();
-                        List<Entity> entities = w.getEntities();
-                        String cat_name = bitQuest.REDIS.get("pet:" + player.getUniqueId());
-                        for (Entity entity : entities) {
-                            if (entity instanceof Ocelot) {
-                                if (entity.getCustomName() != null && entity.getCustomName().equals(cat_name)) {
-                                    ((Ocelot) entity).setTarget((LivingEntity) event.getEntity());
-                                }
-                            }
-                        }
-                    }
-                }
+                } 
             }
         }
     }
