@@ -1,7 +1,7 @@
 class:
 	maven compile -B -T 1C
 jar:
-	maven package -B -T 1C
+	mvn clean compile assembly:single
 
 format:
 	./format.sh

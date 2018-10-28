@@ -433,8 +433,7 @@ public class EntityEvents implements Listener {
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    // if (dice == 20) {
-                    if (dice > 4) {
+                    if (dice == 20) {
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                             final User user = new User(bitQuest.db_con, player.getUniqueId());
 
@@ -605,7 +604,7 @@ public class EntityEvents implements Listener {
                                         + level
                                         + " spawn distance: "
                                         + spawn_distance);
-                    if (bitQuest.rand(1, 20) == 20 && bitQuest.spookyMode == true) {
+                    if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
                         e.getLocation()
                                 .getWorld()
                                 .spawnEntity(
