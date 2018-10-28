@@ -2,24 +2,25 @@ FROM debian:stretch
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update
-RUN apt-get install -y wget
-RUN apt-get install -y git
-RUN apt-get install -y software-properties-common dirmngr openjdk-8-jre openjdk-8-jdk maven
+RUN apt-get install -y software-properties-common dirmngr openjdk-8-jre-headless maven git build-essential
 RUN mkdir -p /spigot/plugins
-WORKDIR /spigot
+WORKDIR /build
 # DOWNLOAD AND BUILD SPIGOT
-ADD https://hub.spigotmc.org/jenkins/job/BuildTools/64/artifact/target/BuildTools.jar /tmp/BuildTools.jar
-RUN export SHELL=/bin/bash && cd /tmp && java -jar BuildTools.jar
-RUN cp /tmp/Spigot/Spigot-Server/target/spigot-*.jar /spigot/spigot.jar
-RUN cd /spigot && echo "eula=true" > eula.txt
+ADD https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar /build/BuildTools.jar
+RUN cd /build && java -jar BuildTools.jar --rev latest
+RUN cp /build/Spigot/Spigot-Server/target/spigot-*.jar /spigot/spigot.jar
+WORKDIR /spigot
+RUN echo "eula=true" > eula.txt
 COPY server.properties /spigot/
 COPY bukkit.yml /spigot/
 COPY spigot.yml /spigot/
-RUN mkdir /bitquest
+WORKDIR /bitquest
+RUN apt-get install -y openjdk-8-jdk
 COPY . /bitquest/
-RUN export SHELL=/bin/bash && cd /bitquest/ && mvn clean compile assembly:single
+RUN mvn clean compile assembly:single
 RUN cp /bitquest/target/BitQuest.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
-
+ADD https://hub.spigotmc.org/jenkins/job/spigot-essentials/lastSuccessfulBuild/artifact/Essentials/target/Essentials-2.x-SNAPSHOT.jar /spigot/plugins/Essentials.jar
+WORKDIR /spigot
 CMD java -jar spigot.jar
