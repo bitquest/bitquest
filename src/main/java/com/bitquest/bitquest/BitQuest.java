@@ -134,7 +134,8 @@ public class BitQuest extends JavaPlugin {
             DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
 
             if (ADMIN_UUID == null) {
-                log("Warning: You haven't designated a super admin. Launch with ADMIN_UUID env variable to set.");
+                log("[warning] ADMIN_UUID env variable to is not set.");
+
             }
 
             // registers listener classes
