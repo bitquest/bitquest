@@ -156,11 +156,11 @@ public class EntityEvents implements Listener {
         BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
         BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
         BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-
+        if (bitQuest.BITQUEST_ENV.equals("development") == true && bitQuest.ADMIN_UUID==null) {
+            player.setOp(true);
+        }
         if (bitQuest.isModerator(player)) {
-            if (bitQuest.BITQUEST_ENV.equals("development") == true) {
-                player.setOp(true);
-            }
+
             player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
             Long balance = null;
             try {
@@ -433,7 +433,7 @@ public class EntityEvents implements Listener {
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    if (dice == 20) {
+                    if (dice > 2) {
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                             final User user = new User(bitQuest.db_con, player.getUniqueId());
 
@@ -604,7 +604,7 @@ public class EntityEvents implements Listener {
                                         + level
                                         + " spawn distance: "
                                         + spawn_distance);
-                    if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
+                    if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true ) {
                         e.getLocation()
                                 .getWorld()
                                 .spawnEntity(
@@ -648,8 +648,9 @@ public class EntityEvents implements Listener {
         if (event instanceof EntityDamageByEntityEvent) {
             EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
             Entity damager = damageEvent.getDamager();
-            if (damager instanceof Player
-                    || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+
+            if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+                // player damage
                 Player player;
 
                 if (damager instanceof Arrow) {
@@ -685,6 +686,13 @@ public class EntityEvents implements Listener {
                         event.setCancelled(true);
                     }
                 } 
+            } else {
+                if (damageEvent.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
+                    Projectile p = (Projectile) damageEvent.getDamager(); // Cast projectile to
+                    if (!(p.getShooter() instanceof Ghast)) {
+                        damageEvent.setDamage(20000.0f);
+                    }
+                }
             }
         }
     }

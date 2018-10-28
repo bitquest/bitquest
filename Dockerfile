@@ -34,6 +34,5 @@ RUN mvn clean compile assembly:single
 RUN cp /bitquest/target/BitQuest.jar /spigot/plugins/
 # Add the last version of NoCheatPlus
 ADD http://ci.md-5.net/job/NoCheatPlus/lastSuccessfulBuild/artifact/target/NoCheatPlus.jar /spigot/plugins/NoCheatPlus.jar
-ADD https://hub.spigotmc.org/jenkins/job/spigot-essentials/lastSuccessfulBuild/artifact/Essentials/target/Essentials-2.x-SNAPSHOT.jar /spigot/plugins/Essentials.jar
 WORKDIR /spigot
 CMD java -jar spigot.jar
