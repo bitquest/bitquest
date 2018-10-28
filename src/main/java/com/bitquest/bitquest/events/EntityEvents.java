@@ -633,8 +633,8 @@ public class EntityEvents implements Listener {
             } else {
                 if (damageEvent.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
                     Projectile p = (Projectile) damageEvent.getDamager(); // Cast projectile to
-                    if (!(p.getShooter() instanceof Ghast)) {
-                        damageEvent.setDamage(20000.0f);
+                    if (p.getShooter() instanceof Ghast) {
+                        damageEvent.setDamage(200.0f);
                     }
                 }
             }
