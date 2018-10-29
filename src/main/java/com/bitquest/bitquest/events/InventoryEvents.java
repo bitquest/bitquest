@@ -117,7 +117,7 @@ public class InventoryEvents implements Listener {
                     }
                     final boolean hasOpenSlotsFinal = hasOpenSlots;
                     final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-                    if (BitQuest.BITCOIN_NODE_HOST != null) {
+                    if (bitQuest.BLOCKCYPHER_CHAIN != null) {
 
                         if (user.wallet.getBalance(3) >= satFinal) {
 
