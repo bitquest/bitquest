@@ -139,7 +139,7 @@ public class Wallet {
             con.setDoOutput(true);
             OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
             out.write(tx.toString());
-            System.out.println(x.toString());
+            System.out.println(tx.toString());
             out.close();
             int responseCode = con.getResponseCode();
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
