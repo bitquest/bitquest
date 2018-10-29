@@ -176,13 +176,15 @@ public class EntityEvents implements Listener {
                             + balance / BitQuest.DENOMINATION_FACTOR
                             + " "
                             + BitQuest.DENOMINATION_NAME);
-
+            String url="https://live.blockcypher.com/btc-testnet/address/"+bitQuest.wallet.address;
+            if(bitQuest.BLOCKCYPHER_CHAIN=="btc/main") url="https://live.blockcypher.com/btc/address/"+bitQuest.wallet.address;
+            if(bitQuest.BLOCKCYPHER_CHAIN=="doge/main") url="https://live.blockcypher.com/doge/address/"+bitQuest.wallet.address;
             player.sendMessage(
                     ChatColor.DARK_BLUE
                             + ""
                             + ChatColor.UNDERLINE
-                            + "http://blockchain.info/address/"
-                            + bitQuest.wallet.address);
+                            + url
+                            );
         }
 
         String welcome = rawwelcome.toString();
