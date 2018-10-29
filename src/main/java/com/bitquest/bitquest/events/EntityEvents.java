@@ -137,11 +137,17 @@ public class EntityEvents implements Listener {
                 System.out.println("kicking banned player "+event.getPlayer().getDisplayName());
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "You are temporarily banned. Please contact bitquest@bitquest.co");
             }
+            if(BitQuest.REDIS.exists("rate_limit:"+event.getPlayer().getUniqueId())==true) {
+                Long ttl=BitQuest.REDIS.ttl("rate_limit:"+event.getPlayer().getUniqueId());
+                event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"Please try again in "+ttl+" seconds.");
+            }
             Long balance=user.wallet.getBalance(0);
             
         } catch(Exception e) {
             e.printStackTrace();
-            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"The server is over capacity at this moment. Please try again later.");
+            BitQuest.REDIS.set("rate_limit:"+event.getPlayer().getUniqueId(),"1");
+            BitQuest.REDIS.expire("rate_limit:"+event.getPlayer().getUniqueId(),60);
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"The server is in limited capacity at this moment. Please try again later.");
         }
     }
 
