@@ -8,6 +8,7 @@ spigot:
   links:
     - redis
     - postgres
+    - bitcoin
 redis:
   image: redis
 postgres:
@@ -15,3 +16,8 @@ postgres:
   environment:
     - POSTGRES_USER=bitquest
     - POSTGRES_PASSWORD=ORLY
+bitcoin:
+  image: mego/bitcoin-core
+  environment:
+    - USERNAME=testnet
+    - PASSWORD=testnet

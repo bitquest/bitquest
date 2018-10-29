@@ -43,10 +43,10 @@ public class BitQuest extends JavaPlugin {
             System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
     public static final String BITCOIN_NODE_HOST =
-            System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_NODE_HOST") : null;
+            System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_PORT_8332_TCP_ADDR") : null;
     public static final int BITCOIN_NODE_PORT =
             System.getenv("BITCOIN_NODE_PORT") != null
-                    ? Integer.parseInt(System.getenv("BITCOIN_NODE_PORT"))
+                    ? Integer.parseInt(System.getenv("BITCOIN_PORT_8332_TCP_PORT"))
                     : 18332;
     public static final String SERVERDISPLAY_NAME =
             System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
@@ -57,7 +57,7 @@ public class BitQuest extends JavaPlugin {
     public static final String DENOMINATION_NAME =
             System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
     public static final String BLOCKCYPHER_CHAIN =
-            System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : null;
+            System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
     public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
     public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
     public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
