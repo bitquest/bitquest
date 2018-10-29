@@ -5,10 +5,12 @@ spigot:
     - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
   ports:
     - "25565:25565"
+  environment:
+    - BLOCKCYPHER_CHAIN=btc/test3
+    - DENOMINATION_NAME=TestBits
   links:
     - redis
     - postgres
-    - bitcoin
 redis:
   image: redis
 postgres:
@@ -16,8 +18,3 @@ postgres:
   environment:
     - POSTGRES_USER=bitquest
     - POSTGRES_PASSWORD=ORLY
-bitcoin:
-  image: mego/bitcoin-core
-  environment:
-    - USERNAME=testnet
-    - PASSWORD=testnet

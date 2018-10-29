@@ -124,55 +124,56 @@ public class InventoryEvents implements Listener {
               }
               final boolean hasOpenSlotsFinal = hasOpenSlots;
               final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-		if (bitQuest.BLOCKCYPHER_CHAIN != null) {
-              user.wallet.getBalance(
-                  0,
-                  new Wallet.GetBalanceCallback() {
-                    @Override
-                    public void run(Long balance) {
-                      try {
-                        if (balance >= satFinal) {
+              System.out.println("[final price] "+satFinal);
+              if (BitQuest.BLOCKCYPHER_CHAIN!=null) {
+                    user.wallet.getBalance(
+                        0,
+                        new Wallet.GetBalanceCallback() {
+                          @Override
+                          public void run(Long balance) {
+                            try {
+                              if (balance >= satFinal) {
 
-                          if (hasOpenSlotsFinal) {
-                            if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
-                              if (clicked.getType() == Material.ENCHANTED_BOOK)
-                                bitQuest.books.remove(0);
+                                if (hasOpenSlotsFinal) {
+                                  if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
+                                    if (clicked.getType() == Material.ENCHANTED_BOOK)
+                                      bitQuest.books.remove(0);
 
-                              ItemStack item = event.getCurrentItem();
-                              ItemMeta meta = item.getItemMeta();
-                              ArrayList<String> Lore = new ArrayList<String>();
-                              meta.setLore(null);
-                              item.setItemMeta(meta);
-                              player.getInventory().addItem(item);
-                              player.sendMessage(
-                                  ChatColor.GREEN
-                                      + "You bought "
-                                      + clicked.getType()
-                                      + " for "
-                                      + ChatColor.LIGHT_PURPLE
-                                      + satFinal / 100);
+                                    ItemStack item = event.getCurrentItem();
+                                    ItemMeta meta = item.getItemMeta();
+                                    ArrayList<String> Lore = new ArrayList<String>();
+                                    meta.setLore(null);
+                                    item.setItemMeta(meta);
+                                    player.getInventory().addItem(item);
+                                    player.sendMessage(
+                                        ChatColor.GREEN
+                                            + "You bought "
+                                            + clicked.getType()
+                                            + " for "
+                                            + ChatColor.LIGHT_PURPLE
+                                            + satFinal / 100);
 
-                              bitQuest.updateScoreboard(player);
+                                    bitQuest.updateScoreboard(player);
 
 
-                            } else {
-                              player.sendMessage(
-                                  ChatColor.RED
-                                      + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                                  } else {
+                                    player.sendMessage(
+                                        ChatColor.RED
+                                            + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                                  }
+                                } else {
+                                  player.sendMessage(
+                                      ChatColor.DARK_RED + "You don't have space in your inventory");
+                                }
+                              } else {
+                                player.sendMessage(ChatColor.DARK_RED + "You don't have enough "+BitQuest.DENOMINATION_NAME);
+                              }
+                            } catch (Exception e) {
+                              e.printStackTrace();
                             }
-                          } else {
-                            player.sendMessage(
-                                ChatColor.DARK_RED + "You don't have space in your inventory");
                           }
-                        } else {
-                          player.sendMessage(ChatColor.DARK_RED + "You don't have enough "+BitQuest.DENOMINATION_NAME);
-                        }
-                      } catch (Exception e) {
-                        e.printStackTrace();
-                      }
-                    }
-                  });
-		}  else {
+                        });
+              }  else {
                       try {
                         if (user.countEmeralds() >= satFinal/100) {
 

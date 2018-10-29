@@ -47,7 +47,7 @@ public class BitQuest extends JavaPlugin {
     public static final int BITCOIN_NODE_PORT =
             System.getenv("BITCOIN_NODE_PORT") != null
                     ? Integer.parseInt(System.getenv("BITCOIN_PORT_8332_TCP_PORT"))
-                    : 18332;
+                    : 8332;
     public static final String SERVERDISPLAY_NAME =
             System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
     public static final Long DENOMINATION_FACTOR =
@@ -55,9 +55,9 @@ public class BitQuest extends JavaPlugin {
                     ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
                     : 100L;
     public static final String DENOMINATION_NAME =
-            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "TestBits";
+            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Ems";
     public static final String BLOCKCYPHER_CHAIN =
-            System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
+            System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : null;
     public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_ENV_USERNAME");
     public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_ENV_PASSWORD");
     public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
@@ -312,7 +312,7 @@ public class BitQuest extends JavaPlugin {
                             + ChatColor.BOLD.toString()
                             + "Quest");
 
-            if (BitQuest.BITCOIN_NODE_HOST != null) {
+            if (BitQuest.BLOCKCYPHER_CHAIN!=null) {
                 Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
                 score.setScore((int) (user.wallet.getBalance(0) / DENOMINATION_FACTOR));
                 player.setScoreboard(walletScoreboard);
@@ -683,10 +683,10 @@ public class BitQuest extends JavaPlugin {
                             player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                             final BitQuest bitQuest = this;
-                            if ((BITCOIN_NODE_HOST != null)) {
+                            if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                                 Long balance = user.wallet.getBalance(3);
                                 if (balance >= LAND_PRICE) {
-                                    if (user.wallet.payment(System.getenv("BITQUEST_ADDRESS"), LAND_PRICE)) {
+                                    if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
                                         saveLandData(player, name, x, z);
 
                                     } else {
