@@ -333,7 +333,7 @@ public class BitQuest extends JavaPlugin {
                 });
             }//end emerald here
         } catch(Exception e) {
-            e.printStackTrace();
+            System.out.println("[scoreboard] rate limit");
         }
     }
 
@@ -715,7 +715,7 @@ public class BitQuest extends JavaPlugin {
                                                     + (int)
                                                     Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
                                                     + ChatColor.DARK_RED
-                                                    + BitQuest.DENOMINATION_NAME);
+                                                    + " " + BitQuest.DENOMINATION_NAME);
                                 }
                             } else {
                                 int landxprice = 1;
