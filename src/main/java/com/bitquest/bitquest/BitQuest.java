@@ -55,11 +55,11 @@ public class BitQuest extends JavaPlugin {
                     ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
                     : 100L;
     public static final String DENOMINATION_NAME =
-            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
+            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "TestBits";
     public static final String BLOCKCYPHER_CHAIN =
             System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
-    public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_NODE_USERNAME");
-    public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_NODE_PASSWORD");
+    public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_ENV_USERNAME");
+    public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_ENV_PASSWORD");
     public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
     public static final String BLOCKCYPHER_API_KEY =
             System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
