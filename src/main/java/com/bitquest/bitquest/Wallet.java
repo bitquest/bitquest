@@ -183,6 +183,8 @@ public class Wallet {
                     JSONParser parser = new JSONParser();
                     JSONObject response_object = (JSONObject) parser.parse(sb.toString());
                     return (Long) response_object.get("final_balance");
+                case 429:
+                    throw new IOException("Rate limit");
             }
 
             return Long.valueOf(0);
