@@ -152,7 +152,8 @@ public class InventoryEvents implements Listener {
                                                         + clicked.getType()
                                                         + " for "
                                                         + ChatColor.LIGHT_PURPLE
-                                                        + satFinal / 100);
+                                                        + satFinal / 100
+                                                        + " (+ miner fees)");
 
                                         bitQuest.updateScoreboard(player);
 
