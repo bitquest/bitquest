@@ -118,6 +118,7 @@ public class EntityEvents implements Listener {
     public void onPlayerLogin(PlayerLoginEvent event) {
         try {
             Player player = event.getPlayer();
+            final User user = new User(bitQuest.db_con, player.getUniqueId());
 
             if (!(BitQuest.REDIS.exists("name:" + player.getUniqueId().toString()))) {
                 //give new players a compass @BitcoinJake09
@@ -136,9 +137,11 @@ public class EntityEvents implements Listener {
                 System.out.println("kicking banned player "+event.getPlayer().getDisplayName());
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "You are temporarily banned. Please contact bitquest@bitquest.co");
             }
+            Long balance=user.wallet.getBalance(0);
+            
         } catch(Exception e) {
             e.printStackTrace();
-            Bukkit.shutdown();
+            event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"The server is over capacity at this moment. Please try again later.");
         }
     }
 
@@ -163,12 +166,7 @@ public class EntityEvents implements Listener {
 
             player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
             Long balance = null;
-            try {
-                balance = bitQuest.wallet.getBalance(0);
-            } catch (Exception e) {
-                // TODO: Better handling of a getBalance error when player is joining.
-                Bukkit.shutdown();
-            }
+     
             player.sendMessage(
                     ChatColor.GRAY
                             + "The world wallet balance is: "
