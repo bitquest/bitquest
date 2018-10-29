@@ -372,14 +372,14 @@ public class EntityEvents implements Listener {
                     // roll a D20
 
                     Long money = Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level)) * 10 * bitQuest.DENOMINATION_FACTOR;
-                    int dice = BitQuest.rand(1, 20);
+                    int dice = BitQuest.rand(1, 100);
                     final Player player = (Player) damage.getDamager();
 
                     // Add EXP
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    if (dice > 2) {
+                    if (dice < 20) { // Only 20% of players obtain loot
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                             final User user = new User(bitQuest.db_con, player.getUniqueId());
 
@@ -557,7 +557,7 @@ public class EntityEvents implements Listener {
                                         new Location(
                                                 e.getLocation().getWorld(),
                                                 e.getLocation().getX(),
-                                                100,
+                                                80,
                                                 e.getLocation().getZ()),
                                         EntityType.GHAST);
                         e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
