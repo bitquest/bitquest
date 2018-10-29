@@ -90,8 +90,13 @@ public class InventoryEvents implements Listener {
 
         // Merchant inventory
         if (inventory.getName().equalsIgnoreCase("Market")) {
+            if(bitQuest.REDIS.exists("rate_limit:"+player.getUniqueId())==true) {
+                player.sendMessage(ChatColor.DARK_RED+"Please try again in "+bitQuest.REDIS.ttl("rate_limit:"+player.getUniqueId())+" seconds.");
+                player.closeInventory();
+                event.setCancelled(true);
+                return;
 
-            if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+            } else if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
                 final User user;
                 try {
                     user = new User(bitQuest.db_con, player.getUniqueId());
