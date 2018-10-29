@@ -45,7 +45,7 @@ public class BitQuest extends JavaPlugin {
     public static final String BITCOIN_NODE_HOST =
             System.getenv("BITCOIN_NODE_HOST") != null ? System.getenv("BITCOIN_PORT_8332_TCP_ADDR") : null;
     public static final int BITCOIN_NODE_PORT =
-            System.getenv("BITCOIN_NODE_PORT") != null
+            System.getenv("BITCOIN_PORT_8332_TCP_PORT") != null
                     ? Integer.parseInt(System.getenv("BITCOIN_PORT_8332_TCP_PORT"))
                     : 8332;
     public static final String SERVERDISPLAY_NAME =
