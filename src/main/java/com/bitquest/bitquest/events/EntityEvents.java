@@ -377,7 +377,9 @@ public class EntityEvents implements Listener {
                     int exp = level * 4;
                     bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
                     bitQuest.setTotalExperience(player);
-                    if (dice < 20) { // Only 20% of players obtain loot
+                    if (dice < 20 && bitQuest.REDIS.exists("loot:rate:limit")==false) { // Only 20% of players obtain loot
+                        bitQuest.REDIS.set("loot:rate:limit","1");
+                        bitQuest.REDIS.expire("loot:rate:limit",60); // max 1 loot per minute
                         if (BitQuest.BLOCKCYPHER_CHAIN != null) {
                             final User user = new User(bitQuest.db_con, player.getUniqueId());
 

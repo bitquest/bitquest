@@ -210,6 +210,8 @@ public class BitQuest extends JavaPlugin {
             modCommands.put("migrateclans", new MigrateClansCommand());
             System.out.println("[startup] finished");
             publish_stats();
+            REDIS.set("loot:rate:limit","1");
+            REDIS.expire("loot:rate:limit",10);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("[fatal] plugin enable fails");
