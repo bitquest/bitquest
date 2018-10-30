@@ -173,15 +173,7 @@ public class EntityEvents implements Listener {
         if (bitQuest.isModerator(player)) {
 
             player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-            Long balance = null;
-     
-            player.sendMessage(
-                    ChatColor.GRAY
-                            + "The world wallet balance is: "
-                            + ChatColor.LIGHT_PURPLE
-                            + balance / BitQuest.DENOMINATION_FACTOR
-                            + " "
-                            + BitQuest.DENOMINATION_NAME);
+
             String url="https://live.blockcypher.com/btc-testnet/address/"+bitQuest.wallet.address;
             if(bitQuest.BLOCKCYPHER_CHAIN=="btc/main") url="https://live.blockcypher.com/btc/address/"+bitQuest.wallet.address;
             if(bitQuest.BLOCKCYPHER_CHAIN=="doge/main") url="https://live.blockcypher.com/doge/address/"+bitQuest.wallet.address;
