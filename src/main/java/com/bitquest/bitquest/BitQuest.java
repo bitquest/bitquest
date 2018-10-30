@@ -183,6 +183,7 @@ public class BitQuest extends JavaPlugin {
             commands = new HashMap<String, CommandAction>();
             commands.put("wallet", new WalletCommand(this));
             commands.put("land", new LandCommand(this));
+            commands.put("home", new HomeCommand(this));
             commands.put("clan", new ClanCommand(this));
             commands.put("transfer", new TransferCommand(this));
             commands.put("report", new ReportCommand(this));
