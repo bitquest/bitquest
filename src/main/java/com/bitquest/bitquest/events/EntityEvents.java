@@ -202,11 +202,11 @@ public class EntityEvents implements Listener {
         // Prints the user balance
         bitQuest.setTotalExperience(player);
 
-        // check and set experience
-        bitQuest.updateScoreboard(player);
+
 
         player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
         if(BitQuest.REDIS.exists("bitquest:motd")==true) player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
+        if(BitQuest.REDIS.exists("loot:pool")==true) player.sendMessage("loot pool: "+BitQuest.REDIS.get("loot:pool"));
 
         BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
         // spawn pet

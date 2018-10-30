@@ -481,7 +481,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 },
                 0,
-                12000L);
+                30000L);
 
     }
     public void publish_stats() {
@@ -490,7 +490,9 @@ public class BitQuest extends JavaPlugin {
                 JSONParser parser = new JSONParser();
 
                 final JSONObject jsonObject = new JSONObject();
-                jsonObject.put("balance", wallet.getBalance(0));
+                Long balance=wallet.getBalance(0);
+                REDIS.set("loot:pool",Long.toString(balance));
+                jsonObject.put("balance", balance);
                 jsonObject.put("time", new Date().getTime());
                 URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "-stats/_doc");
                 System.out.println(url.toString());
