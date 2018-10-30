@@ -478,7 +478,7 @@ public class BitQuest extends JavaPlugin {
                     }
                 },
                 0,
-                1200L);
+                12000L);
 
     }
     public void publish_stats() {
