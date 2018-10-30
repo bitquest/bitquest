@@ -141,8 +141,7 @@ public class EntityEvents implements Listener {
                 Long ttl=BitQuest.REDIS.ttl("rate_limit:"+event.getPlayer().getUniqueId());
                 event.disallow(PlayerLoginEvent.Result.KICK_OTHER,"Please try again in "+ttl+" seconds.");
             }
-            Long balance=user.wallet.getBalance(0);
-            
+
         } catch(Exception e) {
             e.printStackTrace();
             BitQuest.REDIS.set("rate_limit:"+event.getPlayer().getUniqueId(),"1");
@@ -158,7 +157,6 @@ public class EntityEvents implements Listener {
         // On dev environment, admin gets op. In production, nobody gets op.
 
         player.setGameMode(GameMode.SURVIVAL);
-        bitQuest.updateScoreboard(player);
         bitQuest.setTotalExperience(player);
         final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
         System.out.println("User " + player.getName() + "logged in with IP " + ip);
@@ -220,6 +218,8 @@ public class EntityEvents implements Listener {
         if(legacyWallet.getBalance(5)>0) {
             player.sendMessage(ChatColor.RED+"You have "+legacyWallet.getBalance(5)+" SAT in your old wallet. Use the /upgradewallet command to send them to your new one.");
         }
+        bitQuest.updateScoreboard(player);
+
     }
 
     @EventHandler
