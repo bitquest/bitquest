@@ -456,14 +456,14 @@ public class EntityEvents implements Listener {
         Chunk chunk = e.getLocation().getChunk();
 
         LivingEntity entity = e.getEntity();
-        int maxlevel = 16;
+        int maxlevel = 10;
         int minlevel = 1;
         if (e.getLocation().getWorld().getName().equals("world_nether")) {
-            minlevel = 16;
-            maxlevel = 32;
+            minlevel = 10;
+            maxlevel = 30;
         } else if (e.getLocation().getWorld().getName().equals("world_end")) {
-            minlevel = 32;
-            maxlevel = 64;
+            minlevel = 30;
+            maxlevel = 100;
         }
         int spawn_distance =
                 (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
@@ -471,7 +471,7 @@ public class EntityEvents implements Listener {
         EntityType entityType = entity.getType();
         // TODO: Increase spawn_distance divisor to 64 or 32
         int level =
-                BitQuest.rand(minlevel, Math.max(minlevel, (Math.min(maxlevel, spawn_distance / 64))));
+                BitQuest.rand(minlevel, Math.min(maxlevel, spawn_distance / 32));
 
         if (entity instanceof Monster) {
 
@@ -485,7 +485,6 @@ public class EntityEvents implements Listener {
 
                     // nerf_level makes sure high level mobs are away from the spawn
                     if (level < 1) level = 1;
-                    if (bitQuest.rand(1, 20) == 20) level = level * 2;
 
                     entity.setMaxHealth(1 + level);
                     entity.setHealth(1 + level);
