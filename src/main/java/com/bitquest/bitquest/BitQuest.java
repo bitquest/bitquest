@@ -55,7 +55,7 @@ public class BitQuest extends JavaPlugin {
                     ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
                     : 100L;
     public static final String DENOMINATION_NAME =
-            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Ems";
+            System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
     public static final String BLOCKCYPHER_CHAIN =
             System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : null;
     public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_ENV_USERNAME");
