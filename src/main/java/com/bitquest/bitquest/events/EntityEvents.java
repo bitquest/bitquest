@@ -206,7 +206,7 @@ public class EntityEvents implements Listener {
 
         player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
         if(BitQuest.REDIS.exists("bitquest:motd")==true) player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
-        if(BitQuest.REDIS.exists("loot:pool")==true) player.sendMessage("loot pool: "+BitQuest.REDIS.get("loot:pool"));
+        if(BitQuest.REDIS.exists("loot:pool")==true) player.sendMessage("The loot pool is: "+BitQuest.REDIS.get("loot:pool"));
 
         BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
         // spawn pet
@@ -220,7 +220,7 @@ public class EntityEvents implements Listener {
         }
         bitQuest.updateScoreboard(player);
 
-    }
+        }
 
     @EventHandler
     public void onExperienceChange(PlayerExpChangeEvent event)
@@ -388,9 +388,9 @@ public class EntityEvents implements Listener {
                                 bitQuest.wallet_balance_cache -= money;
                                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);
                                 System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
-                                player.sendMessage(
+                                bitQuest.announce(
                                         ChatColor.GREEN
-                                                + "You got "
+                                                + player.getDisplayName()+" got "
                                                 + ChatColor.BOLD
                                                 + money / bitQuest.DENOMINATION_FACTOR
                                                 + ChatColor.GREEN

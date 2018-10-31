@@ -294,7 +294,11 @@ public class BitQuest extends JavaPlugin {
 
         return new JSONObject(); // just give them an empty object
     }
-
+    public void announce(final String message) {
+        for(Player player : Bukkit.getOnlinePlayers()) {
+            player.sendMessage(message);
+        }
+    }
     public void updateScoreboard(final Player player) {
         try {
             final User user = new User(this.db_con, player.getUniqueId());
@@ -316,9 +320,14 @@ public class BitQuest extends JavaPlugin {
                             + "Quest");
 
             if (BitQuest.BLOCKCYPHER_CHAIN!=null) {
-                Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + BitQuest.DENOMINATION_NAME); // Get a fake offline player
+                Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); // Get a fake offline player
                 score.setScore((int) (user.wallet.getBalance(0) / DENOMINATION_FACTOR));
+                if(REDIS.exists("loot:pool")==true) {
+                    Score score2 = walletScoreboardObjective.getScore(ChatColor.GREEN + "Loot Pool:"); // Get a fake offline player
+                    score2.setScore(Integer.parseInt(REDIS.get("loot:pool")));
+                }
                 player.setScoreboard(walletScoreboard);
+
             } else {
                 BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                 scheduler.runTaskAsynchronously(this, new Runnable() {
@@ -486,12 +495,13 @@ public class BitQuest extends JavaPlugin {
     }
     public void publish_stats() {
         try {
+            Long balance=wallet.getBalance(0);
+            REDIS.set("loot:pool",Long.toString(balance));
             if(System.getenv("ELASTICSEARCH_ENDPOINT")!=null) {
                 JSONParser parser = new JSONParser();
 
                 final JSONObject jsonObject = new JSONObject();
-                Long balance=wallet.getBalance(0);
-                REDIS.set("loot:pool",Long.toString(balance));
+
                 jsonObject.put("balance", balance);
                 jsonObject.put("time", new Date().getTime());
                 URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "-stats/_doc");
@@ -689,38 +699,13 @@ public class BitQuest extends JavaPlugin {
                             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                             final BitQuest bitQuest = this;
                             if (BitQuest.BLOCKCYPHER_CHAIN != null) {
-                                Long balance = user.wallet.getBalance(3);
-                                if (balance >= LAND_PRICE) {
-                                    if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
-                                        saveLandData(player, name, x, z);
 
-                                    } else {
-                                        if (balance < (BitQuest.LAND_PRICE)) {
-                                            player.sendMessage(
-                                                    ChatColor.DARK_RED
-                                                            + "You don't have enough money! You need "
-                                                            + ChatColor.LIGHT_PURPLE
-                                                            + (int)
-                                                            Math.ceil(
-                                                                    ((BitQuest.LAND_PRICE) - balance)
-                                                                            / BitQuest.DENOMINATION_FACTOR)
-                                                            + ChatColor.DARK_RED
-                                                            + " more "
-                                                            + BitQuest.DENOMINATION_NAME);
-                                        } else {
-                                            player.sendMessage(
-                                                    ChatColor.RED + "Claim payment failed. Please try again later.");
-                                        }
-                                    }
+                                if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
+                                    saveLandData(player, name, x, z);
                                 } else {
-                                    player.sendMessage(
-                                            ChatColor.DARK_RED
-                                                    + "You don't have enough money! You need "
-                                                    + ChatColor.LIGHT_PURPLE
-                                                    + (int)
-                                                    Math.ceil((BitQuest.LAND_PRICE) / BitQuest.DENOMINATION_FACTOR)
-                                                    + ChatColor.DARK_RED
-                                                    + " " + BitQuest.DENOMINATION_NAME);
+
+                                    player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+
                                 }
                             } else {
                                 int landxprice = 1;
