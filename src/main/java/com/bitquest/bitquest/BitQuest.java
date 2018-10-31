@@ -407,7 +407,7 @@ public class BitQuest extends JavaPlugin {
     public void teleportToSpawn(Player player) {
         BitQuest bitQuest = this;
         // TODO: open the tps inventory
-        player.sendMessage(ChatColor.GREEN + "Teleporting to satoshi town...");
+        player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
         player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
         World world = Bukkit.getWorld("world");
 
