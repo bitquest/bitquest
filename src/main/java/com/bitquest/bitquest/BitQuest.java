@@ -905,19 +905,13 @@ public class BitQuest extends JavaPlugin {
             chunk = "netherchunk";
         }//end nether @bitcoinjake09
         String key = chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
-        if (land_unclaimed_cache.containsKey(key)) {
-            return false;
-        } else if (land_owner_cache.containsKey(key)) {
-            return true;
-        } else {
+
             if (REDIS.exists(key) == true) {
-                land_owner_cache.put(key, REDIS.get(key));
                 return true;
             } else {
-                land_unclaimed_cache.put(key, true);
                 return false;
             }
-        }
+
     }
 
     @Override

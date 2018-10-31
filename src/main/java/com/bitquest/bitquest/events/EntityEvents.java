@@ -264,7 +264,7 @@ public class EntityEvents implements Listener {
 
 
             pvar = 0;
-            if (!event.getFrom().getWorld().getName().endsWith("_end")) {
+            if (event.getFrom().getWorld().getName().endsWith("_end")==false&&event.getFrom().getWorld().getName().endsWith("_nether")==false) {
                 // announce new area
                 String chunkname = "";
                 if (event.getPlayer().getWorld().getName().equals("world")) {
@@ -291,12 +291,14 @@ public class EntityEvents implements Listener {
                     }
                 }
                 if (bitQuest.landIsClaimed(event.getTo())) {
-                    if (bitQuest.land_name_cache.containsKey(key2)) {
-                        name2 = bitQuest.land_name_cache.get(key2);
+                    name2 = BitQuest.REDIS.get(key2) != null ? BitQuest.REDIS.get(key2) : "the wilderness";
+                    if(bitQuest.canBuild(event.getTo(),event.getPlayer())==true) {
+                        event.getPlayer().setGameMode(GameMode.SURVIVAL);
                     } else {
-                        name2 = BitQuest.REDIS.get(key2) != null ? BitQuest.REDIS.get(key2) : "the wilderness";
-                        bitQuest.land_name_cache.put(key2, name2);
+                        event.getPlayer().setGameMode(GameMode.ADVENTURE);
                     }
+                } else {
+                    event.getPlayer().setGameMode(GameMode.ADVENTURE);
                 }
 
                 if (!name1.equals(name2)) {
@@ -306,7 +308,10 @@ public class EntityEvents implements Listener {
                     } else {
                         event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + name2 + " ]");
                     }
+                    bitQuest.updateScoreboard(event.getPlayer());
                 }
+            } else {
+                event.getPlayer().setGameMode(GameMode.ADVENTURE);
             }
         }
     }
