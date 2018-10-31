@@ -19,6 +19,9 @@ commands:
   currency:
     description: "change player currency"
     usage: "/currency <ems|bits>"
+  donate:
+    description: "Donate to the server administrator using your wallet"
+    usage: "/donate <amount>"
   home:
     description: "teleports you to your last bed"
     usage: "/home"
@@ -76,9 +79,6 @@ commands:
   report:
     description: "Sends a report message to the moderators"
     usage: "/report <player> <reason>"
-  donate:
-    description: "Donate to BitQuest from your wallet"
-    usage: "/donate <amount>"
   fixabandonland:
     description: "Fixes chunks with no owners that still have permissions"
     usage: "/fixabandonland [true|yes]"

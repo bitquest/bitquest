@@ -21,36 +21,42 @@ public class DonateCommand extends CommandAction {
 
     public boolean run(CommandSender sender, Command cmd, String label, String[] args, final Player player) {
         if (args.length == 1) {
-            try {
-                final Long bits = Long.parseLong(args[0]);
-                final Long sat = bits * bitQuest.DENOMINATION_FACTOR;
-                final User user = new User(bitQuest.db_con, player.getUniqueId());
-                final Long balance = user.wallet.getBalance(0);
+            if(System.getenv("DONATION_ADDRESS")!=null) {
+                try {
+                    final Long bits = Long.parseLong(args[0]);
+                    final Long sat = bits * bitQuest.DENOMINATION_FACTOR;
+                    final User user = new User(bitQuest.db_con, player.getUniqueId());
+                    final Long balance = user.wallet.getBalance(0);
 
-                if (balance > sat) {
-                    if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
-                        player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
-                        bitQuest.updateScoreboard(player);
+                    if (balance > sat) {
+                        if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
+                            player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
+                            bitQuest.updateScoreboard(player);
+                        } else {
+                            player.sendMessage(ChatColor.RED + "Donation failed");
+                        }
                     } else {
-                        player.sendMessage(ChatColor.RED + "Donation failed");
+                        player.sendMessage(
+                                ChatColor.DARK_RED
+                                        + "Not enough balance to donate "
+                                        + ChatColor.LIGHT_PURPLE
+                                        + ""
+                                        + bits
+                                        + " "
+                                        + BitQuest.DENOMINATION_NAME);
                     }
-                } else {
-                    player.sendMessage(
-                            ChatColor.DARK_RED
-                                    + "Not enough balance to donate "
-                                    + ChatColor.LIGHT_PURPLE
-                                    + ""
-                                    + bits
-                                    + " "
-                                    + BitQuest.DENOMINATION_NAME);
-                }
 
-                return true;
-            } catch (Exception e) {
-                System.out.println(e);
-                player.sendMessage(ChatColor.RED + "Command failed.");
+                    return true;
+                } catch (Exception e) {
+                    System.out.println(e);
+                    player.sendMessage(ChatColor.RED + "Command failed.");
+                    return true;
+                }
+            } else {
+                player.sendMessage(ChatColor.RED+"Donations are disabled in this server");
                 return true;
             }
+
         } else {
             return false;
         }
