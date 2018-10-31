@@ -16,6 +16,9 @@ commands:
   clan:
     description: "used for creating, joining, operating clans"
     usage: "/clan <new|invite|kick|join|leave>"
+  currency:
+    description: "change player currency"
+    usage: "/currency <ems|bits>"
   home:
     description: "teleports you to your last bed"
     usage: "/home"
@@ -25,6 +28,12 @@ commands:
   maintenance:
     description: "Enables maintenance mode and stops players from joining the server"
     usage: "/maintenance <seconds>"
+  mod:
+    description: "Utility to add/remove/list moderators"
+    usage: "/mod <add|remove|list>"
+  motd:
+    description: "Change the message of the day"
+    usage: "/motd <message>"
   pet:
     description: "Adopt an ocelot for 300 bits"
     usage: "/pet <name>"
@@ -34,9 +43,6 @@ commands:
   send:
     description: "sends bits to other player"
     usage: "/send <amount> <player>"
-  currency:
-    description: "change player currency"
-    usage: "/currency <ems|bits>"
   spawn:
     description: "teleports to spawn"
     usage: "/spawn"
@@ -49,9 +55,6 @@ commands:
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"
-  mod:
-    description: "Utility to add/remove/list moderators"
-    usage: "/mod <add|remove|list>"
   emergencystop:
     description: "Stops the server cleanly in case of emergency"
     usage: "/emergencystop [reason]"
