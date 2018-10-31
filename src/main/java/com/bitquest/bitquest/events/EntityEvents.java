@@ -625,7 +625,7 @@ public class EntityEvents implements Listener {
                 } else if (event.getEntity() instanceof Player) {
                     // PvP is off in overworld and nether
 
-                    if ((event.getEntity().getWorld().getName().endsWith("_end")) || (bitQuest.isPvP(event.getEntity().getLocation()))) {
+                    if (event.getEntity().getWorld().getName().endsWith("_end")) {
                         event.setCancelled(false);
                     } else {
                         event.setCancelled(true);
