@@ -308,7 +308,6 @@ public class EntityEvents implements Listener {
                     } else {
                         event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + name2 + " ]");
                     }
-                    bitQuest.updateScoreboard(event.getPlayer());
                 }
             } else {
                 event.getPlayer().setGameMode(GameMode.ADVENTURE);
