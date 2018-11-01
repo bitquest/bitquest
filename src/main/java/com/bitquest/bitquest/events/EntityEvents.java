@@ -298,7 +298,7 @@ public class EntityEvents implements Listener {
                         event.getPlayer().setGameMode(GameMode.ADVENTURE);
                     }
                 } else {
-                    event.getPlayer().setGameMode(GameMode.ADVENTURE);
+                    event.getPlayer().setGameMode(GameMode.SURVIVAL);
                 }
 
                 if (!name1.equals(name2)) {
