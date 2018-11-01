@@ -310,7 +310,11 @@ public class EntityEvents implements Listener {
                     }
                 }
             } else {
-                event.getPlayer().setGameMode(GameMode.ADVENTURE);
+                if(bitQuest.isModerator(event.getPlayer())) {
+                    event.getPlayer().setGameMode(GameMode.SURVIVAL);
+                } else {
+                    event.getPlayer().setGameMode(GameMode.ADVENTURE);
+                }
             }
         }
     }

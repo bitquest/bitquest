@@ -46,13 +46,17 @@ public class BlockEvents implements Listener {
     Block b = event.getBlock();
     Material m = b.getType();
     if(event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_the_end")) {
-      if(m.equals(Material.ENDER_STONE)) {
+      if(bitQuest.isModerator(event.getPlayer())) {
         event.setCancelled(false);
       } else {
         event.setCancelled(true);
       }
     } if(event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_nether")) {
-      event.setCancelled(true);
+      if(bitQuest.isModerator(event.getPlayer())) {
+        event.setCancelled(false);
+      } else {
+        event.setCancelled(true);
+      }
     } else if (m.equals(Material.BEDROCK)
         || m.equals(Material.COMMAND)
         || m.equals(Material.COMMAND_CHAIN)
