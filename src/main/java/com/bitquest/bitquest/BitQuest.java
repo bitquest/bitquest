@@ -322,10 +322,7 @@ public class BitQuest extends JavaPlugin {
             if (BitQuest.BLOCKCYPHER_CHAIN!=null) {
                 Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); // Get a fake offline player
                 score.setScore((int) (user.wallet.getBalance(0) / DENOMINATION_FACTOR));
-                if(REDIS.exists("loot:pool")==true) {
-                    Score score2 = walletScoreboardObjective.getScore(ChatColor.GREEN + "Loot Pool:"); // Get a fake offline player
-                    score2.setScore(Integer.parseInt(REDIS.get("loot:pool")));
-                }
+
                 player.setScoreboard(walletScoreboard);
 
             } else {

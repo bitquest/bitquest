@@ -35,7 +35,13 @@ public class LandCommand extends CommandAction {
             return true;
 
         } else {
-            if (args[0].equalsIgnoreCase("info")) {
+            if (args[0].equalsIgnoreCase("transfer")) {
+                if(args.length==2) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if (args[0].equalsIgnoreCase("info")) {
                 Location location = player.getLocation();
                 int x = location.getChunk().getX();
                 int z = location.getChunk().getZ();
