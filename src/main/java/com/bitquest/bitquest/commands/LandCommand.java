@@ -35,7 +35,14 @@ public class LandCommand extends CommandAction {
             return true;
 
         } else {
-            if (args[0].equalsIgnoreCase("claim")) {
+            if (args[0].equalsIgnoreCase("info")) {
+                Location location = player.getLocation();
+                int x = location.getChunk().getX();
+                int z = location.getChunk().getZ();
+                String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
+                player.sendMessage(landname);
+                return true;
+            } else if (args[0].equalsIgnoreCase("claim")) {
                 if (args.length > 1) {
                     StringBuilder sb = new StringBuilder(args[1]);
                     //            for (int i = 3; i < args.length; i++){
@@ -44,7 +51,7 @@ public class LandCommand extends CommandAction {
                     String claimName = sb.toString().trim();
 
                     Location location = player.getLocation();
-                    if (!(location.getWorld().getName().equals("world")) && !(location.getWorld().getName().equals("world_nether"))) {
+                    if (!location.getWorld().getName().equals("world")) {
                         player.sendMessage(ChatColor.DARK_RED + "You cannot claim land here.");
                         return true;
                     }

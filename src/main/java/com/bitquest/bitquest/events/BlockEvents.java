@@ -45,13 +45,7 @@ public class BlockEvents implements Listener {
     // If block is bedrock, cancel the event
     Block b = event.getBlock();
     Material m = b.getType();
-    if(event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_the_end")) {
-      if(bitQuest.isModerator(event.getPlayer())) {
-        event.setCancelled(false);
-      } else {
-        event.setCancelled(true);
-      }
-    } if(event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_nether")) {
+    if(event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_the_end")||event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_nether")) {
       if(bitQuest.isModerator(event.getPlayer())) {
         event.setCancelled(false);
       } else {
