@@ -160,8 +160,9 @@ public class Wallet {
     }
 
     public Long getBalance(int confirmations) throws IOException, ParseException {
+        if(BitQuest.BLOCKCYPHER_CHAIN=="btc/test3") {
             HttpsURLConnection c = null;
-            URL u = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/addrs/" + this.address + "/balance");
+            URL u = new URL("https://testnet.blockchain.info/balance?active="+this.address);
             c = (HttpsURLConnection) u.openConnection();
             c.setRequestMethod("GET");
             c.setRequestProperty("Content-length", "0");
@@ -183,14 +184,42 @@ public class Wallet {
                     System.out.println(sb.toString());
                     JSONParser parser = new JSONParser();
                     JSONObject response_object = (JSONObject) parser.parse(sb.toString());
+                    JSONObject address_object= (JSONObject) response_object.get(this.address);
+                    return (Long) address_object.get("final_balance");
+                case 429:
+                    throw new IOException("Rate limit");
+            }
+            return Long.valueOf(0);
+        } else {
+            HttpsURLConnection c = null;
+            URL u = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/addrs/" + this.address + "/balance");
+            c = (HttpsURLConnection) u.openConnection();
+            c.setRequestMethod("GET");
+            c.setRequestProperty("Content-length", "0");
+            c.setUseCaches(false);
+            c.setAllowUserInteraction(false);
+            c.connect();
+            int status = c.getResponseCode();
+            System.out.println("[balance] status:" + status);
+            switch (status) {
+                case 200:
+                case 201:
+                    BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+                    StringBuilder sb = new StringBuilder();
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    System.out.println(sb.toString());
+                    JSONParser parser = new JSONParser();
+                    JSONObject response_object = (JSONObject) parser.parse(sb.toString());
                     return (Long) response_object.get("final_balance");
                 case 429:
                     throw new IOException("Rate limit");
             }
-
             return Long.valueOf(0);
-
-
+        }
     }
 
     public String url() {

@@ -227,7 +227,7 @@ public class EntityEvents implements Listener {
             throws ParseException, org.json.simple.parser.ParseException, IOException {
         event.setAmount(0);
     }
-    
+
     @EventHandler
     public void onEnchantItemEvent(EnchantItemEvent event)
             throws ParseException, org.json.simple.parser.ParseException, IOException {
