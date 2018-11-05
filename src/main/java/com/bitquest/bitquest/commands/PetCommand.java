@@ -18,6 +18,16 @@ public class PetCommand extends CommandAction {
     if (args[0] == null) {
       player.sendMessage("Your pet needs a name!");
       return false;
+    } else if ((args[0].equalsIgnoreCase("on"))&&(BitQuest.REDIS.get("petIsOn"+player.getUniqueId().toString()).equalsIgnoreCase("off"))) {
+      BitQuest.REDIS.set("petIsOn"+player.getUniqueId().toString(), "on");
+      player.sendMessage("Your pet is on!");
+	bitQuest.spawnPet(player);
+      return true;
+    } else if ((args[0].equalsIgnoreCase("off"))&&(BitQuest.REDIS.get("petIsOn"+player.getUniqueId().toString()).equalsIgnoreCase("on"))) {
+      BitQuest.REDIS.set("petIsOn"+player.getUniqueId().toString(), "off");
+      player.sendMessage("Your pet is off!");
+	bitQuest.spawnPet(player);
+      return true;
     } else if (args[0].isEmpty()) {
       player.sendMessage("Your pet needs a cool name!");
       return false;
@@ -30,6 +40,8 @@ public class PetCommand extends CommandAction {
     } else {
       if (bitQuest.REDIS.sismember("pet:names", args[0])) {
         player.sendMessage(ChatColor.RED + "A pet with that name already exists.");
+      } else if ((args[0].equalsIgnoreCase("off"))||(args[0].equalsIgnoreCase("on"))) {
+        player.sendMessage("You can not choose that as a name!");
       } else {
         try {
           bitQuest.adoptPet(player, args[0]);
