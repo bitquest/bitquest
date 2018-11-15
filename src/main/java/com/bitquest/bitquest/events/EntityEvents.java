@@ -281,13 +281,12 @@ public class EntityEvents implements Listener {
                 }
                 if (bitQuest.landIsClaimed(event.getTo())) {
                     name2 = BitQuest.REDIS.get(key2) != null ? BitQuest.REDIS.get(key2) : "the wilderness";
-                    if(bitQuest.canBuild(event.getTo(),event.getPlayer())==true) {
-                        event.getPlayer().setGameMode(GameMode.SURVIVAL);
-                    } else {
-                        event.getPlayer().setGameMode(GameMode.ADVENTURE);
-                    }
-                } else {
+
+                }
+                if(event.getTo().getWorld().equals("world")==true) {
                     event.getPlayer().setGameMode(GameMode.SURVIVAL);
+                } else {
+                    event.getPlayer().setGameMode(GameMode.ADVENTURE);
                 }
 
                 if (!name1.equals(name2)) {

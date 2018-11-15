@@ -655,14 +655,14 @@ public class BitQuest extends JavaPlugin {
 
     public void claimLand(final String name, Chunk chunk, final Player player)
             throws ParseException, org.json.simple.parser.ParseException, IOException {
-
         String tempchunk = "";
         if (player.getLocation().getWorld().getName().equals("world")) {
             tempchunk = "chunk";
         }//end world lmao @bitcoinjake09
         else if (player.getLocation().getWorld().getName().equals("world_nether")) {
             tempchunk = "netherchunk";
-        }//end nether @bitcoinjake09
+        }
+        //end nether @bitcoinjake09
         // check that land actually has a name
         final int x = chunk.getX();
         final int z = chunk.getZ();
@@ -675,83 +675,87 @@ public class BitQuest extends JavaPlugin {
                         + z
                         + " with name "
                         + name);
+        if (REDIS.exists(tempchunk + "" + x + "," + z + "owner") == false) {
 
-        if (!name.isEmpty()) {
-            // check that desired area name doesn't have non-alphanumeric characters
-            boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
-            if (!hasNonAlpha) {
-                // 16 characters max + ^transfer ^ (11 characters)
-                if (name.length() <= 27) {
+            if (!name.isEmpty()) {
+                // check that desired area name doesn't have non-alphanumeric characters
+                boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
+                if (!hasNonAlpha) {
+                    // 16 characters max + ^transfer ^ (11 characters)
+                    if (name.length() <= 27) {
 
-                    if (name.equalsIgnoreCase("the wilderness")) {
-                        player.sendMessage(ChatColor.DARK_RED + "You cannot name your land that.");
-                        return;
-                    }
-                    if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
-                        try {
+                        if (name.equalsIgnoreCase("the wilderness")) {
+                            player.sendMessage(ChatColor.DARK_RED + "You cannot name your land that.");
+                            return;
+                        }
+                        if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
+                            try {
 
 
-                            final User user = new User(this.db_con, player.getUniqueId());
-                            player.sendMessage(ChatColor.YELLOW + "Claiming land...");
-                            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                            final BitQuest bitQuest = this;
-                            if (BitQuest.BLOCKCYPHER_CHAIN != null) {
+                                final User user = new User(this.db_con, player.getUniqueId());
+                                player.sendMessage(ChatColor.YELLOW + "Claiming land...");
+                                BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+                                final BitQuest bitQuest = this;
+                                if (BitQuest.BLOCKCYPHER_CHAIN != null) {
 
-                                if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
-                                    saveLandData(player, name, x, z);
-                                } else {
-
-                                    player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-
-                                }
-                            } else {
-                                int landxprice = 1;
-                                if (player.getLocation().getWorld().getName().equals("world_nether")) {
-                                    landxprice = 4;
-                                }
-                                int land_price_in_emeralds = (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
-                                if (user.countEmeralds(player.getInventory()) > land_price_in_emeralds) {
-                                    if (user.removeEmeralds(land_price_in_emeralds,player)) {
+                                    if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
                                         saveLandData(player, name, x, z);
                                     } else {
-                                        player.sendMessage(ChatColor.RED + "There was an error.");
+
+                                        player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
+
                                     }
-
                                 } else {
-                                    player.sendMessage(
-                                            ChatColor.RED
-                                                    + "You have "
-                                                    + user.countEmeralds(player.getInventory())
-                                                    + ". To buy land you need "
-                                                    + land_price_in_emeralds);
-                                }
-                            }
-                        } catch(Exception e) {
-                            e.printStackTrace();
-                        }
+                                    int landxprice = 1;
+                                    if (player.getLocation().getWorld().getName().equals("world_nether")) {
+                                        landxprice = 4;
+                                    }
+                                    int land_price_in_emeralds = (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
+                                    if (user.countEmeralds(player.getInventory()) > land_price_in_emeralds) {
+                                        if (user.removeEmeralds(land_price_in_emeralds, player)) {
+                                            saveLandData(player, name, x, z);
+                                        } else {
+                                            player.sendMessage(ChatColor.RED + "There was an error.");
+                                        }
 
-                    } else if (BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
-                        player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
+                                    } else {
+                                        player.sendMessage(
+                                                ChatColor.RED
+                                                        + "You have "
+                                                        + user.countEmeralds(player.getInventory())
+                                                        + ". To buy land you need "
+                                                        + land_price_in_emeralds);
+                                    }
+                                }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+
+                        } else if (BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
+                            player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
+                        } else {
+                            // Rename land
+                            BitQuest.REDIS.set(tempchunk + "" + x + "," + z + "name", name);
+                            player.sendMessage(
+                                    ChatColor.GREEN
+                                            + "You renamed this land to "
+                                            + ChatColor.DARK_GREEN
+                                            + name
+                                            + ChatColor.GREEN
+                                            + ".");
+                        }
                     } else {
-                        // Rename land
-                        BitQuest.REDIS.set(tempchunk + "" + x + "," + z + "name", name);
-                        player.sendMessage(
-                                ChatColor.GREEN
-                                        + "You renamed this land to "
-                                        + ChatColor.DARK_GREEN
-                                        + name
-                                        + ChatColor.GREEN
-                                        + ".");
+                        player.sendMessage(ChatColor.DARK_RED + "Your land name must be 27 characters max");
                     }
                 } else {
-                    player.sendMessage(ChatColor.DARK_RED + "Your land name must be 27 characters max");
+                    player.sendMessage(
+                            ChatColor.DARK_RED + "Your land name must contain only letters and numbers");
                 }
             } else {
-                player.sendMessage(
-                        ChatColor.DARK_RED + "Your land name must contain only letters and numbers");
+                player.sendMessage(ChatColor.DARK_RED + "Your land must have a name");
             }
         } else {
-            player.sendMessage(ChatColor.DARK_RED + "Your land must have a name");
+            player.sendMessage(ChatColor.DARK_RED+"This area is already claimed.");
         }
 
     }
@@ -765,13 +769,7 @@ public class BitQuest extends JavaPlugin {
             chunk = "netherchunk";
         }//end nether @bitcoinjake09
         String key = chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
-        if (land_owner_cache.containsKey(key)) {
-            if (land_owner_cache.get(key).equals(player.getUniqueId().toString())) {
-                return true;
-            } else {
-                return false;
-            }
-        } else if (REDIS.get(key).equals(player.getUniqueId().toString())) {
+        if(REDIS.get(key).equals(player.getUniqueId().toString())) {
             // player is the owner of the chunk
             return true;
         } else {
@@ -995,6 +993,4 @@ public class BitQuest extends JavaPlugin {
     public void crashtest() {
         this.setEnabled(false);
     }
-
-
 }
