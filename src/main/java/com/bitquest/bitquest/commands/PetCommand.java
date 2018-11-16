@@ -18,15 +18,21 @@ public class PetCommand extends CommandAction {
     if (args[0] == null) {
       player.sendMessage("Your pet needs a name!");
       return false;
-    } else if ((args[0].equalsIgnoreCase("on"))&&(BitQuest.REDIS.get("petIsOn"+player.getUniqueId().toString()).equalsIgnoreCase("off"))) {
-      BitQuest.REDIS.set("petIsOn"+player.getUniqueId().toString(), "on");
+    } else if ((args[0].equalsIgnoreCase("on"))
+        && (BitQuest.REDIS
+            .get("petIsOn" + player.getUniqueId().toString())
+            .equalsIgnoreCase("off"))) {
+      BitQuest.REDIS.set("petIsOn" + player.getUniqueId().toString(), "on");
       player.sendMessage("Your pet is on!");
-	bitQuest.spawnPet(player);
+      bitQuest.spawnPet(player);
       return true;
-    } else if ((args[0].equalsIgnoreCase("off"))&&(BitQuest.REDIS.get("petIsOn"+player.getUniqueId().toString()).equalsIgnoreCase("on"))) {
-      BitQuest.REDIS.set("petIsOn"+player.getUniqueId().toString(), "off");
+    } else if ((args[0].equalsIgnoreCase("off"))
+        && (BitQuest.REDIS
+            .get("petIsOn" + player.getUniqueId().toString())
+            .equalsIgnoreCase("on"))) {
+      BitQuest.REDIS.set("petIsOn" + player.getUniqueId().toString(), "off");
       player.sendMessage("Your pet is off!");
-	bitQuest.spawnPet(player);
+      bitQuest.spawnPet(player);
       return true;
     } else if (args[0].isEmpty()) {
       player.sendMessage("Your pet needs a cool name!");
@@ -40,15 +46,15 @@ public class PetCommand extends CommandAction {
     } else {
       if (bitQuest.REDIS.sismember("pet:names", args[0])) {
         player.sendMessage(ChatColor.RED + "A pet with that name already exists.");
-      } else if ((args[0].equalsIgnoreCase("off"))||(args[0].equalsIgnoreCase("on"))) {
+      } else if ((args[0].equalsIgnoreCase("off")) || (args[0].equalsIgnoreCase("on"))) {
         player.sendMessage("You can not choose that as a name!");
       } else {
         try {
           bitQuest.adoptPet(player, args[0]);
 
-        } catch(Exception e) {
+        } catch (Exception e) {
           System.out.println(e);
-          player.sendMessage(ChatColor.DARK_RED+"FAIL. Please try again later.");
+          player.sendMessage(ChatColor.DARK_RED + "FAIL. Please try again later.");
         }
       }
 

@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
-
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -19,16 +18,18 @@ public class User {
   private String clan;
   public UUID uuid;
 
-  public User(Connection db_con, UUID _uuid) throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
+  public User(Connection db_con, UUID _uuid)
+      throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
     this.uuid = _uuid;
-    PreparedStatement pst = db_con.prepareStatement("SELECT * FROM users WHERE uuid='"+this.uuid+"'");
+    PreparedStatement pst =
+        db_con.prepareStatement("SELECT * FROM users WHERE uuid='" + this.uuid + "'");
     ResultSet rs = pst.executeQuery();
-    if(rs.next()) {
-      this.wallet=new Wallet(rs.getString(3),rs.getString(4),rs.getString(5),rs.getString(6));
+    if (rs.next()) {
+      this.wallet = new Wallet(rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
     } else {
-      System.out.println("[user not found] "+this.uuid);
-      this.wallet=BitQuest.generateNewWallet();
-      this.wallet.save(this.uuid,db_con);
+      System.out.println("[user not found] " + this.uuid);
+      this.wallet = BitQuest.generateNewWallet();
+      this.wallet.save(this.uuid, db_con);
     }
   }
 
@@ -45,8 +46,7 @@ public class User {
     if (BitQuest.REDIS.get("experience.raw." + this.uuid.toString()) == null) {
       return 0;
     } else {
-      return Integer.parseInt(
-          BitQuest.REDIS.get("experience.raw." + this.uuid.toString()));
+      return Integer.parseInt(BitQuest.REDIS.get("experience.raw." + this.uuid.toString()));
     }
   }
 
