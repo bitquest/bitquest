@@ -117,6 +117,18 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 | POSTGRES_1_PORT_5432_TCP_ADDR | Address of DB server                                                   | 
 | POSTGRES_1_PORT_5432_TCP_PORT | Port for the DB server                                                 |
 
+# First time building on linux with docker/docker-compose/gradlew
+$ chmod +x gradlew
+$ ./gradlew setupworkspace
+$ ./gradlew build
+$ ./gradlew shadowjar
+
+# Recursive builds will only need:
+$ ./gradlew shadowjar
+
+# To run:
+$ docker-compose up
+
 # Troubleshooting
 ## I'm getting a JedisConnectionException error when starting
 Please make sure you have redis installed. If you are running via docker please make sure you have a redis container linked to the bitquest container.
