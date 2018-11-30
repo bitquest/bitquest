@@ -88,7 +88,7 @@ public class LandCommand extends CommandAction {
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
 
-        if (bitQuest.landIsClaimed(location) && bitQuest.isOwner(location, player)) {
+        if (bitQuest.landIsClaimed(location) && (bitQuest.isOwner(location, player)||bitQuest.isModerator(player))) {
           String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
 
           if (args[1].equalsIgnoreCase("public")) {
@@ -184,7 +184,7 @@ public class LandCommand extends CommandAction {
         } else {
           player.sendMessage(
               ChatColor.RED
-                  + "Connectivity to Blockchain is limited. Please try again in 5 seconds.");
+                  + "You don't have permission to do this.");
 
           return true;
         }
