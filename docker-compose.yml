@@ -11,6 +11,7 @@ spigot:
   links:
     - redis
     - postgres
+    - bitcoind
 redis:
   image: redis
 postgres:
@@ -18,3 +19,8 @@ postgres:
   environment:
     - POSTGRES_USER=bitquest
     - POSTGRES_PASSWORD=ORLY
+bitcoind:
+  image: mego/bitcoind
+  environment:
+    - USERNAME=wobble
+    - PASSWORD=l1z4rdk1ng
