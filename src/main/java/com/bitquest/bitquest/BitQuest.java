@@ -841,9 +841,7 @@ public class BitQuest extends JavaPlugin {
         return true; // pvp @BitcoinJake09
       } else if (landPermissionCode(location).equals("c")) {
         String owner_uuid =
-            REDIS.get(
-                chunk
-                    + ""
+            REDIS.get("chunk"
                     + location.getChunk().getX()
                     + ","
                     + location.getChunk().getZ()

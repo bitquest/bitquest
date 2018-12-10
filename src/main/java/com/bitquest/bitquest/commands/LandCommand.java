@@ -4,6 +4,8 @@ import com.bitquest.bitquest.BitQuest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -35,6 +37,21 @@ public class LandCommand extends CommandAction {
     } else {
       if (args[0].equalsIgnoreCase("transfer")) {
         if (args.length == 2) {
+          Location location = player.getLocation();
+
+          if(bitQuest.isOwner(location,player)) {
+            for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+              if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
+                  player.sendMessage("Changing the land ownership to "+onlinePlayer.getDisplayName()+"...");
+                  BitQuest.REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner",player.getUniqueId().toString());
+                }
+              }
+            }
+            player.sendMessage(ChatColor.DARK_RED+"Cannot find player "+args[1]);
+          } else {
+            player.sendMessage(ChatColor.DARK_RED+"Only the owner of this land can transfer.");
+          }
           return true;
         } else {
           return false;
