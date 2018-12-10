@@ -4,6 +4,8 @@ import com.bitquest.bitquest.BitQuest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
@@ -27,20 +29,46 @@ public class LandCommand extends CommandAction {
       tempchunk = "netherchunk";
     } // end nether @bitcoinjake09
     if (args.length == 0) {
-      player.sendMessage(
-          ChatColor.RED
-              + "If you are trying to buy a land, the command is: /land claim nameofyourland");
-      return true;
-
+      return false;
     } else {
-      if (args[0].equalsIgnoreCase("transfer")) {
+      Location location = player.getLocation();
+
+      if (args[0].equalsIgnoreCase("rename")) {
+        if(args.length==2) {
+          if(bitQuest.validName(args[1])==false) {
+            player.sendMessage(ChatColor.DARK_RED+"Invalid name.");
+            return false;
+          } else if(bitQuest.isOwner(location, player)) {
+            BitQuest.REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"name",args[1]);
+            player.sendMessage(ChatColor.GREEN+"Land renamed to "+args[1]);
+          } else {
+            player.sendMessage(ChatColor.DARK_RED+"Only the owner of this land can rename it.");
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } else if (args[0].equalsIgnoreCase("transfer")) {
         if (args.length == 2) {
+
+          if(bitQuest.isOwner(location,player)) {
+            for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+              if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
+                if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
+                  player.sendMessage("Changing the land ownership to "+onlinePlayer.getDisplayName()+"...");
+                  BitQuest.REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"owner",player.getUniqueId().toString());
+                }
+              }
+            }
+            player.sendMessage(ChatColor.DARK_RED+"Cannot find player "+args[1]);
+          } else {
+            player.sendMessage(ChatColor.DARK_RED+"Only the owner of this land can transfer.");
+          }
           return true;
         } else {
           return false;
         }
       } else if (args[0].equalsIgnoreCase("info")) {
-        Location location = player.getLocation();
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
         String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
@@ -54,7 +82,6 @@ public class LandCommand extends CommandAction {
           //            }
           String claimName = sb.toString().trim();
 
-          Location location = player.getLocation();
           if (!location.getWorld().getName().equals("world")) {
             player.sendMessage(ChatColor.DARK_RED + "You cannot claim land here.");
             return true;
@@ -84,7 +111,6 @@ public class LandCommand extends CommandAction {
       } else if (args[0].equalsIgnoreCase("permission")) {
         bitQuest.land_permission_cache = new HashMap();
 
-        Location location = player.getLocation();
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
 

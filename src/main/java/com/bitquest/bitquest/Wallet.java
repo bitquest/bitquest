@@ -9,6 +9,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.UUID;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.bind.DatatypeConverter;
@@ -60,6 +61,8 @@ public class Wallet {
     final JSONObject blockcypher_params = new JSONObject();
     blockcypher_params.put("inputs", inputs);
     blockcypher_params.put("outputs", outputs);
+    blockcypher_params.put("fees", BitQuest.MINER_FEE);
+
     URL url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/new");
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setConnectTimeout(5000);
@@ -85,146 +88,170 @@ public class Wallet {
   }
 
   public boolean payment(String _address, Long sat) {
-    try {
-      // create skeleton tx to be signed
-      JSONObject tx = this.txSkeleton(_address, sat);
-      // obtain message (hash) to be signed with private key
-      JSONArray tosign = (JSONArray) tx.get("tosign");
-      String msg = tosign.get(0).toString();
-      // TODO: Create raw transaction with in full node
-      // creating a key object from WiF
-      DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
-      ECKey key = dpk.getKey();
-      // checking our key object
-      NetworkParameters params = TestNet3Params.get();
-      if (System.getenv("BITQUEST_ENV") != null) {
-        if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
-          System.out.println("[transaction] main net transaction start");
-          params = MainNetParams.get();
+    System.out.println("[payment] "+this.address+" -> "+sat);
+    if(sat>1) {
+      try {
+        // create skeleton tx to be signed
+        JSONObject tx = this.txSkeleton(_address, sat);
+        // obtain message (hash) to be signed with private key
+        JSONArray tosign = (JSONArray) tx.get("tosign");
+        String msg = tosign.get(0).toString();
+        // TODO: Create raw transaction with in full node
+        // creating a key object from WiF
+        DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
+        ECKey key = dpk.getKey();
+        // checking our key object
+        NetworkParameters params = TestNet3Params.get();
+        if (System.getenv("BITQUEST_ENV") != null) {
+          if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
+            System.out.println("[transaction] main net transaction start");
+            params = MainNetParams.get();
+          }
         }
-      }
-      String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
-      // System.out.println(wif.equals(check));  // true
-      // creating Sha object from string
-      Sha256Hash hash = Sha256Hash.wrap(msg);
-      // creating signature
-      ECDSASignature sig = key.sign(hash);
-      // encoding
-      byte[] res = sig.encodeToDER();
-      // converting to hex
-      String hex = DatatypeConverter.printHexBinary(res);
-      JSONArray signatures = new JSONArray();
-      signatures.add(hex);
-      tx.put("signatures", signatures);
-      JSONArray pubkeys = new JSONArray();
-      // add my public key
-      pubkeys.add(this.public_key);
-      tx.put("pubkeys", pubkeys);
-      // go back to blockcypher with signed transaction
-      URL url;
-      if (System.getenv("BLOCKCYPHER_TOKEN") != null) {
-        url =
-            new URL(
-                "https://api.blockcypher.com/v1/"
-                    + BitQuest.BLOCKCYPHER_CHAIN
-                    + "/txs/send?token="
-                    + System.getenv("BLOCKCYPHER_TOKEN"));
-      } else {
-        url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
-      }
+        String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
+        // System.out.println(wif.equals(check));  // true
+        // creating Sha object from string
+        Sha256Hash hash = Sha256Hash.wrap(msg);
+        // creating signature
+        ECDSASignature sig = key.sign(hash);
+        // encoding
+        byte[] res = sig.encodeToDER();
+        // converting to hex
+        String hex = DatatypeConverter.printHexBinary(res);
+        JSONArray signatures = new JSONArray();
+        signatures.add(hex);
+        tx.put("signatures", signatures);
+        JSONArray pubkeys = new JSONArray();
+        // add my public key
+        pubkeys.add(this.public_key);
+        tx.put("pubkeys", pubkeys);
+        // go back to blockcypher with signed transaction
+        URL url;
+        if (System.getenv("BLOCKCYPHER_TOKEN") != null) {
+          url =
+                  new URL(
+                          "https://api.blockcypher.com/v1/"
+                                  + BitQuest.BLOCKCYPHER_CHAIN
+                                  + "/txs/send?token="
+                                  + System.getenv("BLOCKCYPHER_TOKEN"));
+        } else {
+          url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
+        }
 
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      con.setConnectTimeout(5000);
-      con.setDoOutput(true);
-      OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-      out.write(tx.toString());
-      System.out.println(tx.toString());
-      out.close();
-      int responseCode = con.getResponseCode();
-      BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-      String inputLine;
-      StringBuffer response = new StringBuffer();
-      while ((inputLine = in.readLine()) != null) {
-        response.append(inputLine);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setConnectTimeout(5000);
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        out.write(tx.toString());
+        System.out.println(tx.toString());
+        out.close();
+        int responseCode = con.getResponseCode();
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+          response.append(inputLine);
+        }
+        in.close();
+        JSONParser parser = new JSONParser();
+        JSONObject response_object = (JSONObject) parser.parse(response.toString());
+        System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
+        return true;
+      } catch (Exception e) {
+        e.printStackTrace();
+        return false;
       }
-      in.close();
-      JSONParser parser = new JSONParser();
-      JSONObject response_object = (JSONObject) parser.parse(response.toString());
-      System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
-      return true;
-    } catch (Exception e) {
-      e.printStackTrace();
+    } else {
       return false;
     }
+
   }
 
-  public Long getBalance(int confirmations) throws IOException, ParseException {
-    if (BitQuest.BLOCKCYPHER_CHAIN == "btc/test3") {
-      HttpsURLConnection c = null;
-      URL u = new URL("https://testnet.blockchain.info/balance?active=" + this.address);
-      c = (HttpsURLConnection) u.openConnection();
-      c.setRequestMethod("GET");
-      c.setRequestProperty("Content-length", "0");
-      c.setUseCaches(false);
-      c.setAllowUserInteraction(false);
-      c.connect();
-      int status = c.getResponseCode();
-      System.out.println("[balance] status:" + status);
-      switch (status) {
-        case 200:
-        case 201:
-          BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-          StringBuilder sb = new StringBuilder();
-          String line;
-          while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
-          }
-          br.close();
-          System.out.println(sb.toString());
-          JSONParser parser = new JSONParser();
-          JSONObject response_object = (JSONObject) parser.parse(sb.toString());
-          JSONObject address_object = (JSONObject) response_object.get(this.address);
-          return (Long) address_object.get("final_balance");
-        case 429:
-          throw new IOException("Rate limit");
-      }
-      return Long.valueOf(0);
-    } else {
-      HttpsURLConnection c = null;
-      URL u =
-          new URL(
-              "https://api.blockcypher.com/v1/"
-                  + BitQuest.BLOCKCYPHER_CHAIN
-                  + "/addrs/"
-                  + this.address
-                  + "/balance");
-      c = (HttpsURLConnection) u.openConnection();
-      c.setRequestMethod("GET");
-      c.setRequestProperty("Content-length", "0");
-      c.setUseCaches(false);
-      c.setAllowUserInteraction(false);
-      c.connect();
-      int status = c.getResponseCode();
-      System.out.println("[balance] status:" + status);
-      switch (status) {
-        case 200:
-        case 201:
-          BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
-          StringBuilder sb = new StringBuilder();
-          String line;
-          while ((line = br.readLine()) != null) {
-            sb.append(line + "\n");
-          }
-          br.close();
-          System.out.println(sb.toString());
-          JSONParser parser = new JSONParser();
-          JSONObject response_object = (JSONObject) parser.parse(sb.toString());
-          return (Long) response_object.get("final_balance");
-        case 429:
-          throw new IOException("Rate limit");
-      }
-      return Long.valueOf(0);
+  public Long importAddress(String account) throws IOException, ParseException {
+    JSONParser parser = new JSONParser();
+    final JSONObject jsonObject = new JSONObject();
+    jsonObject.put("jsonrpc", "1.0");
+    jsonObject.put("id", "bitquest");
+    jsonObject.put("method", "importaddress");
+    JSONArray params = new JSONArray();
+    params.add(this.address);
+    params.add(account);
+    System.out.println("[importaddress] " + this.address+ " "+ account);
+    jsonObject.put("params", params);
+    URL url =
+            new URL(
+                    "http://"
+                            + System.getenv("BITCOIND_PORT_8332_TCP_ADDR")
+                            + ":"
+                            + System.getenv("BITCOIND_PORT_8332_TCP_PORT"));
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setConnectTimeout(5000);
+    String userPassword =
+            System.getenv("BITCOIND_ENV_USERNAME") + ":" + System.getenv("BITCOIND_ENV_PASSWORD");
+    String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
+    con.setRequestProperty("Authorization", "Basic " + encoding);
+
+    con.setRequestMethod("POST");
+    con.setRequestProperty(
+            "User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+    con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
+    con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+    con.setDoOutput(true);
+    OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+    out.write(jsonObject.toString());
+    out.close();
+
+    int responseCode = con.getResponseCode();
+
+    BufferedReader in =
+            new BufferedReader(new InputStreamReader(con.getInputStream()));
+    String inputLine;
+    StringBuffer response = new StringBuffer();
+
+    while ((inputLine = in.readLine()) != null) {
+      response.append(inputLine);
     }
+    in.close();
+    JSONObject response_object = (JSONObject) parser.parse(response.toString());
+    System.out.println(response_object);
+    return  Long.valueOf(0);
+  }
+  public Long getBalance(int confirmations) throws IOException, ParseException {
+    HttpsURLConnection c = null;
+    URL u=new URL("https://blockchain.info/q/addressbalance/" + this.address);
+    if(BitQuest.BLOCKCYPHER_CHAIN.equals("btc/test3")) u = new URL("https://testnet.blockchain.info/q/addressbalance/" + this.address+"?confirmations="+confirmations);
+    c = (HttpsURLConnection) u.openConnection();
+    c.setRequestMethod("GET");
+    c.setRequestProperty("Content-length", "0");
+    c.setUseCaches(false);
+    c.setAllowUserInteraction(false);
+    c.connect();
+    int status = c.getResponseCode();
+    System.out.println("[balance] status:"+status);
+    switch (status) {
+      case 500:
+        System.out.println(u.toString());
+
+      case 200:
+      case 201:
+        BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
+        StringBuilder sb = new StringBuilder();
+        String line;
+        while ((line = br.readLine()) != null) {
+          sb.append(line + "\n");
+        }
+        br.close();
+        System.out.println("[balance] "+this.address+": "+sb.toString().trim());
+        return Long.parseLong(sb.toString().trim());
+        // JSONParser parser = new JSONParser();
+
+        // JSONObject response_object = (JSONObject) parser.parse(sb.toString());
+        // return (Long) response_object.get("final_balance");
+      case 429:
+        throw new IOException("Rate limit");
+    }
+
+    return Long.valueOf(0);
   }
 
   public String url() {

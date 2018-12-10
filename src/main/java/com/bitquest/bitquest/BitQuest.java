@@ -61,7 +61,7 @@ public class BitQuest extends JavaPlugin {
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
-
+  public static final int MINER_FEE = 10000;
   public static final int MAX_STOCK = 100;
   public static final String SERVER_NAME =
       System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
@@ -175,13 +175,19 @@ public class BitQuest extends JavaPlugin {
           && System.getenv("ADDRESS") != null
           && System.getenv("WIF") != null) {
         wallet =
-            new Wallet(
-                System.getenv("PRIVATE"),
-                System.getenv("PUBLIC"),
-                System.getenv("ADDRESS"),
-                System.getenv("WIF"));
+                new Wallet(
+                        System.getenv("PRIVATE"),
+                        System.getenv("PUBLIC"),
+                        System.getenv("ADDRESS"),
+                        System.getenv("WIF"));
         System.out.println("[world wallet] imported from environment");
-
+      } else if (REDIS.exists("private")&&REDIS.exists("public")&&REDIS.exists("address")&&REDIS.exists("wif")){
+        wallet =
+                new Wallet(
+                        REDIS.get("private"),
+                        REDIS.get("public"),
+                        REDIS.get("address"),
+                        REDIS.get("wif"));
       } else {
         wallet = this.generateNewWallet();
         System.out.println("[world wallet] generated new wallet");
@@ -261,6 +267,11 @@ public class BitQuest extends JavaPlugin {
     in.close();
     JSONObject response_object = (JSONObject) parser.parse(response.toString());
     System.out.println("Created wallet: " + response_object.get("address").toString());
+    REDIS.set("private",response_object.get("private").toString());
+    REDIS.set("public",response_object.get("public").toString());
+    REDIS.set("address",response_object.get("address").toString());
+    REDIS.set("wif",response_object.get("wif").toString());
+
     return new Wallet(
         response_object.get("private").toString(),
         response_object.get("public").toString(),
@@ -679,7 +690,14 @@ public class BitQuest extends JavaPlugin {
             + "!");
     updateScoreboard(player);
   }
-
+  public boolean validName(final String name) {
+    boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
+    if(name.isEmpty()||name.length() > 28||hasNonAlpha||name.equalsIgnoreCase("the wilderness")) {
+      return false;
+    } else {
+      return true;
+    }
+  }
   public void claimLand(final String name, Chunk chunk, final Player player)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     String tempchunk = "";
@@ -704,17 +722,9 @@ public class BitQuest extends JavaPlugin {
             + name);
     if (REDIS.exists(tempchunk + "" + x + "," + z + "owner") == false) {
 
-      if (!name.isEmpty()) {
-        // check that desired area name doesn't have non-alphanumeric characters
-        boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
-        if (!hasNonAlpha) {
-          // 16 characters max + ^transfer ^ (11 characters)
-          if (name.length() <= 27) {
+      if(validName(name)) {
 
-            if (name.equalsIgnoreCase("the wilderness")) {
-              player.sendMessage(ChatColor.DARK_RED + "You cannot name your land that.");
-              return;
-            }
+
             if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
               try {
 
@@ -771,15 +781,9 @@ public class BitQuest extends JavaPlugin {
                       + ChatColor.GREEN
                       + ".");
             }
-          } else {
-            player.sendMessage(ChatColor.DARK_RED + "Your land name must be 27 characters max");
-          }
-        } else {
-          player.sendMessage(
-              ChatColor.DARK_RED + "Your land name must contain only letters and numbers");
-        }
+
       } else {
-        player.sendMessage(ChatColor.DARK_RED + "Your land must have a name");
+        player.sendMessage(ChatColor.DARK_RED + "Invalid name.");
       }
     } else {
       player.sendMessage(ChatColor.DARK_RED + "This area is already claimed.");
@@ -830,9 +834,7 @@ public class BitQuest extends JavaPlugin {
         return true; // pvp @BitcoinJake09
       } else if (landPermissionCode(location).equals("c")) {
         String owner_uuid =
-            REDIS.get(
-                chunk
-                    + ""
+            REDIS.get("chunk"
                     + location.getChunk().getX()
                     + ","
                     + location.getChunk().getZ()

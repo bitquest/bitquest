@@ -205,15 +205,18 @@ public class EntityEvents implements Listener {
     bitQuest.setTotalExperience(player);
 
     player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
-    if (BitQuest.REDIS.exists("bitquest:motd") == true)
-      player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
-    if (BitQuest.REDIS.exists("loot:pool") == true)
+    if (BitQuest.REDIS.exists("bitquest:motd") == true) player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
+    try {
       player.sendMessage(
-          "The loot pool is: "
-              + (int)
-                  (Long.parseLong(BitQuest.REDIS.get("loot:pool")) / bitQuest.DENOMINATION_FACTOR)
-              + " "
-              + bitQuest.DENOMINATION_NAME);
+              "The loot pool is: "
+                      + (int)
+                      (bitQuest.wallet.getBalance(1)/bitQuest.DENOMINATION_FACTOR)
+                      + " "
+                      + bitQuest.DENOMINATION_NAME);
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+
 
     BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
     // spawn pet
@@ -294,11 +297,8 @@ public class EntityEvents implements Listener {
         if (bitQuest.landIsClaimed(event.getTo())) {
           name2 = BitQuest.REDIS.get(key2) != null ? BitQuest.REDIS.get(key2) : "the wilderness";
         }
-        if (event.getTo().getWorld().equals("world") == true) {
-          event.getPlayer().setGameMode(GameMode.SURVIVAL);
-        } else {
-          event.getPlayer().setGameMode(GameMode.ADVENTURE);
-        }
+        event.getPlayer().setGameMode(GameMode.SURVIVAL);
+
 
         if (!name1.equals(name2)) {
 
@@ -309,11 +309,7 @@ public class EntityEvents implements Listener {
           }
         }
       } else {
-        if (bitQuest.isModerator(event.getPlayer())) {
-          event.getPlayer().setGameMode(GameMode.SURVIVAL);
-        } else {
-          event.getPlayer().setGameMode(GameMode.ADVENTURE);
-        }
+        event.getPlayer().setGameMode(GameMode.ADVENTURE);
       }
     }
   }
