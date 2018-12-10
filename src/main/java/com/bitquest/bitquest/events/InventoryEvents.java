@@ -82,17 +82,7 @@ public class InventoryEvents implements Listener {
 
     // Merchant inventory
     if (inventory.getName().equalsIgnoreCase("Market")) {
-      if (bitQuest.REDIS.exists("rate_limit:" + player.getUniqueId()) == true) {
-        player.sendMessage(
-            ChatColor.DARK_RED
-                + "Please try again in "
-                + bitQuest.REDIS.ttl("rate_limit:" + player.getUniqueId())
-                + " seconds.");
-        player.closeInventory();
-        event.setCancelled(true);
-        return;
-
-      } else if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
+      if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         final User user;
         try {
           user = new User(bitQuest.db_con, player.getUniqueId());
@@ -131,13 +121,8 @@ public class InventoryEvents implements Listener {
           }
           final boolean hasOpenSlotsFinal = hasOpenSlots;
           final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-          if (bitQuest.BLOCKCYPHER_CHAIN != null) {
-
             try {
-              if (user.wallet.getBalance(3) >= satFinal) {
-
                 if (hasOpenSlotsFinal) {
-
                   if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
                     if (clicked.getType() == Material.ENCHANTED_BOOK) bitQuest.books.remove(0);
 
@@ -161,15 +146,12 @@ public class InventoryEvents implements Listener {
                   } else {
                     player.sendMessage(
                         ChatColor.RED
-                            + "Transaction failed. Please try again in a few moments (ERROR 1)");
+                            + "Transaction failed. Please try again in a few moments");
                   }
                 } else {
                   player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
                 }
-              } else {
-                player.sendMessage(
-                    ChatColor.DARK_RED + "You don't have enough " + BitQuest.DENOMINATION_NAME);
-              }
+
             } catch (Exception e) {
               e.printStackTrace();
               player.sendMessage(
@@ -179,46 +161,7 @@ public class InventoryEvents implements Listener {
               event.setCancelled(true);
             }
 
-          } else {
-            // emeralds
-            try {
-              if (user.countEmeralds(player.getInventory()) >= satFinal / 100) {
 
-                if (hasOpenSlotsFinal) {
-                  if (user.removeEmeralds((int) satFinal / 100, player)) {
-                    if (clicked.getType() == Material.ENCHANTED_BOOK) bitQuest.books.remove(0);
-
-                    ItemStack item = event.getCurrentItem();
-                    ItemMeta meta = item.getItemMeta();
-                    ArrayList<String> Lore = new ArrayList<String>();
-                    meta.setLore(null);
-                    item.setItemMeta(meta);
-                    player.getInventory().addItem(item);
-                    player.sendMessage(
-                        ChatColor.GREEN
-                            + "You bought "
-                            + clicked.getType()
-                            + " for "
-                            + ChatColor.LIGHT_PURPLE
-                            + satFinal / 100);
-
-                    bitQuest.updateScoreboard(player);
-
-                  } else {
-                    player.sendMessage(
-                        ChatColor.RED
-                            + "Transaction failed. Please try again in a few moments (ERROR 1)");
-                  }
-                } else {
-                  player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
-                }
-              } else {
-                player.sendMessage(ChatColor.DARK_RED + "You don't have enough ems");
-              }
-            } catch (Exception e) {
-              e.printStackTrace();
-            }
-          }
         }
       }
     }
@@ -242,7 +185,7 @@ public class InventoryEvents implements Listener {
           ItemMeta meta = button.getItemMeta();
           ArrayList<String> lore = new ArrayList<String>();
           int bits_price;
-          bits_price = trades.get(i).price;
+          bits_price = (int) (trades.get(i).price+(BitQuest.MINER_FEE/BitQuest.DENOMINATION_FACTOR));
 
           lore.add("Price: " + bits_price);
           meta.setLore(lore);

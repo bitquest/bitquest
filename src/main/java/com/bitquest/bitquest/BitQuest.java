@@ -55,13 +55,13 @@ public class BitQuest extends JavaPlugin {
   public static final String DENOMINATION_NAME =
       System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
   public static final String BLOCKCYPHER_CHAIN =
-      System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : null;
+      System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
   public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_ENV_USERNAME");
   public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_ENV_PASSWORD");
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
-
+  public static final int MINER_FEE = 1000;
   public static final int MAX_STOCK = 100;
   public static final String SERVER_NAME =
       System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
@@ -175,13 +175,19 @@ public class BitQuest extends JavaPlugin {
           && System.getenv("ADDRESS") != null
           && System.getenv("WIF") != null) {
         wallet =
-            new Wallet(
-                System.getenv("PRIVATE"),
-                System.getenv("PUBLIC"),
-                System.getenv("ADDRESS"),
-                System.getenv("WIF"));
+                new Wallet(
+                        System.getenv("PRIVATE"),
+                        System.getenv("PUBLIC"),
+                        System.getenv("ADDRESS"),
+                        System.getenv("WIF"));
         System.out.println("[world wallet] imported from environment");
-
+      } else if (REDIS.exists("private")&&REDIS.exists("public")&&REDIS.exists("address")&&REDIS.exists("wif")){
+        wallet =
+                new Wallet(
+                        REDIS.get("private"),
+                        REDIS.get("public"),
+                        REDIS.get("address"),
+                        REDIS.get("wif"));
       } else {
         wallet = this.generateNewWallet();
         System.out.println("[world wallet] generated new wallet");
@@ -261,6 +267,11 @@ public class BitQuest extends JavaPlugin {
     in.close();
     JSONObject response_object = (JSONObject) parser.parse(response.toString());
     System.out.println("Created wallet: " + response_object.get("address").toString());
+    REDIS.set("private",response_object.get("private").toString());
+    REDIS.set("public",response_object.get("public").toString());
+    REDIS.set("address",response_object.get("address").toString());
+    REDIS.set("wif",response_object.get("wif").toString());
+
     return new Wallet(
         response_object.get("private").toString(),
         response_object.get("public").toString(),
