@@ -690,7 +690,14 @@ public class BitQuest extends JavaPlugin {
             + "!");
     updateScoreboard(player);
   }
-
+  public boolean validName(final String name) {
+    boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
+    if(name.isEmpty()||name.length() > 28||hasNonAlpha||name.equalsIgnoreCase("the wilderness")) {
+      return false;
+    } else {
+      return true;
+    }
+  }
   public void claimLand(final String name, Chunk chunk, final Player player)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     String tempchunk = "";
@@ -715,17 +722,9 @@ public class BitQuest extends JavaPlugin {
             + name);
     if (REDIS.exists(tempchunk + "" + x + "," + z + "owner") == false) {
 
-      if (!name.isEmpty()) {
-        // check that desired area name doesn't have non-alphanumeric characters
-        boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
-        if (!hasNonAlpha) {
-          // 16 characters max + ^transfer ^ (11 characters)
-          if (name.length() <= 27) {
+      if(validName(name)) {
 
-            if (name.equalsIgnoreCase("the wilderness")) {
-              player.sendMessage(ChatColor.DARK_RED + "You cannot name your land that.");
-              return;
-            }
+
             if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
               try {
 
@@ -782,15 +781,9 @@ public class BitQuest extends JavaPlugin {
                       + ChatColor.GREEN
                       + ".");
             }
-          } else {
-            player.sendMessage(ChatColor.DARK_RED + "Your land name must be 27 characters max");
-          }
-        } else {
-          player.sendMessage(
-              ChatColor.DARK_RED + "Your land name must contain only letters and numbers");
-        }
+
       } else {
-        player.sendMessage(ChatColor.DARK_RED + "Your land must have a name");
+        player.sendMessage(ChatColor.DARK_RED + "Invalid name.");
       }
     } else {
       player.sendMessage(ChatColor.DARK_RED + "This area is already claimed.");

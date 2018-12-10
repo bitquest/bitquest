@@ -29,15 +29,27 @@ public class LandCommand extends CommandAction {
       tempchunk = "netherchunk";
     } // end nether @bitcoinjake09
     if (args.length == 0) {
-      player.sendMessage(
-          ChatColor.RED
-              + "If you are trying to buy a land, the command is: /land claim nameofyourland");
-      return true;
-
+      return false;
     } else {
-      if (args[0].equalsIgnoreCase("transfer")) {
+      Location location = player.getLocation();
+
+      if (args[0].equalsIgnoreCase("rename")) {
+        if(args.length==2) {
+          if(bitQuest.validName(args[1])==false) {
+            player.sendMessage(ChatColor.DARK_RED+"Invalid name.");
+            return false;
+          } else if(bitQuest.isOwner(location, player)) {
+            BitQuest.REDIS.set("chunk"+location.getChunk().getX()+","+location.getChunk().getZ()+"name",args[1]);
+            player.sendMessage(ChatColor.GREEN+"Land renamed to "+args[1]);
+          } else {
+            player.sendMessage(ChatColor.DARK_RED+"Only the owner of this land can rename it.");
+          }
+          return true;
+        } else {
+          return false;
+        }
+      } else if (args[0].equalsIgnoreCase("transfer")) {
         if (args.length == 2) {
-          Location location = player.getLocation();
 
           if(bitQuest.isOwner(location,player)) {
             for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -57,7 +69,6 @@ public class LandCommand extends CommandAction {
           return false;
         }
       } else if (args[0].equalsIgnoreCase("info")) {
-        Location location = player.getLocation();
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
         String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
@@ -71,7 +82,6 @@ public class LandCommand extends CommandAction {
           //            }
           String claimName = sb.toString().trim();
 
-          Location location = player.getLocation();
           if (!location.getWorld().getName().equals("world")) {
             player.sendMessage(ChatColor.DARK_RED + "You cannot claim land here.");
             return true;
@@ -101,7 +111,6 @@ public class LandCommand extends CommandAction {
       } else if (args[0].equalsIgnoreCase("permission")) {
         bitQuest.land_permission_cache = new HashMap();
 
-        Location location = player.getLocation();
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
 
