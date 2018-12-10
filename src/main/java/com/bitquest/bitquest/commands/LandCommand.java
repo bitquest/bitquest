@@ -50,7 +50,6 @@ public class LandCommand extends CommandAction {
         }
       } else if (args[0].equalsIgnoreCase("transfer")) {
         if (args.length == 2) {
-
           if(bitQuest.isOwner(location,player)) {
             for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
               if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {

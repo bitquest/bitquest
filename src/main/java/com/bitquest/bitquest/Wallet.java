@@ -220,6 +220,7 @@ public class Wallet {
     HttpsURLConnection c = null;
     URL u=new URL("https://blockchain.info/q/addressbalance/" + this.address);
     if(BitQuest.BLOCKCYPHER_CHAIN.equals("btc/test3")) u = new URL("https://testnet.blockchain.info/q/addressbalance/" + this.address+"?confirmations="+confirmations);
+    if(BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) u = new URL("https://dogechain.info/chain/Dogecoin/q/addressbalance/" + this.address);
     c = (HttpsURLConnection) u.openConnection();
     c.setRequestMethod("GET");
     c.setRequestProperty("Content-length", "0");
