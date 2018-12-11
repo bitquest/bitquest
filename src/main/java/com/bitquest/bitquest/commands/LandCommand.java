@@ -32,8 +32,9 @@ public class LandCommand extends CommandAction {
       return false;
     } else {
       Location location = player.getLocation();
-
-      if (args[0].equalsIgnoreCase("rename")) {
+      if (args[0].equalsIgnoreCase("price")) {
+        player.sendMessage("Land price is: "+(BitQuest.LAND_PRICE+BitQuest.MINER_FEE)*BitQuest.DENOMINATION_FACTOR+" "+BitQuest.DENOMINATION_NAME+" (incl. miner fees)");
+      } else if (args[0].equalsIgnoreCase("rename")) {
         if(args.length==2) {
           if(bitQuest.validName(args[1])==false) {
             player.sendMessage(ChatColor.DARK_RED+"Invalid name.");
