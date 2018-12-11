@@ -1004,7 +1004,7 @@ public class BitQuest extends JavaPlugin {
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
         out.write(jsonObject.toString());
         out.close();
-        int responseCode = con.getResponseCode();
+        // int responseCode = con.getResponseCode();
 
         BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
         String inputLine;
