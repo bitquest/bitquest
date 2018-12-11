@@ -471,7 +471,7 @@ public class EntityEvents implements Listener {
     EntityType entityType = entity.getType();
     // TODO: Increase spawn_distance divisor to 64 or 32
     // max level is 128
-    int level = Math.min(128,BitQuest.rand(1, Math.round(spawn_distance / difficulty)));
+    int level = Math.min(128,BitQuest.rand(1, Math.round(spawn_distance * difficulty)));
 
     if (entity instanceof Monster) {
 
@@ -516,7 +516,7 @@ public class EntityEvents implements Listener {
           if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-       
+
 
           // give random equipment
           if (entity instanceof Zombie
