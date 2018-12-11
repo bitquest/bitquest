@@ -475,7 +475,7 @@ public class EntityEvents implements Listener {
     if (entity instanceof Monster) {
 
       // Disable mob spawners. Keep mob farmers away
-      if (e.getSpawnReason() == SpawnReason.SPAWNER) {
+      if (e.getSpawnReason() == SpawnReason.SPAWNER||spawn_distance<64) {
         e.setCancelled(true);
       } else {
         try {
