@@ -243,7 +243,11 @@ public class Wallet {
         }
         br.close();
         System.out.println("[balance] "+this.address+": "+sb.toString().trim());
-        return Math.round(Double.parseDouble(sb.toString().trim()));
+        if(BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) {
+          return Math.round(Double.parseDouble(sb.toString().trim())*100000000L);
+        } else {
+          return Math.round(Double.parseDouble(sb.toString().trim()));
+        }
         // JSONParser parser = new JSONParser();
 
         // JSONObject response_object = (JSONObject) parser.parse(sb.toString());
