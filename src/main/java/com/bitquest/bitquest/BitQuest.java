@@ -201,7 +201,7 @@ public class BitQuest extends JavaPlugin {
 
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
-
+      sendDiscordMessage("BitQuest starting");
       commands = new HashMap<String, CommandAction>();
       commands.put("wallet", new WalletCommand(this));
       commands.put("land", new LandCommand(this));
@@ -983,15 +983,15 @@ public class BitQuest extends JavaPlugin {
   }
 
   public boolean sendDiscordMessage(String content) {
-    System.out.println(DISCORD_HOOK_URL);
-    if (DISCORD_HOOK_URL != null) {
+    if (System.getenv("DISCORD_HOOK_URL") != null) {
+      System.out.println("[discord] "+content);
       try {
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("content", content);
 
-        URL url = new URL(DISCORD_HOOK_URL);
+        URL url = new URL(System.getenv("DISCORD_HOOK_URL"));
         HttpsURLConnection con = null;
 
         con = (HttpsURLConnection) url.openConnection();
@@ -1016,7 +1016,7 @@ public class BitQuest extends JavaPlugin {
         in.close();
         System.out.println(response.toString());
         return true;
-      } catch (IOException e) {
+      } catch (Exception e) {
         e.printStackTrace();
         return false;
       }

@@ -385,10 +385,8 @@ public class EntityEvents implements Listener {
               final User user = new User(bitQuest.db_con, player.getUniqueId());
 
               if (bitQuest.wallet.payment(user.wallet.address, money)) {
-                bitQuest.last_loot_player = player;
-                bitQuest.wallet_balance_cache -= money;
                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                System.out.println("[loot cache] " + bitQuest.wallet_balance_cache);
+                bitQuest.sendDiscordMessage(player.getDisplayName()+" looted "+money/bitQuest.DENOMINATION_FACTOR+" "+bitQuest.DENOMINATION_NAME);
                 bitQuest.announce(
                     ChatColor.GREEN
                         + player.getDisplayName()
@@ -533,6 +531,7 @@ public class EntityEvents implements Listener {
           if (entity instanceof PigZombie) {
             PigZombie pigZombie = (PigZombie) entity;
             pigZombie.setAngry(true);
+            pigZombie.setAngry(true);
           }
 
           // some skeletons are black
@@ -648,14 +647,14 @@ public class EntityEvents implements Listener {
     // Gives random SWORD
     if (!(entity instanceof Skeleton)) {
       Material sword_material = null;
-      if (BitQuest.rand(0, 4) < level) sword_material = Material.WOOD_AXE;
-      if (BitQuest.rand(0, 6) < level) sword_material = Material.GOLD_AXE;
+      if (BitQuest.rand(0, 2) < level) sword_material = Material.WOOD_AXE;
+      if (BitQuest.rand(0, 4) < level) sword_material = Material.GOLD_AXE;
       if (BitQuest.rand(0, 8) < level) sword_material = Material.IRON_AXE;
       if (BitQuest.rand(0, 16) < level) sword_material = Material.DIAMOND_AXE;
       if (BitQuest.rand(0, 32) < level) sword_material = Material.WOOD_SWORD;
-      if (BitQuest.rand(0, 56) < level) sword_material = Material.GOLD_SWORD;
-      if (BitQuest.rand(0, 64) < level) sword_material = Material.IRON_SWORD;
-      if (BitQuest.rand(0, 128) < level) sword_material = Material.DIAMOND_SWORD;
+      if (BitQuest.rand(0, 64) < level) sword_material = Material.GOLD_SWORD;
+      if (BitQuest.rand(0, 128) < level) sword_material = Material.IRON_SWORD;
+      if (BitQuest.rand(0, 256) < level) sword_material = Material.DIAMOND_SWORD;
       if (sword_material != null) {
         ItemStack sword = new ItemStack(sword_material);
         randomEnchantItem(sword, level);
@@ -667,11 +666,11 @@ public class EntityEvents implements Listener {
     // Gives random HELMET
     Material helmet_material = null;
 
-    if (BitQuest.rand(0, 16) < level) helmet_material = Material.LEATHER_HELMET;
+    if (BitQuest.rand(0, 32) < level) helmet_material = Material.LEATHER_HELMET;
 
-    if (BitQuest.rand(0, 32) < level) helmet_material = Material.CHAINMAIL_HELMET;
-    if (BitQuest.rand(0, 64) < level) helmet_material = Material.IRON_HELMET;
-    if (BitQuest.rand(0, 128) < level) helmet_material = Material.DIAMOND_HELMET;
+    if (BitQuest.rand(0, 64) < level) helmet_material = Material.CHAINMAIL_HELMET;
+    if (BitQuest.rand(0, 128) < level) helmet_material = Material.IRON_HELMET;
+    if (BitQuest.rand(0, 256) < level) helmet_material = Material.DIAMOND_HELMET;
     if (helmet_material != null) {
       ItemStack helmet = new ItemStack(helmet_material);
 
@@ -682,10 +681,10 @@ public class EntityEvents implements Listener {
 
     // Gives random CHESTPLATE
     Material chestplate_material = null;
-    if (BitQuest.rand(0, 16) < level) chestplate_material = Material.LEATHER_CHESTPLATE;
-    if (BitQuest.rand(0, 32) < level) chestplate_material = Material.CHAINMAIL_CHESTPLATE;
-    if (BitQuest.rand(0, 64) < level) chestplate_material = Material.IRON_CHESTPLATE;
-    if (BitQuest.rand(0, 128) < level) chestplate_material = Material.DIAMOND_CHESTPLATE;
+    if (BitQuest.rand(0, 32) < level) chestplate_material = Material.LEATHER_CHESTPLATE;
+    if (BitQuest.rand(0, 64) < level) chestplate_material = Material.CHAINMAIL_CHESTPLATE;
+    if (BitQuest.rand(0, 128) < level) chestplate_material = Material.IRON_CHESTPLATE;
+    if (BitQuest.rand(0, 256) < level) chestplate_material = Material.DIAMOND_CHESTPLATE;
 
     if (chestplate_material != null) {
       ItemStack chest = new ItemStack(chestplate_material);
@@ -696,10 +695,10 @@ public class EntityEvents implements Listener {
 
     // Gives random Leggings
     Material leggings_material = null;
-    if (BitQuest.rand(0, 16) < level) leggings_material = Material.LEATHER_LEGGINGS;
-    if (BitQuest.rand(0, 32) < level) leggings_material = Material.CHAINMAIL_LEGGINGS;
-    if (BitQuest.rand(0, 64) < level) leggings_material = Material.IRON_LEGGINGS;
-    if (BitQuest.rand(0, 128) < level) leggings_material = Material.DIAMOND_LEGGINGS;
+    if (BitQuest.rand(0, 32) < level) leggings_material = Material.LEATHER_LEGGINGS;
+    if (BitQuest.rand(0, 64) < level) leggings_material = Material.CHAINMAIL_LEGGINGS;
+    if (BitQuest.rand(0, 128) < level) leggings_material = Material.IRON_LEGGINGS;
+    if (BitQuest.rand(0, 256) < level) leggings_material = Material.DIAMOND_LEGGINGS;
     if (leggings_material != null) {
       ItemStack leggings = new ItemStack(leggings_material);
 
@@ -710,11 +709,11 @@ public class EntityEvents implements Listener {
 
     // Gives Random BOOTS
     Material boot_material = null;
-    if (BitQuest.rand(0, 16) < level) boot_material = Material.LEATHER_BOOTS;
+    if (BitQuest.rand(0, 32) < level) boot_material = Material.LEATHER_BOOTS;
 
-    if (BitQuest.rand(0, 32) < level) boot_material = Material.CHAINMAIL_BOOTS;
-    if (BitQuest.rand(0, 64) < level) boot_material = Material.IRON_BOOTS;
-    if (BitQuest.rand(0, 128) < level) boot_material = Material.DIAMOND_BOOTS;
+    if (BitQuest.rand(0, 64) < level) boot_material = Material.CHAINMAIL_BOOTS;
+    if (BitQuest.rand(0, 128) < level) boot_material = Material.IRON_BOOTS;
+    if (BitQuest.rand(0, 256) < level) boot_material = Material.DIAMOND_BOOTS;
     if (boot_material != null) {
       ItemStack boots = new ItemStack(boot_material);
 
