@@ -516,9 +516,6 @@ public class EntityEvents implements Listener {
           if (bitQuest.rand(1, 100) < level)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-          if (bitQuest.rand(1, 100) < level)
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.LEVITATION, Integer.MAX_VALUE, 2), true);
           if (level > 64)
             entity.addPotionEffect(
                 new PotionEffect(PotionEffectType.GLOWING, Integer.MAX_VALUE, 2), true);
