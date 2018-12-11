@@ -371,10 +371,7 @@ public class EntityEvents implements Listener {
         if (damage.getDamager() instanceof Player && level >= 1) {
           // roll a D20
 
-          Long money =
-              Math.min(BitQuest.rand(1, level), BitQuest.rand(1, level))
-                  * 10
-                  * bitQuest.DENOMINATION_FACTOR;
+          Long money = BitQuest.rand(1, level) * bitQuest.DENOMINATION_FACTOR * 100;
           int dice = BitQuest.rand(1, 100);
           final Player player = (Player) damage.getDamager();
 
@@ -382,11 +379,8 @@ public class EntityEvents implements Listener {
           int exp = level * 4;
           bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
           bitQuest.setTotalExperience(player);
-          if (dice < 20
-              && Integer.parseInt(bitQuest.REDIS.get("loot:pool"))
-                  > 0) { // Only 20% of players obtain loot
-            bitQuest.REDIS.set("loot:rate:limit", "1");
-            bitQuest.REDIS.expire("loot:rate:limit", 60); // max 1 loot per minute
+          if (dice < 20&&bitQuest.wallet.getBalance(0)>(money+BitQuest.MINER_FEE)) { // Only 20% of players obtain loot
+
             if (BitQuest.BLOCKCYPHER_CHAIN != null) {
               final User user = new User(bitQuest.db_con, player.getUniqueId());
 
