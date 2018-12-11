@@ -95,35 +95,40 @@ public class Wallet {
         JSONObject tx = this.txSkeleton(_address, sat);
         // obtain message (hash) to be signed with private key
         JSONArray tosign = (JSONArray) tx.get("tosign");
-        String msg = tosign.get(0).toString();
-        // TODO: Create raw transaction with in full node
-        // creating a key object from WiF
-        DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
-        ECKey key = dpk.getKey();
-        // checking our key object
-        NetworkParameters params = TestNet3Params.get();
-        if (System.getenv("BITQUEST_ENV") != null) {
-          if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
-            System.out.println("[transaction] main net transaction start");
-            params = MainNetParams.get();
-          }
-        }
-        String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
-        // System.out.println(wif.equals(check));  // true
-        // creating Sha object from string
-        Sha256Hash hash = Sha256Hash.wrap(msg);
-        // creating signature
-        ECDSASignature sig = key.sign(hash);
-        // encoding
-        byte[] res = sig.encodeToDER();
-        // converting to hex
-        String hex = DatatypeConverter.printHexBinary(res);
         JSONArray signatures = new JSONArray();
-        signatures.add(hex);
-        tx.put("signatures", signatures);
         JSONArray pubkeys = new JSONArray();
-        // add my public key
-        pubkeys.add(this.public_key);
+
+        // sign every output
+        for(int i=0;i<tosign.size();i++) {
+          String msg = tosign.get(i).toString();
+          // TODO: Create raw transaction with in full node
+          // creating a key object from WiF
+          DumpedPrivateKey dpk = DumpedPrivateKey.fromBase58(null, this.wif);
+          ECKey key = dpk.getKey();
+          // checking our key object
+          NetworkParameters params = TestNet3Params.get();
+          if (System.getenv("BITQUEST_ENV") != null) {
+            if (System.getenv("BITQUEST_ENV").equalsIgnoreCase("production")) {
+              System.out.println("[transaction] main net transaction start");
+              params = MainNetParams.get();
+            }
+          }
+          String check = ((org.bitcoinj.core.ECKey) key).getPrivateKeyAsWiF(params);
+          // System.out.println(wif.equals(check));  // true
+          // creating Sha object from string
+          Sha256Hash hash = Sha256Hash.wrap(msg);
+          // creating signature
+          ECDSASignature sig = key.sign(hash);
+          // encoding
+          byte[] res = sig.encodeToDER();
+          // converting to hex
+          String hex = DatatypeConverter.printHexBinary(res);
+          signatures.add(hex);
+          // add my public key
+          pubkeys.add(this.public_key);
+        }
+
+        tx.put("signatures", signatures);
         tx.put("pubkeys", pubkeys);
         // go back to blockcypher with signed transaction
         URL url;
