@@ -421,7 +421,6 @@ public class EntityEvents implements Listener {
                         + " "
                         + "Emeralds"
                         + " of loot!");
-                player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
               }
             }
           }
