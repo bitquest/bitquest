@@ -517,7 +517,7 @@ scheduler.runTaskAsynchronously(this, new Runnable() {
           }
         },
         0,
-        7200L);
+        72000L);
 
     scheduler.scheduleSyncRepeatingTask(
         this,
