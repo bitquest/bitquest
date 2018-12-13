@@ -33,7 +33,7 @@ public class LandCommand extends CommandAction {
     } else {
       Location location = player.getLocation();
       if (args[0].equalsIgnoreCase("price")) {
-        player.sendMessage("Land price is: "+(BitQuest.LAND_PRICE+BitQuest.MINER_FEE)*BitQuest.DENOMINATION_FACTOR+" "+BitQuest.DENOMINATION_NAME+" (incl. miner fees)");
+        player.sendMessage("Land price is: "+Math.round((bitQuest.LAND_PRICE+BitQuest.MINER_FEE)/bitQuest.DENOMINATION_FACTOR)+" "+BitQuest.DENOMINATION_NAME+" (incl. miner fees)");
       } else if (args[0].equalsIgnoreCase("rename")) {
         if(args.length==2) {
           if(bitQuest.validName(args[1])==false) {
@@ -71,8 +71,26 @@ public class LandCommand extends CommandAction {
       } else if (args[0].equalsIgnoreCase("info")) {
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
-        String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
-        player.sendMessage(landname);
+        if(bitQuest.landIsClaimed(location)) {
+          String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
+          player.sendMessage(landname);
+          String permission_key= "chunk"
+                  + location.getChunk().getX()
+                  + ","
+                  + location.getChunk().getZ()
+                  + "permissions";
+          if(bitQuest.REDIS.exists(permission_key)) {
+            String permission_code = BitQuest.REDIS.get(permission_key);
+            if(permission_code.equals("p")) player.sendMessage("Permission: public");
+          } else {
+            player.sendMessage("Permission: private");
+          }
+
+
+        } else {
+          player.sendMessage("Land is not claimed");
+        }
+
         return true;
       } else if (args[0].equalsIgnoreCase("claim")) {
         if (args.length > 1) {
@@ -208,11 +226,7 @@ public class LandCommand extends CommandAction {
           }
 
         } else {
-          player.sendMessage(
-              ChatColor.RED
-                  + "You don't have permission to do this.");
-
-          return true;
+          return false;
         }
       } else {
         player.sendMessage(
