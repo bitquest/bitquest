@@ -365,7 +365,7 @@ public class EntityEvents implements Listener {
     final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
 
     if (entity instanceof Monster) {
-        bitQuest.createBossFight(e.getEntity().getLocation());
+        if(bitQuest.rand(0,1000)<100) bitQuest.createBossFight(e.getEntity().getLocation());
       if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
         final EntityDamageByEntityEvent damage =
             (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -469,7 +469,7 @@ public class EntityEvents implements Listener {
     EntityType entityType = entity.getType();
     // TODO: Increase spawn_distance divisor to 64 or 32
     // max level is 128
-    int level = Math.min(128,BitQuest.rand(1, Math.round((spawn_distance/100) * difficulty)));
+    int level = Math.min(128,BitQuest.rand(1, Math.round((spawn_distance/1000) * difficulty)));
     if (entity instanceof  Giant) {
         entity.setMaxHealth(2858519);
         entity.setCustomName("Giant Terry");
