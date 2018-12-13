@@ -34,6 +34,7 @@ import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
+import org.bukkit.util.Vector;
 
 public class EntityEvents implements Listener {
   BitQuest bitQuest;
@@ -364,7 +365,7 @@ public class EntityEvents implements Listener {
     final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
 
     if (entity instanceof Monster) {
-
+        bitQuest.createBossFight(e.getEntity().getLocation());
       if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
         final EntityDamageByEntityEvent damage =
             (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
@@ -469,8 +470,10 @@ public class EntityEvents implements Listener {
     // TODO: Increase spawn_distance divisor to 64 or 32
     // max level is 128
     int level = Math.min(128,BitQuest.rand(1, Math.round((spawn_distance/100) * difficulty)));
-
-    if (entity instanceof Monster) {
+    if (entity instanceof  Giant) {
+        entity.setMaxHealth(2858519);
+        entity.setCustomName("Giant Terry");
+    } else if (entity instanceof Monster) {
 
       // Disable mob spawners. Keep mob farmers away
       if (e.getSpawnReason() == SpawnReason.SPAWNER||spawn_distance<64) {
@@ -561,6 +564,7 @@ public class EntityEvents implements Listener {
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
           }
+
         } catch (Exception e1) {
           System.out.println("Event failed. Shutting down...");
           e1.printStackTrace();
@@ -592,9 +596,7 @@ public class EntityEvents implements Listener {
     if (event instanceof EntityDamageByEntityEvent) {
       EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
       Entity damager = damageEvent.getDamager();
-
-      if (damager instanceof Player
-          || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+      if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
         // player damage
         Player player;
 
@@ -611,7 +613,14 @@ public class EntityEvents implements Listener {
             event.setCancelled(true);
           }
         }
+        // Player vs. Giant
+          if (event.getEntity() instanceof Giant) {
+              Vector v = damager.getLocation().toVector().subtract(event.getEntity().getLocation().toVector()).normalize();
+              event.getEntity().setVelocity(v);
 
+              event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(),EntityType.ZOMBIE);
+              ((Giant) event.getEntity()).setTarget((Player)damager);
+          }
         // Player vs. Animal in claimed location
         if (event.getEntity() instanceof Animals) {
           if (!bitQuest.canBuild(event.getEntity().getLocation(), player)) {

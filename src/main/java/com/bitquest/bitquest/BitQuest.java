@@ -236,12 +236,31 @@ public class BitQuest extends JavaPlugin {
       publish_stats();
       REDIS.set("loot:rate:limit", "1");
       REDIS.expire("loot:rate:limit", 10);
+      killAllVillagers();
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("[fatal] plugin enable fails");
       Bukkit.shutdown();
     }
   }
+  public void createBossFight(Location location) {
+    World w=Bukkit.getWorld("world");
+    List<Entity> entities = w.getEntities();
+    boolean already_spawned=false;
+    for (Entity en : entities) {
+      if ((en instanceof Giant)) {
+        already_spawned=true;
+      }
+    }
+
+    if(already_spawned==false) {
+      location.getWorld().spawnEntity(location,EntityType.GIANT);
+    } else {
+      System.out.println("[boss fight] a giant already spawned");
+    }
+  }
+
+
 
   public static final Wallet generateNewWallet()
       throws IOException, org.json.simple.parser.ParseException {
@@ -519,6 +538,8 @@ public class BitQuest extends JavaPlugin {
         0,
         7200L);
 
+
+
     scheduler.scheduleSyncRepeatingTask(
         this,
         new Runnable() {
@@ -610,12 +631,22 @@ public class BitQuest extends JavaPlugin {
         ((Villager) entity).remove();
       }
     }
+    for (Entity entity : entities) {
+      if ((entity instanceof Giant)) {
+        villagerskilled = villagerskilled + 1;
+        ((Giant) entity).remove();
+      }
+    }
     w = Bukkit.getWorld("world_nether");
     entities = w.getEntities();
     for (Entity entity : entities) {
       if ((entity instanceof Villager)) {
         villagerskilled = villagerskilled + 1;
         ((Villager) entity).remove();
+      }
+      if ((entity instanceof Giant)) {
+        villagerskilled = villagerskilled + 1;
+        ((Giant) entity).remove();
       }
     }
     System.out.println("Killed " + villagerskilled + " villagers");
