@@ -61,7 +61,9 @@ public class BitQuest extends JavaPlugin {
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
-  public static final int MINER_FEE = 10000;
+  public static final Long MINER_FEE =
+          System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE")) : 10000;
+
   public static final int MAX_STOCK = 100;
   public static final String SERVER_NAME =
       System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
