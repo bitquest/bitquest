@@ -244,20 +244,23 @@ public class BitQuest extends JavaPlugin {
     }
   }
   public void createBossFight(Location location) {
-    World w=Bukkit.getWorld("world");
-    List<Entity> entities = w.getEntities();
-    boolean already_spawned=false;
-    for (Entity en : entities) {
-      if ((en instanceof Giant)) {
-        already_spawned=true;
+    if(location.getWorld().getName().equals("world_the_end")) {
+      World w=Bukkit.getWorld("world_the_end");
+      List<Entity> entities = w.getEntities();
+      boolean already_spawned=false;
+      for (Entity en : entities) {
+        if ((en instanceof Giant)) {
+          already_spawned=true;
+        }
+      }
+
+      if(already_spawned==false) {
+        location.getWorld().spawnEntity(location,EntityType.GIANT);
+      } else {
+        System.out.println("[boss fight] a giant already spawned");
       }
     }
 
-    if(already_spawned==false) {
-      location.getWorld().spawnEntity(location,EntityType.GIANT);
-    } else {
-      System.out.println("[boss fight] a giant already spawned");
-    }
   }
 
 
