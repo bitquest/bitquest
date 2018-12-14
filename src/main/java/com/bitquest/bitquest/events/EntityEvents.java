@@ -452,23 +452,21 @@ public class EntityEvents implements Listener {
     LivingEntity entity = e.getEntity();
     int maxlevel = 10;
     int minlevel = 1;
-    int difficulty=1;
+    int difficulty=10;
 
     if (e.getLocation().getWorld().getName().equals("world_nether")) {
       minlevel = 10;
-      maxlevel = 30;
-      difficulty=10;
+      maxlevel = 50;
     } else if (e.getLocation().getWorld().getName().equals("world_end")) {
-      minlevel = 30;
+      minlevel = 50;
       maxlevel = 100;
-      difficulty=100;
     }
     int spawn_distance =
         (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
 
     EntityType entityType = entity.getType();
     // max level is 128
-    int level = Math.min(128,BitQuest.rand(difficulty, difficulty+Math.round(spawn_distance/1000)));
+    int level = Math.min(maxlevel,BitQuest.rand(minlevel, minlevel+(spawn_distance/1000)));
     if (entity instanceof  Giant) {
         entity.setMaxHealth(2858519);
         entity.setCustomName("Giant Terry");
