@@ -27,7 +27,7 @@ commands:
     usage: "/home"
   land:
     description: "Manage permissions for the land you're standing on"
-    usage: "/land <info|claim|transfer|permissions>"
+    usage: "/land <info|claim|transfer|permissions|price>"
   maintenance:
     description: "Enables maintenance mode and stops players from joining the server"
     usage: "/maintenance <seconds>"
