@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+	
+	<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>BitQuest 2</title>
+  <meta name="description" content="The new BitQuest, version 2.0 is finished. The goal of this release was to make the integration of Bitcoin into Minecraft simple, open, and hackable. I am su...">
+	<!-- Custom CSS -->
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.min.css">
+  <link rel="stylesheet" href="/css/bitquest.css">
+  <link rel="stylesheet" href="/css/home.css">
+
+  <link rel="canonical" href="http://localhost:4000/2016/05/19/bitquest-2.html">
+  <link rel="alternate" type="application/rss+xml" title="The server that runs on Bitcoin!" href="http://localhost:4000/feed.xml">
+  
+  <!-- FONTS -->
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:400,300,700' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Roboto+Slab:400,300,700' rel='stylesheet' type='text/css'>
+  
+  <!-- MDI -->
+  <link rel="stylesheet" href="//cdn.materialdesignicons.com/1.3.41/css/materialdesignicons.min.css">
+  
+  <!-- FAVICON -->
+  <link rel="shortcut icon" href="/images/favicon.ico" >
+  
+  <!-- JQUERY -->
+  <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI=" crossorigin="anonymous"></script>
+  <script>
+    $(function() {
+      $('a[href*="#"]:not([href="#"])').click(function() {
+        if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') && location.hostname == this.hostname) {
+          var target = $(this.hash);
+          target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+          if (target.length) {
+            $('html, body').animate({
+              scrollTop: target.offset().top
+            }, 1000);
+            return false;
+          }
+        }
+      });
+    });
+  </script>
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-50933804-18"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-50933804-18');
+</script>
+
+</head>
+
+
+	<body>
+		
+		
+<header>
+      <div class="container">
+            <div class="row">
+                  <div class="col-md-4">
+                  </div>
+                  <div class="col-md-2">
+                        <a href="/wiki.html" class="btn-header">&raquo; Wiki</a>
+                  </div>
+                  <div class="col-md-2">
+                        <a target="_blank" href="http://github.com/bitquest" class="btn-header">&raquo; Github</a>
+                  </div>
+                  <div class="col-md-4">
+                  </div>
+            </div>
+            <div class="row">
+                  <div class="col-md-4">
+                  </div>
+                  <div class="col-md-4">
+                        <a href="/">
+                        <img id="logo"src="/images/bitquest-logo.png" alt="The server that runs on Bitcoin!">
+                        </a>
+                  </div>
+                  <div class="col-md-4"></div>
+            </div>
+      </div>
+</header>         
+		<div class="container">
+			<div class="row">
+				<div class="col-md-10 col-md-offset-1">
+					<a href="/blog" class="btn btn-sm btn-default"><i class="mdi mdi-arrow-left"></i> Back to Blog</a>
+				</div>
+			</div>
+		</div>
+		<section class="main">
+	      <div class="container">
+	        <div class="content row">
+	        	<div class="col-md-10 col-md-offset-1">
+              <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+                <h1 class="post-title" itemprop="name headline">BitQuest 2</h1>
+                <p class="post-meta"><time datetime="2016-05-19T16:17:00-04:00" itemprop="datePublished">May 19, 2016</time> • <span itemprop="author" itemscope itemtype="http://schema.org/Person">By <strong itemprop="name">explodi</strong></span></p>
+            
+              <div class="post-content" itemprop="articleBody">
+                <p><img class="post-full-img" src="http://i.imgur.com/tqZEwpL.png" alt="Satoshi Town, also known as &quot;the spawn&quot;" /></p>
+
+<p>The new BitQuest, version 2.0 is finished. The goal of this release was to make the integration of Bitcoin into Minecraft simple, open, and hackable. I am sure this is far from perfect, but a really fun new way to play Minecraft.</p>
+
+<p>Let’s go ahead and tell you what’s new and different!</p>
+
+<hr />
+
+<h2 id="on-chain-wallets">On-Chain wallets</h2>
+
+<p><img class="post-side-img side-l" src="http://i.imgur.com/UM6nLpU.jpg" alt="My Wallet" /></p>
+
+<p>Before 2.0, we were accounting player’s balance ‘off chain’: A database of debits, credits, and balances. The good side of this, is we can handle a huge amount of transactions, because we didn’t need to upload every one of them to the Blockchain, which induces fees and confirmation time.</p>
+
+<p>The problem with that solution is that we have to keep track of every transaction, secure and segregate wallets, and produce checks for potencial duplications.</p>
+
+<p>We now use “on chain” transactions, which means everything is uploaded to the Blockchain and all the information about the server economy is out there in the open for everyone to account for where the money is, and where it goes (more on that later).</p>
+
+<p>Having an on chain wallet also means you can do player-to-player transactions without the server being the middleman.</p>
+
+<p>The bad side is transactions are a little slow, there’s a limit on how many we can do and sometimes you have to wait confirmation times to spend bits. There are a number of Bitcoin enhancements coming in the future that will make things better, and we are looking into it.</p>
+
+<p>To handle all transactions, we use the excellent tools of our friends at <a href="http://www.blockcypher.com">BlockCypher</a></p>
+
+<hr />
+
+<h2 id="new-markets-and-loot">New Markets and Loot</h2>
+
+<p><img class="post-side-img side-r" src="http://i.imgur.com/jmUsfeg.gif" alt="Buying diamond and Elytra" /></p>
+
+<p>In Satoshi Town you can buy valuable stuff with Bitcoin, like food or the latest Elytra wings. Each comes at a different price, though. But the interesting part is what happens to the Bitcoin spent in items!</p>
+
+<p>All Market transactions go to a “World” wallet. Each time a monster is killed, a small number of calculations (and luck) might substract 200 bits from that wallet directly to yours, a small reward for your braveness. If you choose to spend that money again inside the Market, it will go back to the world wallet, rewarding another player.</p>
+
+<p>Since the transactions are now on-chain, you can look into the world wallet and explore the raw operations of the game economy:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://blockchain.info/address/1BiWdDaHChaKTcNXWs3nxPRcxb6CHM5h2u
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="land-ownership">Land Ownership</h2>
+
+<p><img class="post-side-img side-l" src="http://i.imgur.com/4dfEhu2.gif" alt="Extending the empire" /></p>
+
+<p>In the past BitQuest, land was free but ubiquitous. So many players claimed plots and never got back, leaving construction projects unfinished and deadly traps; Also, the community was growing and server space shrinking.</p>
+
+<p>In this new version, a land “chunk” of 16x16 blocks can be bought at the price of 200 bits (or 0.0002BTC); This transaction goes straight to the administrator as a contribution for server maintenance.</p>
+
+<p>You can claim contiguous chunks to make big areas, even cities!</p>
+
+<hr />
+
+<h2 id="bitquest-is-also-a-plugin">BitQuest is also a plugin</h2>
+<p>While you can play BitQuest in <a href="http://bitquest.co">the official server</a>, the project was re-written from scratch as a plug-in just because a single, but very important goal: To allow anyone to make their own Minecraft Bitcoin servers. It matches the latest <a href="http://spigotmc.com">Spigot</a> API and compatible with Mac/PC/Linux vanilla Minecraft.</p>
+
+<p>For now, it’s a little rough and undocumented but very soon we’ll have JAR and Docker Image in line with last stable BitQuest for deployment with minimum configuration. We hope this attracts collaborators as well expand the Bitcoin gaming universe.</p>
+
+<hr />
+
+<h2 id="open-source">Open Source</h2>
+<p>We believe that inside the next generation of virtual worlds, money will be an inter-operable, open, transparent asset backed by the Blockchain, like Bitcoin. A game money we can spend outside a specific world, perhaps in other games.</p>
+
+<p>Assets bought inside video games, like weapons or land ownership should be stored on the blockchain, and players must have freedom to sell or barter those assets inside or outside the system without restrictions or fees, just like any real world stuff you buy.</p>
+
+<p>There is so much work to do and BitQuest is just a tiny fraction. This release would be impossible without the help of <a href="https://twitter.com/shallonhackenb1">Airiellis</a>, Burntone, <a href="https://github.com/Xeyler">Xeyler</a>, <a href="https://github.com/juanj">juanj</a>, <a href="https://github.com/RagingMouser">RagingMouser</a> and everyone on the BitQuest slack team.</p>
+
+<p>The BitQuest plugin is open source that you can fork or contribute on our <a href="https://github.com/bitquest/bitquest">Github repo</a>, And if you want to support BitQuest even further, your donations are appreciated:</p>
+
+<div class="qr-code-container">
+	<img src="https://chart.googleapis.com/chart?chs=300x300&amp;cht=qr&amp;chl=bitcoin:3A1hmUUqCUV7SdftvVpWc8jQ3xmGqBPGeZ" alt="3A1hmUUqCUV7SdftvVpWc8jQ3xmGqBPGeZ" />
+	<span>3A1hmUUqCUV7SdftvVpWc8jQ3xmGqBPGeZ</span>
+</div>
+
+<p>Thanks for playing!!</p>
+
+              </div>
+            
+            </article>
+                        </div>
+	        </div>
+	      </div>  
+	    </section>
+
+		<div class="container">
+  <div class="row">
+     <section id="donate" class="donate text-center">
+        <h1>Support BitQuest, your donations are appreciated!</h1>
+        <div class="container">
+           <div class="row" id="support-row">
+              <div class="col-md-6" id="qr-btc-container">
+                 <h3>Bitcoin address</h3>
+                 <img src="/images/bitquest-donate-qr.jpg" alt="3A1hmUUqCUV7SdftvVpWc8jQ3xmGqBPGeZ">
+                 <span>3J2sBkLXqHDJvHG22DMBRdNhceevooHaQi</span>
+              </div>
+              <div class="col-md-6" id="qr-dgc-container">
+                 <h3>Dogecoin address</h3>
+                 <img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=dogecoin:DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg&choe=UTF-8" alt="DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg">
+                 <span>DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg</span>
+              </div>
+           </div>
+        </div>
+     </section>
+  </div>
+</div>
+<footer class="site-footer ground">
+  <div class="container">
+     <!-- <h2 class="footer-heading">More info</h2> -->
+     <div class="row">
+        <div class="col-sm-4">
+           <h4>More info</h4>
+           <ul class="more-links">
+              <li class="nav-item">
+                 <a href="http://map.bitquest.co" class="nav-link" target="_blank">World map</a>
+              </li>
+              <li class="nav-item">
+                 <a href="/wiki.html" class="nav-link">Official wiki</a>
+              </li>
+           </ul>
+        </div>
+        <div class="col-sm-4">
+           <h4>Bitquest communities</h4>
+           <ul class="social-media-list hr">
+              
+              <li>
+                 <a href="http://reddit.com/r/bitquest">
+                 <span class="icon icon--reddit"><i class="mdi mdi-reddit"></i></span>
+                 <span class="username">/r/bitquest</span></a>
+              </li>
+              
+              
+              <li>
+                 <a href="http://github.com/bitquest">
+                 <span class="icon icon--github"><i class="mdi mdi-github-box"></i></span>
+                 <span class="username">github.com/bitquest</span></a>
+              </li>
+              
+              
+              <li>
+                 <a href="http://twitter.com/bitquestmc">
+                 <span class="icon icon--twitter"><i class="mdi mdi-twitter-box"></i></span>
+                 <span class="username">@bitquestmc</span></a>
+              </li>
+              
+              
+              <li>
+                 <a href="http://facebook.com/BitQuestMC">
+                 <span class="icon icon--facebook"><i class="mdi mdi-facebook-box"></i></span>
+                 <span class="username">BitQuestMC</span></a>
+              </li>
+              
+              <li>
+                 <a href="https://discord.gg/pknXcj2"><img src="/images/white-discord-svg.svg" style="width:20px; height:23px; margin-left:-2px">Discord</a>
+              </li>
+           </ul>
+        </div>
+        <div class="col-sm-4">
+           <h4>Subscribe to the newsletter</h4>
+           <div class="newsletter-box">
+              <!-- <span class="cta text-right">
+                 Subscribe to the newsletter
+                 </span> -->
+              <form action="//mego.us3.list-manage.com/subscribe/post?u=5f8be72ce6c44eb5f1b21584e&id=bf31ce24ee" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="" class="form-inline validate">
+                 <div class="form-group">
+                    <i class="mdi mdi-email-outline"></i>
+                    <input type="email" name="EMAIL" class="form-control required email" id="mce-email" placeholder="your@email.com">
+                 </div>
+                 <button type="submit" class="btn"><i class="mdi mdi-send"></i></button>
+              </form>
+           </div>
+        </div>
+     </div>
+     <div class="col-md-12 text-center">
+        <ul class="contact-list">
+           <li>BitQuest - The server that runs on Bitcoin!</li>
+           <li><a href="mailto:bitquest@bitquest.co">bitquest@bitquest.co</a></li>
+        </ul>
+     </div>
+  </div>
+</footer>
+<!-- JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+
+
+	
+
+	</body>
+
+</html>
+
