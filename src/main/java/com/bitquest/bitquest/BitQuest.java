@@ -268,7 +268,7 @@ public class BitQuest extends JavaPlugin {
 
   }
   static Long witherReward() {
-    return (LAND_PRICE*2);
+    return (LAND_PRICE);
   }
   public void createBossFight(Location location) {
     if(REDIS.exists("loot_cache")) {

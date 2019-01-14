@@ -62,10 +62,10 @@ public class ChatEvents implements Listener {
     //				}
     //			}
     //		} else
-    if (message.startsWith("!")) {
+    if (message.endsWith("!")) {
       if (message.length() > 1 && message.substring(1, message.length()).trim().length() >= 1) {
         event.setMessage(message.substring(1, message.length()));
-
+        bitQuest.sendDiscordMessage(sender.getName()+": "+message);
         // Spigot replaces "%1$s" with the player's name and "%2$s" with the original message.
         event.setFormat(
             ChatColor.BLUE.toString()
