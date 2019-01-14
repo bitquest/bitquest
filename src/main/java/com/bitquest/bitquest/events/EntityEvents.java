@@ -364,25 +364,22 @@ public class EntityEvents implements Listener {
 
     final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
 
-    if (entity instanceof Monster) {
-        if(bitQuest.rand(0,1000)<100) bitQuest.createBossFight(e.getEntity().getLocation());
-      if (e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+    if (entity instanceof Monster && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
         final EntityDamageByEntityEvent damage =
             (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
-        if (damage.getDamager() instanceof Player && level >= 1) {
-          // roll a D20
+        Player player=null;
+        if(damage.getDamager() instanceof Player) player=(Player) damage.getDamager();
+        if(damage.getDamager() instanceof Arrow && ((Arrow)damage.getDamager()).getShooter() instanceof  Player) player=(Player)((Arrow)damage.getDamager()).getShooter();
+        if (player!=null) {
 
-          Long money = BitQuest.rand(1, level) * bitQuest.DENOMINATION_FACTOR * 100;
-          int dice = BitQuest.rand(1, 100);
-          final Player player = (Player) damage.getDamager();
+          Long money = bitQuest.LAND_PRICE;
 
           // Add EXP
           int exp = level * 4;
           bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
           bitQuest.setTotalExperience(player);
-          if (dice < 20&&bitQuest.wallet.getBalance(0)>(money+BitQuest.MINER_FEE)) { // Only 20% of players obtain loot
+          if (damage.getEntity() instanceof Wither) {
 
-            if (BitQuest.BLOCKCYPHER_CHAIN != null) {
               final User user = new User(bitQuest.db_con, player.getUniqueId());
 
               if (bitQuest.wallet.payment(user.wallet.address, money)) {
@@ -400,32 +397,9 @@ public class EntityEvents implements Listener {
                         + " of loot!");
                 player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
               }
-            } else {
-              // emeralds
-              final User user = new User(bitQuest.db_con, player.getUniqueId());
-              if (user.addEmeralds((int) (money / bitQuest.DENOMINATION_FACTOR), player)) {
-                bitQuest.last_loot_player = player;
-                System.out.println(
-                    "[loot] "
-                        + player.getDisplayName()
-                        + ": "
-                        + (money / bitQuest.DENOMINATION_FACTOR)
-                        + "Emeralds");
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You got "
-                        + ChatColor.BOLD
-                        + money / bitQuest.DENOMINATION_FACTOR
-                        + ChatColor.GREEN
-                        + " "
-                        + "Emeralds"
-                        + " of loot!");
-              }
-            }
+
           }
         }
-      }
-
     } else {
       e.setDroppedExp(0);
     }
@@ -467,10 +441,12 @@ public class EntityEvents implements Listener {
     EntityType entityType = entity.getType();
     // max level is 128
     int level = Math.min(maxlevel,BitQuest.rand(minlevel, minlevel+(spawn_distance/1000)));
+
     if (entity instanceof  Giant) {
         entity.setMaxHealth(2858519);
         entity.setCustomName("Giant Terry");
     } else if (entity instanceof Monster) {
+      bitQuest.createBossFight(e.getEntity().getLocation());
 
       // Disable mob spawners. Keep mob farmers away
       if (e.getSpawnReason() == SpawnReason.SPAWNER||spawn_distance<64) {
@@ -480,16 +456,20 @@ public class EntityEvents implements Listener {
 
           e.setCancelled(false);
 
-          // nerf_level makes sure high level mobs are away from the spawn
           if (level < 1) level = 1;
 
-          entity.setMaxHealth(1 + level);
-          entity.setHealth(1 + level);
           entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
           entity.setCustomName(
               String.format(
                   "%s lvl %d",
                   WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
+          if(entity instanceof Wither) {
+            level=level+10;
+            entity.setCustomName("Wither (Reward: "+Math.round((bitQuest.LAND_PRICE)/bitQuest.DENOMINATION_FACTOR)+" "+bitQuest.DENOMINATION_NAME+")");
+          }
+          entity.setMaxHealth(1 + level);
+
+          entity.setHealth(1 + level);
 
           // add potion effects
           if (bitQuest.rand(1, 100) < level)
@@ -610,6 +590,7 @@ public class EntityEvents implements Listener {
             event.setCancelled(true);
           }
         }
+
         // Player vs. Giant
           if (event.getEntity() instanceof Giant) {
               Vector v = damager.getLocation().toVector().subtract(event.getEntity().getLocation().toVector()).normalize();

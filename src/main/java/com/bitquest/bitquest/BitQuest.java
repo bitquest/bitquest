@@ -111,6 +111,7 @@ public class BitQuest extends JavaPlugin {
   public ArrayList<ItemStack> books = new ArrayList<ItemStack>();
   // when true, server is closed for maintenance and not allowing players to join in.
   public boolean maintenance_mode = false;
+  boolean boss_already_spawned=false;
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
@@ -232,32 +233,58 @@ public class BitQuest extends JavaPlugin {
       modCommands.put("motd", new MOTDCommand(this));
       // TODO: Remove this command after migrate.
       modCommands.put("migrateclans", new MigrateClansCommand());
-      System.out.println("[startup] finished");
+      updateLootPoolCache();
       publish_stats();
       REDIS.set("loot:rate:limit", "1");
       REDIS.expire("loot:rate:limit", 10);
       killAllVillagers();
+      System.out.println("[startup] finished");
+
     } catch (Exception e) {
       e.printStackTrace();
       System.out.println("[fatal] plugin enable fails");
       Bukkit.shutdown();
     }
   }
+  public void updateLootPoolCache() {
+    System.out.println("[loot_cache]");
+    boss_already_spawned=false;
+    try {
+      Long balance=wallet.getBalance(0);
+      System.out.println("[loot_cache] "+balance);
+
+      if(balance>(LAND_PRICE+MINER_FEE)*2) {
+        REDIS.set("loot_cache",balance.toString());
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+      REDIS.del("loot_cache");
+      System.out.println("[loot_cache] FAIL");
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
+      REDIS.del("loot_cache");
+      System.out.println("[loot_cache] FAIL");
+
+    }
+
+  }
   public void createBossFight(Location location) {
-    if(location.getWorld().getName().equals("world_the_end")) {
-      World w=Bukkit.getWorld("world_the_end");
-      List<Entity> entities = w.getEntities();
-      boolean already_spawned=false;
+    if(REDIS.exists("loot_cache")&&(BITQUEST_ENV.equals("development")||location.getWorld().getName().equals("world_the_end"))) {
+      List<Entity> entities = location.getWorld().getEntities();
+
       for (Entity en : entities) {
-        if ((en instanceof Giant)) {
-          already_spawned=true;
+        if ((en instanceof Wither)) {
+          boss_already_spawned=true;
         }
       }
 
-      if(already_spawned==false) {
-        location.getWorld().spawnEntity(location,EntityType.GIANT);
-      } else {
-        System.out.println("[boss fight] a giant already spawned");
+      if(boss_already_spawned==false&&location.getY()>64) {
+        System.out.println("[boss fight] spawn in "+location.getX()+","+location.getY()+","+location.getZ());
+        boss_already_spawned=true;
+        location.getWorld().spawnEntity(location,EntityType.WITHER);
+
+        for (Player player : Bukkit.getOnlinePlayers()) { player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation())); }
+
       }
     }
 
@@ -536,6 +563,7 @@ public class BitQuest extends JavaPlugin {
             // A villager is born
             World world = Bukkit.getWorld("world");
             world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
+
           }
         },
         0,
@@ -550,6 +578,7 @@ public class BitQuest extends JavaPlugin {
           public void run() {
             run_season_events();
             publish_stats();
+            updateLootPoolCache();
           }
         },
         0,
@@ -623,9 +652,7 @@ public class BitQuest extends JavaPlugin {
     }
     System.out.println("Killed " + entitiesremoved + " entities");
   }
-
-  public void killAllVillagers() {
-    World w = Bukkit.getWorld("world");
+  public int killAllVillagersInWorld(World w) {
     List<Entity> entities = w.getEntities();
     int villagerskilled = 0;
     for (Entity entity : entities) {
@@ -633,25 +660,24 @@ public class BitQuest extends JavaPlugin {
         villagerskilled = villagerskilled + 1;
         ((Villager) entity).remove();
       }
-    }
-    for (Entity entity : entities) {
       if ((entity instanceof Giant)) {
         villagerskilled = villagerskilled + 1;
         ((Giant) entity).remove();
       }
-    }
-    w = Bukkit.getWorld("world_nether");
-    entities = w.getEntities();
-    for (Entity entity : entities) {
-      if ((entity instanceof Villager)) {
+      if ((entity instanceof Wither)) {
         villagerskilled = villagerskilled + 1;
-        ((Villager) entity).remove();
-      }
-      if ((entity instanceof Giant)) {
-        villagerskilled = villagerskilled + 1;
-        ((Giant) entity).remove();
+        ((Wither) entity).remove();
       }
     }
+    return villagerskilled;
+
+  }
+  public void killAllVillagers() {
+    int villagerskilled=0;
+    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world"));
+    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
+    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
+
     System.out.println("Killed " + villagerskilled + " villagers");
   }
 
