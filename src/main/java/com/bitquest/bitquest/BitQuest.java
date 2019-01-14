@@ -269,7 +269,7 @@ public class BitQuest extends JavaPlugin {
 
   }
   public void createBossFight(Location location) {
-    if(REDIS.exists("loot_cache")&&(BITQUEST_ENV.equals("development")||location.getWorld().getName().equals("world_the_end"))) {
+    if(REDIS.exists("loot_cache")) {
       List<Entity> entities = location.getWorld().getEntities();
 
       for (Entity en : entities) {
@@ -283,7 +283,12 @@ public class BitQuest extends JavaPlugin {
         boss_already_spawned=true;
         location.getWorld().spawnEntity(location,EntityType.WITHER);
 
-        for (Player player : Bukkit.getOnlinePlayers()) { player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation())); }
+        for (Player player : Bukkit.getOnlinePlayers()) {
+          if(player.getWorld().getName().equals(player.getWorld().getName())) {
+            player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation()));
+
+          }
+        }
 
       }
     }
