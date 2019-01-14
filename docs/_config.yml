@@ -1,0 +1,33 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: The server that runs on Bitcoin!
+email: bitquest@bitquest.co
+description: >
+  Bitquest is a Survival style Minecraft server with a Bitcoin-denominated economy: Players can buy, sell and trade items using BTC micropayments with a fully funcional Bitcoin wallet you can send money to/from.
+  To start playing, Connect to the following address using the PC Version of Minecraft:
+  play.bitquest.co
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://bitquest.co" # the base hostname & protocol for your site
+twitter_username: bitquestmc
+github_username:  bitquest
+facebook_username:  BitQuestMC
+reddit_username:  bitquest
+excerpt_separator: <!--more-->
+
+# Build settings
+markdown: kramdown
+collections:
+  wiki:
+    output: true
+defaults:
+  - scope:
+      path: ""
+      type: "wiki"
+    values:
+      layout: article

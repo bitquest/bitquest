@@ -384,7 +384,7 @@ public class EntityEvents implements Listener {
 
               if (bitQuest.wallet.payment(user.wallet.address, money)) {
                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-                bitQuest.sendDiscordMessage(player.getDisplayName()+" looted "+money/bitQuest.DENOMINATION_FACTOR+" "+bitQuest.DENOMINATION_NAME);
+                bitQuest.sendDiscordMessage(player.getDisplayName()+" killed "+damage.getEntity().getName()+" !!! A reward was paid: "+money/bitQuest.DENOMINATION_FACTOR+" "+bitQuest.DENOMINATION_NAME);
                 bitQuest.announce(
                     ChatColor.GREEN
                         + player.getDisplayName()

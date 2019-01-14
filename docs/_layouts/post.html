@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	
+	{% include head.html %}
+
+	<body>
+		
+		{% include header.html %}
+		<div class="container">
+			<div class="row">
+				<div class="col-md-10 col-md-offset-1">
+					<a href="{{ "/blog" | prepend: site.baseurl }}" class="btn btn-sm btn-default"><i class="mdi mdi-arrow-left"></i> Back to Blog</a>
+				</div>
+			</div>
+		</div>
+		<section class="main">
+	      <div class="container">
+	        <div class="content row">
+	        	<div class="col-md-10 col-md-offset-1">
+              <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+                <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
+                <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time>{% if page.author %} • <span itemprop="author" itemscope itemtype="http://schema.org/Person">By <strong itemprop="name">{{ page.author }}</strong></span>{% endif %}</p>
+            
+              <div class="post-content" itemprop="articleBody">
+                {{ content }}
+              </div>
+            
+            </article>
+                        </div>
+	        </div>
+	      </div>  
+	    </section>
+
+		{% include footer.html %}
+	
+
+	</body>
+
+</html>
+

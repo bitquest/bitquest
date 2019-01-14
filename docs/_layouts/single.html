@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	
+	{% include head.html %}
+
+	<body>
+		
+		{% include header.html %}
+		<div class="container">
+			<div class="row">
+				<div class="col-md-10 col-md-offset-1">
+					<a href="{{ "/blog" | prepend: site.baseurl }}" class="btn btn-sm btn-default"><i class="mdi mdi-arrow-left"></i> Back to Blog</a>
+				</div>
+			</div>
+		</div>
+		<section class="main">
+	      <div class="container">
+	        <div class="content row">
+	        	<div class="col-md-10 col-md-offset-1">
+	        		{{ content }}
+	        	</div>
+	        </div>
+	      </div>  
+	    </section>
+
+		{% include footer.html %}
+	
+		<!-- JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+	</body>
+
+</html>

@@ -1,0 +1,97 @@
+---
+layout: home
+---
+<header>
+   <div class="container">
+     <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+            <a href="/wiki.html" class="btn-header">&raquo; Wiki</a>
+        </div>
+        <div class="col-md-2">
+            <a target="_blank" href="http://github.com/bitquest" class="btn-header">&raquo; Github</a>
+        </div>
+        <div class="col-md-4">
+        </div>
+     </div>
+      <div class="row">
+         <a href="{{ site.baseurl }}/">
+         <img src="/images/bitquest-logo.png" id="logo-home" alt="{{ site.title }}">
+         </a>
+      </div>
+      <div class="row">
+         <h1 class="txt">Welcome to the first Minecraft server denominated in cryptocurrency</h1>
+      </div>
+      <div class="row">
+         <!--CONNECT TO BQ-->
+         <div class="col-md-6">
+            <div class="connectandplaybq">
+               <div class="box">Bitcoin</div>
+               <div>play.bitquest.co</div>
+               <div>Using Minecraft 1.12.2 for PC, Mac or Linux</div>
+            </div>
+         </div>
+         <!--CONNECT TO DQ-->
+         <div class="col-md-6">
+            <div class="connectandplaydc">
+               <div class="box">Dogecoin</div>
+               <div>doge.bitquest.co</div>
+               <div>Using Minecraft 1.12.2 for PC, Mac or Linux</div>
+            </div>
+         </div>
+      </div>
+   </div>
+</header>
+<div class="container" id="home-features">
+   <div class="row">
+      <div class="col-md-12">
+         <h1>Bitquest Features</h1>
+      </div>
+   </div>
+   <div class="row">
+      <div class="home-feature col-md-4">
+         <img class="img-responsive img-circle feat-image" src="images/bank.jpg">
+         <div class="feat-desc">
+            <h2 class="feat-title">Bits</h2>
+            <p>The currency on this server are the Bits. <strong>A bit is a fraction of a Bitcoin (1/1000000)</strong> that you can obtain by killing monsters, trading with users or transfering from an outside wallet. All of it is stored on a <strong>standard Bitcoin wallet on the Blockchain</strong>.</p>
+         </div>
+      </div>
+      <div class="home-feature col-md-4">
+         <img class="img-responsive img-circle feat-image" src="images/level.jpg">
+         <div class="feat-desc">
+            <h2 class="feat-title">Level System</h2>
+            <p>The level system is different that in a vanilla server. <strong>You gather experience from killing mobs and is never lost</strong>. Your XP allows you to become stronger and gain extra health.</p>
+         </div>
+      </div>
+      <div class="home-feature col-md-4">
+         <img class="img-responsive img-circle feat-image" src="images/fun.jpg">
+         <div class="feat-desc">
+            <h2 class="feat-title">Fun</h2>
+            <p>BitQuest is made having the concept of fun in it. <strong>Bots and AFK farming are strictly banned</strong>.</p>
+         </div>
+      </div>
+   </div>
+</div>
+<section class="blog">
+   <div class="container">
+      <section class="latest-posts">
+         <h4>Latest Posts</h4>
+         <ul class="post-list col-md-12">
+            {% for post in site.posts limit:2 %}
+            <li class="post col-md-6">
+               <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+               <h3 class="post-title">
+                  <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+               </h3>
+               <p>{{ post.content | strip_html | truncatewords: 33 }}</p>
+               <p><a href="{{ post.url | prepend: site.baseurl }}">&raquo; View more</a></p>
+            </li>
+            {% endfor %}
+         </ul>
+         <div class="row text-center">
+            <a href="/blog" class="btn">&raquo; Bitquest development blog</a>
+         </div>
+      </section>
+   </div>
+</section>

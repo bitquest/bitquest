@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>	
+	{% include head.html %}
+	<body>		
+		{% include header.html %}
+		<section class="main">
+	      <div class="container">
+	        <div class="content row">
+	        	<div class="col-md-8 col-md-offset-2">
+	        		{{ content }}
+	        	</div>
+	        </div>
+	      </div>  
+	    </section>
+		{% include footer.html %}
+		<!-- JS -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+	</body>
+
+</html>

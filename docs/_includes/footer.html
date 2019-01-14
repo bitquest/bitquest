@@ -1,0 +1,100 @@
+<div class="container">
+  <div class="row">
+     <section id="donate" class="donate text-center">
+        <h1>Support BitQuest, your donations are appreciated!</h1>
+        <div class="container">
+           <div class="row" id="support-row">
+              <div class="col-md-6" id="qr-btc-container">
+                 <h3>Bitcoin address</h3>
+                 <img src="/images/bitquest-donate-qr.jpg" alt="3A1hmUUqCUV7SdftvVpWc8jQ3xmGqBPGeZ">
+                 <span>3J2sBkLXqHDJvHG22DMBRdNhceevooHaQi</span>
+              </div>
+              <div class="col-md-6" id="qr-dgc-container">
+                 <h3>Dogecoin address</h3>
+                 <img src="https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=dogecoin:DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg&choe=UTF-8" alt="DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg">
+                 <span>DMDvcmbpDbMjqoMeTdcBqXk4QHSxJMoxjg</span>
+              </div>
+           </div>
+        </div>
+     </section>
+  </div>
+</div>
+<footer class="site-footer ground">
+  <div class="container">
+     <!-- <h2 class="footer-heading">More info</h2> -->
+     <div class="row">
+        <div class="col-sm-4">
+           <h4>More info</h4>
+           <ul class="more-links">
+              <li class="nav-item">
+                 <a href="http://map.bitquest.co" class="nav-link" target="_blank">World map</a>
+              </li>
+              <li class="nav-item">
+                 <a href="/wiki.html" class="nav-link">Official wiki</a>
+              </li>
+           </ul>
+        </div>
+        <div class="col-sm-4">
+           <h4>Bitquest communities</h4>
+           <ul class="social-media-list hr">
+              {% if site.reddit_username %}
+              <li>
+                 <a href="http://reddit.com/r/{{ site.reddit_username }}">
+                 <span class="icon icon--reddit"><i class="mdi mdi-reddit"></i></span>
+                 <span class="username">/r/{{ site.reddit_username }}</span></a>
+              </li>
+              {% endif %}
+              {% if site.github_username %}
+              <li>
+                 <a href="http://github.com/{{ site.github_username }}">
+                 <span class="icon icon--github"><i class="mdi mdi-github-box"></i></span>
+                 <span class="username">github.com/{{ site.github_username }}</span></a>
+              </li>
+              {% endif %}
+              {% if site.twitter_username %}
+              <li>
+                 <a href="http://twitter.com/{{ site.twitter_username }}">
+                 <span class="icon icon--twitter"><i class="mdi mdi-twitter-box"></i></span>
+                 <span class="username">@{{ site.twitter_username }}</span></a>
+              </li>
+              {% endif %}
+              {% if site.facebook_username %}
+              <li>
+                 <a href="http://facebook.com/{{ site.facebook_username }}">
+                 <span class="icon icon--facebook"><i class="mdi mdi-facebook-box"></i></span>
+                 <span class="username">{{ site.facebook_username }}</span></a>
+              </li>
+              {% endif %}
+              <li>
+                 <a href="https://discord.gg/pknXcj2"><img src="/images/white-discord-svg.svg" style="width:20px; height:23px; margin-left:-2px">Discord</a>
+              </li>
+           </ul>
+        </div>
+        <div class="col-sm-4">
+           <h4>Subscribe to the newsletter</h4>
+           <div class="newsletter-box">
+              <!-- <span class="cta text-right">
+                 Subscribe to the newsletter
+                 </span> -->
+              <form action="//mego.us3.list-manage.com/subscribe/post?u=5f8be72ce6c44eb5f1b21584e&id=bf31ce24ee" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form" class="validate" target="_blank" novalidate="" class="form-inline validate">
+                 <div class="form-group">
+                    <i class="mdi mdi-email-outline"></i>
+                    <input type="email" name="EMAIL" class="form-control required email" id="mce-email" placeholder="your@email.com">
+                 </div>
+                 <button type="submit" class="btn"><i class="mdi mdi-send"></i></button>
+              </form>
+           </div>
+        </div>
+     </div>
+     <div class="col-md-12 text-center">
+        <ul class="contact-list">
+           <li>BitQuest - {{ site.title }}</li>
+           <li><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+        </ul>
+     </div>
+  </div>
+</footer>
+<!-- JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0-alpha1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+
