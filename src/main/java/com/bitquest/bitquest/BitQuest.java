@@ -1058,61 +1058,64 @@ public class BitQuest extends JavaPlugin {
     return URLDecoder.decode(en, "UTF-8");
   }
   public boolean sendDiscordMessage(String content) {
-      System.out.println("[discord] "+content);
-      try {
-        String json = "{\"content\":\""+content+"\"}";
+      if(System.getenv("DISCORD_HOOK_URL")!=null) {
+        System.out.println("[discord] "+content);
+        try {
+          String json = "{\"content\":\""+content+"\"}";
 
-        JSONParser parser = new JSONParser();
+          JSONParser parser = new JSONParser();
 
-        final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("content", content);
-        CookieHandler.setDefault(new CookieManager());
+          final JSONObject jsonObject = new JSONObject();
+          jsonObject.put("content", content);
+          CookieHandler.setDefault(new CookieManager());
 
-        URL url = new URL("https://discordapp.com/api/webhooks/534467837528375307/zQh6DRl1pmTPy1QyNN4-9QtFBrX-ivBbLgrdvLqEDOP3U9IOAT4DVm1Ad7SjbTpxaklR");
-        HttpsURLConnection con = null;
+          URL url = new URL(System.getenv("DISCORD_HOOK_URL"));
+          HttpsURLConnection con = null;
 
-        System.setProperty("http.agent", "");
+          System.setProperty("http.agent", "");
 
-        con = (HttpsURLConnection) url.openConnection();
+          con = (HttpsURLConnection) url.openConnection();
 
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setRequestProperty("Cookie", "bitquest=true");
-        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+          con.setRequestMethod("POST");
+          con.setRequestProperty("Content-Type", "application/json");
+          con.setRequestProperty("Cookie", "bitquest=true");
+          con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
-        con.setDoOutput(true);
-        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        out.write(json);
-        out.close();
-        int responseCode = con.getResponseCode();
-        if(responseCode==200) {
-          BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-          String inputLine;
-          StringBuffer response = new StringBuffer();
+          con.setDoOutput(true);
+          OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+          out.write(json);
+          out.close();
+          int responseCode = con.getResponseCode();
+          if(responseCode==200) {
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
 
-          while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+            while ((inputLine = in.readLine()) != null) {
+              response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+            return true;
+          } else {
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+            String inputLine;
+            StringBuffer response = new StringBuffer();
+
+            while ((inputLine = in.readLine()) != null) {
+              response.append(inputLine);
+            }
+            in.close();
+            System.out.println(response.toString());
+            return false;
           }
-          in.close();
-          System.out.println(response.toString());
-          return true;
-        } else {
-          BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-          String inputLine;
-          StringBuffer response = new StringBuffer();
 
-          while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
-          }
-          in.close();
-          System.out.println(response.toString());
+        } catch (Exception e) {
+          e.printStackTrace();
           return false;
         }
-
-      } catch (Exception e) {
-        e.printStackTrace();
-        return false;
       }
+
 
   }
 
