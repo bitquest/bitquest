@@ -1058,9 +1058,9 @@ public class BitQuest extends JavaPlugin {
     return URLDecoder.decode(en, "UTF-8");
   }
   public boolean sendDiscordMessage(String content) {
-      if(System.getenv("DISCORD_HOOK_URL")!=null) {
-        System.out.println("[discord] "+content);
-        try {
+    if(System.getenv("DISCORD_HOOK_URL")!=null) {
+      System.out.println("[discord] "+content);
+      try {
           String json = "{\"content\":\""+content+"\"}";
 
           JSONParser parser = new JSONParser();
@@ -1110,12 +1110,12 @@ public class BitQuest extends JavaPlugin {
             return false;
           }
 
-        } catch (Exception e) {
+      } catch (Exception e) {
           e.printStackTrace();
           return false;
-        }
       }
-
+    }
+    return false;
 
   }
 
