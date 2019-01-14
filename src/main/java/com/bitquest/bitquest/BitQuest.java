@@ -4,8 +4,7 @@ import com.bitquest.bitquest.commands.*;
 import com.bitquest.bitquest.events.*;
 import com.google.gson.JsonObject;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.*;
 import java.sql.DriverManager;
 import java.text.ParseException;
 import java.util.*;
@@ -268,6 +267,9 @@ public class BitQuest extends JavaPlugin {
     }
 
   }
+  static Long witherReward() {
+    return (LAND_PRICE*2);
+  }
   public void createBossFight(Location location) {
     if(REDIS.exists("loot_cache")) {
       List<Entity> entities = location.getWorld().getEntities();
@@ -286,7 +288,7 @@ public class BitQuest extends JavaPlugin {
         for (Player player : Bukkit.getOnlinePlayers()) {
           if(player.getWorld().getName().equals(player.getWorld().getName())) {
             player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation()));
-
+            sendDiscordMessage("A Wither has spawned in "+location.getX()+","+location.getY()+","+location.getZ()+" rewards: "+Math.round(witherReward()/DENOMINATION_FACTOR)+" "+DENOMINATION_NAME);
           }
         }
 
@@ -1048,48 +1050,70 @@ public class BitQuest extends JavaPlugin {
 
     return false; // not pvp
   }
+  public String urlenEncode(String en) throws UnsupportedEncodingException {
+    return URLEncoder.encode(en, "UTF-8");
+  }
 
+  public String urlenDecode(String en) throws UnsupportedEncodingException {
+    return URLDecoder.decode(en, "UTF-8");
+  }
   public boolean sendDiscordMessage(String content) {
-    if (System.getenv("DISCORD_HOOK_URL") != null) {
       System.out.println("[discord] "+content);
       try {
+        String json = "{\"content\":\""+content+"\"}";
+
         JSONParser parser = new JSONParser();
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("content", content);
+        CookieHandler.setDefault(new CookieManager());
 
-        URL url = new URL(System.getenv("DISCORD_HOOK_URL"));
+        URL url = new URL("https://discordapp.com/api/webhooks/534467837528375307/zQh6DRl1pmTPy1QyNN4-9QtFBrX-ivBbLgrdvLqEDOP3U9IOAT4DVm1Ad7SjbTpxaklR");
         HttpsURLConnection con = null;
+
+        System.setProperty("http.agent", "");
 
         con = (HttpsURLConnection) url.openConnection();
 
         con.setRequestMethod("POST");
-        con.setRequestProperty("User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
-        con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Cookie", "bitquest=true");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+
         con.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        out.write(jsonObject.toString());
+        out.write(json);
         out.close();
-        // int responseCode = con.getResponseCode();
+        int responseCode = con.getResponseCode();
+        if(responseCode==200) {
+          BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+          String inputLine;
+          StringBuffer response = new StringBuffer();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
+          while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+          }
+          in.close();
+          System.out.println(response.toString());
+          return true;
+        } else {
+          BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+          String inputLine;
+          StringBuffer response = new StringBuffer();
 
-        while ((inputLine = in.readLine()) != null) {
-          response.append(inputLine);
+          while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+          }
+          in.close();
+          System.out.println(response.toString());
+          return false;
         }
-        in.close();
-        System.out.println(response.toString());
-        return true;
+
       } catch (Exception e) {
         e.printStackTrace();
         return false;
       }
-    } else {
-      return false;
-    }
+
   }
 
   public void crashtest() {
