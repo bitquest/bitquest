@@ -6,9 +6,7 @@ author: "explodi"
 ---
 <img src="/images/blog/wither.png"/>
 
-Today servers have been updated with a special event: The hunt for withers, who have invaded the bitquest and dogequest spawn cities. The server will reward with 100 bits to anyone who can save the city from this vicious monsters.
-
-To help the Wither hunters, their location will be revealed in our <a href="https://discord.gg/jvJ624c">Discord server</a>, so be sure to be there.
+Today servers have been updated with a special event: The hunt for withers, who have invaded the bitquest and dogequest spawn cities. The server will reward with 100 bits to anyone who can save the server from this vicious monsters.
 
 The rules of the event are simple:
 
@@ -21,4 +19,7 @@ In addition to the location of the monsters, our discord bot will announce the c
 
 If you like this event and you'd like more, please consider donating to the BitQuest project.
 
-As always, thanks for playing!
+Are you ready for some Wither hunting? Connect using Minecraft (Java) 1.3.2 to:
+
+* play.bitquest.co (Bitcoin)
+* doge.bitquest.co (Dogecoin)
