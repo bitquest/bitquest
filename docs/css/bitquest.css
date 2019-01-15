@@ -97,6 +97,16 @@ footer a {
 footer a:hover {
     color: #ec9f00;
 }
+figure {
+    max-width: 500px;
+    margin:0 auto;
+    clear: both;
+    margin-top:32px;
+    margin-bottom:32px;
+}
+figcaption {
+    font-size:12px;
+}
 a:active {
     color: #c58401;
     text-decoration: none;
