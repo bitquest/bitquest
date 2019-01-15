@@ -79,7 +79,7 @@ pre {
 }
 /** * Site header */
 header {
-    background:url('/images/frame.png'), url('http://map.bitquest.co/shot.jpg');
+    background:url('/images/frame.png'), url('/images/map.jpg');
     background-size:cover, cover;
     background-position:center, top;
     background-attachment: fixed;
