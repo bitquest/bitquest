@@ -271,28 +271,34 @@ public class BitQuest extends JavaPlugin {
     return (LAND_PRICE);
   }
   public void createBossFight(Location location) {
-    if(REDIS.exists("loot_cache")&&Integer.parseInt(REDIS.get("loot_cache"))>(400*DENOMINATION_FACTOR)) {
-      List<Entity> entities = location.getWorld().getEntities();
+    try {
+      if(wallet.getBalance(0)>400*DENOMINATION_FACTOR) {
+        List<Entity> entities = location.getWorld().getEntities();
 
-      for (Entity en : entities) {
-        if ((en instanceof Wither)) {
-          boss_already_spawned=true;
-        }
-      }
-
-      if(boss_already_spawned==false&&location.getY()>64) {
-        System.out.println("[boss fight] spawn in "+location.getX()+","+location.getY()+","+location.getZ());
-        boss_already_spawned=true;
-        location.getWorld().spawnEntity(location,EntityType.WITHER);
-
-        for (Player player : Bukkit.getOnlinePlayers()) {
-          if(player.getWorld().getName().equals(player.getWorld().getName())) {
-            player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation()));
-            sendDiscordMessage("A Wither has spawned in "+location.getX()+","+location.getY()+","+location.getZ()+" rewards: "+Math.round(witherReward()/DENOMINATION_FACTOR)+" "+DENOMINATION_NAME);
+        for (Entity en : entities) {
+          if ((en instanceof Wither)) {
+            boss_already_spawned=true;
           }
         }
 
+        if(boss_already_spawned==false&&location.getY()>64) {
+          System.out.println("[boss fight] spawn in "+location.getX()+","+location.getY()+","+location.getZ());
+          boss_already_spawned=true;
+          location.getWorld().spawnEntity(location,EntityType.WITHER);
+
+          for (Player player : Bukkit.getOnlinePlayers()) {
+            if(player.getWorld().getName().equals(player.getWorld().getName())) {
+              player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation()));
+              sendDiscordMessage("A Wither has spawned in "+location.getX()+","+location.getY()+","+location.getZ()+" rewards: "+Math.round(witherReward()/DENOMINATION_FACTOR)+" "+DENOMINATION_NAME);
+            }
+          }
+
+        }
       }
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (org.json.simple.parser.ParseException e) {
+      e.printStackTrace();
     }
 
   }
