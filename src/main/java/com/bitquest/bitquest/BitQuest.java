@@ -271,7 +271,7 @@ public class BitQuest extends JavaPlugin {
   }
   public void createBossFight(Location location) {
     try {
-      if((BitQuest.rand(0,100)==5)&&wallet.getBalance(0)>400*DENOMINATION_FACTOR) {
+      if(REDIS.exists("loot_cache")&&Integer.parseInt(REDIS.get("loot_cache"))>400*DENOMINATION_FACTOR) {
         List<Entity> entities = location.getWorld().getEntities();
 
         for (Entity en : entities) {
@@ -594,7 +594,7 @@ public class BitQuest extends JavaPlugin {
           }
         },
         0,
-        300000L);
+        30000L);
   }
 
   public void publish_stats() {
