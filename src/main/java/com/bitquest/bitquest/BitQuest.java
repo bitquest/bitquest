@@ -203,7 +203,6 @@ public class BitQuest extends JavaPlugin {
 
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
-      sendDiscordMessage("BitQuest starting");
       commands = new HashMap<String, CommandAction>();
       commands.put("wallet", new WalletCommand(this));
       commands.put("land", new LandCommand(this));
