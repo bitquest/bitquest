@@ -271,7 +271,7 @@ public class BitQuest extends JavaPlugin {
   }
   public void createBossFight(Location location) {
     try {
-      if(wallet.getBalance(0)>400*DENOMINATION_FACTOR) {
+      if((BitQuest.rand(0,10)==5)&&wallet.getBalance(0)>400*DENOMINATION_FACTOR) {
         List<Entity> entities = location.getWorld().getEntities();
 
         for (Entity en : entities) {
