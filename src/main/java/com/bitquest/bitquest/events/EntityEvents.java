@@ -112,19 +112,6 @@ public class EntityEvents implements Listener {
     try {
       Player player = event.getPlayer();
       final User user = new User(bitQuest.db_con, player.getUniqueId());
-
-      if (!(BitQuest.REDIS.exists("name:" + player.getUniqueId().toString()))) {
-        // give new players a compass @BitcoinJake09
-        player.getInventory().addItem(new ItemStack(Material.COMPASS, 1));
-      }
-      // sets currency flag if not set. @BitcoinJake09
-      if (BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null) {
-        BitQuest.REDIS.set(
-            "currency" + player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
-      } else if ((BitQuest.REDIS.get("currency" + player.getUniqueId().toString()) == null)) {
-        BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), "emerald");
-      }
-
       BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
       if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
