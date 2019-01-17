@@ -294,10 +294,9 @@ public class BitQuest extends JavaPlugin {
 
         }
       }
-    } catch (IOException e) {
+    } catch (Exception e) {
       e.printStackTrace();
-    } catch (org.json.simple.parser.ParseException e) {
-      e.printStackTrace();
+
     }
 
   }
