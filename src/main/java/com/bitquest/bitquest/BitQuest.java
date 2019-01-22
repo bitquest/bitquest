@@ -271,7 +271,7 @@ public class BitQuest extends JavaPlugin {
   }
   public void createBossFight(Location location) {
     try {
-      if(REDIS.exists("loot_cache")&&Integer.parseInt(REDIS.get("loot_cache"))>400*DENOMINATION_FACTOR) {
+      if(REDIS.exists("loot_cache")&&Double.parseDouble(REDIS.get("loot_cache"))>400*DENOMINATION_FACTOR) {
         List<Entity> entities = location.getWorld().getEntities();
 
         for (Entity en : entities) {
