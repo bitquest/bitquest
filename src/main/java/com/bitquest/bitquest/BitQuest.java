@@ -122,7 +122,8 @@ public class BitQuest extends JavaPlugin {
           + ":"
           + System.getenv("POSTGRES_PORT_5432_TCP_PORT")
           + "/"
-          + System.getenv("POSTGRES_PORT_5432_TCP_DBNAME");
+          + System.getenv("POSTGRES_PORT_5432_TCP_DBNAME")
+          + "?ssl=true";
   public java.sql.Connection db_con;
 
   @Override
@@ -133,8 +134,7 @@ public class BitQuest extends JavaPlugin {
     if (System.getenv("POSTGRES_PORT_5432_TCP_PORT") == null) {
       Bukkit.shutdown();
       System.out.println("Please set the POSTGRES_PORT_5432_TCP_PORT environment variable");
-    }
-    ;
+    };
 
     try {
       Class.forName("org.postgresql.Driver");
