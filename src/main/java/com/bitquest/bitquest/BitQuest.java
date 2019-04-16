@@ -121,7 +121,8 @@ public class BitQuest extends JavaPlugin {
           + System.getenv("POSTGRES_PORT_5432_TCP_ADDR")
           + ":"
           + System.getenv("POSTGRES_PORT_5432_TCP_PORT")
-          + "/bitquest";
+          + "/"
+          + System.getenv("POSTGRES_PORT_5432_TCP_DBNAME");
   public java.sql.Connection db_con;
 
   @Override
