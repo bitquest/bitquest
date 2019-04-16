@@ -123,7 +123,7 @@ public class BitQuest extends JavaPlugin {
           + System.getenv("POSTGRES_PORT_5432_TCP_PORT")
           + "/"
           + System.getenv("POSTGRES_PORT_5432_TCP_DBNAME")
-          + "?ssl=true";
+          + "?ssl=true&sslmode=prefer";
   public java.sql.Connection db_con;
 
   @Override
