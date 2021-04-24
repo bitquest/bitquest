@@ -6,6 +6,7 @@ import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
@@ -17,7 +18,7 @@ import java.util.List;
 public class BitQuestTest {
 
     @Test
-    public void testWallet() throws SQLException, IOException, ParseException, java.text.ParseException, MnemonicLengthException {
+    public void testWallet() throws SQLException, ParseException, java.text.ParseException, MnemonicLengthException, IOException {
         final String db_url = "jdbc:postgresql://localhost:5432/bitquest";
         // generate new mnemonic code
         MnemonicCode mnemonicCode = new MnemonicCode();
@@ -36,6 +37,13 @@ public class BitQuestTest {
         DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
         String xpub = masterKey.serializePubB58( network );
         System.out.println(xpub);
+        final JSONObject params = new JSONObject();
+        params.put("extended_public_key", xpub);
+        params.put("name", "1");
+
+
+        JSONObject wallet_response=BlockCypher.api("wallets/hd",params);
+        System.out.println(wallet_response);
 
     }
 }
