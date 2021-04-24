@@ -182,7 +182,7 @@ public class InventoryEvents implements Listener {
           ItemMeta meta = button.getItemMeta();
           ArrayList<String> lore = new ArrayList<String>();
           int bits_price;
-          bits_price = (int) (trades.get(i).price+(BitQuest.MINER_FEE/BitQuest.DENOMINATION_FACTOR));
+          bits_price = (int) (trades.get(i).price + (BitQuest.MINER_FEE/BitQuest.DENOMINATION_FACTOR));
 
           lore.add("Price: " + bits_price);
           meta.setLore(lore);
@@ -237,7 +237,7 @@ public class InventoryEvents implements Listener {
   public void OnPlayerDropItem(PlayerDropItemEvent event)
   {
       Player player = event.getPlayer();
-      if(BitQuest.REDIS.get("currency"+player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
+      if(BitQuest.REDIS.get("currency" + player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
       {
           try { bitQuest.updateScoreboard(player); } catch (Exception e){}
       }

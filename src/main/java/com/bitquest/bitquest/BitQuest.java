@@ -67,11 +67,7 @@ public class BitQuest extends JavaPlugin {
   public static final String SERVER_NAME =
       System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
 
-  // Can save world data in elasticsearch (optional)
-  public static final String ELASTICSEARCH_ENDPOINT =
-      System.getenv("ELASTICSEARCH_ENDPOINT") != null
-          ? System.getenv("ELASTICSEARCH_ENDPOINT")
-          : null;
+
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
   // localhost:6379
   public static final String REDIS_HOST =
