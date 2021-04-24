@@ -87,6 +87,7 @@ Configuration can be done via enviroment variables:
 | POSTGRES_1_PORT_5432_TCP_ADDR   | Address of DB server                                                   | 
 | POSTGRES_1_PORT_5432_TCP_PORT   | Port for the DB server                                                 |
 | POSTGRES_1_PORT_5432_TCP_DBNAME | Name of the database to be used                                        |
+| DB_SSL                          | If true, PostgreSQL will enable SSL connection to the server           |
 
 # More info
 
