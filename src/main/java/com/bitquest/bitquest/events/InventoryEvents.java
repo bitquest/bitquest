@@ -218,7 +218,7 @@ public class InventoryEvents implements Listener {
 
   // @bitcoinjake09 updates scoreboard if emeralds
   @EventHandler
-  public void OnPlayerPickup(PlayerPickupItemEvent event) {
+  public void OnPlayerPickup(final PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
     ItemStack item = event.getItem().getItemStack();
     Material itemType = item.getType();
