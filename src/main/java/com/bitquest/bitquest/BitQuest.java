@@ -100,7 +100,7 @@ public class BitQuest extends JavaPlugin {
   // caches is used to reduce the amounts of calls to redis, storing some chunk information in
   // memory
   public HashMap<String, Boolean> land_unclaimed_cache = new HashMap<String, Boolean>();
-  public HashMap<String, String> land_owner_cache = new HashMap<String, Boolean>();
+  public HashMap<String, String> land_owner_cache = new HashMap<String, String>();
   public HashMap<String, String> land_permission_cache = new HashMap();
   public HashMap<String, String> land_name_cache = new HashMap();
   public Long wallet_balance_cache = 0L;
