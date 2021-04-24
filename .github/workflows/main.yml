@@ -28,8 +28,6 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
-      - name: Install Maven packages
-        run: mvn install
       - name: Test
         run: mvn test
       - name: Build Plugin
