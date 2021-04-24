@@ -117,26 +117,22 @@ public class BitQuest extends JavaPlugin {
   public static String DB_PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "5432";
   public static String DB_NAME = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "bitquest";
   public static String DB_URL_ARGUMENTS = System.getenv("DB_SSL")!=null ? "?ssl=true&sslmode=require" : ""; 
+  private static String DB_USERNAME = System.getenv("DB_USERNAME") != null ? System.getenv("DB_USERNAME") : "bitquest";
+  private static String DB_PASSWORD = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "bitquest";
+
   public static String db_url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + DB_URL_ARGUMENTS;
   public java.sql.Connection db_con;
 
   @Override
   public void onEnable() {
     log("[startup] BitQuest starting");
-
-    System.out.println("Checking that POSTGRES_PORT_5432_TCP_PORT envoronment variable exists...");
-    if (System.getenv("POSTGRES_PORT_5432_TCP_PORT") == null) {
-      Bukkit.shutdown();
-      System.out.println("Please set the POSTGRES_PORT_5432_TCP_PORT environment variable");
-    };
-
     try {
       Class.forName("org.postgresql.Driver");
       this.db_con =
           DriverManager.getConnection(
               this.db_url,
-              System.getenv("POSTGRES_ENV_POSTGRES_USER"),
-              System.getenv("POSTGRES_ENV_POSTGRES_PASSWORD"));
+              DB_USERNAME,
+              DB_PASSWORD;
       DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
 
       if (ADMIN_UUID == null) {
