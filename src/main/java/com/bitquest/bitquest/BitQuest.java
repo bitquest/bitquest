@@ -132,7 +132,7 @@ public class BitQuest extends JavaPlugin {
           DriverManager.getConnection(
               this.db_url,
               DB_USERNAME,
-              DB_PASSWORD;
+              DB_PASSWORD);
       DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
 
       if (ADMIN_UUID == null) {
