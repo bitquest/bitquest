@@ -112,9 +112,12 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
-  // Enable PostgreSQL SSL Mode if POSTGRES_SSL env variable exists;
+  // Create the PostgreSQL connection URL
+  public static String DB_HOST = System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "postgres";
+  public static String DB_PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "5432";
+  public static String DB_NAME = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "bitquest";
   public static String DB_URL_ARGUMENTS = System.getenv("DB_SSL")!=null ? "?ssl=true&sslmode=require" : ""; 
-  public static String db_url = "jdbc:postgresql://" + System.getenv("POSTGRES_PORT_5432_TCP_ADDR") + ":" + System.getenv("POSTGRES_PORT_5432_TCP_PORT") + "/" + System.getenv("POSTGRES_PORT_5432_TCP_DBNAME") + DB_URL_ARGUMENTS;
+  public static String db_url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + DB_URL_ARGUMENTS;
   public java.sql.Connection db_con;
 
   @Override
