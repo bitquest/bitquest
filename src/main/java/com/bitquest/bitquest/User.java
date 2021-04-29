@@ -1,10 +1,6 @@
 package com.bitquest.bitquest;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.UUID;
 import org.bukkit.Material;
@@ -18,18 +14,15 @@ public class User {
   private String clan;
   public UUID uuid;
 
-  public User(Connection db_con, UUID _uuid)
-      throws ParseException, org.json.simple.parser.ParseException, IOException, SQLException {
+  public User(UUID _uuid)
+      throws ParseException, org.json.simple.parser.ParseException, IOException {
     this.uuid = _uuid;
-    PreparedStatement pst =
-        db_con.prepareStatement("SELECT * FROM users WHERE uuid='" + this.uuid + "'");
-    ResultSet rs = pst.executeQuery();
-    if (rs.next()) {
-      this.wallet = new Wallet(rs.getString(3), rs.getString(4), rs.getString(5), rs.getString(6));
+    if (BitQuest.REDIS.get("Wallet.address."+_uuid) != null) {
+   	this.wallet = new Wallet(BitQuest.REDIS.get("Wallet.private_key."+_uuid), BitQuest.REDIS.get("Wallet.public_key."+_uuid), BitQuest.REDIS.get("Wallet.address."+_uuid), BitQuest.REDIS.get("Wallet.WIF."+_uuid));
     } else {
       System.out.println("[user not found] " + this.uuid);
       this.wallet = BitQuest.generateNewWallet();
-      this.wallet.save(this.uuid, db_con);
+      this.wallet.save(this.uuid);
     }
   }
 

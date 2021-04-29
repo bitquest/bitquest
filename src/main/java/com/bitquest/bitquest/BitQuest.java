@@ -5,7 +5,7 @@ import com.bitquest.bitquest.events.*;
 import com.google.gson.JsonObject;
 import java.io.*;
 import java.net.*;
-import java.sql.DriverManager;
+//import java.sql.DriverManager;
 import java.text.ParseException;
 import java.util.*;
 import javax.net.ssl.HttpsURLConnection;
@@ -89,7 +89,7 @@ public class BitQuest extends JavaPlugin {
           ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
           : 2000L;
 
-        
+
   public static int rand(int min, int max) {
     return min + (int) (Math.random() * ((max - min) + 1));
   }
@@ -112,21 +112,25 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> modCommands;
   private Player[] moderators;
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
+
   // Create the PostgreSQL connection URL
+  /*
   public static String DB_HOST = System.getenv("DB_HOST") != null ? System.getenv("DB_HOST") : "postgres";
   public static String DB_PORT = System.getenv("DB_PORT") != null ? System.getenv("DB_PORT") : "5432";
   public static String DB_NAME = System.getenv("DB_NAME") != null ? System.getenv("DB_NAME") : "bitquest";
-  public static String DB_URL_ARGUMENTS = System.getenv("DB_SSL")!=null ? "?ssl=true&sslmode=require" : ""; 
+  public static String DB_URL_ARGUMENTS = System.getenv("DB_SSL")!=null ? "?ssl=true&sslmode=require" : "";
   private static String DB_USERNAME = System.getenv("DB_USERNAME") != null ? System.getenv("DB_USERNAME") : "bitquest";
   private static String DB_PASSWORD = System.getenv("DB_PASSWORD") != null ? System.getenv("DB_PASSWORD") : "bitquest";
 
   public static String db_url = "jdbc:postgresql://" + DB_HOST + ":" + DB_PORT + "/" + DB_NAME + DB_URL_ARGUMENTS;
   public java.sql.Connection db_con;
+*/
 
   @Override
   public void onEnable() {
     log("[startup] BitQuest starting");
     try {
+      /*
       Class.forName("org.postgresql.Driver");
       this.db_con =
           DriverManager.getConnection(
@@ -134,7 +138,7 @@ public class BitQuest extends JavaPlugin {
               DB_USERNAME,
               DB_PASSWORD);
       DBMigrationCheck migration = new DBMigrationCheck(this.db_con);
-
+      */
       if (ADMIN_UUID == null) {
         log("[warning] ADMIN_UUID env variable to is not set.");
       }
@@ -388,7 +392,7 @@ public class BitQuest extends JavaPlugin {
 
   public void updateScoreboard(final Player player) {
     try {
-      final User user = new User(this.db_con, player.getUniqueId());
+      final User user = new User(player.getUniqueId());
       ScoreboardManager scoreboardManager;
       Scoreboard walletScoreboard;
       Objective walletScoreboardObjective;
@@ -449,7 +453,7 @@ public class BitQuest extends JavaPlugin {
 
   public void adoptPet(Player player, String pet_name) {
     try {
-      final User user = new User(this.db_con, player.getUniqueId());
+      final User user = new User(player.getUniqueId());
       if (user.wallet.getBalance(3) >= PET_PRICE) {
         try {
           if (user.wallet.payment(this.wallet.address, PET_PRICE) == true) {
@@ -792,7 +796,7 @@ public class BitQuest extends JavaPlugin {
             if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
               try {
 
-                final User user = new User(this.db_con, player.getUniqueId());
+                final User user = new User(player.getUniqueId());
                 player.sendMessage(ChatColor.YELLOW + "Claiming land...");
                 BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
                 final BitQuest bitQuest = this;
