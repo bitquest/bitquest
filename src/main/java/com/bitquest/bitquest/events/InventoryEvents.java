@@ -82,7 +82,7 @@ public class InventoryEvents implements Listener {
       if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         final User user;
         try {
-          user = new User(bitQuest.db_con, player.getUniqueId());
+          user = new User(player.getUniqueId());
 
         } catch (Exception e) {
           e.printStackTrace();
