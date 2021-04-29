@@ -111,7 +111,7 @@ public class EntityEvents implements Listener {
   public void onPlayerLogin(PlayerLoginEvent event) {
     try {
       Player player = event.getPlayer();
-      final User user = new User(bitQuest.db_con, player.getUniqueId());
+      final User user = new User(player.getUniqueId());
       BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
       if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
@@ -367,7 +367,7 @@ public class EntityEvents implements Listener {
           bitQuest.setTotalExperience(player);
           if (damage.getEntity() instanceof Wither) {
 
-              final User user = new User(bitQuest.db_con, player.getUniqueId());
+              final User user = new User(player.getUniqueId());
 
               if (bitQuest.wallet.payment(user.wallet.address, money)) {
                 System.out.println("[loot] " + player.getDisplayName() + ": " + money);

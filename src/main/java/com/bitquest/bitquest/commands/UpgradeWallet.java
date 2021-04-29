@@ -19,7 +19,7 @@ public class UpgradeWallet extends CommandAction {
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
     LegacyWallet legacyWallet = new LegacyWallet(player.getUniqueId().toString());
     try {
-      User user = new User(bitQuest.db_con, player.getUniqueId());
+      User user = new User(player.getUniqueId());
       LegacyWallet legacy_wallet = new LegacyWallet(player.getUniqueId().toString());
 
       Long balance = legacy_wallet.getBalance(2);

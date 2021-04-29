@@ -277,22 +277,11 @@ public class Wallet {
     }
   }
 
-  public boolean save(UUID uuid, Connection db_con) throws SQLException {
-    PreparedStatement user_create_pst =
-        db_con.prepareStatement(
-            "INSERT INTO USERS (uuid,private,public,address,wif) VALUES ('"
-                + uuid.toString()
-                + "','"
-                + this.private_key
-                + "','"
-                + this.public_key
-                + "','"
-                + this.address
-                + "','"
-                + this.wif
-                + "')");
-    user_create_pst.executeUpdate();
-
+  public boolean save(UUID uuid) {
+	BitQuest.REDIS.set("Wallet.private_key."+uuid.toString(), this.private_key);
+	BitQuest.REDIS.set("Wallet.public_key."+uuid.toString(), this.public_key);
+	BitQuest.REDIS.set("Wallet.address."+uuid.toString(), this.address);
+ 	BitQuest.REDIS.set("Wallet.WIF."+uuid.toString(), this.wif);
     return true;
   }
 }

@@ -21,7 +21,7 @@ public class DonateCommand extends CommandAction {
         try {
           final Long bits = Long.parseLong(args[0]);
           final Long sat = bits * bitQuest.DENOMINATION_FACTOR;
-          final User user = new User(bitQuest.db_con, player.getUniqueId());
+          final User user = new User(player.getUniqueId());
           final Long balance = user.wallet.getBalance(0);
 
             if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
