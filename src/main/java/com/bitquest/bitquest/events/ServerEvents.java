@@ -19,12 +19,8 @@ public class ServerEvents implements Listener {
     event.setMotd(
         ChatColor.GOLD
             + ChatColor.BOLD.toString()
-            + BitQuest.SERVERDISPLAY_NAME
+            + BitQuest.SERVER_NAME
             + ChatColor.GRAY
-            + ChatColor.BOLD.toString()
-            + "Quest"
-            + ChatColor.RESET
-            + " - The server that runs on "
-            + BitQuest.DENOMINATION_NAME);
+        );
   }
 }

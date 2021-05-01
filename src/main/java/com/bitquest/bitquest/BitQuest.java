@@ -43,7 +43,7 @@ public class BitQuest extends JavaPlugin {
       System.getenv("BITQUEST_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITQUEST_NODE_PORT"))
           : 8332;
-  public static final String BITQUEST_NAME =
+  public static final String SERVER_NAME =
       System.getenv("BITQUEST_NAME") != null ? System.getenv("BITQUEST_NAME") : "BitQuest";
   public static final Long DENOMINATION_FACTOR =
       System.getenv("DENOMINATION_FACTOR") != null
@@ -62,8 +62,7 @@ public class BitQuest extends JavaPlugin {
           System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE")) : 10000;
 
   public static final int MAX_STOCK = 100;
-  public static final String SERVER_NAME =
-      System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
+
 
 
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
