@@ -73,15 +73,14 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 
 Configuration can be done via enviroment variables:
 
-| environment variable            | description                                                            |
-|---------------------------------|------------------------------------------------------------------------|
-| ADMIN_UUID                      | Minecraft user ID for the main administrator                           |
-| BLOCKCYPHER_CHAIN               | btc/main for bitcoin mainnet. btc/test3 for bitcoin testnet            |
-| POSTGRES_ENV_POSTGRES_USER      | Username for connecting to the PostgreSQL database                     |
-| POSTGRES_1_PORT_5432_TCP_ADDR   | Address of DB server                                                   | 
-| POSTGRES_1_PORT_5432_TCP_PORT   | Port for the DB server                                                 |
-| POSTGRES_1_PORT_5432_TCP_DBNAME | Name of the database to be used                                        |
-| DB_SSL                          | If true, PostgreSQL will enable SSL connection to the server           |
+| Environment variable   | Description                         |
+|------------------------|-------------------------------------|
+| BITQUEST_ADMIN_UUID    | Minecraft user ID for the root user |
+| BITQUEST_NAME          | The name of your server             |
+| BITQUEST_NODE_HOST     | Host of the Node                    |
+| BITQUEST_NODE_PORT     | Port of the Node                    |
+| BITQUEST_NODE_RPC_USER | Node RPC username                   |
+| BITQUEST_NODE_RPC_PASS | Node RPC password                   |
 
 # More info
 
