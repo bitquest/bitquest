@@ -211,15 +211,7 @@ public class EntityEvents implements Listener {
     if (BitQuest.REDIS.exists("pet:" + player.getUniqueId().toString())) {
       bitQuest.spawnPet(player);
     }
-    // check if user has a legacy wallet
-    LegacyWallet legacyWallet = new LegacyWallet(player.getUniqueId().toString());
-    if (legacyWallet.getBalance(5) > 0) {
-      player.sendMessage(
-          ChatColor.RED
-              + "You have "
-              + legacyWallet.getBalance(5)
-              + " SAT in your old wallet. Use the /upgradewallet command to send them to your new one.");
-    }
+
     bitQuest.updateScoreboard(player);
   }
 
@@ -507,14 +499,7 @@ public class EntityEvents implements Listener {
             ItemStack bow = new ItemStack(Material.BOW);
             randomEnchantItem(bow, level);
           }
-          if (BitQuest.BITQUEST_ENV.equals("development"))
-            System.out.println(
-                "[spawn mob] "
-                    + entityType.name()
-                    + " lvl "
-                    + level
-                    + " spawn distance: "
-                    + spawn_distance);
+
           if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
             e.getLocation()
                 .getWorld()
