@@ -7,14 +7,9 @@ services:
       - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
     ports:
       - "25565:25565"
-    links:
-      - redis
-      - postgres
+    environment:
+      - BITQUEST_NODE_HOST=btcd
   redis:
     image: redis
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_USER=bitquest
-      - POSTGRES_PASSWORD=bitquest
-      - POSTGRES_DB=bitquest
+  btcd:
+    image: explodi/btcd

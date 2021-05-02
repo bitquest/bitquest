@@ -8,5 +8,7 @@ public class Node {
     public Node() {
         this.host="localhost";
         this.port=18333;
+        this.rpcUsername="testuser";
+        this.rpcPassword="testpass";
     }
 }
