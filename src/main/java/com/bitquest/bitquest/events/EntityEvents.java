@@ -1,7 +1,6 @@
 package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
-import com.bitquest.bitquest.LegacyWallet;
 import com.bitquest.bitquest.User;
 import java.io.IOException;
 import java.sql.SQLException;

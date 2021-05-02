@@ -32,14 +32,16 @@ public class BitQuest extends JavaPlugin {
   // TODO: remove env variables not being used anymore
   // Connecting to REDIS
   // Links to the administration account via Environment Variables
+  public static final String BITQUEST_ENV =
+      System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "";
   public static final UUID ADMIN_UUID =
       System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
-  public static final String NODE_HOST =
+  public static final String BITQUEST_NODE_HOST =
       System.getenv("BITQUEST_NODE_HOST") != null
           ? System.getenv("BITQUEST_NODE_HOST")
           : null;
-  public static final int NODE_PORT =
+  public static final int BITQUEST_NODE_PORT =
       System.getenv("BITQUEST_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITQUEST_NODE_PORT"))
           : 8332;
@@ -54,7 +56,7 @@ public class BitQuest extends JavaPlugin {
   public static final String BLOCKCYPHER_CHAIN =
       System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
   public static final String NODE_RPC_USERNAME = System.getenv("NODE_RPC_USERNAME"); 
-  public static final String NODE_RPC_PASWORD = System.getenv("NODE_RPC_PASWORD");
+  public static final String NODE_RPC_PASSWORD = System.getenv("NODE_RPC_PASSWORD");
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
@@ -188,7 +190,7 @@ public class BitQuest extends JavaPlugin {
       }
       System.out.println("[world wallet] address: " + wallet.address);
 
-      if (BITCOIN_NODE_HOST != null) {
+      if (BITQUEST_NODE_HOST != null) {
         System.out.println("[startup] checking bitcoin node connection");
         getBlockChainInfo();
       }
@@ -204,7 +206,6 @@ public class BitQuest extends JavaPlugin {
       commands.put("report", new ReportCommand(this));
       commands.put("send", new SendCommand(this));
       commands.put("currency", new CurrencyCommand(this));
-      commands.put("upgradewallet", new UpgradeWallet(this));
       commands.put("donate", new DonateCommand(this));
       commands.put("profession", new ProfessionCommand(this));
       commands.put("spawn", new SpawnCommand(this));
@@ -344,10 +345,10 @@ public class BitQuest extends JavaPlugin {
       JSONArray params = new JSONArray();
       jsonObject.put("params", params);
       System.out.println("Checking blockchain info...");
-      URL url = new URL("http://" + BITCOIN_NODE_HOST + ":" + BITCOIN_NODE_PORT);
+      URL url = new URL("http://" + BITQUEST_NODE_HOST + ":" + BITQUEST_NODE_PORT);
       System.out.println(url.toString());
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      String userPassword = BITCOIN_NODE_USERNAME + ":" + BITCOIN_NODE_PASSWORD;
+      String userPassword = NODE_RPC_USERNAME + ":" + NODE_RPC_PASSWORD;
       String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
       con.setRequestProperty("Authorization", "Basic " + encoding);
 
@@ -402,10 +403,7 @@ public class BitQuest extends JavaPlugin {
       walletScoreboardObjective.setDisplayName(
           ChatColor.GOLD
               + ChatColor.BOLD.toString()
-              + BitQuest.SERVERDISPLAY_NAME
-              + ChatColor.GRAY
-              + ChatColor.BOLD.toString()
-              + "Quest");
+              + BitQuest.SERVER_NAME );
 
       if (BitQuest.BLOCKCYPHER_CHAIN != null) {
         Score score =
@@ -973,7 +971,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public void sendWalletInfo(final Player player, final User user) {
-    if (BITCOIN_NODE_HOST != null) {
+    if (BITQUEST_NODE_HOST != null) {
       // TODO: Rewrite send wallet info
     }
     try {
