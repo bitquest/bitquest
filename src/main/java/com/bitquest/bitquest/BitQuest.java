@@ -32,21 +32,19 @@ public class BitQuest extends JavaPlugin {
   // TODO: remove env variables not being used anymore
   // Connecting to REDIS
   // Links to the administration account via Environment Variables
-  public static final String BITQUEST_ENV =
-      System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
   public static final UUID ADMIN_UUID =
       System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
-  public static final String BITCOIN_NODE_HOST =
-      System.getenv("BITCOIN_PORT_8332_TCP_ADDR") != null
-          ? System.getenv("BITCOIN_PORT_8332_TCP_ADDR")
+  public static final String NODE_HOST =
+      System.getenv("BITQUEST_NODE_HOST") != null
+          ? System.getenv("BITQUEST_NODE_HOST")
           : null;
-  public static final int BITCOIN_NODE_PORT =
-      System.getenv("BITCOIN_PORT_8332_TCP_PORT") != null
-          ? Integer.parseInt(System.getenv("BITCOIN_PORT_8332_TCP_PORT"))
+  public static final int NODE_PORT =
+      System.getenv("BITQUEST_NODE_PORT") != null
+          ? Integer.parseInt(System.getenv("BITQUEST_NODE_PORT"))
           : 8332;
-  public static final String SERVERDISPLAY_NAME =
-      System.getenv("SERVERDISPLAY_NAME") != null ? System.getenv("SERVERDISPLAY_NAME") : "Bit";
+  public static final String SERVER_NAME =
+      System.getenv("BITQUEST_NAME") != null ? System.getenv("BITQUEST_NAME") : "BitQuest";
   public static final Long DENOMINATION_FACTOR =
       System.getenv("DENOMINATION_FACTOR") != null
           ? Long.parseLong(System.getenv("DENOMINATION_FACTOR"))
@@ -55,8 +53,8 @@ public class BitQuest extends JavaPlugin {
       System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
   public static final String BLOCKCYPHER_CHAIN =
       System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
-  public static final String BITCOIN_NODE_USERNAME = System.getenv("BITCOIN_ENV_USERNAME");
-  public static final String BITCOIN_NODE_PASSWORD = System.getenv("BITCOIN_ENV_PASSWORD");
+  public static final String NODE_RPC_USERNAME = System.getenv("NODE_RPC_USERNAME"); 
+  public static final String NODE_RPC_PASWORD = System.getenv("NODE_RPC_PASWORD");
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
@@ -64,8 +62,7 @@ public class BitQuest extends JavaPlugin {
           System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE")) : 10000;
 
   public static final int MAX_STOCK = 100;
-  public static final String SERVER_NAME =
-      System.getenv("SERVER_NAME") != null ? System.getenv("SERVER_NAME") : "BitQuest";
+
 
 
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
