@@ -32,6 +32,8 @@ public class BitQuest extends JavaPlugin {
   // TODO: remove env variables not being used anymore
   // Connecting to REDIS
   // Links to the administration account via Environment Variables
+  public static final String BITQUEST_ENV =
+      System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "";
   public static final UUID ADMIN_UUID =
       System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
