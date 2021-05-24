@@ -24,12 +24,12 @@ public class DonateCommand extends CommandAction {
           final User user = new User(player.getUniqueId());
           final Long balance = user.wallet.getBalance(0);
 
-            if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
-              player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
-              bitQuest.updateScoreboard(player);
-            } else {
-              player.sendMessage(ChatColor.RED + "Donation failed");
-            }
+          if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
+            player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
+            bitQuest.updateScoreboard(player);
+          } else {
+            player.sendMessage(ChatColor.RED + "Donation failed");
+          }
 
 
           return true;

@@ -28,25 +28,25 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Villager;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.PigZombie;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
 import org.bukkit.event.player.PlayerBucketEmptyEvent;
 import org.bukkit.event.player.PlayerBucketFillEvent;
@@ -74,7 +74,7 @@ import org.bukkit.util.Vector;
 public class EntityEvents implements Listener {
   BitQuest bitQuest;
   StringBuilder rawwelcome = new StringBuilder();
-  String PROBLEM_MESSAGE = "Can't join right now. Come back later";
+  static String PROBLEM_MESSAGE = "Can't join right now. Come back later";
 
   private static final List<Material> PROTECTED_BLOCKS =
       Arrays.asList(
@@ -390,7 +390,7 @@ public class EntityEvents implements Listener {
         player = (Player) damage.getDamager();
       }
       if (damage.getDamager() instanceof Arrow
-        && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
+          && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
         player = (Player) ((Arrow) damage.getDamager()).getShooter();
       }
       if (player != null) {
@@ -725,43 +725,43 @@ public class EntityEvents implements Listener {
     }
 
     // Gives random CHESTPLATE
-    Material chestplate_material = null;
+    Material chestplateMaterial = null;
     if (BitQuest.rand(0, 32) < level) {
-      chestplate_material = Material.LEATHER_CHESTPLATE;
+      chestplateMaterial = Material.LEATHER_CHESTPLATE;
     }
     if (BitQuest.rand(0, 64) < level) {
-      chestplate_material = Material.CHAINMAIL_CHESTPLATE;
+      chestplateMaterial = Material.CHAINMAIL_CHESTPLATE;
     }
     if (BitQuest.rand(0, 128) < level) {
-      chestplate_material = Material.IRON_CHESTPLATE;
+      chestplateMaterial = Material.IRON_CHESTPLATE;
     }
     if (BitQuest.rand(0, 256) < level) {
-      chestplate_material = Material.DIAMOND_CHESTPLATE;
+      chestplateMaterial = Material.DIAMOND_CHESTPLATE;
     }
 
-    if (chestplate_material != null) {
-      ItemStack chest = new ItemStack(chestplate_material);
+    if (chestplateMaterial != null) {
+      ItemStack chest = new ItemStack(chestplateMaterial);
       randomEnchantItem(chest, level);
 
       entity.getEquipment().setChestplate(chest);
     }
 
     // Gives random Leggings
-    Material leggings_material = null;
+    Material leggingsMaterial = null;
     if (BitQuest.rand(0, 32) < level) {
-      leggings_material = Material.LEATHER_LEGGINGS;
+      leggingsMaterial = Material.LEATHER_LEGGINGS;
     }
     if (BitQuest.rand(0, 64) < level) {
-      leggings_material = Material.CHAINMAIL_LEGGINGS;
+      leggingsMaterial = Material.CHAINMAIL_LEGGINGS;
     }
     if (BitQuest.rand(0, 128) < level) {
-      leggings_material = Material.IRON_LEGGINGS;
+      leggingsMaterial = Material.IRON_LEGGINGS;
     }
     if (BitQuest.rand(0, 256) < level) {
-      leggings_material = Material.DIAMOND_LEGGINGS;
+      leggingsMaterial = Material.DIAMOND_LEGGINGS;
     }
-    if (leggings_material != null) {
-      ItemStack leggings = new ItemStack(leggings_material);
+    if (leggingsMaterial != null) {
+      ItemStack leggings = new ItemStack(leggingsMaterial);
 
       randomEnchantItem(leggings, level);
 
@@ -769,22 +769,22 @@ public class EntityEvents implements Listener {
     }
 
     // Gives Random BOOTS
-    Material boot_material = null;
+    Material bootMaterial = null;
     if (BitQuest.rand(0, 32) < level) {
-      boot_material = Material.LEATHER_BOOTS;
+      bootMaterial = Material.LEATHER_BOOTS;
     }
 
     if (BitQuest.rand(0, 64) < level) {
-      boot_material = Material.CHAINMAIL_BOOTS;
+      bootMaterial = Material.CHAINMAIL_BOOTS;
     }
     if (BitQuest.rand(0, 128) < level) {
-      boot_material = Material.IRON_BOOTS;
+      bootMaterial = Material.IRON_BOOTS;
     }
     if (BitQuest.rand(0, 256) < level) {
-      boot_material = Material.DIAMOND_BOOTS;
+      bootMaterial = Material.DIAMOND_BOOTS;
     }
-    if (boot_material != null) {
-      ItemStack boots = new ItemStack(boot_material);
+    if (bootMaterial != null) {
+      ItemStack boots = new ItemStack(bootMaterial);
 
       randomEnchantItem(boots, level);
 

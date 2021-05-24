@@ -17,10 +17,10 @@ public class SendCommand extends CommandAction {
 
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-    int MAX_SEND = 10000; // to be multiplied by DENOMINATION_FACTOR
+    int maxSend = 10000; // to be multiplied by DENOMINATION_FACTOR
     if (args.length == 2) {
       for (char c : args[0].toCharArray()) {
-        if (!Character.isDigit(c)) return false;
+        if (!Character.isDigit(c)) { return false; }
       }
       if (args[0].length() > 8) {
         // maximum send is 8 digits
@@ -29,7 +29,7 @@ public class SendCommand extends CommandAction {
       final Long amount = Long.parseLong(args[0]);
       final Long sat = amount * BitQuest.DENOMINATION_FACTOR;
 
-      if (amount != 0 && amount <= MAX_SEND) {
+      if (amount != 0 && amount <= maxSend) {
 
         for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
           if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
@@ -82,7 +82,7 @@ public class SendCommand extends CommandAction {
         }
       } else {
         player.sendMessage(
-            "Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + MAX_SEND);
+            "Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + maxSend);
       }
     } else {
       return false;

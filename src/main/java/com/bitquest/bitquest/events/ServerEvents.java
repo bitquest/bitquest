@@ -21,6 +21,6 @@ public class ServerEvents implements Listener {
             + ChatColor.BOLD.toString()
             + BitQuest.SERVER_NAME
             + ChatColor.GRAY
-        );
+    );
   }
 }

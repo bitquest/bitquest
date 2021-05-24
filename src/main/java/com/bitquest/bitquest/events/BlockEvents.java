@@ -2,7 +2,10 @@ package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
 import java.util.List;
-import org.bukkit.*;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -51,11 +54,11 @@ public class BlockEvents implements Listener {
         // Check if moderator
         if (!bitQuest.isModerator(event.getPlayer())) {
           // If the player can't build there cancel it
-			if (!bitQuest.canBuild(soilBlock.getLocation(), event.getPlayer())) {
-				event.setCancelled(true);
-			} else {
-				event.setCancelled(false);
-			}
+          if (!bitQuest.canBuild(soilBlock.getLocation(), event.getPlayer())) {
+            event.setCancelled(true);
+          } else {
+            event.setCancelled(false);
+          }
         }
       }
     }
@@ -113,8 +116,7 @@ public class BlockEvents implements Listener {
     String tempchunk = "";
     if (event.getBlock().getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
-    }
-    else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
+    } else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
       tempchunk = "netherchunk";
     }
 
@@ -150,16 +152,19 @@ public class BlockEvents implements Listener {
     String tempchunk = "";
     if (event.getBlock().getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
-    } // end world lmao @bitcoinjake09
+    } 
+    // end world lmao @bitcoinjake09
     else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
       tempchunk = "netherchunk";
-    } // end nether @bitcoinjake09
+    } 
+    // end nether @bitcoinjake09
 
     if (event.isSticky()) {
       Chunk pistonChunk = piston.getChunk();
       Chunk blockChunk = nextBlock.getChunk();
 
-      String owner1, owner2;
+      String owner1;
+      String owner2;
       if ((owner2 = BitQuest.REDIS
           .get(tempchunk + "" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
         if ((owner1 = BitQuest.REDIS

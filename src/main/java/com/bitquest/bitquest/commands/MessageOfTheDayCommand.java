@@ -6,10 +6,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class MOTDCommand extends CommandAction {
+public class MessageOfTheDayCommand extends CommandAction {
   private BitQuest bitQuest;
 
-  public MOTDCommand(BitQuest plugin) {
+  public MessageOfTheDayCommand(BitQuest plugin) {
     this.bitQuest = plugin;
   }
 

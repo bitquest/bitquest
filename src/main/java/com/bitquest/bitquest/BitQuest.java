@@ -221,7 +221,7 @@ public class BitQuest extends JavaPlugin {
       modCommands.put("spectate", new SpectateCommand(this));
       modCommands.put("emergencystop", new EmergencystopCommand());
       modCommands.put("fixabandonland", new FixAbandonLand());
-      modCommands.put("motd", new MOTDCommand(this));
+      modCommands.put("motd", new MessageOfTheDayCommand(this));
       // TODO: Remove this command after migrate.
       modCommands.put("migrateclans", new MigrateClansCommand());
       updateLootPoolCache();

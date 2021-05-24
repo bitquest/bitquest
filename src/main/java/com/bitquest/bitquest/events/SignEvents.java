@@ -23,7 +23,7 @@ public class SignEvents implements Listener {
 
   /**
    * onSignChange
-   * Fired when a user types on a new sign or changes the content of a sign 
+   * Fired when a user types on a new sign or changes the content of a sign.
    */
   @EventHandler
   public void onSignChange(SignChangeEvent event)
