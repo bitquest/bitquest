@@ -214,11 +214,6 @@
       <message key="name.invalidPattern"
              value="Class type name ''{0}'' must match pattern ''{1}''."/>
     </module>
-    <module name="RecordComponentName">
-      <property name="format" value="^[a-z]([a-z0-9][a-zA-Z0-9]*)?$"/>
-      <message key="name.invalidPattern"
-               value="Record component name ''{0}'' must match pattern ''{1}''."/>
-    </module>
     <module name="RecordTypeParameterName">
       <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]*[T]$)"/>
       <message key="name.invalidPattern"
@@ -247,7 +242,7 @@
     </module>
     <module name="Indentation">
       <property name="basicOffset" value="2"/>
-      <property name="braceAdjustment" value="2"/>
+      <property name="braceAdjustment" value="0"/>
       <property name="caseIndent" value="2"/>
       <property name="throwsIndent" value="4"/>
       <property name="lineWrappingIndentation" value="4"/>
@@ -332,13 +327,6 @@
       <property name="allowedAnnotations" value="Override, Test"/>
       <property name="tokens" value="METHOD_DEF, CTOR_DEF, ANNOTATION_FIELD_DEF,
                                    COMPACT_CTOR_DEF"/>
-    </module>
-    <module name="MissingJavadocType">
-      <property name="scope" value="protected"/>
-      <property name="tokens"
-                value="CLASS_DEF, INTERFACE_DEF, ENUM_DEF,
-                      RECORD_DEF, ANNOTATION_DEF"/>
-      <property name="excludeScope" value="nothing"/>
     </module>
     <module name="MethodName">
       <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
