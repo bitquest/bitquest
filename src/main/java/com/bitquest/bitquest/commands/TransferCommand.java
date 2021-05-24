@@ -23,7 +23,9 @@ public class TransferCommand extends CommandAction {
         return false;
       }
       for (char c : args[0].toCharArray()) {
-        if (!Character.isDigit(c)) return false;
+        if (!Character.isDigit(c)) {
+          return false;
+        }
       }
       final Long sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
 

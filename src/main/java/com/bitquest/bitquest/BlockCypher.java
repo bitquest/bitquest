@@ -7,12 +7,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import javax.net.ssl.HttpsURLConnection;
-
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.json.simple.JSONObject;
 
 
 public class BlockCypher {
@@ -87,12 +85,12 @@ public class BlockCypher {
         }
         br.close();
         JSONParser parser = new JSONParser();
-        JSONObject response_object = (JSONObject) parser.parse(sb.toString());
-        return response_object;
+        JSONObject responseObject = (JSONObject) parser.parse(sb.toString());
+        return responseObject;
       case 429:
         throw new IOException("Rate Limit");
+      default:
+        throw new IOException("Internal Server Error");
     }
-
-    return null;
   }
 }

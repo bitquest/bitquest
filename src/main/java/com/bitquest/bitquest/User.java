@@ -7,18 +7,19 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.scoreboard.*;
 
 public class User {
   public Wallet wallet;
   private String clan;
   public UUID uuid;
 
-  public User(UUID _uuid)
+  public User(UUID u)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    this.uuid = _uuid;
-    if (BitQuest.REDIS.get("Wallet.address."+_uuid) != null) {
-   	this.wallet = new Wallet(BitQuest.REDIS.get("Wallet.private_key."+_uuid), BitQuest.REDIS.get("Wallet.public_key."+_uuid), BitQuest.REDIS.get("Wallet.address."+_uuid), BitQuest.REDIS.get("Wallet.WIF."+_uuid));
+    this.uuid = u;
+    if (BitQuest.REDIS.get("Wallet.address." + uuid) != null) {
+      this.wallet = new Wallet(BitQuest.REDIS.get("Wallet.private_key." + uuid),
+          BitQuest.REDIS.get("Wallet.public_key." + uuid),
+          BitQuest.REDIS.get("Wallet.address." + uuid), BitQuest.REDIS.get("Wallet.WIF." + uuid));
     } else {
       System.out.println("[user not found] " + this.uuid);
       this.wallet = BitQuest.generateNewWallet();
@@ -48,12 +49,12 @@ public class User {
     ItemStack[] items = inventory.getContents();
     int amount = 0;
     for (int i = 0; i < inventory.getSize(); i++) {
-      ItemStack TempStack = items[i];
-      if ((TempStack != null) && (TempStack.getType() != Material.AIR)) {
-        if (TempStack.getType().toString() == "EMERALD_BLOCK") {
-          amount += (TempStack.getAmount() * 9);
-        } else if (TempStack.getType().toString() == "EMERALD") {
-          amount += TempStack.getAmount();
+      ItemStack tempStack = items[i];
+      if ((tempStack != null) && (tempStack.getType() != Material.AIR)) {
+        if (tempStack.getType().toString() == "EMERALD_BLOCK") {
+          amount += (tempStack.getAmount() * 9);
+        } else if (tempStack.getType().toString() == "EMERALD") {
+          amount += tempStack.getAmount();
         }
       }
     }
@@ -61,60 +62,65 @@ public class User {
   }
 
   public boolean removeEmeralds(int amount, Player player) {
-    int EmCount = this.countEmeralds(player.getInventory());
-    int LessEmCount = countEmeralds(player.getInventory()) - amount;
-    double TempAmount = (double) amount;
-    int EmsBack = 0;
+    int emCount = this.countEmeralds(player.getInventory());
+    int lessEmCount = countEmeralds(player.getInventory()) - amount;
+    double tempAmount = (double) amount;
+    int emsBack = 0;
     ItemStack[] items = player.getInventory().getContents();
     if (countEmeralds(player.getInventory()) >= amount) {
-      while (TempAmount > 0) {
+      while (tempAmount > 0) {
         for (int i = 0; i < player.getInventory().getSize(); i++) {
-          ItemStack TempStack = items[i];
+          ItemStack tempStack = items[i];
 
-          if ((TempStack != null) && (TempStack.getType() != Material.AIR)) {
+          if ((tempStack != null) && (tempStack.getType() != Material.AIR)) {
 
-            if ((TempStack.getType().toString() == "EMERALD_BLOCK") && (TempAmount >= 9)) {
+            if ((tempStack.getType().toString() == "EMERALD_BLOCK") && (tempAmount >= 9)) {
               player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
-              TempAmount = TempAmount - 9;
+              tempAmount = tempAmount - 9;
             }
-            if ((TempStack.getType().toString() == "EMERALD_BLOCK") && (TempAmount < 9)) {
+            if ((tempStack.getType().toString() == "EMERALD_BLOCK") && (tempAmount < 9)) {
               player.getInventory().removeItem(new ItemStack(Material.EMERALD_BLOCK, 1));
-              EmsBack = (9 - (int) TempAmount); // if 8, ems back = 1
-              TempAmount = TempAmount - TempAmount;
-              if (EmsBack > 0) {
-                player.getInventory().addItem(new ItemStack(Material.EMERALD, EmsBack));
+              emsBack = (9 - (int) tempAmount); // if 8, ems back = 1
+              tempAmount = tempAmount - tempAmount;
+              if (emsBack > 0) {
+                player.getInventory().addItem(new ItemStack(Material.EMERALD, emsBack));
               }
             }
-            if ((TempStack.getType().toString() == "EMERALD") && (TempAmount >= 1)) {
+            if ((tempStack.getType().toString() == "EMERALD") && (tempAmount >= 1)) {
               player.getInventory().removeItem(new ItemStack(Material.EMERALD, 1));
-              TempAmount = TempAmount - 1;
+              tempAmount = tempAmount - 1;
             }
           } // end if != Material.AIR
         } // end for loop
       } // end while loop
     } // end (EmCount>=amount)
-    EmCount = countEmeralds(player.getInventory());
-    if ((EmCount == LessEmCount) || (TempAmount == 0)) return true;
+    emCount = countEmeralds(player.getInventory());
+    if ((emCount == lessEmCount) || (tempAmount == 0)) {
+      return true;
+    }
     return false;
   } // end of remove emeralds
+
   // start addemeralds to inventory
   public boolean addEmeralds(int amount, Player player) {
-    int EmCount = countEmeralds(player.getInventory());
+    int emCount = countEmeralds(player.getInventory());
     int moreEmCount = countEmeralds(player.getInventory()) + amount;
     double bits = (double) amount;
-    double TempAmount = (double) amount;
-    int EmsBack = 0;
-    while (TempAmount >= 0) {
-      if (TempAmount >= 9) {
-        TempAmount = TempAmount - 9;
+    double tempAmount = (double) amount;
+    int emsBack = 0;
+    while (tempAmount >= 0) {
+      if (tempAmount >= 9) {
+        tempAmount = tempAmount - 9;
         player.getInventory().addItem(new ItemStack(Material.EMERALD_BLOCK, 1));
       }
-      if (TempAmount < 9) {
-        TempAmount = TempAmount - 1;
+      if (tempAmount < 9) {
+        tempAmount = tempAmount - 1;
         player.getInventory().addItem(new ItemStack(Material.EMERALD, 1));
       }
-      EmCount = countEmeralds(player.getInventory());
-      if ((EmCount == moreEmCount)) return true;
+      emCount = countEmeralds(player.getInventory());
+      if ((emCount == moreEmCount)) {
+        return true;
+      }
     } // end while loop
     return false;
   }

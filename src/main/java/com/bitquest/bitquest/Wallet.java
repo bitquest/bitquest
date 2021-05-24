@@ -24,18 +24,18 @@ import org.json.simple.parser.ParseException;
 
 public class Wallet {
   public String address;
-  private String private_key;
-  private String public_key;
+  private String privateKey;
+  private String publicKey;
   private String wif;
 
-  public Wallet(String _private_key, String _public_key, String _address, String _wif) {
-    this.public_key = _public_key;
-    this.private_key = _private_key;
-    this.address = _address;
-    this.wif = _wif;
+  public Wallet(String privateKey, String publicKey, String address, String wif) {
+    this.publicKey = publicKey;
+    this.privateKey = privateKey;
+    this.address = address;
+    this.wif = wif;
   }
 
-  JSONObject txSkeleton(String _address, Long sat) throws IOException, ParseException {
+  JSONObject txSkeleton(String outputAddress, Long sat) throws IOException, ParseException {
     // inputs
     final JSONArray inputs = new JSONArray();
     final JSONArray input_addresses = new JSONArray();
@@ -48,7 +48,7 @@ public class Wallet {
     final JSONArray outputs = new JSONArray();
     final JSONArray output_addresses = new JSONArray();
     final JSONObject output = new JSONObject();
-    output_addresses.add(_address);
+    output_addresses.add(outputAddress);
     ;
     output.put("addresses", output_addresses);
     output.put("value", sat);
@@ -84,12 +84,12 @@ public class Wallet {
     return (JSONObject) parser.parse(response.toString());
   }
 
-  public boolean payment(String _address, Long sat) {
+  public boolean payment(String toAddress, Long sat) {
     System.out.println("[payment] " + this.address + " -> " + sat);
     if (sat > 1) {
       try {
         // create skeleton tx to be signed
-        JSONObject tx = this.txSkeleton(_address, sat);
+        JSONObject tx = this.txSkeleton(toAddress, sat);
         // obtain message (hash) to be signed with private key
         JSONArray tosign = (JSONArray) tx.get("tosign");
         JSONArray signatures = new JSONArray();
@@ -122,7 +122,7 @@ public class Wallet {
           String hex = DatatypeConverter.printHexBinary(res);
           signatures.add(hex);
           // add my public key
-          pubkeys.add(this.public_key);
+          pubkeys.add(this.publicKey);
         }
 
         tx.put("signatures", signatures);
@@ -157,7 +157,7 @@ public class Wallet {
         }
         in.close();
         JSONParser parser = new JSONParser();
-        JSONObject response_object = (JSONObject) parser.parse(response.toString());
+        JSONObject responseObject = (JSONObject) parser.parse(response.toString());
         System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
         return true;
       } catch (Exception e) {
@@ -171,7 +171,6 @@ public class Wallet {
   }
 
   public Long importAddress(String account) throws IOException, ParseException {
-    JSONParser parser = new JSONParser();
     final JSONObject jsonObject = new JSONObject();
     jsonObject.put("jsonrpc", "1.0");
     jsonObject.put("id", "bitquest");
@@ -215,8 +214,8 @@ public class Wallet {
       response.append(inputLine);
     }
     in.close();
-    JSONObject response_object = (JSONObject) parser.parse(response.toString());
-    System.out.println(response_object);
+    JSONParser parser = new JSONParser();
+    JSONObject responseObject = (JSONObject) parser.parse(response.toString());
     return Long.valueOf(0);
   }
 
@@ -242,7 +241,7 @@ public class Wallet {
     switch (status) {
       case 500:
         System.out.println(u.toString());
-
+        throw new IOException("Internal Server Error");
       case 200:
       case 201:
         BufferedReader br = new BufferedReader(new InputStreamReader(c.getInputStream()));
@@ -264,9 +263,10 @@ public class Wallet {
         // return (Long) response_object.get("final_balance");
       case 429:
         throw new IOException("Rate limit");
+      default:
+        throw new IOException("Internal Server Error");
     }
 
-    return Long.valueOf(0);
   }
 
   public String url() {
@@ -283,8 +283,8 @@ public class Wallet {
   }
 
   public boolean save(UUID uuid) {
-    BitQuest.REDIS.set("Wallet.private_key." + uuid.toString(), this.private_key);
-    BitQuest.REDIS.set("Wallet.public_key." + uuid.toString(), this.public_key);
+    BitQuest.REDIS.set("Wallet.privateKey." + uuid.toString(), this.privateKey);
+    BitQuest.REDIS.set("Wallet.publicKey." + uuid.toString(), this.publicKey);
     BitQuest.REDIS.set("Wallet.address." + uuid.toString(), this.address);
     BitQuest.REDIS.set("Wallet.WIF." + uuid.toString(), this.wif);
     return true;

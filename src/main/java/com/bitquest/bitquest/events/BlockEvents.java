@@ -2,7 +2,6 @@ package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
 import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -10,8 +9,14 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockBurnEvent;
+import org.bukkit.event.block.BlockIgniteEvent;
 import org.bukkit.event.block.BlockIgniteEvent.IgniteCause;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class BlockEvents implements Listener {
@@ -127,7 +132,8 @@ public class BlockEvents implements Listener {
       Chunk pistonChunk = piston.getChunk();
       Chunk blockChunk = nextBlock.getChunk();
 
-      String owner1, owner2;
+      String owner1;
+      String owner2;
       if ((owner2 = BitQuest.REDIS
           .get(tempchunk + "" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
         if ((owner1 = BitQuest.REDIS
@@ -152,13 +158,10 @@ public class BlockEvents implements Listener {
     String tempchunk = "";
     if (event.getBlock().getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
-    } 
-    // end world lmao @bitcoinjake09
-    else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
+    } else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
       tempchunk = "netherchunk";
-    } 
-    // end nether @bitcoinjake09
-
+    }
+    
     if (event.isSticky()) {
       Chunk pistonChunk = piston.getChunk();
       Chunk blockChunk = nextBlock.getChunk();

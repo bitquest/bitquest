@@ -18,9 +18,7 @@ public class ButcherCommand extends CommandAction {
       List<Entity> entities = w.getEntities();
       int killed = 0;
       for (Entity entity : entities) {
-        if (entity instanceof Player) {
-
-        } else if (entity.getLocation().getChunk().getX() == c.getX()
+        if (entity instanceof Player == false && entity.getLocation().getChunk().getX() == c.getX()
             && entity.getLocation().getChunk().getZ() == c.getZ()) {
           killed = killed + 1;
           entity.remove();

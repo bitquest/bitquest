@@ -4,7 +4,6 @@ import com.bitquest.bitquest.BitQuest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.HashMap;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,8 +23,7 @@ public class LandCommand extends CommandAction {
     String tempchunk = "";
     if (player.getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
-    } // end world lmao @bitcoinjake09
-    else if (player.getLocation().getWorld().getName().equals("world_nether")) {
+    } else if (player.getLocation().getWorld().getName().equals("world_nether")) {
       tempchunk = "netherchunk";
     } // end nether @bitcoinjake09
     if (args.length == 0) {
@@ -87,8 +85,8 @@ public class LandCommand extends CommandAction {
               + location.getChunk().getZ()
               + "permissions";
           if (bitQuest.REDIS.exists(permissionKey)) {
-            String permission_code = BitQuest.REDIS.get(permissionKey);
-            if (permission_code.equals("p")) {
+            String permissionCode = BitQuest.REDIS.get(permissionKey);
+            if (permissionCode.equals("p")) {
               player.sendMessage("Permission: public");
             }
           } else {
@@ -241,8 +239,8 @@ public class LandCommand extends CommandAction {
       } else {
         player.sendMessage(
             ChatColor.RED
-                +
-                "If you want buy claim a land, use /land claim landname. For permissions, use /land permission [public,private,clan]");
+                + "If you want buy claim a land, use /land claim landname."
+                + "For permissions, use /land permission [public,private,clan]");
       }
     }
     return false;

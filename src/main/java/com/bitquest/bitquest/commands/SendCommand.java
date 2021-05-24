@@ -20,7 +20,9 @@ public class SendCommand extends CommandAction {
     int maxSend = 10000; // to be multiplied by DENOMINATION_FACTOR
     if (args.length == 2) {
       for (char c : args[0].toCharArray()) {
-        if (!Character.isDigit(c)) { return false; }
+        if (!Character.isDigit(c)) { 
+          return false; 
+        }
       }
       if (args[0].length() > 8) {
         // maximum send is 8 digits
@@ -40,9 +42,9 @@ public class SendCommand extends CommandAction {
                 Long balance = user.wallet.getBalance(0);
 
                 if (balance >= sat) {
-                  User user_tip = new User(onlinePlayer.getUniqueId());
+                  User userTip = new User(onlinePlayer.getUniqueId());
                   // TODO: Pay to user address
-                  if (user.wallet.payment(user_tip.wallet.address, sat)) {
+                  if (user.wallet.payment(userTip.wallet.address, sat)) {
                     bitQuest.updateScoreboard(onlinePlayer);
                     bitQuest.updateScoreboard(player);
                     player.sendMessage(

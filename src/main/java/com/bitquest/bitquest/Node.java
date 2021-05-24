@@ -9,7 +9,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -22,11 +21,10 @@ public class Node {
   public String rpcPassword;
 
   /*
-      RPCCall
+      rpcCall
       Utility function for communicating with the node via RPC
   */
-  private JSONObject RPCCall(String method, JSONArray params) throws IOException, ParseException {
-    JSONParser parser = new JSONParser();
+  private JSONObject rpcCall(String method, JSONArray params) throws IOException, ParseException {
     final JSONObject jsonObject = new JSONObject();
     jsonObject.put("jsonrpc", "1.0");
     jsonObject.put("id", "bitquest");
@@ -65,23 +63,25 @@ public class Node {
     }
     in.close();
     System.out.println(responseJson.toString());
+    JSONParser parser = new JSONParser();
     JSONObject response = (JSONObject) parser.parse(responseJson.toString());
     return (JSONObject) response;
   }
 
-  private JSONObject RPCCall(String method) throws IOException, ParseException {
-    return RPCCall(method, new JSONArray());
+  private JSONObject rpcCall(String method) throws IOException, ParseException {
+    return rpcCall(method, new JSONArray());
   }
 
   /*
       blocks
-      Return the last block synced in the Node. If the number is the same as the last block mined on the network, it means the node is fully synced up.
+      Return the last block synced in the Node. 
+      If the number is the same as the last block mined on the network, 
+      it means the node is fully synced up.
   */
   public Long blocks() throws IOException, ParseException {
-    JSONObject response = RPCCall("getblockchaininfo");
-    JSONObject blockhain_info = (JSONObject) response.get("result");
-
-    Long blocks = (Long) blockhain_info.get("blocks");
+    JSONObject response = rpcCall("getblockchaininfo");
+    JSONObject blockchainInfo = (JSONObject) response.get("result");
+    Long blocks = (Long) blockchainInfo.get("blocks");
     return blocks;
   }
 
@@ -90,7 +90,7 @@ public class Node {
       Returns a list of all the wallets stored in the node
   */
   public JSONObject accounts() throws IOException, ParseException {
-    JSONObject response = RPCCall("listaccounts");
+    JSONObject response = rpcCall("listaccounts");
     return (JSONObject) response.get("result");
   }
 
@@ -101,7 +101,7 @@ public class Node {
   public JSONObject account(String address) throws IOException, ParseException {
     JSONArray params = new JSONArray();
     params.add(address);
-    JSONObject response = RPCCall("getaccount", params);
+    JSONObject response = rpcCall("getaccount", params);
     return (JSONObject) response.get("result");
   }
 
@@ -109,10 +109,10 @@ public class Node {
       address
       Returns the address of specified account
   */
-  public String address(String account_id) throws IOException, ParseException {
+  public String address(String accountId) throws IOException, ParseException {
     JSONArray params = new JSONArray();
-    params.add(account_id);
-    JSONObject response = RPCCall("getaccountaddress", params);
+    params.add(accountId);
+    JSONObject response = rpcCall("getaccountaddress", params);
     System.out.println(response);
     return (String) response.get("result");
   }
