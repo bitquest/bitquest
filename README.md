@@ -9,12 +9,12 @@ This project is an experiment and not a commercial product, bugs can, and most l
 
 # Features
 ## Bitcoin Wallet
-The [BitQuest](https://bitquest.co/) server and every player has a bitcoin address. Any player can receive and send bitcoin to any address inside or outside the game. This is useful for buying materials, selling crafts, trading, tipping, etcetera.
+The [BitQuest](https://bitquest.co/) server and every player has a bitcoin address. Any player can receive and send bitcoin to any address inside or outside the game. This is useful for buying materials, selling crafts, trading, tipping, etc.
 ![A player just joined the server](http://i.imgur.com/1A6wkaB.png)
-![The playercan see it's bitcoin balance](http://i.imgur.com/5g5pBXB.png)
+![The player can see it's bitcoin balance](http://i.imgur.com/5g5pBXB.png)
 
 ## Loot
-Every time a player kills an enemy (mob) there is a chance to get loot. If that is the case the server makes a transaction directly from the server address to the player address and the player is notified.
+Every time a player kills an enemy (mob) there is a chance to get loot. If that is the case the server makes a transaction directly from the server address to the player address.
 ![A player got loot](http://i.imgur.com/cxqXmt2.png)
 
 ## Player to player transactions
@@ -61,7 +61,7 @@ make -B jar
 
 This will create a BitQuest.jar in the target folder.
 
-# Contibuting
+# Contributing
 Before submitting a pull request, please format the code using checkstyle. To run checkstyle and check if there are warnings:
 
 ````
@@ -74,7 +74,7 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 
 ## Configuration
 
-Configuration can be done via enviroment variables:
+Configuration can be done via environment variables:
 
 | Environment variable       | Description                         |
 |----------------------------|-------------------------------------|

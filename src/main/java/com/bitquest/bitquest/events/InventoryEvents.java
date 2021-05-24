@@ -1,31 +1,34 @@
 package com.bitquest.bitquest.events;
 
-import com.bitquest.bitquest.*;
+import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.Trade;
 import java.util.ArrayList;
-import org.bukkit.*;
+import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryInteractEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+/**
+ * InventoryEvents
+ * Catches events in the user's inventories, chests and merchants.
+ */
 public class InventoryEvents implements Listener {
   BitQuest bitQuest;
   ArrayList<Trade> trades;
 
+  /**
+   * By default, prices are in bits (not satoshi).
+   */
   public InventoryEvents(BitQuest plugin) {
-    // Villager Prices
-    // By default, prices are in bits (not satoshi)
     bitQuest = plugin;
-    trades = new ArrayList<Trade>();
+    trades = new ArrayList<>();
     trades.add(new Trade(new ItemStack(Material.CLAY_BALL, 64), 100));
     trades.add(new Trade(new ItemStack(Material.COOKED_BEEF, 64), 100));
     trades.add(new Trade(new ItemStack(Material.FENCE, 64), 100));
@@ -111,47 +114,49 @@ public class InventoryEvents implements Listener {
           for (ItemStack item : player.getInventory().getContents()) {
             if (item == null
                 || (item.getType() == clicked.getType()
-                    && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
+                && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
               hasOpenSlots = true;
               break;
             }
           }
           final boolean hasOpenSlotsFinal = hasOpenSlots;
           final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
-            try {
-                if (hasOpenSlotsFinal) {
-                  if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
-                    if (clicked.getType() == Material.ENCHANTED_BOOK) { bitQuest.books.remove(0); }
-
-                  ItemStack item = event.getCurrentItem();
-                  ItemMeta meta = item.getItemMeta();
-                  ArrayList<String> Lore = new ArrayList<String>();
-                  meta.setLore(null);
-                  item.setItemMeta(meta);
-                    player.getInventory().addItem(item);
-                    player.sendMessage(
-                        ChatColor.GREEN
-                            + "You bought "
-                            + clicked.getType()
-                            + " for "
-                            + ChatColor.LIGHT_PURPLE
-                            + satFinal / 100
-                            + " (+ miner fees)");
-                    bitQuest.updateScoreboard(player);
-                  } else {
-                    player.sendMessage(
-                        ChatColor.RED
-                            + "Transaction failed. Please try again in a few moments");
-                  }
-                } else {
-                  player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
+          try {
+            if (hasOpenSlotsFinal) {
+              if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
+                if (clicked.getType() == Material.ENCHANTED_BOOK) {
+                  bitQuest.books.remove(0);
                 }
 
-            } catch (Exception e) {
+                ItemStack item = event.getCurrentItem();
+                ItemMeta meta = item.getItemMeta();
+                ArrayList<String> lore = new ArrayList<String>();
+                meta.setLore(null);
+                item.setItemMeta(meta);
+                player.getInventory().addItem(item);
+                player.sendMessage(
+                    ChatColor.GREEN
+                        + "You bought "
+                        + clicked.getType()
+                        + " for "
+                        + ChatColor.LIGHT_PURPLE
+                        + satFinal / 100
+                        + " (+ miner fees)");
+                bitQuest.updateScoreboard(player);
+              } else {
+                player.sendMessage(
+                    ChatColor.RED
+                        + "Transaction failed. Please try again in a few moments");
+              }
+            } else {
+              player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
+            }
+
+          } catch (Exception e) {
             e.printStackTrace();
             player.sendMessage(
                 ChatColor.DARK_RED
-                + "Problem reading your wallet balance. Please try again later.");
+                    + "Problem reading your wallet balance. Please try again later.");
             player.closeInventory();
             event.setCancelled(true);
           }
@@ -179,7 +184,7 @@ public class InventoryEvents implements Listener {
           ArrayList<String> lore = new ArrayList<String>();
           int bitsPrice;
           bitsPrice = (int) (trades.get(i).price
-            + (BitQuest.MINER_FEE / BitQuest.DENOMINATION_FACTOR));
+              + (BitQuest.MINER_FEE / BitQuest.DENOMINATION_FACTOR));
           lore.add("Price: " + bitsPrice);
           meta.setLore(lore);
           button.setItemMeta(meta);
@@ -217,16 +222,16 @@ public class InventoryEvents implements Listener {
    *
    * @param event picked up item
    */
-  
+
   @EventHandler
-  public void OnPlayerPickup(final PlayerPickupItemEvent event) {
+  public void onPlayerPickup(final PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
     ItemStack item = event.getItem().getItemStack();
     Material itemType = item.getType();
     if (((itemType == Material.EMERALD_BLOCK) || (itemType == Material.EMERALD))
         && (BitQuest.REDIS
-            .get("currency" + player.getUniqueId().toString())
-            .equalsIgnoreCase("emerald"))) {
+        .get("currency" + player.getUniqueId().toString())
+        .equalsIgnoreCase("emerald"))) {
       try {
         bitQuest.updateScoreboard(player);
       } catch (Exception e) {

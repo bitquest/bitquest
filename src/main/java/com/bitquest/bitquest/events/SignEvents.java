@@ -10,6 +10,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
+/**
+ * SignEvents
+ * Catches sign name changes used for users to claim land.
+ */
 public class SignEvents implements Listener {
   BitQuest bitQuest;
 
@@ -17,6 +21,10 @@ public class SignEvents implements Listener {
     bitQuest = plugin;
   }
 
+  /**
+   * onSignChange
+   * Fired when a user types on a new sign or changes the content of a sign 
+   */
   @EventHandler
   public void onSignChange(SignChangeEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
