@@ -30,6 +30,8 @@ jobs:
           java-version: '16'
       - name: Install checkstyle
         run: sudo apt-get install -y checkstyle
+      - name: Print Checkstyle Version
+        run: checkstyle --version
       - name: Lint
         run: checkstyle -c checkstyle.xml .
       - name: Test
