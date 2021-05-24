@@ -85,8 +85,8 @@ public class Wallet {
   }
 
   public boolean payment(String _address, Long sat) {
-    System.out.println("[payment] "+this.address+" -> "+sat);
-    if(sat>1) {
+    System.out.println("[payment] " + this.address + " -> " + sat);
+    if (sat > 1) {
       try {
         // create skeleton tx to be signed
         JSONObject tx = this.txSkeleton(_address, sat);
@@ -96,7 +96,7 @@ public class Wallet {
         JSONArray pubkeys = new JSONArray();
 
         // sign every output
-        for(int i=0;i<tosign.size();i++) {
+        for (int i = 0; i < tosign.size(); i++) {
           String msg = tosign.get(i).toString();
           // TODO: Create raw transaction with in full node
           // creating a key object from WiF
@@ -131,13 +131,14 @@ public class Wallet {
         URL url;
         if (System.getenv("BLOCKCYPHER_TOKEN") != null) {
           url =
-                  new URL(
-                          "https://api.blockcypher.com/v1/"
-                                  + BitQuest.BLOCKCYPHER_CHAIN
-                                  + "/txs/send?token="
-                                  + System.getenv("BLOCKCYPHER_TOKEN"));
+              new URL(
+                  "https://api.blockcypher.com/v1/"
+                      + BitQuest.BLOCKCYPHER_CHAIN
+                      + "/txs/send?token="
+                      + System.getenv("BLOCKCYPHER_TOKEN"));
         } else {
-          url = new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
+          url =
+              new URL("https://api.blockcypher.com/v1/" + BitQuest.BLOCKCYPHER_CHAIN + "/txs/send");
         }
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -178,24 +179,24 @@ public class Wallet {
     JSONArray params = new JSONArray();
     params.add(this.address);
     params.add(account);
-    System.out.println("[importaddress] " + this.address+ " "+ account);
+    System.out.println("[importaddress] " + this.address + " " + account);
     jsonObject.put("params", params);
     URL url =
-            new URL(
-                    "http://"
-                            + System.getenv("BITCOIND_PORT_8332_TCP_ADDR")
-                            + ":"
-                            + System.getenv("BITCOIND_PORT_8332_TCP_PORT"));
+        new URL(
+            "http://"
+                + System.getenv("BITCOIND_PORT_8332_TCP_ADDR")
+                + ":"
+                + System.getenv("BITCOIND_PORT_8332_TCP_PORT"));
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setConnectTimeout(5000);
     String userPassword =
-            System.getenv("BITCOIND_ENV_USERNAME") + ":" + System.getenv("BITCOIND_ENV_PASSWORD");
+        System.getenv("BITCOIND_ENV_USERNAME") + ":" + System.getenv("BITCOIND_ENV_PASSWORD");
     String encoding = Base64.getEncoder().encodeToString(userPassword.getBytes());
     con.setRequestProperty("Authorization", "Basic " + encoding);
 
     con.setRequestMethod("POST");
     con.setRequestProperty(
-            "User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
+        "User-Agent", "Mozilla/1.22 (compatible; MSIE 2.0; Windows 3.1)");
     con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
     con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
     con.setDoOutput(true);
@@ -206,7 +207,7 @@ public class Wallet {
     int responseCode = con.getResponseCode();
 
     BufferedReader in =
-            new BufferedReader(new InputStreamReader(con.getInputStream()));
+        new BufferedReader(new InputStreamReader(con.getInputStream()));
     String inputLine;
     StringBuffer response = new StringBuffer();
 
@@ -216,13 +217,20 @@ public class Wallet {
     in.close();
     JSONObject response_object = (JSONObject) parser.parse(response.toString());
     System.out.println(response_object);
-    return  Long.valueOf(0);
+    return Long.valueOf(0);
   }
+
   public Long getBalance(int confirmations) throws IOException, ParseException {
     HttpsURLConnection c = null;
-    URL u=new URL("https://blockchain.info/q/addressbalance/" + this.address);
-    if(BitQuest.BLOCKCYPHER_CHAIN.equals("btc/test3")) u = new URL("https://testnet.blockchain.info/q/addressbalance/" + this.address+"?confirmations="+confirmations);
-    if(BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) u = new URL("https://dogechain.info/chain/Dogecoin/q/addressbalance/" + this.address);
+    URL u = new URL("https://blockchain.info/q/addressbalance/" + this.address);
+    if (BitQuest.BLOCKCYPHER_CHAIN.equals("btc/test3")) {
+      u = new URL(
+          "https://testnet.blockchain.info/q/addressbalance/" + this.address + "?confirmations=" +
+              confirmations);
+    }
+    if (BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) {
+      u = new URL("https://dogechain.info/chain/Dogecoin/q/addressbalance/" + this.address);
+    }
     c = (HttpsURLConnection) u.openConnection();
     c.setRequestMethod("GET");
     c.setRequestProperty("Content-length", "0");
@@ -230,7 +238,7 @@ public class Wallet {
     c.setAllowUserInteraction(false);
     c.connect();
     int status = c.getResponseCode();
-    System.out.println("[balance] status:"+status);
+    System.out.println("[balance] status:" + status);
     switch (status) {
       case 500:
         System.out.println(u.toString());
@@ -244,9 +252,9 @@ public class Wallet {
           sb.append(line + "\n");
         }
         br.close();
-        System.out.println("[balance] "+this.address+": "+sb.toString().trim());
-        if(BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) {
-          return Math.round(Double.parseDouble(sb.toString().trim())*100000000L);
+        System.out.println("[balance] " + this.address + ": " + sb.toString().trim());
+        if (BitQuest.BLOCKCYPHER_CHAIN.equals("doge/main")) {
+          return Math.round(Double.parseDouble(sb.toString().trim()) * 100000000L);
         } else {
           return Math.round(Double.parseDouble(sb.toString().trim()));
         }
@@ -275,10 +283,10 @@ public class Wallet {
   }
 
   public boolean save(UUID uuid) {
-	BitQuest.REDIS.set("Wallet.private_key."+uuid.toString(), this.private_key);
-	BitQuest.REDIS.set("Wallet.public_key."+uuid.toString(), this.public_key);
-	BitQuest.REDIS.set("Wallet.address."+uuid.toString(), this.address);
- 	BitQuest.REDIS.set("Wallet.WIF."+uuid.toString(), this.wif);
+    BitQuest.REDIS.set("Wallet.private_key." + uuid.toString(), this.private_key);
+    BitQuest.REDIS.set("Wallet.public_key." + uuid.toString(), this.public_key);
+    BitQuest.REDIS.set("Wallet.address." + uuid.toString(), this.address);
+    BitQuest.REDIS.set("Wallet.WIF." + uuid.toString(), this.wif);
     return true;
   }
 }

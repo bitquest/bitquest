@@ -20,14 +20,44 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Animals;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.Creeper;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Ghast;
+import org.bukkit.entity.Giant;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Skeleton;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Monster;
+import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.Wither;
+import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.enchantment.EnchantItemEvent;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerArmorStandManipulateEvent;
+import org.bukkit.event.player.PlayerBucketEmptyEvent;
+import org.bukkit.event.player.PlayerBucketFillEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
@@ -209,7 +239,7 @@ public class EntityEvents implements Listener {
               + (int)
               (bitQuest.wallet.getBalance(1) / bitQuest.DENOMINATION_FACTOR)
               + " "
-              + bitQuest.DENOMINATION_NAME);
+              + BitQuest.DENOMINATION_NAME);
     } catch (Exception e) {
       e.printStackTrace();
     }
@@ -351,16 +381,16 @@ public class EntityEvents implements Listener {
 
     final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
 
-    if (entity instanceof Monster &&
-        e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+    if (entity instanceof Monster
+        && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       final EntityDamageByEntityEvent damage =
           (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
       Player player = null;
       if (damage.getDamager() instanceof Player) {
         player = (Player) damage.getDamager();
       }
-      if (damage.getDamager() instanceof Arrow &&
-          ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
+      if (damage.getDamager() instanceof Arrow
+        && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
         player = (Player) ((Arrow) damage.getDamager()).getShooter();
       }
       if (player != null) {
@@ -431,12 +461,12 @@ public class EntityEvents implements Listener {
       minlevel = 50;
       maxlevel = 100;
     }
-    int spawn_distance =
+    int spawnDistance =
         (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
 
     EntityType entityType = entity.getType();
     // max level is 128
-    int level = Math.min(maxlevel, BitQuest.rand(minlevel, minlevel + (spawn_distance / 1000)));
+    int level = Math.min(maxlevel, BitQuest.rand(minlevel, minlevel + (spawnDistance / 1000)));
 
     if (entity instanceof Giant) {
       entity.setMaxHealth(2858519);
@@ -445,7 +475,7 @@ public class EntityEvents implements Listener {
       bitQuest.createBossFight(e.getEntity().getLocation());
 
       // Disable mob spawners. Keep mob farmers away
-      if (e.getSpawnReason() == SpawnReason.SPAWNER || spawn_distance < 64) {
+      if (e.getSpawnReason() == SpawnReason.SPAWNER || spawnDistance < 64) {
         e.setCancelled(true);
       } else {
         try {
@@ -556,7 +586,7 @@ public class EntityEvents implements Listener {
               + " lvl "
               + level
               + " spawn distance: "
-              + spawn_distance
+              + spawnDistance
               + " maxhealth: "
               + entity.getMaxHealth());
 
@@ -573,8 +603,8 @@ public class EntityEvents implements Listener {
     if (event instanceof EntityDamageByEntityEvent) {
       EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
       Entity damager = damageEvent.getDamager();
-      if (damager instanceof Player ||
-          (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+      if (damager instanceof Player
+          || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
         // player damage
         Player player;
 
@@ -671,23 +701,23 @@ public class EntityEvents implements Listener {
     }
 
     // Gives random HELMET
-    Material helmet_material = null;
+    Material helmetMaterial = null;
 
     if (BitQuest.rand(0, 32) < level) {
-      helmet_material = Material.LEATHER_HELMET;
+      helmetMaterial = Material.LEATHER_HELMET;
     }
 
     if (BitQuest.rand(0, 64) < level) {
-      helmet_material = Material.CHAINMAIL_HELMET;
+      helmetMaterial = Material.CHAINMAIL_HELMET;
     }
     if (BitQuest.rand(0, 128) < level) {
-      helmet_material = Material.IRON_HELMET;
+      helmetMaterial = Material.IRON_HELMET;
     }
     if (BitQuest.rand(0, 256) < level) {
-      helmet_material = Material.DIAMOND_HELMET;
+      helmetMaterial = Material.DIAMOND_HELMET;
     }
-    if (helmet_material != null) {
-      ItemStack helmet = new ItemStack(helmet_material);
+    if (helmetMaterial != null) {
+      ItemStack helmet = new ItemStack(helmetMaterial);
 
       randomEnchantItem(helmet, level);
 

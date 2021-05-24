@@ -113,10 +113,10 @@ public class BlockEvents implements Listener {
     String tempchunk = "";
     if (event.getBlock().getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
-    } // end world lmao @bitcoinjake09
+    }
     else if (event.getBlock().getLocation().getWorld().getName().equals("world_nether")) {
       tempchunk = "netherchunk";
-    } // end nether @bitcoinjake09
+    }
 
     if (!blocks.isEmpty()) {
       Block lastBlock = blocks.get(blocks.size() - 1);

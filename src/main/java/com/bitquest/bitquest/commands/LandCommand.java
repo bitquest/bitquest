@@ -81,13 +81,13 @@ public class LandCommand extends CommandAction {
         if (bitQuest.landIsClaimed(location)) {
           String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
           player.sendMessage(landname);
-          String permission_key = "chunk"
+          String permissionKey = "chunk"
               + location.getChunk().getX()
               + ","
               + location.getChunk().getZ()
               + "permissions";
-          if (bitQuest.REDIS.exists(permission_key)) {
-            String permission_code = BitQuest.REDIS.get(permission_key);
+          if (bitQuest.REDIS.exists(permissionKey)) {
+            String permission_code = BitQuest.REDIS.get(permissionKey);
             if (permission_code.equals("p")) {
               player.sendMessage("Permission: public");
             }
