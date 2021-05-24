@@ -56,16 +56,15 @@ public class BitQuest extends JavaPlugin {
       System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
   public static final String BLOCKCYPHER_CHAIN =
       System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
-  public static final String NODE_RPC_USERNAME = System.getenv("BITQUEST_NODE_RPC_USER"); 
+  public static final String NODE_RPC_USERNAME = System.getenv("BITQUEST_NODE_RPC_USER");
   public static final String NODE_RPC_PASSWORD = System.getenv("BITQUEST_NODE_RPC_PASSWORD");
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
   public static final Long MINER_FEE =
-          System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE")) : 10000;
+      System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE")) : 10000;
 
   public static final int MAX_STOCK = 100;
-
 
 
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
@@ -107,7 +106,7 @@ public class BitQuest extends JavaPlugin {
   public ArrayList<ItemStack> books = new ArrayList<ItemStack>();
   // when true, server is closed for maintenance and not allowing players to join in.
   public boolean maintenance_mode = false;
-  boolean boss_already_spawned=false;
+  boolean boss_already_spawned = false;
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
@@ -171,19 +170,20 @@ public class BitQuest extends JavaPlugin {
           && System.getenv("ADDRESS") != null
           && System.getenv("WIF") != null) {
         wallet =
-                new Wallet(
-                        System.getenv("PRIVATE"),
-                        System.getenv("PUBLIC"),
-                        System.getenv("ADDRESS"),
-                        System.getenv("WIF"));
+            new Wallet(
+                System.getenv("PRIVATE"),
+                System.getenv("PUBLIC"),
+                System.getenv("ADDRESS"),
+                System.getenv("WIF"));
         System.out.println("[world wallet] imported from environment");
-      } else if (REDIS.exists("private")&&REDIS.exists("public")&&REDIS.exists("address")&&REDIS.exists("wif")){
+      } else if (REDIS.exists("private") && REDIS.exists("public") && REDIS.exists("address") &&
+          REDIS.exists("wif")) {
         wallet =
-                new Wallet(
-                        REDIS.get("private"),
-                        REDIS.get("public"),
-                        REDIS.get("address"),
-                        REDIS.get("wif"));
+            new Wallet(
+                REDIS.get("private"),
+                REDIS.get("public"),
+                REDIS.get("address"),
+                REDIS.get("wif"));
       } else {
         wallet = this.generateNewWallet();
         System.out.println("[world wallet] generated new wallet");
@@ -237,15 +237,16 @@ public class BitQuest extends JavaPlugin {
       Bukkit.shutdown();
     }
   }
+
   public void updateLootPoolCache() {
     System.out.println("[loot_cache]");
-    boss_already_spawned=false;
+    boss_already_spawned = false;
     try {
-      Long balance=wallet.getBalance(0);
-      System.out.println("[loot_cache] "+balance);
+      Long balance = wallet.getBalance(0);
+      System.out.println("[loot_cache] " + balance);
 
-      if(balance>(LAND_PRICE+MINER_FEE)*2) {
-        REDIS.set("loot_cache",balance.toString());
+      if (balance > (LAND_PRICE + MINER_FEE) * 2) {
+        REDIS.set("loot_cache", balance.toString());
       }
     } catch (IOException e) {
       e.printStackTrace();
@@ -259,29 +260,38 @@ public class BitQuest extends JavaPlugin {
     }
 
   }
+
   static Long witherReward() {
     return (LAND_PRICE);
   }
+
   public void createBossFight(Location location) {
     try {
-      if(REDIS.exists("loot_cache")&&Double.parseDouble(REDIS.get("loot_cache"))>400*DENOMINATION_FACTOR) {
+      if (REDIS.exists("loot_cache") &&
+          Double.parseDouble(REDIS.get("loot_cache")) > 400 * DENOMINATION_FACTOR) {
         List<Entity> entities = location.getWorld().getEntities();
 
         for (Entity en : entities) {
           if ((en instanceof Wither)) {
-            boss_already_spawned=true;
+            boss_already_spawned = true;
           }
         }
 
-        if(boss_already_spawned==false&&location.getY()>64) {
-          System.out.println("[boss fight] spawn in "+location.getX()+","+location.getY()+","+location.getZ());
-          boss_already_spawned=true;
-          location.getWorld().spawnEntity(location,EntityType.WITHER);
+        if (boss_already_spawned == false && location.getY() > 64) {
+          System.out.println(
+              "[boss fight] spawn in " + location.getX() + "," + location.getY() + "," +
+                  location.getZ());
+          boss_already_spawned = true;
+          location.getWorld().spawnEntity(location, EntityType.WITHER);
 
           for (Player player : Bukkit.getOnlinePlayers()) {
-            if(player.getWorld().getName().equals(player.getWorld().getName())) {
-              player.sendMessage("A boss has spawned! Distance: "+location.distance(player.getLocation()));
-              sendDiscordMessage("A Wither has spawned in "+location.getX()+","+location.getY()+","+location.getZ()+" rewards: "+Math.round(witherReward()/DENOMINATION_FACTOR)+" "+DENOMINATION_NAME);
+            if (player.getWorld().getName().equals(player.getWorld().getName())) {
+              player.sendMessage(
+                  "A boss has spawned! Distance: " + location.distance(player.getLocation()));
+              sendDiscordMessage(
+                  "A Wither has spawned in " + location.getX() + "," + location.getY() + "," +
+                      location.getZ() + " rewards: " +
+                      Math.round(witherReward() / DENOMINATION_FACTOR) + " " + DENOMINATION_NAME);
             }
           }
 
@@ -293,7 +303,6 @@ public class BitQuest extends JavaPlugin {
     }
 
   }
-
 
 
   public static final Wallet generateNewWallet()
@@ -322,10 +331,10 @@ public class BitQuest extends JavaPlugin {
     in.close();
     JSONObject response_object = (JSONObject) parser.parse(response.toString());
     System.out.println("Created wallet: " + response_object.get("address").toString());
-    REDIS.set("private",response_object.get("private").toString());
-    REDIS.set("public",response_object.get("public").toString());
-    REDIS.set("address",response_object.get("address").toString());
-    REDIS.set("wif",response_object.get("wif").toString());
+    REDIS.set("private", response_object.get("private").toString());
+    REDIS.set("public", response_object.get("public").toString());
+    REDIS.set("address", response_object.get("address").toString());
+    REDIS.set("wif", response_object.get("wif").toString());
 
     return new Wallet(
         response_object.get("private").toString(),
@@ -333,6 +342,7 @@ public class BitQuest extends JavaPlugin {
         response_object.get("address").toString(),
         response_object.get("wif").toString());
   }
+
   // @todo: make this just accept the endpoint name and (optional) parameters
   public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
     JSONParser parser = new JSONParser();
@@ -403,7 +413,7 @@ public class BitQuest extends JavaPlugin {
       walletScoreboardObjective.setDisplayName(
           ChatColor.GOLD
               + ChatColor.BOLD.toString()
-              + BitQuest.SERVER_NAME );
+              + BitQuest.SERVER_NAME);
 
       if (BitQuest.BLOCKCYPHER_CHAIN != null) {
         Score score =
@@ -571,7 +581,6 @@ public class BitQuest extends JavaPlugin {
         7200L);
 
 
-
     scheduler.scheduleSyncRepeatingTask(
         this,
         new Runnable() {
@@ -653,6 +662,7 @@ public class BitQuest extends JavaPlugin {
     }
     System.out.println("Killed " + entitiesremoved + " entities");
   }
+
   public int killAllVillagersInWorld(World w) {
     List<Entity> entities = w.getEntities();
     int villagerskilled = 0;
@@ -673,11 +683,12 @@ public class BitQuest extends JavaPlugin {
     return villagerskilled;
 
   }
+
   public void killAllVillagers() {
-    int villagerskilled=0;
-    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world"));
-    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
-    villagerskilled+=killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
+    int villagerskilled = 0;
+    villagerskilled += killAllVillagersInWorld(Bukkit.getWorld("world"));
+    villagerskilled += killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
+    villagerskilled += killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
 
     System.out.println("Killed " + villagerskilled + " villagers");
   }
@@ -723,7 +734,9 @@ public class BitQuest extends JavaPlugin {
     // base health=6
     // level health max=
     int health = 8 + (player.getLevel() / 2);
-    if (health > 40) health = 40;
+    if (health > 40) {
+      health = 40;
+    }
     // player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE,
     // player.getLevel(), true));
     player.setMaxHealth(health);
@@ -753,14 +766,17 @@ public class BitQuest extends JavaPlugin {
             + "!");
     updateScoreboard(player);
   }
+
   public boolean validName(final String name) {
     boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
-    if(name.isEmpty()||name.length() > 28||hasNonAlpha||name.equalsIgnoreCase("the wilderness")) {
+    if (name.isEmpty() || name.length() > 28 || hasNonAlpha ||
+        name.equalsIgnoreCase("the wilderness")) {
       return false;
     } else {
       return true;
     }
   }
+
   public void claimLand(final String name, Chunk chunk, final Player player)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     String tempchunk = "";
@@ -785,65 +801,65 @@ public class BitQuest extends JavaPlugin {
             + name);
     if (REDIS.exists(tempchunk + "" + x + "," + z + "owner") == false) {
 
-      if(validName(name)) {
+      if (validName(name)) {
 
 
-            if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
-              try {
+        if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
+          try {
 
-                final User user = new User(player.getUniqueId());
-                player.sendMessage(ChatColor.YELLOW + "Claiming land...");
-                BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-                final BitQuest bitQuest = this;
-                if (BitQuest.BLOCKCYPHER_CHAIN != null) {
+            final User user = new User(player.getUniqueId());
+            player.sendMessage(ChatColor.YELLOW + "Claiming land...");
+            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+            final BitQuest bitQuest = this;
+            if (BitQuest.BLOCKCYPHER_CHAIN != null) {
 
-                  if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
-                    saveLandData(player, name, x, z);
-                  } else {
+              if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
+                saveLandData(player, name, x, z);
+              } else {
 
-                    player.sendMessage(
-                        ChatColor.RED + "Claim payment failed. Please try again later.");
-                  }
-                } else {
-                  int landxprice = 1;
-                  if (player.getLocation().getWorld().getName().equals("world_nether")) {
-                    landxprice = 4;
-                  }
-                  int land_price_in_emeralds =
-                      (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
-                  if (user.countEmeralds(player.getInventory()) > land_price_in_emeralds) {
-                    if (user.removeEmeralds(land_price_in_emeralds, player)) {
-                      saveLandData(player, name, x, z);
-                    } else {
-                      player.sendMessage(ChatColor.RED + "There was an error.");
-                    }
-
-                  } else {
-                    player.sendMessage(
-                        ChatColor.RED
-                            + "You have "
-                            + user.countEmeralds(player.getInventory())
-                            + ". To buy land you need "
-                            + land_price_in_emeralds);
-                  }
-                }
-              } catch (Exception e) {
-                e.printStackTrace();
+                player.sendMessage(
+                    ChatColor.RED + "Claim payment failed. Please try again later.");
               }
-
-            } else if (BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
-              player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
             } else {
-              // Rename land
-              BitQuest.REDIS.set(tempchunk + "" + x + "," + z + "name", name);
-              player.sendMessage(
-                  ChatColor.GREEN
-                      + "You renamed this land to "
-                      + ChatColor.DARK_GREEN
-                      + name
-                      + ChatColor.GREEN
-                      + ".");
+              int landxprice = 1;
+              if (player.getLocation().getWorld().getName().equals("world_nether")) {
+                landxprice = 4;
+              }
+              int land_price_in_emeralds =
+                  (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
+              if (user.countEmeralds(player.getInventory()) > land_price_in_emeralds) {
+                if (user.removeEmeralds(land_price_in_emeralds, player)) {
+                  saveLandData(player, name, x, z);
+                } else {
+                  player.sendMessage(ChatColor.RED + "There was an error.");
+                }
+
+              } else {
+                player.sendMessage(
+                    ChatColor.RED
+                        + "You have "
+                        + user.countEmeralds(player.getInventory())
+                        + ". To buy land you need "
+                        + land_price_in_emeralds);
+              }
             }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+
+        } else if (BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
+          player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
+        } else {
+          // Rename land
+          BitQuest.REDIS.set(tempchunk + "" + x + "," + z + "name", name);
+          player.sendMessage(
+              ChatColor.GREEN
+                  + "You renamed this land to "
+                  + ChatColor.DARK_GREEN
+                  + name
+                  + ChatColor.GREEN
+                  + ".");
+        }
 
       } else {
         player.sendMessage(ChatColor.DARK_RED + "Invalid name.");
@@ -898,10 +914,10 @@ public class BitQuest extends JavaPlugin {
       } else if (landPermissionCode(location).equals("c")) {
         String owner_uuid =
             REDIS.get("chunk"
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "owner");
+                + location.getChunk().getX()
+                + ","
+                + location.getChunk().getZ()
+                + "owner");
         String owner_clan = REDIS.get("clan:" + owner_uuid);
         String player_clan = REDIS.get("clan:" + player.getUniqueId().toString());
         if (owner_clan.equals(player_clan)) {
@@ -987,7 +1003,9 @@ public class BitQuest extends JavaPlugin {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED + "Error reading wallet. Please try again later.");
     }
-  };
+  }
+
+  ;
 
   public boolean landIsClaimed(Location location) {
     String chunk = "";
@@ -1044,6 +1062,7 @@ public class BitQuest extends JavaPlugin {
 
     return false; // not pvp
   }
+
   public String urlenEncode(String en) throws UnsupportedEncodingException {
     return URLEncoder.encode(en, "UTF-8");
   }
@@ -1051,62 +1070,64 @@ public class BitQuest extends JavaPlugin {
   public String urlenDecode(String en) throws UnsupportedEncodingException {
     return URLDecoder.decode(en, "UTF-8");
   }
+
   public boolean sendDiscordMessage(String content) {
-    if(System.getenv("DISCORD_HOOK_URL")!=null) {
-      System.out.println("[discord] "+content);
+    if (System.getenv("DISCORD_HOOK_URL") != null) {
+      System.out.println("[discord] " + content);
       try {
-          String json = "{\"content\":\""+content+"\"}";
+        String json = "{\"content\":\"" + content + "\"}";
 
-          JSONParser parser = new JSONParser();
+        JSONParser parser = new JSONParser();
 
-          final JSONObject jsonObject = new JSONObject();
-          jsonObject.put("content", content);
-          CookieHandler.setDefault(new CookieManager());
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("content", content);
+        CookieHandler.setDefault(new CookieManager());
 
-          URL url = new URL(System.getenv("DISCORD_HOOK_URL"));
-          HttpsURLConnection con = null;
+        URL url = new URL(System.getenv("DISCORD_HOOK_URL"));
+        HttpsURLConnection con = null;
 
-          System.setProperty("http.agent", "");
+        System.setProperty("http.agent", "");
 
-          con = (HttpsURLConnection) url.openConnection();
+        con = (HttpsURLConnection) url.openConnection();
 
-          con.setRequestMethod("POST");
-          con.setRequestProperty("Content-Type", "application/json");
-          con.setRequestProperty("Cookie", "bitquest=true");
-          con.setRequestProperty("User-Agent", "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setRequestProperty("Cookie", "bitquest=true");
+        con.setRequestProperty("User-Agent",
+            "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
-          con.setDoOutput(true);
-          OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-          out.write(json);
-          out.close();
-          int responseCode = con.getResponseCode();
-          if(responseCode==200) {
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
+        con.setDoOutput(true);
+        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
+        out.write(json);
+        out.close();
+        int responseCode = con.getResponseCode();
+        if (responseCode == 200) {
+          BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+          String inputLine;
+          StringBuffer response = new StringBuffer();
 
-            while ((inputLine = in.readLine()) != null) {
-              response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-            return true;
-          } else {
-            BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
-            String inputLine;
-            StringBuffer response = new StringBuffer();
-
-            while ((inputLine = in.readLine()) != null) {
-              response.append(inputLine);
-            }
-            in.close();
-            System.out.println(response.toString());
-            return false;
+          while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
           }
+          in.close();
+          System.out.println(response.toString());
+          return true;
+        } else {
+          BufferedReader in = new BufferedReader(new InputStreamReader(con.getErrorStream()));
+          String inputLine;
+          StringBuffer response = new StringBuffer();
+
+          while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+          }
+          in.close();
+          System.out.println(response.toString());
+          return false;
+        }
 
       } catch (Exception e) {
-          e.printStackTrace();
-          return false;
+        e.printStackTrace();
+        return false;
       }
     }
     return false;
