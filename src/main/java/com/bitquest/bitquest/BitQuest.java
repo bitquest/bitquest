@@ -345,7 +345,7 @@ public class BitQuest extends JavaPlugin {
       JSONArray params = new JSONArray();
       jsonObject.put("params", params);
       System.out.println("Checking blockchain info...");
-      URL url = new URL("http://" + NODE_HOST + ":" + BITQUEST_NODE_PORT);
+      URL url = new URL("http://" + NODE_HOST + ":" + NODE_PORT);
       System.out.println(url.toString());
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       String userPassword = NODE_RPC_USERNAME + ":" + NODE_RPC_PASSWORD;

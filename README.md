@@ -36,10 +36,13 @@ Additionally, players can send Bitcoin to other players via /send:
 Official BitQuest server is not online anymore, but you can start your own server using Docker or Bukkit.
 
 # Start a BitQuest server
+There are two methods to create a Bitquest server: One involves running a Docker image with everything ready, and the other is to build the plugin from source and adding it to a Spigot instance.
 
 ## Using Docker
 You can download the a (https://hub.docker.com/repository/docker/explodi/bitquest)[official BitQuest docker image]. 
 This image builds a bukkit server with the latest BitQuest version plugin installed.
+
+You must also have a node running, and the connection info (RPC login, host, port) set in the environment variables. (See: configuration)
 
 ## Building the BitQuest Java Plugin
 You can build the bitquest Java plugin that you can drop in to a Bukkit server. This will enable all BitQuest features on your server. 
