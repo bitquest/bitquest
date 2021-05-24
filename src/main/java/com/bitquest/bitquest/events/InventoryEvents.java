@@ -121,13 +121,13 @@ public class InventoryEvents implements Listener {
             try {
                 if (hasOpenSlotsFinal) {
                   if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
-                    if (clicked.getType() == Material.ENCHANTED_BOOK) bitQuest.books.remove(0);
+                    if (clicked.getType() == Material.ENCHANTED_BOOK) { bitQuest.books.remove(0); }
 
-                    ItemStack item = event.getCurrentItem();
-                    ItemMeta meta = item.getItemMeta();
-                    ArrayList<String> Lore = new ArrayList<String>();
-                    meta.setLore(null);
-                    item.setItemMeta(meta);
+                  ItemStack item = event.getCurrentItem();
+                  ItemMeta meta = item.getItemMeta();
+                  ArrayList<String> Lore = new ArrayList<String>();
+                  meta.setLore(null);
+                  item.setItemMeta(meta);
                     player.getInventory().addItem(item);
                     player.sendMessage(
                         ChatColor.GREEN
@@ -137,9 +137,7 @@ public class InventoryEvents implements Listener {
                             + ChatColor.LIGHT_PURPLE
                             + satFinal / 100
                             + " (+ miner fees)");
-
                     bitQuest.updateScoreboard(player);
-
                   } else {
                     player.sendMessage(
                         ChatColor.RED
@@ -150,15 +148,13 @@ public class InventoryEvents implements Listener {
                 }
 
             } catch (Exception e) {
-              e.printStackTrace();
-              player.sendMessage(
-                  ChatColor.DARK_RED
-                      + "Problem reading your wallet balance. Please try again later.");
-              player.closeInventory();
-              event.setCancelled(true);
-            }
-
-
+            e.printStackTrace();
+            player.sendMessage(
+                ChatColor.DARK_RED
+                + "Problem reading your wallet balance. Please try again later.");
+            player.closeInventory();
+            event.setCancelled(true);
+          }
         }
       }
     }
@@ -175,16 +171,16 @@ public class InventoryEvents implements Listener {
 
       Inventory marketInventory = Bukkit.getServer().createInventory(null, 54, "Market");
       for (int i = 0; i < trades.size(); i++) {
-        int inventory_stock = bitQuest.MAX_STOCK;
+        int inventoryStock = bitQuest.MAX_STOCK;
 
-        if (inventory_stock > 0) {
+        if (inventoryStock > 0) {
           ItemStack button = new ItemStack(trades.get(i).itemStack);
           ItemMeta meta = button.getItemMeta();
           ArrayList<String> lore = new ArrayList<String>();
-          int bits_price;
-          bits_price = (int) (trades.get(i).price + (BitQuest.MINER_FEE/BitQuest.DENOMINATION_FACTOR));
-
-          lore.add("Price: " + bits_price);
+          int bitsPrice;
+          bitsPrice = (int) (trades.get(i).price
+            + (BitQuest.MINER_FEE / BitQuest.DENOMINATION_FACTOR));
+          lore.add("Price: " + bitsPrice);
           meta.setLore(lore);
           button.setItemMeta(meta);
           marketInventory.setItem(i, button);
@@ -194,10 +190,10 @@ public class InventoryEvents implements Listener {
         ItemStack button = new ItemStack(bitQuest.books.get(0));
         ItemMeta meta = button.getItemMeta();
         ArrayList<String> lore = new ArrayList<String>();
-        int bits_price;
-        bits_price = 2;
+        int bitsPrice;
+        bitsPrice = 2;
 
-        lore.add("Price: " + bits_price);
+        lore.add("Price: " + bitsPrice);
         meta.setLore(lore);
         button.setItemMeta(meta);
         marketInventory.setItem(trades.size(), button);
@@ -206,17 +202,22 @@ public class InventoryEvents implements Listener {
     }
   }
 
-  @EventHandler(priority = EventPriority.HIGH)
-  public void onInventoryOpen(InventoryOpenEvent event) {
-    event.setCancelled(false);
-  }
+  // @EventHandler(priority = EventPriority.HIGH)
+  // public void onInventoryOpen(InventoryOpenEvent event) {
+  //   event.setCancelled(false);
+  // }
 
-  @EventHandler(priority = EventPriority.HIGH)
-  public void onInventoryInteract(InventoryInteractEvent event) {
-    event.setCancelled(false);
-  }
+  // @EventHandler(priority = EventPriority.HIGH)
+  // public void onInventoryInteract(final InventoryInteractEvent event) {
+  //   event.setCancelled(false);
+  // }
 
-  // @bitcoinjake09 updates scoreboard if emeralds
+  /**
+   * updates scoreboard if emeralds.
+   *
+   * @param event picked up item
+   */
+  
   @EventHandler
   public void OnPlayerPickup(final PlayerPickupItemEvent event) {
     Player player = event.getPlayer();
@@ -229,17 +230,20 @@ public class InventoryEvents implements Listener {
       try {
         bitQuest.updateScoreboard(player);
       } catch (Exception e) {
+        System.out.println(e.getMessage());
       }
     }
   }
-  /*
+    /*
   @EventHandler
   public void OnPlayerDropItem(PlayerDropItemEvent event)
   {
       Player player = event.getPlayer();
-      if(BitQuest.REDIS.get("currency" + player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
+      if(BitQuest.REDIS.get("currency" + 
+      player.getUniqueId().toString()).equalsIgnoreCase("emerald"))
       {
           try { bitQuest.updateScoreboard(player); } catch (Exception e){}
       }
-  } */
+  } 
+  */
 }

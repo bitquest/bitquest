@@ -28,6 +28,10 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '11'
+      - name: Install checkstyle
+        run: sudo apt-get install -y checkstyle
+      - name: Lint
+        run: checkstyle -c checkstyle.xml .
       - name: Test
         run: mvn test
       - name: Build Plugin

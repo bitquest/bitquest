@@ -47,13 +47,13 @@ You must also have a node running, and the connection info (RPC login, host, por
 ## Building the BitQuest Java Plugin
 You can build the bitquest Java plugin that you can drop in to a Bukkit server. This will enable all BitQuest features on your server. 
 
-## 1. Requirements
+### 1. Requirements
 
 1. Java JRE+SDK (Version 1.8)
 2. Maven
 
 
-## 2. Compile BitQuest and generate a JAR file
+### 2. Compile BitQuest and generate a JAR file
 
 ```
 make -B jar
@@ -62,12 +62,11 @@ make -B jar
 This will create a BitQuest.jar in the target folder.
 
 # Contibuting
-Before submitting a pull request, please format the code in google style.
-You can easly format the code by doing (you can exec this script from anywhere (you can do ../../../../../build.sh if you where on src/java/main/bitquest/bitquest/)):
+Before submitting a pull request, please format the code using checkstyle. To run checkstyle and check if there are warnings:
 
-```sh
-./format.sh
-```
+````
+make -B lint
+````
 
 # Running a BitQuest server with Docker
 
