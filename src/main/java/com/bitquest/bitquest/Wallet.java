@@ -158,7 +158,7 @@ public class Wallet {
         in.close();
         JSONParser parser = new JSONParser();
         JSONObject responseObject = (JSONObject) parser.parse(response.toString());
-        System.out.println("[payment] " + this.address + " -> " + sat + " -> " + _address);
+        System.out.println("[payment] " + this.address + " -> " + sat + " -> " + toAddress);
         return true;
       } catch (Exception e) {
         e.printStackTrace();

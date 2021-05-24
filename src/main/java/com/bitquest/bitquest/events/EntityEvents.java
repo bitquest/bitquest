@@ -305,11 +305,11 @@ public class EntityEvents implements Listener {
         String key1 = chunkname + "" + x1 + "," + z1 + "name";
         String key2 = chunkname + "" + x2 + "," + z2 + "name";
         if (bitQuest.landIsClaimed(event.getFrom())) {
-          if (bitQuest.land_name_cache.containsKey(key1)) {
-            name1 = bitQuest.land_name_cache.get(key1);
+          if (bitQuest.landNameCache.containsKey(key1)) {
+            name1 = bitQuest.landNameCache.get(key1);
           } else {
             name1 = BitQuest.REDIS.get(key1) != null ? BitQuest.REDIS.get(key1) : "the wilderness";
-            bitQuest.land_name_cache.put(key1, name1);
+            bitQuest.landNameCache.put(key1, name1);
           }
         }
         if (bitQuest.landIsClaimed(event.getTo())) {

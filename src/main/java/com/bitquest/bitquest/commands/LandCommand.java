@@ -134,7 +134,7 @@ public class LandCommand extends CommandAction {
         }
 
       } else if (args[0].equalsIgnoreCase("permission")) {
-        bitQuest.land_permission_cache = new HashMap();
+        bitQuest.landPermissionCache = new HashMap();
 
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
