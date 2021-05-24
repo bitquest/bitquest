@@ -11,7 +11,13 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.WordUtils;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Chunk;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.*;
@@ -85,7 +91,8 @@ public class EntityEvents implements Listener {
           EntityType.PAINTING,
           EntityType.ENDER_CRYSTAL);
 
-  private int pvar = 0; // pvp area variable @bitcoinjake09
+  // TODO: Implement PvP variables somewhere else 
+  // private int pvar = 0; // pvp area variable @bitcoinjake09
 
   public EntityEvents(BitQuest plugin) {
     bitQuest = plugin;
@@ -110,7 +117,6 @@ public class EntityEvents implements Listener {
   public void onPlayerLogin(PlayerLoginEvent event) {
     try {
       Player player = event.getPlayer();
-      final User user = new User(player.getUniqueId());
       BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
       BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
       if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
@@ -150,7 +156,7 @@ public class EntityEvents implements Listener {
     BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
     BitQuest.REDIS.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
     BitQuest.REDIS.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
-    if (bitQuest.BITQUEST_ENV.equals("development") == true && bitQuest.ADMIN_UUID == null) {
+    if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
       player.setOp(true);
     }
     if (bitQuest.isModerator(player)) {
@@ -158,10 +164,10 @@ public class EntityEvents implements Listener {
       player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
 
       String url = "https://live.blockcypher.com/btc-testnet/address/" + bitQuest.wallet.address;
-      if (bitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
+      if (BitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
         url = "https://live.blockcypher.com/btc/address/" + bitQuest.wallet.address;
       }
-      if (bitQuest.BLOCKCYPHER_CHAIN == "doge/main") {
+      if (BitQuest.BLOCKCYPHER_CHAIN == "doge/main") {
         url = "https://live.blockcypher.com/doge/address/" + bitQuest.wallet.address;
       }
       player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + url);
@@ -249,7 +255,6 @@ public class EntityEvents implements Listener {
           .getPlayer()
           .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
-      pvar = 0;
       if (event.getFrom().getWorld().getName().endsWith("_end") == false
           && event.getFrom().getWorld().getName().endsWith("_nether") == false) {
         // announce new area
@@ -458,9 +463,9 @@ public class EntityEvents implements Listener {
                   WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
           if (entity instanceof Wither) {
             level = level + 10;
-            entity.setCustomName("Wither (Reward: " +
-                Math.round((bitQuest.LAND_PRICE) / bitQuest.DENOMINATION_FACTOR) + " " +
-                bitQuest.DENOMINATION_NAME + ")");
+            entity.setCustomName("Wither (Reward: "
+                + Math.round((bitQuest.LAND_PRICE) / bitQuest.DENOMINATION_FACTOR) + " "
+                + bitQuest.DENOMINATION_NAME + ")");
           }
           entity.setMaxHealth(1 + level);
 
@@ -632,33 +637,33 @@ public class EntityEvents implements Listener {
 
     // Gives random SWORD
     if (!(entity instanceof Skeleton)) {
-      Material sword_material = null;
+      Material swordMaterial = null;
       if (BitQuest.rand(0, 2) < level) {
-        sword_material = Material.WOOD_AXE;
+        swordMaterial = Material.WOOD_AXE;
       }
       if (BitQuest.rand(0, 4) < level) {
-        sword_material = Material.GOLD_AXE;
+        swordMaterial = Material.GOLD_AXE;
       }
       if (BitQuest.rand(0, 8) < level) {
-        sword_material = Material.IRON_AXE;
+        swordMaterial = Material.IRON_AXE;
       }
       if (BitQuest.rand(0, 16) < level) {
-        sword_material = Material.DIAMOND_AXE;
+        swordMaterial = Material.DIAMOND_AXE;
       }
       if (BitQuest.rand(0, 32) < level) {
-        sword_material = Material.WOOD_SWORD;
+        swordMaterial = Material.WOOD_SWORD;
       }
       if (BitQuest.rand(0, 64) < level) {
-        sword_material = Material.GOLD_SWORD;
+        swordMaterial = Material.GOLD_SWORD;
       }
       if (BitQuest.rand(0, 128) < level) {
-        sword_material = Material.IRON_SWORD;
+        swordMaterial = Material.IRON_SWORD;
       }
       if (BitQuest.rand(0, 256) < level) {
-        sword_material = Material.DIAMOND_SWORD;
+        swordMaterial = Material.DIAMOND_SWORD;
       }
-      if (sword_material != null) {
-        ItemStack sword = new ItemStack(sword_material);
+      if (swordMaterial != null) {
+        ItemStack sword = new ItemStack(swordMaterial);
         randomEnchantItem(sword, level);
 
         entity.getEquipment().setItemInHand(sword);
