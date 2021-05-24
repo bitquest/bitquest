@@ -37,14 +37,15 @@ public class BitQuest extends JavaPlugin {
   public static final UUID ADMIN_UUID =
       System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
-  public static final String BITQUEST_NODE_HOST =
+  public static final String NODE_HOST =
       System.getenv("BITQUEST_NODE_HOST") != null
           ? System.getenv("BITQUEST_NODE_HOST")
-          : null;
-  public static final int BITQUEST_NODE_PORT =
+          : "localhost";
+  // NODE_PORT: Defaults to Dogecoin Testnet port
+  public static final int NODE_PORT =
       System.getenv("BITQUEST_NODE_PORT") != null
           ? Integer.parseInt(System.getenv("BITQUEST_NODE_PORT"))
-          : 8332;
+          : 44555;
   public static final String SERVER_NAME =
       System.getenv("BITQUEST_NAME") != null ? System.getenv("BITQUEST_NAME") : "BitQuest";
   public static final Long DENOMINATION_FACTOR =
@@ -55,8 +56,8 @@ public class BitQuest extends JavaPlugin {
       System.getenv("DENOMINATION_NAME") != null ? System.getenv("DENOMINATION_NAME") : "Bits";
   public static final String BLOCKCYPHER_CHAIN =
       System.getenv("BLOCKCYPHER_CHAIN") != null ? System.getenv("BLOCKCYPHER_CHAIN") : "btc/test3";
-  public static final String NODE_RPC_USERNAME = System.getenv("NODE_RPC_USERNAME"); 
-  public static final String NODE_RPC_PASSWORD = System.getenv("NODE_RPC_PASSWORD");
+  public static final String NODE_RPC_USERNAME = System.getenv("BITQUEST_NODE_RPC_USER"); 
+  public static final String NODE_RPC_PASSWORD = System.getenv("BITQUEST_NODE_RPC_PASSWORD");
   public static final String DISCORD_HOOK_URL = System.getenv("DISCORD_HOOK_URL");
   public static final String BLOCKCYPHER_API_KEY =
       System.getenv("BLOCKCYPHER_API_KEY") != null ? System.getenv("BLOCKCYPHER_API_KEY") : null;
@@ -100,8 +101,8 @@ public class BitQuest extends JavaPlugin {
   // memory
   public HashMap<String, Boolean> land_unclaimed_cache = new HashMap<String, Boolean>();
   public HashMap<String, String> land_owner_cache = new HashMap<String, String>();
-  public HashMap<String, String> land_permission_cache = new HashMap();
-  public HashMap<String, String> land_name_cache = new HashMap();
+  public HashMap<String, String> land_permission_cache = new HashMap<String, String>();
+  public HashMap<String, String> land_name_cache = new HashMap<String, String>();
   public Long wallet_balance_cache = 0L;
   public ArrayList<ItemStack> books = new ArrayList<ItemStack>();
   // when true, server is closed for maintenance and not allowing players to join in.
@@ -109,7 +110,6 @@ public class BitQuest extends JavaPlugin {
   boolean boss_already_spawned=false;
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
-  private Player[] moderators;
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
 
   // Create the PostgreSQL connection URL
@@ -190,7 +190,7 @@ public class BitQuest extends JavaPlugin {
       }
       System.out.println("[world wallet] address: " + wallet.address);
 
-      if (BITQUEST_NODE_HOST != null) {
+      if (NODE_HOST != null) {
         System.out.println("[startup] checking bitcoin node connection");
         getBlockChainInfo();
       }
@@ -345,7 +345,7 @@ public class BitQuest extends JavaPlugin {
       JSONArray params = new JSONArray();
       jsonObject.put("params", params);
       System.out.println("Checking blockchain info...");
-      URL url = new URL("http://" + BITQUEST_NODE_HOST + ":" + BITQUEST_NODE_PORT);
+      URL url = new URL("http://" + NODE_HOST + ":" + BITQUEST_NODE_PORT);
       System.out.println(url.toString());
       HttpURLConnection con = (HttpURLConnection) url.openConnection();
       String userPassword = NODE_RPC_USERNAME + ":" + NODE_RPC_PASSWORD;
@@ -971,7 +971,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public void sendWalletInfo(final Player player, final User user) {
-    if (BITQUEST_NODE_HOST != null) {
+    if (NODE_HOST != null) {
       // TODO: Rewrite send wallet info
     }
     try {

@@ -38,7 +38,8 @@ Official BitQuest server is not online anymore, but you can start your own serve
 # Start a BitQuest server
 
 ## Using Docker
-You can download the <a official BitQuest docker image. This will spawn a bukkit server with the latest BitQuest version plugin installed.
+You can download the a (https://hub.docker.com/repository/docker/explodi/bitquest)[official BitQuest docker image]. 
+This image builds a bukkit server with the latest BitQuest version plugin installed.
 
 ## Building the BitQuest Java Plugin
 You can build the bitquest Java plugin that you can drop in to a Bukkit server. This will enable all BitQuest features on your server. 
@@ -78,7 +79,7 @@ Configuration can be done via enviroment variables:
 | BITQUEST_ADMIN_UUID        | Minecraft user ID for the root user |
 | BITQUEST_NAME              | The name of your server             |
 | BITQUEST_NODE_HOST         | Host of the Node                    |
-| BITQUEST_NODE_PORT         | Port of the Node (default: 18333)   |
+| BITQUEST_NODE_PORT         | Port of the Node                    |
 | BITQUEST_NODE_RPC_USER     | Node RPC username                   |
 | BITQUEST_NODE_RPC_PASSWORD | Node RPC password                   |
 

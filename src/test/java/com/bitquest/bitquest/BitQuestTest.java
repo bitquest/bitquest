@@ -6,6 +6,7 @@ import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.wallet.DeterministicSeed;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
@@ -41,9 +42,14 @@ public class BitQuestTest {
         System.out.println(xpub);
         // Check if HD wallet exists
         Node node = new Node();
-        node.host=System.getenv("BITQUEST_NODE_HOST");
-        node.rpcUsername=System.getenv("BITQUEST_NODE_RPC_USER");
-        node.rpcUsername=System.getenv("BITQUEST_NODE_RPC_USER");
-        
+        node.host = BitQuest.NODE_HOST;
+        node.port = BitQuest.NODE_PORT;
+        System.out.println(node.port);
+        node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
+        node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
+        System.out.println(node.blocks());
+        System.out.println(node.accounts());
+        String address = node.address("test");
+        System.out.println(address);
     }
 }

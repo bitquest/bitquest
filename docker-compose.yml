@@ -8,8 +8,8 @@ services:
     ports:
       - "25565:25565"
     environment:
-      - BITQUEST_NODE_HOST=btcd
+      - BITQUEST_NODE_HOST=dogecoind
   redis:
     image: redis
-  btcd:
-    image: explodi/btcd
+  dogecoind:
+    image: explodi/dogecoind
