@@ -15,31 +15,31 @@ import org.bukkit.entity.Player;
 public class FixAbandonLand extends CommandAction {
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
-    int XySize = 0;
+    int xySize = 0;
     Set<String> ownerList = BitQuest.REDIS.keys("chunk*owner");
     Set<String> permissionsList = BitQuest.REDIS.keys("*permissions");
-    String[] XYs = new String[ownerList.size()];
+    String[] xys = new String[ownerList.size()];
     String[] subPerms = new String[permissionsList.size()];
     for (String tempOwnerList : ownerList) {
-      XYs[XySize] = tempOwnerList.substring(0, tempOwnerList.length() - 5);
+      xys[xySize] = tempOwnerList.substring(0, tempOwnerList.length() - 5);
       sender.sendMessage(
           ChatColor.DARK_RED
-              + BitQuest.REDIS.get(XYs[XySize] + "name")
+              + BitQuest.REDIS.get(xys[xySize] + "name")
               + " is owned by: "
               + (BitQuest.REDIS.get(tempOwnerList)));
-      XySize++;
+      xySize++;
     }
 
-    XySize = 0;
+    xySize = 0;
 
     for (String tempPermissionsList : permissionsList) {
-      subPerms[XySize] = tempPermissionsList.substring(0, tempPermissionsList.length() - 11);
+      subPerms[xySize] = tempPermissionsList.substring(0, tempPermissionsList.length() - 11);
       sender.sendMessage(
           ChatColor.YELLOW
               + tempPermissionsList
               + " is set to: "
-              + (BitQuest.REDIS.get(subPerms[XySize] + "permissions")));
-      XySize++;
+              + (BitQuest.REDIS.get(subPerms[xySize] + "permissions")));
+      xySize++;
     }
 
     for (int i = 0; i <= permissionsList.size() - 1; i++) {
