@@ -5,13 +5,19 @@ services:
     build: .
     volumes:
       - "./target/BitQuest.jar:/spigot/plugins/BitQuest.jar"
+      - "./world:/spigot/world"
+      - "./world_the_end:/spigot/world_the_end"
+      - "./world_nether:/spigot/world_nether"
     ports:
       - "25565:25565"
     environment:
       - BITQUEST_NODE_HOST=dogecoind
+      - BITQUEST_NODE_RPC_USER=user
+      - BITQUEST_NODE_RPC_PASSWORD=hackme
   redis:
     image: redis
   dogecoind:
     image: explodi/dogecoind
+    command: ["-testnet","-rpcuser=user","-rpcpassword=hackme"]
     volumes:
       - "./data:/root/.dogecoin"

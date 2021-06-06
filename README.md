@@ -76,14 +76,15 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 
 Before running the server, the following environment variables must be set:
 
-| Environment variable       | Description                         |
-|----------------------------|-------------------------------------|
-| BITQUEST_ADMIN_UUID        | Minecraft user ID for the root user |
-| BITQUEST_NAME              | The name of your server             |
-| BITQUEST_NODE_HOST         | Host of the Node                    |
-| BITQUEST_NODE_PORT         | Port of the Node                    |
-| BITQUEST_NODE_RPC_USER     | Node RPC username                   |
-| BITQUEST_NODE_RPC_PASSWORD | Node RPC password                   |
+| Environment variable       | Description                             |
+|----------------------------|-----------------------------------------|
+| BITQUEST_ADMIN_UUID        | Minecraft user ID for the root user     |
+| BITQUEST_ENV               | Set to 'production' for a public server | 
+| BITQUEST_NAME              | The name of your server                 |
+| BITQUEST_NODE_HOST         | Host of the Node                        |
+| BITQUEST_NODE_PORT         | Port of the Node                        |
+| BITQUEST_NODE_RPC_USER     | Node RPC username                       |
+| BITQUEST_NODE_RPC_PASSWORD | Node RPC password                       |
 
 # More info
 

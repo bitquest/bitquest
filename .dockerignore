@@ -8,3 +8,6 @@ log/*
 google-java-format-1.5-all-deps.jar*
 .vscode
 data
+world
+world_nether
+world_the_end
