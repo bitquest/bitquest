@@ -74,7 +74,7 @@ Tou can use Docker to run a BitQuest server. There's also an [official BitQuest 
 
 ## Configuration
 
-Configuration can be done via environment variables:
+Before running the server, the following environment variables must be set:
 
 | Environment variable       | Description                         |
 |----------------------------|-------------------------------------|
