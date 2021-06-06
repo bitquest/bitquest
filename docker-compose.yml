@@ -13,3 +13,5 @@ services:
     image: redis
   dogecoind:
     image: explodi/dogecoind
+    volumes:
+      - "./data:/root/.dogecoin"
