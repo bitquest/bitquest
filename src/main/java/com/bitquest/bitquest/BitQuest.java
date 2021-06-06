@@ -126,12 +126,12 @@ public class BitQuest extends JavaPlugin {
   // REDIS: Look for Environment variables on hostname and port, otherwise defaults to
   // localhost:6379
   public static final String REDIS_HOST =
-      System.getenv("REDIS_PORT_6379_TCP_ADDR") != null
-          ? System.getenv("REDIS_PORT_6379_TCP_ADDR")
-          : "localhost";
+      System.getenv("BITQUEST_REDIS_HOST") != null
+          ? System.getenv("BITQUEST_REDIS_HOST")
+          : "redis";
   public static final Integer REDIS_PORT =
-      System.getenv("REDIS_PORT_6379_TCP_PORT") != null
-          ? Integer.parseInt(System.getenv("REDIS_PORT_6379_TCP_PORT"))
+      System.getenv("BITQUEST_REDIS_PORT") != null
+          ? Integer.parseInt(System.getenv("BITQUEST_REDIS_PORT"))
           : 6379;
   public static final Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
 
@@ -169,11 +169,11 @@ public class BitQuest extends JavaPlugin {
 
   @Override
   public void onEnable() {
-    log("[startup] BitQuest starting");
+    log("startup","BitQuest starting");
     try {
 
       if (ADMIN_UUID == null) {
-        log("[warning] ADMIN_UUID env variable to is not set.");
+        log("warning","ADMIN_UUID env variable is not set.");
       }
 
       // registers listener classes
@@ -197,6 +197,8 @@ public class BitQuest extends JavaPlugin {
         saveDefaultConfig();
         System.out.println("[startup] config file does not exist. creating default.");
       }
+      log("startup","Redis host is: "+REDIS_HOST);
+      log("startup","Redis port is: "+REDIS_PORT);
 
       // loads world wallet from env variables. If not present, generates a new one each time the
       // server is run.
@@ -257,8 +259,8 @@ public class BitQuest extends JavaPlugin {
       modCommands.put("emergencystop", new EmergencystopCommand());
       modCommands.put("fixabandonland", new FixAbandonLand());
       modCommands.put("motd", new MessageOfTheDayCommand(this));
-      // TODO: Remove this command after migrate.
-      updateLootPoolCache();
+      // TODO: Re enable loot pool cache
+      // updateLootPoolCache();
       publish_stats();
       REDIS.set("loot:rate:limit", "1");
       REDIS.expire("loot:rate:limit", 10);
@@ -267,7 +269,7 @@ public class BitQuest extends JavaPlugin {
 
     } catch (Exception e) {
       e.printStackTrace();
-      System.out.println("[fatal] plugin enable fails");
+      BitQuest.log("fatal","Enabling plugin fails. Server is shutting down.");
       Bukkit.shutdown();
     }
   }
@@ -727,8 +729,8 @@ public class BitQuest extends JavaPlugin {
     System.out.println("Killed " + villagerskilled + " villagers");
   }
 
-  public static void log(String msg) {
-    System.out.println(msg);
+  public static final void log(String tag, String msg) {
+    System.out.println("[" + tag + "]" + msg);
   }
 
   public int getLevel(int exp) {
