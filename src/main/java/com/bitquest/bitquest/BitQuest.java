@@ -727,8 +727,8 @@ public class BitQuest extends JavaPlugin {
     System.out.println("Killed " + villagerskilled + " villagers");
   }
 
-  public void log(String msg) {
-    Bukkit.getLogger().info(msg);
+  public static void log(String msg) {
+    System.out.println(msg);
   }
 
   public int getLevel(int exp) {

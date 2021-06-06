@@ -35,6 +35,11 @@ jobs:
       - name: Lint
         run: checkstyle -c checkstyle.xml .
       - name: Test
+        env:
+          BITQUEST_NODE_HOST: ${{ secrets.BITQUEST_NODE_HOST }}
+          BITQUEST_NODE_PORT: ${{ secrets.BITQUEST_NODE_PORT }}
+          BITQUEST_NODE_RPC_PASSWORD: ${{ secrets.BITQUEST_NODE_RPC_PASSWORD }}
+          BITQUEST_NODE_RPC_USER: ${{ secrets.BITQUEST_NODE_RPC_USER }}
         run: mvn test
       - name: Build Plugin
         run: make -B jar
