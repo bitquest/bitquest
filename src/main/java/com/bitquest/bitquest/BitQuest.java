@@ -197,8 +197,8 @@ public class BitQuest extends JavaPlugin {
         saveDefaultConfig();
         System.out.println("[startup] config file does not exist. creating default.");
       }
-      log("startup","Redis host is: "+REDIS_HOST);
-      log("startup","Redis port is: "+REDIS_PORT);
+      log("startup","Redis host is: " + REDIS_HOST);
+      log("startup","Redis port is: " + REDIS_PORT);
 
       // loads world wallet from env variables. If not present, generates a new one each time the
       // server is run.

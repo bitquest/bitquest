@@ -43,16 +43,15 @@ public class BitQuestTest {
     DeterministicKey masterKey = HDKeyDerivation.createMasterPrivateKey(seed.getSeedBytes());
     String xpub = masterKey.serializePubB58(network);
     System.out.println(xpub);
-    // Check if HD wallet exists
     Node node = new Node();
     node.host = BitQuest.NODE_HOST;
     node.port = BitQuest.NODE_PORT;
-    System.out.println(node.port);
     node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
-    System.out.println(node.blocks());
-    System.out.println(node.accounts());
-    String address = node.address("test");
-    System.out.println(address);
+    // Test wallet
+    Wallet wallet = new Wallet(node, "test");
+    System.out.println(wallet.balance());
+    System.out.println(wallet.address());
+
   }
 }

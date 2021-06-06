@@ -87,18 +87,28 @@ public class Node {
 
   /*
       accounts
-      Returns a list of all the wallets stored in the node
+      Returns a list of all the accounts in the node
   */
-  public JSONObject accounts() throws IOException, ParseException {
+  public JSONObject listAccounts() throws IOException, ParseException {
     JSONObject response = rpcCall("listaccounts");
     return (JSONObject) response.get("result");
   }
 
   /*
-      account
+      listWallets
+      Returns a list of all the wallets stored in the node
+  */
+  public JSONObject listWallets() throws IOException, ParseException {
+    JSONObject response = rpcCall("listwallets");
+    return (JSONObject) response.get("result");
+  }
+
+
+  /*
+      getAccount
       Returns the owner account of the specified address
   */
-  public JSONObject account(String address) throws IOException, ParseException {
+  public JSONObject getAccount(String address) throws IOException, ParseException {
     JSONArray params = new JSONArray();
     params.add(address);
     JSONObject response = rpcCall("getaccount", params);
@@ -106,10 +116,21 @@ public class Node {
   }
 
   /*
-      address
+      getBalance
+      Returns the balance of account
+  */
+  public Double getBalance(String accountName) throws IOException, ParseException {
+    JSONArray params = new JSONArray();
+    params.add(accountName);
+    JSONObject response = rpcCall("getbalance", params);
+    return (Double) response.get("result");
+  }
+
+  /*
+      getAccountAddress
       Returns the address of specified account
   */
-  public String address(String accountId) throws IOException, ParseException {
+  public String getAccountAddress(String accountId) throws IOException, ParseException {
     JSONArray params = new JSONArray();
     params.add(accountId);
     JSONObject response = rpcCall("getaccountaddress", params);
