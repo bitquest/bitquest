@@ -40,7 +40,7 @@ public class LandCommand extends CommandAction {
             player.sendMessage(ChatColor.DARK_RED + "Invalid name.");
             return false;
           } else if (bitQuest.isOwner(location, player)) {
-            BitQuest.REDIS.set(
+            bitQuest.redis.set(
                 "chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "name",
                 args[1]);
             player.sendMessage(ChatColor.GREEN + "Land renamed to " + args[1]);
@@ -59,7 +59,7 @@ public class LandCommand extends CommandAction {
                 if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
                   player.sendMessage(
                       "Changing the land ownership to " + onlinePlayer.getDisplayName() + "...");
-                  BitQuest.REDIS.set(
+                  bitQuest.redis.set(
                       "chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() +
                           "owner", player.getUniqueId().toString());
                 }
@@ -77,15 +77,15 @@ public class LandCommand extends CommandAction {
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
         if (bitQuest.landIsClaimed(location)) {
-          String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
+          String landname = bitQuest.redis.get(tempchunk + "" + x + "," + z + "name");
           player.sendMessage(landname);
           String permissionKey = "chunk"
               + location.getChunk().getX()
               + ","
               + location.getChunk().getZ()
               + "permissions";
-          if (bitQuest.REDIS.exists(permissionKey)) {
-            String permissionCode = BitQuest.REDIS.get(permissionKey);
+          if (bitQuest.redis.exists(permissionKey)) {
+            String permissionCode = bitQuest.redis.get(permissionKey);
             if (permissionCode.equals("p")) {
               player.sendMessage("Permission: public");
             }
@@ -141,10 +141,10 @@ public class LandCommand extends CommandAction {
 
         if (bitQuest.landIsClaimed(location) &&
             (bitQuest.isOwner(location, player) || bitQuest.isModerator(player))) {
-          String landname = BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name");
+          String landname = bitQuest.redis.get(tempchunk + "" + x + "," + z + "name");
 
           if (args[1].equalsIgnoreCase("public")) {
-            BitQuest.REDIS.set(
+            bitQuest.redis.set(
                 tempchunk
                     + ""
                     + location.getChunk().getX()
@@ -161,7 +161,7 @@ public class LandCommand extends CommandAction {
                     + " is now public");
             return true;
           } else if (args[1].equalsIgnoreCase("clan")) {
-            BitQuest.REDIS.set(
+            bitQuest.redis.set(
                 tempchunk
                     + ""
                     + location.getChunk().getX()
@@ -178,7 +178,7 @@ public class LandCommand extends CommandAction {
                     + " is now clan-owned");
             return true;
           } else if (args[1].equalsIgnoreCase("private")) {
-            BitQuest.REDIS.del(
+            bitQuest.redis.del(
                 tempchunk
                     + ""
                     + location.getChunk().getX()
@@ -194,7 +194,7 @@ public class LandCommand extends CommandAction {
                     + " is now private");
             return true;
           } else if ((args[1].equalsIgnoreCase("pvp")) && (args.length == 2)) {
-            BitQuest.REDIS.set(
+            bitQuest.redis.set(
                 tempchunk
                     + ""
                     + location.getChunk().getX()
@@ -211,7 +211,7 @@ public class LandCommand extends CommandAction {
                     + " is now private PvP");
             return true;
           } else if ((args[1].equalsIgnoreCase("pvp")) && (args[2].equalsIgnoreCase("public"))) {
-            BitQuest.REDIS.set(
+            bitQuest.redis.set(
                 tempchunk
                     + ""
                     + location.getChunk().getX()

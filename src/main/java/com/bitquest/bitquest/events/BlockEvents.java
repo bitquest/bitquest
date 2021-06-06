@@ -134,9 +134,9 @@ public class BlockEvents implements Listener {
 
       String owner1;
       String owner2;
-      if ((owner2 = BitQuest.REDIS
+      if ((owner2 = bitQuest.redis
           .get(tempchunk + "" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-        if ((owner1 = BitQuest.REDIS
+        if ((owner1 = bitQuest.redis
             .get(tempchunk + "" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) !=
             null) {
           if (!owner1.equals(owner2)) {
@@ -168,9 +168,9 @@ public class BlockEvents implements Listener {
 
       String owner1;
       String owner2;
-      if ((owner2 = BitQuest.REDIS
+      if ((owner2 = bitQuest.redis
           .get(tempchunk + "" + blockChunk.getX() + "," + blockChunk.getZ() + "owner")) != null) {
-        if ((owner1 = BitQuest.REDIS
+        if ((owner1 = bitQuest.redis
             .get(tempchunk + "" + pistonChunk.getX() + "," + pistonChunk.getZ() + "owner")) !=
             null) {
           if (!owner1.equals(owner2)) {

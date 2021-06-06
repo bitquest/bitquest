@@ -8,11 +8,17 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class BanlistCommand extends CommandAction {
+  BitQuest bitQuest;
+
+  public BanlistCommand(BitQuest plugin) {
+    bitQuest = plugin;
+  }
+
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
-    Set<String> banlist = BitQuest.REDIS.smembers("banlist");
+    Set<String> banlist = bitQuest.redis.smembers("banlist");
     for (String uuid : banlist) {
-      sender.sendMessage(ChatColor.YELLOW + BitQuest.REDIS.get("name:" + uuid));
+      sender.sendMessage(ChatColor.YELLOW + bitQuest.redis.get("name:" + uuid));
     }
     return true;
   }

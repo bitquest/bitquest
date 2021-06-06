@@ -133,11 +133,10 @@ public class BitQuest extends JavaPlugin {
       System.getenv("BITQUEST_REDIS_PORT") != null
           ? Integer.parseInt(System.getenv("BITQUEST_REDIS_PORT"))
           : 6379;
-  public static final Jedis REDIS = new Jedis(REDIS_HOST, REDIS_PORT);
 
   // Default price: 10,000 satoshis or 100 bits
-  public static final Long LAND_PRICE =
-      System.getenv("LAND_PRICE") != null ? Long.parseLong(System.getenv("LAND_PRICE")) : 10000;
+  public static final Double LAND_PRICE =
+      System.getenv("LAND_PRICE") != null ? Double.parseDouble(System.getenv("LAND_PRICE")) : 10000;
   // Minimum transaction by default is 2000 bits
   public static final Long MINIMUM_TRANSACTION =
       System.getenv("MINIMUM_TRANSACTION") != null
@@ -166,14 +165,23 @@ public class BitQuest extends JavaPlugin {
   private Map<String, CommandAction> commands;
   private Map<String, CommandAction> modCommands;
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
+  public Jedis redis;
+  public Node node;
 
   @Override
   public void onEnable() {
-    log("startup","BitQuest starting");
+    log("startup", "BitQuest starting");
+    redis = new Jedis(REDIS_HOST, REDIS_PORT);
+    node = new Node();
+    Node node = new Node();
+    node.host = BitQuest.NODE_HOST;
+    node.port = BitQuest.NODE_PORT;
+    node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
+    node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
     try {
 
       if (ADMIN_UUID == null) {
-        log("warning","ADMIN_UUID env variable is not set.");
+        log("warning", "ADMIN_UUID env variable is not set.");
       }
 
       // registers listener classes
@@ -197,35 +205,11 @@ public class BitQuest extends JavaPlugin {
         saveDefaultConfig();
         System.out.println("[startup] config file does not exist. creating default.");
       }
-      log("startup","Redis host is: " + REDIS_HOST);
-      log("startup","Redis port is: " + REDIS_PORT);
+      log("startup", "Redis host is: " + REDIS_HOST);
+      log("startup", "Redis port is: " + REDIS_PORT);
 
-      // loads world wallet from env variables. If not present, generates a new one each time the
-      // server is run.
-      if (System.getenv("PRIVATE") != null
-          && System.getenv("PUBLIC") != null
-          && System.getenv("ADDRESS") != null
-          && System.getenv("WIF") != null) {
-        wallet =
-            new Wallet(
-                System.getenv("PRIVATE"),
-                System.getenv("PUBLIC"),
-                System.getenv("ADDRESS"),
-                System.getenv("WIF"));
-        System.out.println("[world wallet] imported from environment");
-      } else if (REDIS.exists("private") && REDIS.exists("public") && REDIS.exists("address") &&
-          REDIS.exists("wif")) {
-        wallet =
-            new Wallet(
-                REDIS.get("private"),
-                REDIS.get("public"),
-                REDIS.get("address"),
-                REDIS.get("wif"));
-      } else {
-        wallet = this.generateNewWallet();
-        System.out.println("[world wallet] generated new wallet");
-      }
-      System.out.println("[world wallet] address: " + wallet.address);
+      this.wallet = new Wallet(node, "loot");
+      System.out.println("[world wallet] address: " + wallet.address());
 
       if (NODE_HOST != null) {
         System.out.println("[startup] checking bitcoin node connection");
@@ -251,25 +235,25 @@ public class BitQuest extends JavaPlugin {
       modCommands.put("butcher", new ButcherCommand());
       modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
       modCommands.put("crashTest", new CrashtestCommand(this));
-      modCommands.put("mod", new ModCommand());
-      modCommands.put("ban", new BanCommand());
-      modCommands.put("unban", new UnbanCommand());
-      modCommands.put("banlist", new BanlistCommand());
+      modCommands.put("mod", new ModCommand(this));
+      modCommands.put("ban", new BanCommand(this));
+      modCommands.put("unban", new UnbanCommand(this));
+      modCommands.put("banlist", new BanlistCommand(this));
       modCommands.put("spectate", new SpectateCommand(this));
       modCommands.put("emergencystop", new EmergencystopCommand());
-      modCommands.put("fixabandonland", new FixAbandonLand());
+      modCommands.put("fixabandonland", new FixAbandonLand(this));
       modCommands.put("motd", new MessageOfTheDayCommand(this));
       // TODO: Re enable loot pool cache
       // updateLootPoolCache();
       publish_stats();
-      REDIS.set("loot:rate:limit", "1");
-      REDIS.expire("loot:rate:limit", 10);
+      redis.set("loot:rate:limit", "1");
+      redis.expire("loot:rate:limit", 10);
       killAllVillagers();
       System.out.println("[startup] finished");
 
     } catch (Exception e) {
       e.printStackTrace();
-      BitQuest.log("fatal","Enabling plugin fails. Server is shutting down.");
+      BitQuest.log("fatal", "Enabling plugin fails. Server is shutting down.");
       Bukkit.shutdown();
     }
   }
@@ -278,33 +262,33 @@ public class BitQuest extends JavaPlugin {
     System.out.println("[loot_cache]");
     bossAlreadySpawned = false;
     try {
-      Long balance = wallet.getBalance(0);
+      Double balance = wallet.balance(0);
       System.out.println("[loot_cache] " + balance);
 
       if (balance > (LAND_PRICE + MINER_FEE) * 2) {
-        REDIS.set("loot_cache", balance.toString());
+        redis.set("loot_cache", balance.toString());
       }
     } catch (IOException e) {
       e.printStackTrace();
-      REDIS.del("loot_cache");
+      redis.del("loot_cache");
       System.out.println("[loot_cache] FAIL");
     } catch (org.json.simple.parser.ParseException e) {
       e.printStackTrace();
-      REDIS.del("loot_cache");
+      redis.del("loot_cache");
       System.out.println("[loot_cache] FAIL");
 
     }
 
   }
 
-  static Long witherReward() {
+  static Double witherReward() {
     return (LAND_PRICE);
   }
 
   public void createBossFight(Location location) {
     try {
-      if (REDIS.exists("loot_cache") &&
-          Double.parseDouble(REDIS.get("loot_cache")) > 400 * DENOMINATION_FACTOR) {
+      if (redis.exists("loot_cache") &&
+          Double.parseDouble(redis.get("loot_cache")) > 400 * DENOMINATION_FACTOR) {
         List<Entity> entities = location.getWorld().getEntities();
 
         for (Entity en : entities) {
@@ -340,44 +324,6 @@ public class BitQuest extends JavaPlugin {
 
   }
 
-
-  public static final Wallet generateNewWallet()
-      throws IOException, org.json.simple.parser.ParseException {
-    final JSONObject jsonObject = new JSONObject();
-
-    URL url = new URL("https://api.blockcypher.com/v1/" + BLOCKCYPHER_CHAIN + "/addrs");
-    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-    con.setConnectTimeout(5000);
-    con.setRequestMethod("POST");
-    con.setDoOutput(true);
-    OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-    out.write(jsonObject.toString());
-    out.close();
-
-    int responseCode = con.getResponseCode();
-
-    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-    String inputLine;
-    StringBuffer response = new StringBuffer();
-
-    while ((inputLine = in.readLine()) != null) {
-      response.append(inputLine);
-    }
-    in.close();
-    JSONParser parser = new JSONParser();
-    JSONObject responseObject = (JSONObject) parser.parse(response.toString());
-    System.out.println("Created wallet: " + responseObject.get("address").toString());
-    REDIS.set("private", responseObject.get("private").toString());
-    REDIS.set("public", responseObject.get("public").toString());
-    REDIS.set("address", responseObject.get("address").toString());
-    REDIS.set("wif", responseObject.get("wif").toString());
-
-    return new Wallet(
-        responseObject.get("private").toString(),
-        responseObject.get("public").toString(),
-        responseObject.get("address").toString(),
-        responseObject.get("wif").toString());
-  }
 
   // @todo: make this just accept the endpoint name and (optional) parameters
   public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
@@ -436,7 +382,7 @@ public class BitQuest extends JavaPlugin {
 
   public void updateScoreboard(final Player player) {
     try {
-      final User user = new User(player.getUniqueId());
+      final User user = new User(player.getUniqueId(), this);
       ScoreboardManager scoreboardManager;
       Scoreboard walletScoreboard;
       Objective walletScoreboardObjective;
@@ -455,7 +401,7 @@ public class BitQuest extends JavaPlugin {
         Score score =
             walletScoreboardObjective.getScore(
                 ChatColor.GREEN + "Balance:"); // Get a fake offline player
-        score.setScore((int) (user.wallet.getBalance(0) / DENOMINATION_FACTOR));
+        score.setScore((int) (user.wallet.balance(0) / DENOMINATION_FACTOR));
 
         player.setScoreboard(walletScoreboard);
 
@@ -485,19 +431,19 @@ public class BitQuest extends JavaPlugin {
   }
 
   public void createPet(User user, String petName) {
-    REDIS.sadd("pet:names", petName);
-    BitQuest.REDIS.zincrby("player:tx", PET_PRICE, user.uuid.toString());
+    redis.sadd("pet:names", petName);
+    redis.zincrby("player:tx", PET_PRICE, user.uuid.toString());
     long unixTime = System.currentTimeMillis() / 1000L;
-    REDIS.set("pet:" + user.uuid.toString() + ":timestamp", Long.toString(unixTime));
-    REDIS.set("pet:" + user.uuid.toString(), petName);
+    redis.set("pet:" + user.uuid.toString() + ":timestamp", Long.toString(unixTime));
+    redis.set("pet:" + user.uuid.toString(), petName);
   }
 
   public void adoptPet(Player player, String petName) {
     try {
-      final User user = new User(player.getUniqueId());
-      if (user.wallet.getBalance(3) >= PET_PRICE) {
+      final User user = new User(player.getUniqueId(), this);
+      if (user.wallet.balance(3) >= PET_PRICE) {
         try {
-          if (user.wallet.payment(this.wallet.address, PET_PRICE) == true) {
+          if (user.wallet.payment(wallet.address(), (double) PET_PRICE) == true) {
             createPet(user, petName);
             spawnPet(player);
           }
@@ -521,7 +467,7 @@ public class BitQuest extends JavaPlugin {
 
   public void spawnPet(Player player) {
     boolean catIsFound = false;
-    String catName = REDIS.get("pet:" + player.getUniqueId());
+    String catName = redis.get("pet:" + player.getUniqueId());
     for (World w : Bukkit.getWorlds()) {
       List<Entity> entities = w.getEntities();
       for (Entity entity : entities) {
@@ -570,7 +516,7 @@ public class BitQuest extends JavaPlugin {
 
               public void run() {
                 player.teleport(spawn);
-                if (REDIS.exists("pet:" + player.getUniqueId()) == true) {
+                if (redis.exists("pet:" + player.getUniqueId()) == true) {
                   spawnPet(player);
                 }
 
@@ -633,8 +579,8 @@ public class BitQuest extends JavaPlugin {
 
   public void publish_stats() {
     try {
-      Long balance = wallet.getBalance(0);
-      REDIS.set("loot:pool", Long.toString(balance));
+      Double balance = wallet.balance(0);
+      redis.set("loot:pool", Double.toString(balance));
       if (System.getenv("ELASTICSEARCH_ENDPOINT") != null) {
 
         final JSONObject jsonObject = new JSONObject();
@@ -754,9 +700,9 @@ public class BitQuest extends JavaPlugin {
 
   public void setTotalExperience(Player player) {
     int rawxp = 0;
-    if (BitQuest.REDIS.exists("experience.raw." + player.getUniqueId().toString())) {
+    if (redis.exists("experience.raw." + player.getUniqueId().toString())) {
       rawxp =
-          Integer.parseInt(BitQuest.REDIS.get("experience.raw." + player.getUniqueId().toString()));
+          Integer.parseInt(redis.get("experience.raw." + player.getUniqueId().toString()));
     }
     // lower factor, experience is easier to get. you can increase to get the opposite effect
     int level = getLevel(rawxp);
@@ -786,9 +732,9 @@ public class BitQuest extends JavaPlugin {
     } else if (player.getWorld().getName().equals("world_nether")) {
       chunk = "netherchunk";
     }
-    BitQuest.REDIS.zincrby("player:tx", LAND_PRICE, player.getUniqueId().toString());
-    BitQuest.REDIS.set(chunk + "" + x + "," + z + "owner", player.getUniqueId().toString());
-    BitQuest.REDIS.set(chunk + "" + x + "," + z + "name", name);
+    redis.zincrby("player:tx", LAND_PRICE, player.getUniqueId().toString());
+    redis.set(chunk + "" + x + "," + z + "owner", player.getUniqueId().toString());
+    redis.set(chunk + "" + x + "," + z + "name", name);
     landOwnerCache = new HashMap();
     landNameCache = new HashMap();
     landUnclaimedCache = new HashMap();
@@ -833,21 +779,21 @@ public class BitQuest extends JavaPlugin {
             + z
             + " with name "
             + name);
-    if (REDIS.exists(tempchunk + "" + x + "," + z + "owner") == false) {
+    if (redis.exists(tempchunk + "" + x + "," + z + "owner") == false) {
 
       if (validName(name)) {
 
 
-        if (REDIS.get(tempchunk + "" + x + "," + z + "owner") == null) {
+        if (redis.get(tempchunk + "" + x + "," + z + "owner") == null) {
           try {
 
-            final User user = new User(player.getUniqueId());
+            final User user = new User(player.getUniqueId(), this);
             player.sendMessage(ChatColor.YELLOW + "Claiming land...");
             BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
             final BitQuest bitQuest = this;
             if (BitQuest.BLOCKCYPHER_CHAIN != null) {
 
-              if (user.wallet.payment(this.wallet.address, LAND_PRICE)) {
+              if (user.wallet.payment(this.wallet.address(), LAND_PRICE)) {
                 saveLandData(player, name, x, z);
               } else {
 
@@ -881,11 +827,11 @@ public class BitQuest extends JavaPlugin {
             e.printStackTrace();
           }
 
-        } else if (BitQuest.REDIS.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
+        } else if (redis.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
           player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
         } else {
           // Rename land
-          BitQuest.REDIS.set(tempchunk + "" + x + "," + z + "name", name);
+          redis.set(tempchunk + "" + x + "," + z + "name", name);
           player.sendMessage(
               ChatColor.GREEN
                   + "You renamed this land to "
@@ -909,10 +855,10 @@ public class BitQuest extends JavaPlugin {
       chunk = "chunk";
     } else if (player.getWorld().getName().equals("world_nether")) {
       chunk = "netherchunk";
-    } 
+    }
     String key =
         chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
-    if (REDIS.get(key).equals(player.getUniqueId().toString())) {
+    if (redis.get(key).equals(player.getUniqueId().toString())) {
       // player is the owner of the chunk
       return true;
     } else {
@@ -945,13 +891,13 @@ public class BitQuest extends JavaPlugin {
         return true; // pvp @BitcoinJake09
       } else if (landPermissionCode(location).equals("c")) {
         String ownerUuid =
-            REDIS.get("chunk"
+            redis.get("chunk"
                 + location.getChunk().getX()
                 + ","
                 + location.getChunk().getZ()
                 + "owner");
-        String ownerClan = REDIS.get("clan:" + ownerUuid);
-        String playerClan = REDIS.get("clan:" + player.getUniqueId().toString());
+        String ownerClan = redis.get("clan:" + ownerUuid);
+        String playerClan = redis.get("clan:" + player.getUniqueId().toString());
         if (ownerClan.equals(playerClan)) {
           return true;
         } else {
@@ -982,8 +928,8 @@ public class BitQuest extends JavaPlugin {
         chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions";
     if (landPermissionCache.containsKey(key)) {
       return landPermissionCache.get(key);
-    } else if (REDIS.exists(key)) {
-      String code = REDIS.get(key);
+    } else if (redis.exists(key)) {
+      String code = redis.get(key);
       landPermissionCache.put(key, code);
       return code;
     } else {
@@ -1000,14 +946,14 @@ public class BitQuest extends JavaPlugin {
     areaJson.addProperty("x", location.getX());
     areaJson.addProperty("z", location.getZ());
     areaJson.addProperty("uuid", UUID.randomUUID().toString());
-    REDIS.lpush("areas", areaJson.toString());
+    redis.lpush("areas", areaJson.toString());
     // TODO: Check if redis actually appended the area to list and return the success of the
     // operation
     return true;
   }
 
   public boolean isModerator(Player player) {
-    if (REDIS.sismember("moderators", player.getUniqueId().toString())) {
+    if (redis.sismember("moderators", player.getUniqueId().toString())) {
       return true;
     } else if (ADMIN_UUID != null
         && player.getUniqueId().toString().equals(ADMIN_UUID.toString())) {
@@ -1022,12 +968,12 @@ public class BitQuest extends JavaPlugin {
       // TODO: Rewrite send wallet info
     }
     try {
-      Long balance = user.wallet.getBalance(0);
+      Double balance = user.wallet.balance(0);
 
-      player.sendMessage("Address: " + user.wallet.address);
+      player.sendMessage("Address: " + user.wallet.address());
       player.sendMessage("Balance: " + balance);
       player.sendMessage(
-          "URL: " + ChatColor.BLUE + ChatColor.UNDERLINE + ChatColor.BOLD + user.wallet.url());
+          "URL: " + ChatColor.BLUE + ChatColor.UNDERLINE + ChatColor.BOLD + user.wallet.address());
       player.sendMessage("-----------");
 
     } catch (Exception e) {
@@ -1048,7 +994,7 @@ public class BitQuest extends JavaPlugin {
     String key =
         chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
 
-    if (REDIS.exists(key) == true) {
+    if (redis.exists(key) == true) {
       return true;
     } else {
       return false;
@@ -1122,7 +1068,7 @@ public class BitQuest extends JavaPlugin {
         con.setRequestProperty("Cookie", "bitquest=true");
         con.setRequestProperty("User-Agent",
             "Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.4; en-US;"
-            + " rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+                + " rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 
         con.setDoOutput(true);
         OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());

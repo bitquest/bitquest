@@ -147,24 +147,24 @@ public class EntityEvents implements Listener {
   public void onPlayerLogin(PlayerLoginEvent event) {
     try {
       Player player = event.getPlayer();
-      BitQuest.REDIS.set("name:" + player.getUniqueId().toString(), player.getName());
-      BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-      if (BitQuest.REDIS.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
+      bitQuest.redis.set("name:" + player.getUniqueId().toString(), player.getName());
+      bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
+      if (bitQuest.redis.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
         System.out.println("kicking banned player " + event.getPlayer().getDisplayName());
         event.disallow(
             PlayerLoginEvent.Result.KICK_OTHER,
             "You are temporarily banned. Please contact bitquest@bitquest.co");
       }
-      if (BitQuest.REDIS.exists("rate_limit:" + event.getPlayer().getUniqueId()) == true) {
-        Long ttl = BitQuest.REDIS.ttl("rate_limit:" + event.getPlayer().getUniqueId());
+      if (bitQuest.redis.exists("rate_limit:" + event.getPlayer().getUniqueId()) == true) {
+        Long ttl = bitQuest.redis.ttl("rate_limit:" + event.getPlayer().getUniqueId());
         event.disallow(
             PlayerLoginEvent.Result.KICK_OTHER, "Please try again in " + ttl + " seconds.");
       }
 
     } catch (Exception e) {
       e.printStackTrace();
-      BitQuest.REDIS.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
-      BitQuest.REDIS.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
+      bitQuest.redis.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
+      bitQuest.redis.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
       event.disallow(
           PlayerLoginEvent.Result.KICK_OTHER,
           "The server is in limited capacity at this moment. Please try again later.");
@@ -181,33 +181,38 @@ public class EntityEvents implements Listener {
     bitQuest.setTotalExperience(player);
     final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
     System.out.println("User " + player.getName() + "logged in with IP " + ip);
-    BitQuest.REDIS.set("ip" + player.getUniqueId().toString(), ip);
-    BitQuest.REDIS.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
-    BitQuest.REDIS.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-    BitQuest.REDIS.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
-    BitQuest.REDIS.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
+    bitQuest.redis.set("ip" + player.getUniqueId().toString(), ip);
+    bitQuest.redis.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
+    bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
+    bitQuest.redis.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
+    bitQuest.redis.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
     if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
       player.setOp(true);
     }
     if (bitQuest.isModerator(player)) {
-
-      player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-
-      String url = "https://live.blockcypher.com/btc-testnet/address/" + bitQuest.wallet.address;
-      if (BitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
-        url = "https://live.blockcypher.com/btc/address/" + bitQuest.wallet.address;
+      try {
+        player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
+        String url = "https://live.blockcypher.com/btc-testnet/address/" +
+            bitQuest.wallet.address();
+        if (BitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
+          url = "https://live.blockcypher.com/btc/address/" + bitQuest.wallet.address();
+        }
+        if (BitQuest.BLOCKCYPHER_CHAIN == "doge/main") {
+          url = "https://live.blockcypher.com/doge/address/" + bitQuest.wallet.address();
+        }
+        player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + url);
+      } catch (IOException e) {
+        e.printStackTrace();
+      } catch (org.json.simple.parser.ParseException e) {
+        e.printStackTrace();
       }
-      if (BitQuest.BLOCKCYPHER_CHAIN == "doge/main") {
-        url = "https://live.blockcypher.com/doge/address/" + bitQuest.wallet.address;
-      }
-      player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + url);
     }
 
     String welcome = rawwelcome.toString();
     welcome = welcome.replace("<name>", player.getName());
     player.sendMessage(welcome);
-    if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-      String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
+    if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
+      String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
       player.setPlayerListName(
           ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
       if (bitQuest.isModerator(player)) {
@@ -221,7 +226,7 @@ public class EntityEvents implements Listener {
                 + ChatColor.WHITE
                 + player.getName());
       }
-    } else if ((!BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString()))
+    } else if ((!bitQuest.redis.exists("clan:" + player.getUniqueId().toString()))
         && (bitQuest.isModerator(player))) {
       player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
     }
@@ -230,14 +235,14 @@ public class EntityEvents implements Listener {
     bitQuest.setTotalExperience(player);
 
     player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
-    if (BitQuest.REDIS.exists("bitquest:motd") == true) {
-      player.sendMessage(BitQuest.REDIS.get("bitquest:motd"));
+    if (bitQuest.redis.exists("bitquest:motd") == true) {
+      player.sendMessage(bitQuest.redis.get("bitquest:motd"));
     }
     try {
       player.sendMessage(
           "The loot pool is: "
               + (int)
-              (bitQuest.wallet.getBalance(1) / bitQuest.DENOMINATION_FACTOR)
+              (bitQuest.wallet.balance(1) / bitQuest.DENOMINATION_FACTOR)
               + " "
               + BitQuest.DENOMINATION_NAME);
     } catch (Exception e) {
@@ -245,9 +250,9 @@ public class EntityEvents implements Listener {
     }
 
 
-    BitQuest.REDIS.zincrby("player:login", 1, player.getUniqueId().toString());
+    bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
     // spawn pet
-    if (BitQuest.REDIS.exists("pet:" + player.getUniqueId().toString())) {
+    if (bitQuest.redis.exists("pet:" + player.getUniqueId().toString())) {
       bitQuest.spawnPet(player);
     }
 
@@ -308,12 +313,12 @@ public class EntityEvents implements Listener {
           if (bitQuest.landNameCache.containsKey(key1)) {
             name1 = bitQuest.landNameCache.get(key1);
           } else {
-            name1 = BitQuest.REDIS.get(key1) != null ? BitQuest.REDIS.get(key1) : "the wilderness";
+            name1 = bitQuest.redis.get(key1) != null ? bitQuest.redis.get(key1) : "the wilderness";
             bitQuest.landNameCache.put(key1, name1);
           }
         }
         if (bitQuest.landIsClaimed(event.getTo())) {
-          name2 = BitQuest.REDIS.get(key2) != null ? BitQuest.REDIS.get(key2) : "the wilderness";
+          name2 = bitQuest.redis.get(key2) != null ? bitQuest.redis.get(key2) : "the wilderness";
         }
         event.getPlayer().setGameMode(GameMode.SURVIVAL);
 
@@ -379,7 +384,7 @@ public class EntityEvents implements Listener {
       throws IOException, ParseException, org.json.simple.parser.ParseException, SQLException {
     final LivingEntity entity = e.getEntity();
 
-    final int level = (new Double(entity.getMaxHealth()).intValue()) - 1;
+    final int level = (int)entity.getMaxHealth() - 1;
 
     if (entity instanceof Monster
         && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
@@ -395,17 +400,17 @@ public class EntityEvents implements Listener {
       }
       if (player != null) {
 
-        Long money = bitQuest.LAND_PRICE;
+        Double money = bitQuest.LAND_PRICE;
 
         // Add EXP
         int exp = level * 4;
-        bitQuest.REDIS.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
+        bitQuest.redis.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
         bitQuest.setTotalExperience(player);
         if (damage.getEntity() instanceof Wither) {
 
-          final User user = new User(player.getUniqueId());
+          final User user = new User(player.getUniqueId(),bitQuest);
 
-          if (bitQuest.wallet.payment(user.wallet.address, money)) {
+          if (bitQuest.wallet.payment(user.wallet.address(), money)) {
             System.out.println("[loot] " + player.getDisplayName() + ": " + money);
             bitQuest.sendDiscordMessage(
                 player.getDisplayName() + " killed " + damage.getEntity().getName() +
@@ -934,7 +939,7 @@ public class EntityEvents implements Listener {
 
   @EventHandler(priority = EventPriority.NORMAL)
   public void onPlayerRespawn(final PlayerRespawnEvent event) {
-    if (bitQuest.REDIS.exists("pet:" + event.getPlayer().getUniqueId())) {
+    if (bitQuest.redis.exists("pet:" + event.getPlayer().getUniqueId())) {
       bitQuest.spawnPet(event.getPlayer());
     }
   }

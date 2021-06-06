@@ -27,12 +27,12 @@ public class TransferCommand extends CommandAction {
           return false;
         }
       }
-      final Long sendAmount = Long.parseLong(args[0]) * BitQuest.DENOMINATION_FACTOR;
+      final Double sendAmount = Double.parseDouble(args[0]);
 
       System.out.println(sendAmount);
       Wallet fromWallet = null;
       try {
-        fromWallet = new User(player.getUniqueId()).wallet;
+        fromWallet = new User(player.getUniqueId(), bitQuest).wallet;
 
         if (sendAmount < (BitQuest.MINIMUM_TRANSACTION * BitQuest.DENOMINATION_FACTOR)) {
           player.sendMessage(

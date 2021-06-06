@@ -49,9 +49,11 @@ public class BitQuestTest {
     node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
     // Test wallet
-    Wallet wallet = new Wallet(node, "test");
-    System.out.println(wallet.balance());
-    System.out.println(wallet.address());
-
+    Wallet alice = new Wallet(node, "alice");
+    System.out.println(alice.balance(0));
+    System.out.println(alice.address());
+    Wallet bob = new Wallet(node, "bob");
+    System.out.println(bob.balance(0));
+    System.out.println(bob.address());
   }
 }

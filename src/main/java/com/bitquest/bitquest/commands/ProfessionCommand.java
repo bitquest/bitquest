@@ -18,7 +18,7 @@ public class ProfessionCommand extends CommandAction {
     if (args.length == 1) {
       String profession = args[0];
       if (profession.equals("rogue")) {
-        bitQuest.REDIS.set("profession:" + player.getUniqueId(), profession);
+        bitQuest.redis.set("profession:" + player.getUniqueId(), profession);
       }
     } else {
       player.sendMessage(ChatColor.RED + "Wrong argument count !");

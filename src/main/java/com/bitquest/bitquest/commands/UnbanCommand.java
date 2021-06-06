@@ -7,13 +7,19 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class UnbanCommand extends CommandAction {
+  private final BitQuest bitQuest;
+
+  public UnbanCommand(BitQuest plugin) {
+    this.bitQuest = plugin;
+  }
+
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
     if (args.length == 1) {
       String playerName = args[0];
-      if (BitQuest.REDIS.exists("uuid:" + playerName)) {
-        String uuid = BitQuest.REDIS.get("uuid:" + playerName);
-        BitQuest.REDIS.srem("banlist", uuid);
+      if (bitQuest.redis.exists("uuid:" + playerName)) {
+        String uuid = bitQuest.redis.get("uuid:" + playerName);
+        bitQuest.redis.srem("banlist", uuid);
         sender.sendMessage(
             ChatColor.GREEN
                 + "Player "

@@ -19,12 +19,11 @@ public class DonateCommand extends CommandAction {
     if (args.length == 1) {
       if (System.getenv("DONATION_ADDRESS") != null) {
         try {
-          final Long bits = Long.parseLong(args[0]);
-          final Long sat = bits * bitQuest.DENOMINATION_FACTOR;
-          final User user = new User(player.getUniqueId());
-          final Long balance = user.wallet.getBalance(0);
+          final Double amount = Double.parseDouble(args[0]);
+          final User user = new User(player.getUniqueId(), bitQuest);
+          final Double balance = user.wallet.balance(0);
 
-          if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), sat)) {
+          if (user.wallet.payment(System.getenv("DONATION_ADDRESS"), amount)) {
             player.sendMessage(ChatColor.GREEN + "Thanks for your support!");
             bitQuest.updateScoreboard(player);
           } else {

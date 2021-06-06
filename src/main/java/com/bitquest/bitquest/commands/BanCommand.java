@@ -8,14 +8,20 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 public class BanCommand extends CommandAction {
+  private final BitQuest bitQuest;
+
+  public BanCommand(BitQuest plugin) {
+    bitQuest = plugin;
+  }
+
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
     if (args.length == 1) {
       String playerName = args[0];
 
-      if (BitQuest.REDIS.exists("uuid:" + playerName)) {
-        String uuid = BitQuest.REDIS.get("uuid:" + playerName);
-        BitQuest.REDIS.sadd("banlist", uuid);
+      if (bitQuest.redis.exists("uuid:" + playerName)) {
+        String uuid = bitQuest.redis.get("uuid:" + playerName);
+        bitQuest.redis.sadd("banlist", uuid);
         Player kickedout = Bukkit.getPlayer(playerName);
 
         if (kickedout != null) {

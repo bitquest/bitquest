@@ -119,9 +119,11 @@ public class Node {
       getBalance
       Returns the balance of account
   */
-  public Double getBalance(String accountName) throws IOException, ParseException {
+  public Double getBalance(String accountName, Integer minimumConfirmations)
+      throws IOException, ParseException {
     JSONArray params = new JSONArray();
     params.add(accountName);
+    params.add(minimumConfirmations);
     JSONObject response = rpcCall("getbalance", params);
     return (Double) response.get("result");
   }

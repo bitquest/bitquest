@@ -21,19 +21,19 @@ public class CurrencyCommand extends CommandAction {
       if ((args[0].equalsIgnoreCase("ems"))
           || (args[0].equalsIgnoreCase("emerald"))
           || (args[0].equalsIgnoreCase("emeralds"))) {
-        BitQuest.REDIS.set("currency" + player.getUniqueId().toString(), "emerald");
+        bitQuest.redis.set("currency" + player.getUniqueId().toString(), "emerald");
         player.sendMessage(
             ChatColor.GREEN
                 + "Currency changed to "
-                + BitQuest.REDIS.get("currency" + player.getUniqueId().toString()));
+                + bitQuest.redis.get("currency" + player.getUniqueId().toString()));
 
       } else if (args[0].equalsIgnoreCase(BitQuest.DENOMINATION_NAME)) {
-        BitQuest.REDIS.set(
+        bitQuest.redis.set(
             "currency" + player.getUniqueId().toString(), BitQuest.DENOMINATION_NAME);
         player.sendMessage(
             ChatColor.GREEN
                 + "Currency changed to "
-                + BitQuest.REDIS.get("currency" + player.getUniqueId().toString()));
+                + bitQuest.redis.get("currency" + player.getUniqueId().toString()));
 
       } else {
         player.sendMessage(ChatColor.RED + "There was a problem changing your currency.");

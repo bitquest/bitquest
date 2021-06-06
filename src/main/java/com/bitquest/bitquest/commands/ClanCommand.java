@@ -26,11 +26,11 @@ public class ClanCommand extends CommandAction {
           if (!hasNonAlpha) {
             // 16 characters max
             if (clanName.length() <= 16) {
-              if (!BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-                if (!BitQuest.REDIS.sismember("clans", clanName)) {
-                  BitQuest.REDIS.sadd("clans", clanName);
-                  BitQuest.REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
-                  BitQuest.REDIS.sadd(
+              if (!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
+                if (!bitQuest.redis.sismember("clans", clanName)) {
+                  bitQuest.redis.sadd("clans", clanName);
+                  bitQuest.redis.set("clan:" + player.getUniqueId().toString(), clanName);
+                  bitQuest.redis.sadd(
                       "clan:" + clanName + ":members", player.getUniqueId().toString());
                   player.sendMessage(
                       ChatColor.GREEN
@@ -60,7 +60,7 @@ public class ClanCommand extends CommandAction {
                 player.sendMessage(
                     ChatColor.RED
                         + "You already belong to the clan "
-                        + BitQuest.REDIS.get("clan:" + player.getUniqueId().toString()));
+                        + bitQuest.redis.get("clan:" + player.getUniqueId().toString()));
                 return true;
               }
             } else {
@@ -86,16 +86,16 @@ public class ClanCommand extends CommandAction {
             return true;
           }
           // check that player is in a clan
-          if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-            String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
+          if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
+            String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
             // check if user is in the uuid database
-            if (BitQuest.REDIS.exists("uuid:" + invitedName)) {
+            if (bitQuest.redis.exists("uuid:" + invitedName)) {
               // check if player already belongs to a clan
-              String uuid = BitQuest.REDIS.get("uuid:" + invitedName);
-              if (!BitQuest.REDIS.exists("clan:" + uuid)) {
+              String uuid = bitQuest.redis.get("uuid:" + invitedName);
+              if (!bitQuest.redis.exists("clan:" + uuid)) {
                 // check if player is already invited to the clan
-                if (!BitQuest.REDIS.sismember("invitations:" + clan, uuid)) {
-                  BitQuest.REDIS.sadd("invitations:" + clan, uuid);
+                if (!bitQuest.redis.sismember("invitations:" + clan, uuid)) {
+                  bitQuest.redis.sadd("invitations:" + clan, uuid);
                   player.sendMessage(
                       ChatColor.GREEN
                           + "You invited "
@@ -125,7 +125,7 @@ public class ClanCommand extends CommandAction {
                 }
 
               } else {
-                if (BitQuest.REDIS.get("clan:" + uuid).equals(clan)) {
+                if (bitQuest.redis.get("clan:" + uuid).equals(clan)) {
                   player.sendMessage(
                       ChatColor.RED
                           + "Player "
@@ -158,14 +158,14 @@ public class ClanCommand extends CommandAction {
         if (args.length > 1) {
           String clanName = args[1];
           // check that player is invited to the clan he wants to join
-          if (BitQuest.REDIS.sismember(
+          if (bitQuest.redis.sismember(
               "invitations:" + clanName, player.getUniqueId().toString())) {
             // user is invited to join
-            if (!BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
+            if (!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
               // user is not part of any clan
-              BitQuest.REDIS.srem("invitations:" + clanName, player.getUniqueId().toString());
-              BitQuest.REDIS.set("clan:" + player.getUniqueId().toString(), clanName);
-              BitQuest.REDIS.sadd("clan:" + clanName + ":members", player.getUniqueId().toString());
+              bitQuest.redis.srem("invitations:" + clanName, player.getUniqueId().toString());
+              bitQuest.redis.set("clan:" + player.getUniqueId().toString(), clanName);
+              bitQuest.redis.sadd("clan:" + clanName + ":members", player.getUniqueId().toString());
               player.sendMessage(
                   ChatColor.GREEN + "You are now part of the " + clanName + " clan!");
               player.setPlayerListName(
@@ -186,7 +186,7 @@ public class ClanCommand extends CommandAction {
               player.sendMessage(
                   ChatColor.RED
                       + "You already belong to the clan "
-                      + BitQuest.REDIS.get("clan:" + player.getUniqueId().toString()));
+                      + bitQuest.redis.get("clan:" + player.getUniqueId().toString()));
               return true;
             }
           } else {
@@ -203,15 +203,15 @@ public class ClanCommand extends CommandAction {
         if (args.length > 1) {
           String toKick = args[1];
           // check if player is in the uuid database
-          if (BitQuest.REDIS.exists("uuid:" + toKick)) {
-            String uuid = BitQuest.REDIS.get("uuid:" + toKick);
+          if (bitQuest.redis.exists("uuid:" + toKick)) {
+            String uuid = bitQuest.redis.get("uuid:" + toKick);
             // check if player belongs to a clan
-            if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-              String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
+            if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
+              String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
               // check that kicker and player are in the same clan
-              if (BitQuest.REDIS.get("clan:" + uuid).equals(clan)) {
-                BitQuest.REDIS.del("clan:" + uuid);
-                BitQuest.REDIS.srem("clan:" + clan + ":members", uuid);
+              if (bitQuest.redis.get("clan:" + uuid).equals(clan)) {
+                bitQuest.redis.del("clan:" + uuid);
+                bitQuest.redis.srem("clan:" + clan + ":members", uuid);
                 removeEmptyClan(clan);
                 player.sendMessage(
                     ChatColor.GREEN
@@ -248,11 +248,11 @@ public class ClanCommand extends CommandAction {
         }
       }
       if (subCommand.equals("leave")) {
-        if (BitQuest.REDIS.exists("clan:" + player.getUniqueId().toString())) {
-          String clan = BitQuest.REDIS.get("clan:" + player.getUniqueId().toString());
+        if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
+          String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
           player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + clan + " clan");
-          BitQuest.REDIS.del("clan:" + player.getUniqueId().toString());
-          BitQuest.REDIS.srem("clan:" + clan + ":members", player.getUniqueId().toString());
+          bitQuest.redis.del("clan:" + player.getUniqueId().toString());
+          bitQuest.redis.srem("clan:" + clan + ":members", player.getUniqueId().toString());
 
           player.setPlayerListName(player.getName());
 
@@ -271,10 +271,10 @@ public class ClanCommand extends CommandAction {
   }
 
   private void removeEmptyClan(String clan) {
-    if (BitQuest.REDIS.scard("clan:" + clan + ":members") == 0) {
-      BitQuest.REDIS.del("clan:" + clan + ":members");
-      BitQuest.REDIS.srem("clans", clan);
-      BitQuest.REDIS.del("invitations:" + clan);
+    if (bitQuest.redis.scard("clan:" + clan + ":members") == 0) {
+      bitQuest.redis.del("clan:" + clan + ":members");
+      bitQuest.redis.srem("clans", clan);
+      bitQuest.redis.del("invitations:" + clan);
     }
   }
 }

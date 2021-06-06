@@ -88,8 +88,7 @@ public class InventoryEvents implements Listener {
       if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
         final User user;
         try {
-          user = new User(player.getUniqueId());
-
+          user = new User(player.getUniqueId(), bitQuest);
         } catch (Exception e) {
           e.printStackTrace();
           player.sendMessage(
@@ -123,10 +122,10 @@ public class InventoryEvents implements Listener {
             }
           }
           final boolean hasOpenSlotsFinal = hasOpenSlots;
-          final long satFinal = sat * BitQuest.DENOMINATION_FACTOR;
+          final long satFinal = (sat * BitQuest.DENOMINATION_FACTOR);
           try {
             if (hasOpenSlotsFinal) {
-              if (user.wallet.payment(bitQuest.wallet.address, satFinal)) {
+              if (user.wallet.payment(bitQuest.wallet.address(), (double) satFinal)) {
                 if (clicked.getType() == Material.ENCHANTED_BOOK) {
                   bitQuest.books.remove(0);
                 }
@@ -232,7 +231,7 @@ public class InventoryEvents implements Listener {
     ItemStack item = event.getItem().getItemStack();
     Material itemType = item.getType();
     if (((itemType == Material.EMERALD_BLOCK) || (itemType == Material.EMERALD))
-        && (BitQuest.REDIS
+        && (bitQuest.redis
         .get("currency" + player.getUniqueId().toString())
         .equalsIgnoreCase("emerald"))) {
       try {

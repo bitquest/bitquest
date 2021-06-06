@@ -22,7 +22,7 @@ public class MessageOfTheDayCommand extends CommandAction {
       player.sendMessage("Please use only aplhanumeric characters.");
       return false;
     } else {
-      bitQuest.REDIS.set("bitquest:motd", args[0]);
+      bitQuest.redis.set("bitquest:motd", args[0]);
       player.sendMessage(ChatColor.GREEN + "Message changed.");
       return true;
     }

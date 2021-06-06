@@ -13,20 +13,26 @@ import org.bukkit.entity.Player;
 // feature also, you can now just run /fixabandonland to see list of land with owners and
 // permissions in redis and what would be removed. then can also run as /fixabandonland <true|yes>
 public class FixAbandonLand extends CommandAction {
+  BitQuest bitQuest;
+
+  public FixAbandonLand(BitQuest plugin) {
+    bitQuest = plugin;
+  }
+
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
     int xySize = 0;
-    Set<String> ownerList = BitQuest.REDIS.keys("chunk*owner");
-    Set<String> permissionsList = BitQuest.REDIS.keys("*permissions");
+    Set<String> ownerList = bitQuest.redis.keys("chunk*owner");
+    Set<String> permissionsList = bitQuest.redis.keys("*permissions");
     String[] xys = new String[ownerList.size()];
     String[] subPerms = new String[permissionsList.size()];
     for (String tempOwnerList : ownerList) {
       xys[xySize] = tempOwnerList.substring(0, tempOwnerList.length() - 5);
       sender.sendMessage(
           ChatColor.DARK_RED
-              + BitQuest.REDIS.get(xys[xySize] + "name")
+              + bitQuest.redis.get(xys[xySize] + "name")
               + " is owned by: "
-              + (BitQuest.REDIS.get(tempOwnerList)));
+              + (bitQuest.redis.get(tempOwnerList)));
       xySize++;
     }
 
@@ -38,24 +44,24 @@ public class FixAbandonLand extends CommandAction {
           ChatColor.YELLOW
               + tempPermissionsList
               + " is set to: "
-              + (BitQuest.REDIS.get(subPerms[xySize] + "permissions")));
+              + (bitQuest.redis.get(subPerms[xySize] + "permissions")));
       xySize++;
     }
 
     for (int i = 0; i <= permissionsList.size() - 1; i++) {
-      if ((BitQuest.REDIS.get(subPerms[i] + "owner")) == null) {
+      if ((bitQuest.redis.get(subPerms[i] + "owner")) == null) {
         sender.sendMessage(
             ChatColor.GREEN
                 + "To Be Removed: "
                 + subPerms[i]
                 + "permissions is set to: "
-                + BitQuest.REDIS.get(subPerms[i] + "permissions"));
+                + bitQuest.redis.get(subPerms[i] + "permissions"));
       }
     }
     if ((args[0].equalsIgnoreCase("true")) || (args[0].equalsIgnoreCase("yes"))) {
       for (int i = 0; i <= permissionsList.size() - 1; i++) {
-        if ((BitQuest.REDIS.get(subPerms[i] + "owner")) == null) {
-          BitQuest.REDIS.del(subPerms[i] + "permissions");
+        if ((bitQuest.redis.get(subPerms[i] + "owner")) == null) {
+          bitQuest.redis.del(subPerms[i] + "permissions");
           sender.sendMessage(ChatColor.GREEN + "Removed: " + subPerms[i] + "permissions");
         }
       }

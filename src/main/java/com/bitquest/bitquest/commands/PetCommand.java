@@ -19,18 +19,18 @@ public class PetCommand extends CommandAction {
       player.sendMessage("Your pet needs a name!");
       return false;
     } else if ((args[0].equalsIgnoreCase("on"))
-        && (BitQuest.REDIS
-            .get("petIsOn" + player.getUniqueId().toString())
-            .equalsIgnoreCase("off"))) {
-      BitQuest.REDIS.set("petIsOn" + player.getUniqueId().toString(), "on");
+        && (bitQuest.redis
+        .get("petIsOn" + player.getUniqueId().toString())
+        .equalsIgnoreCase("off"))) {
+      bitQuest.redis.set("petIsOn" + player.getUniqueId().toString(), "on");
       player.sendMessage("Your pet is on!");
       bitQuest.spawnPet(player);
       return true;
     } else if ((args[0].equalsIgnoreCase("off"))
-        && (BitQuest.REDIS
-            .get("petIsOn" + player.getUniqueId().toString())
-            .equalsIgnoreCase("on"))) {
-      BitQuest.REDIS.set("petIsOn" + player.getUniqueId().toString(), "off");
+        && (bitQuest.redis
+        .get("petIsOn" + player.getUniqueId().toString())
+        .equalsIgnoreCase("on"))) {
+      bitQuest.redis.set("petIsOn" + player.getUniqueId().toString(), "off");
       player.sendMessage("Your pet is off!");
       bitQuest.spawnPet(player);
       return true;
@@ -44,7 +44,7 @@ public class PetCommand extends CommandAction {
       player.sendMessage("That name is too long!");
       return false;
     } else {
-      if (bitQuest.REDIS.sismember("pet:names", args[0])) {
+      if (bitQuest.redis.sismember("pet:names", args[0])) {
         player.sendMessage(ChatColor.RED + "A pet with that name already exists.");
       } else if ((args[0].equalsIgnoreCase("off")) || (args[0].equalsIgnoreCase("on"))) {
         player.sendMessage("You can not choose that as a name!");

@@ -12,19 +12,13 @@ public class User {
   public Wallet wallet;
   private String clan;
   public UUID uuid;
+  private BitQuest bitQuest;
 
-  public User(UUID u)
+  public User(UUID uuid, BitQuest bitQuest)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    this.uuid = u;
-    if (BitQuest.REDIS.get("Wallet.address." + uuid) != null) {
-      this.wallet = new Wallet(BitQuest.REDIS.get("Wallet.private_key." + uuid),
-          BitQuest.REDIS.get("Wallet.public_key." + uuid),
-          BitQuest.REDIS.get("Wallet.address." + uuid), BitQuest.REDIS.get("Wallet.WIF." + uuid));
-    } else {
-      System.out.println("[user not found] " + this.uuid);
-      this.wallet = BitQuest.generateNewWallet();
-      this.wallet.save(this.uuid);
-    }
+    this.uuid = uuid;
+    this.bitQuest = bitQuest;
+    this.wallet = new Wallet(this.bitQuest.node, uuid.toString());
   }
 
   // Team walletScoreboardTeam = walletScoreboard.registerNewTeam("wallet");
@@ -37,10 +31,10 @@ public class User {
   //        System.out.println(exp);
   //    }
   public int experience() {
-    if (BitQuest.REDIS.get("experience.raw." + this.uuid.toString()) == null) {
+    if (bitQuest.redis.get("experience.raw." + this.uuid.toString()) == null) {
       return 0;
     } else {
-      return Integer.parseInt(BitQuest.REDIS.get("experience.raw." + this.uuid.toString()));
+      return Integer.parseInt(bitQuest.redis.get("experience.raw." + this.uuid.toString()));
     }
   }
 
