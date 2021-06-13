@@ -432,8 +432,8 @@ public class BitQuest extends JavaPlugin {
           if (entity.getCustomName() != null && entity.getCustomName().equals(catName)) {
             if (catIsFound == false) {
               entity.teleport(player.getLocation());
-              ((Ocelot) entity).setTamed(true);
-              ((Ocelot) entity).setOwner(player);
+              // ((Ocelot) entity).setTamed(true);
+              // ((Ocelot) entity).setOwner(player);
               catIsFound = true;
             } else {
               entity.remove();

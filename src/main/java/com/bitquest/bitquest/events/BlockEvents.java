@@ -55,7 +55,7 @@ public class BlockEvents implements Listener {
       // Get the soil block
       Block soilBlock = event.getClickedBlock();
       // Check if the block is SOIL
-      if (soilBlock.getType() == Material.SOIL) {
+      if (soilBlock.getType() == Material.LEGACY_SOIL) {
         // Check if moderator
         if (!bitQuest.isModerator(event.getPlayer())) {
           // If the player can't build there cancel it
@@ -81,9 +81,9 @@ public class BlockEvents implements Listener {
       } else {
         event.setCancelled(true);
       }
-    } else if (m.equals(Material.BEDROCK) || m.equals(Material.COMMAND) ||
-        m.equals(Material.COMMAND_CHAIN)
-        || m.equals(Material.COMMAND_REPEATING)) {
+    } else if (m.equals(Material.BEDROCK) || m.equals(Material.LEGACY_COMMAND) ||
+        m.equals(Material.LEGACY_COMMAND_CHAIN)
+        || m.equals(Material.LEGACY_COMMAND_REPEATING)) {
       event.setCancelled(true);
       // If player is in a no-build zone, cancel the event
     } else if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
@@ -102,9 +102,9 @@ public class BlockEvents implements Listener {
     if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
       event.setCancelled(true);
       event.getPlayer().sendMessage(ChatColor.DARK_RED + "You may not place blocks here!");
-    } else if (m.equals(Material.BEDROCK) || m.equals(Material.COMMAND) ||
-        m.equals(Material.COMMAND_CHAIN)
-        || m.equals(Material.COMMAND_REPEATING)) {
+    } else if (m.equals(Material.BEDROCK) || m.equals(Material.LEGACY_COMMAND) ||
+        m.equals(Material.LEGACY_COMMAND_CHAIN)
+        || m.equals(Material.LEGACY_COMMAND_REPEATING)) {
       event.getPlayer().sendMessage(ChatColor.DARK_RED + "Placing that block is not allowed!");
       event.setCancelled(true);
     } else {

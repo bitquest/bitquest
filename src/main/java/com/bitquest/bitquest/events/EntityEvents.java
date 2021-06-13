@@ -84,14 +84,14 @@ public class EntityEvents implements Listener {
           Material.DARK_OAK_DOOR,
           Material.JUNGLE_DOOR,
           Material.SPRUCE_DOOR,
-          Material.WOOD_DOOR,
-          Material.WOODEN_DOOR,
+          Material.LEGACY_WOOD_DOOR,
+          Material.LEGACY_WOODEN_DOOR,
           Material.FURNACE,
-          Material.BURNING_FURNACE,
+          Material.LEGACY_BURNING_FURNACE,
           Material.ACACIA_FENCE_GATE,
           Material.BIRCH_FENCE_GATE,
           Material.DARK_OAK_FENCE_GATE,
-          Material.FENCE_GATE,
+          Material.LEGACY_FENCE_GATE,
           Material.JUNGLE_FENCE_GATE,
           Material.SPRUCE_FENCE_GATE,
           Material.DISPENSER,
@@ -110,7 +110,7 @@ public class EntityEvents implements Listener {
           Material.PINK_SHULKER_BOX,
           Material.PURPLE_SHULKER_BOX,
           Material.RED_SHULKER_BOX,
-          Material.SILVER_SHULKER_BOX,
+          Material.LEGACY_SILVER_SHULKER_BOX,
           Material.WHITE_SHULKER_BOX,
           Material.YELLOW_SHULKER_BOX);
 
@@ -426,7 +426,6 @@ public class EntityEvents implements Listener {
                     + " "
                     + bitQuest.DENOMINATION_NAME
                     + " of loot!");
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_PLING, 20, 1);
           }
 
         }
@@ -674,10 +673,10 @@ public class EntityEvents implements Listener {
     if (!(entity instanceof Skeleton)) {
       Material swordMaterial = null;
       if (BitQuest.rand(0, 2) < level) {
-        swordMaterial = Material.WOOD_AXE;
+        swordMaterial = Material.LEGACY_WOOD_AXE;
       }
       if (BitQuest.rand(0, 4) < level) {
-        swordMaterial = Material.GOLD_AXE;
+        swordMaterial = Material.LEGACY_GOLD_AXE;
       }
       if (BitQuest.rand(0, 8) < level) {
         swordMaterial = Material.IRON_AXE;
@@ -686,10 +685,10 @@ public class EntityEvents implements Listener {
         swordMaterial = Material.DIAMOND_AXE;
       }
       if (BitQuest.rand(0, 32) < level) {
-        swordMaterial = Material.WOOD_SWORD;
+        swordMaterial = Material.LEGACY_WOOD_SWORD;
       }
       if (BitQuest.rand(0, 64) < level) {
-        swordMaterial = Material.GOLD_SWORD;
+        swordMaterial = Material.LEGACY_GOLD_SWORD;
       }
       if (BitQuest.rand(0, 128) < level) {
         swordMaterial = Material.IRON_SWORD;
@@ -913,13 +912,6 @@ public class EntityEvents implements Listener {
     Block b = event.getClickedBlock();
     Player p = event.getPlayer();
     if (b != null && PROTECTED_BLOCKS.contains(b.getType())) {
-      // If block's inventory has "public" in it, allow the player to interact with it.
-      if (b.getState() instanceof InventoryHolder) {
-        Inventory blockInventory = ((InventoryHolder) b.getState()).getInventory();
-        if (blockInventory.getName().toLowerCase().contains("public")) {
-          return;
-        }
-      }
       // If player doesn't have permission, disallow the player to interact with it.
       if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
         event.setCancelled(true);

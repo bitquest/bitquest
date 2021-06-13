@@ -85,3 +85,4 @@ commands:
   migrateclans:
     description: "Migrate clans to keep track of members"
     usage: "/migrateclans"
+api-version: 1.17
