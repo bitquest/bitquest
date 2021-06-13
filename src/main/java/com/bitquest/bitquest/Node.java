@@ -78,11 +78,10 @@ public class Node {
       If the number is the same as the last block mined on the network, 
       it means the node is fully synced up.
   */
-  public Long blocks() throws IOException, ParseException {
+  public JSONObject getBlockchainInfo() throws IOException, ParseException {
     JSONObject response = rpcCall("getblockchaininfo");
     JSONObject blockchainInfo = (JSONObject) response.get("result");
-    Long blocks = (Long) blockchainInfo.get("blocks");
-    return blocks;
+    return blockchainInfo;
   }
 
   /*

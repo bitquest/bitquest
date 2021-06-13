@@ -33,10 +33,13 @@ Additionally, players can send Bitcoin to other players via /send:
 
 # Play Bitquest
 
-Official BitQuest server is not online anymore, but you can start your own server using Docker or Bukkit.
+Official BitQuest server is not online anymore, but you can host your own server using Docker or Bukkit.
 
-# Start a BitQuest server
+# Hosting a BitQuest server
 There are two methods to create a Bitquest server: One involves running a Docker image with everything ready, and the other is to build the plugin from source and adding it to a Spigot instance.
+
+## Hosting a Bitcoin or Dogecoin node
+A requirement for BitQuest is a Full Node of Bitcoin Core or Dogecoin Core. Before starting a BitQuest server make sure you have a fully synched node with RPC access turned on.
 
 ## Using Docker
 You can download the a (https://hub.docker.com/repository/docker/explodi/bitquest)[official BitQuest docker image]. 

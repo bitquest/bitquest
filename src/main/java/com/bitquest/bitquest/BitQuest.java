@@ -208,14 +208,21 @@ public class BitQuest extends JavaPlugin {
       log("startup", "Redis host is: " + REDIS_HOST);
       log("startup", "Redis port is: " + REDIS_PORT);
 
+      try {
+        JSONObject blockchainInfo = node.getBlockchainInfo();
+        Double verificationProgress = (Double) blockchainInfo.get("verificationprogress");
+        log("node", "verificartion progesss: " + verificationProgress);
+
+      } catch (Exception e) {
+        log("fatal",e.getMessage());
+        log("fatal","Cannot connect to node. Make sure your node is running and you have" +
+            "set the credentials in your environment variables.");
+        Bukkit.shutdown();
+        return;
+      }
+      
       this.wallet = new Wallet(node, "loot");
       System.out.println("[world wallet] address: " + wallet.address());
-
-      if (NODE_HOST != null) {
-        System.out.println("[startup] checking bitcoin node connection");
-        getBlockChainInfo();
-      }
-
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
       commands = new HashMap<String, CommandAction>();
@@ -245,7 +252,6 @@ public class BitQuest extends JavaPlugin {
       modCommands.put("motd", new MessageOfTheDayCommand(this));
       // TODO: Re enable loot pool cache
       // updateLootPoolCache();
-      publish_stats();
       redis.set("loot:rate:limit", "1");
       redis.expire("loot:rate:limit", 10);
       killAllVillagers();
@@ -324,55 +330,6 @@ public class BitQuest extends JavaPlugin {
 
   }
 
-
-  // @todo: make this just accept the endpoint name and (optional) parameters
-  public JSONObject getBlockChainInfo() throws org.json.simple.parser.ParseException {
-    JSONParser parser = new JSONParser();
-
-    try {
-      final JSONObject jsonObject = new JSONObject();
-      jsonObject.put("jsonrpc", "1.0");
-      jsonObject.put("id", "bitquest");
-      jsonObject.put("method", "getblockchaininfo");
-      JSONArray params = new JSONArray();
-      jsonObject.put("params", params);
-      System.out.println("Checking blockchain info...");
-      URL url = new URL("http://" + NODE_HOST + ":" + NODE_PORT);
-      System.out.println(url.toString());
-      HttpURLConnection con = (HttpURLConnection) url.openConnection();
-      String userPassword = NODE_RPC_USERNAME + ":" + NODE_RPC_PASSWORD;
-      String encoding = java.util.Base64.getEncoder().encodeToString(userPassword.getBytes());
-      con.setRequestProperty("Authorization", "Basic " + encoding);
-
-      con.setRequestMethod("POST");
-      con.setRequestProperty("User-Agent", "bitquest plugin");
-      con.setRequestProperty("Accept-Language", "en-US,en;q=0.5");
-      con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-      con.setDoOutput(true);
-      OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-      out.write(jsonObject.toString());
-      out.close();
-
-      int responseCode = con.getResponseCode();
-
-      BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-      String inputLine;
-      StringBuffer response = new StringBuffer();
-
-      while ((inputLine = in.readLine()) != null) {
-        response.append(inputLine);
-      }
-      in.close();
-      System.out.println(response.toString());
-      return (JSONObject) parser.parse(response.toString());
-    } catch (IOException e) {
-      System.out.println("problem connecting with bitcoin node");
-      System.out.println(e);
-      // Unable to call API?
-    }
-
-    return new JSONObject(); // just give them an empty object
-  }
 
   public void announce(final String message) {
     for (Player player : Bukkit.getOnlinePlayers()) {
@@ -563,61 +520,9 @@ public class BitQuest extends JavaPlugin {
         7200L);
 
 
-    scheduler.scheduleSyncRepeatingTask(
-        this,
-        new Runnable() {
-          @Override
-          public void run() {
-            run_season_events();
-            publish_stats();
-            updateLootPoolCache();
-          }
-        },
-        0,
-        30000L);
+    
   }
 
-  public void publish_stats() {
-    try {
-      Double balance = wallet.balance(0);
-      redis.set("loot:pool", Double.toString(balance));
-      if (System.getenv("ELASTICSEARCH_ENDPOINT") != null) {
-
-        final JSONObject jsonObject = new JSONObject();
-
-        jsonObject.put("balance", balance);
-        jsonObject.put("time", new Date().getTime());
-        URL url = new URL(System.getenv("ELASTICSEARCH_ENDPOINT") + "-stats/_doc");
-        System.out.println(url.toString());
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
-
-        con.setDoOutput(true);
-        OutputStreamWriter out = new OutputStreamWriter(con.getOutputStream());
-        out.write(jsonObject.toString());
-        out.close();
-
-        int responseCode = con.getResponseCode();
-
-        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = in.readLine()) != null) {
-          response.append(inputLine);
-        }
-        in.close();
-        System.out.println(response.toString());
-        JSONParser parser = new JSONParser();
-        JSONObject responseObject = (JSONObject) parser.parse(response.toString());
-        System.out.println(responseObject);
-      }
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
 
   public void run_season_events() {
     java.util.Date date = new Date();
