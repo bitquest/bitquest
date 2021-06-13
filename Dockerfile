@@ -1,21 +1,9 @@
-FROM debian:stable
-ARG SPIGOT_VERSION=latest
+FROM maven:3.8.1-openjdk-16
+ARG SPIGOT_VERSION=1.17
 ENV DEBIAN_FRONTEND noninteractive
-
-RUN apt-get update
-RUN apt-get install -y software-properties-common dirmngr maven git build-essential gnupg default-jre default-jdk
-# Uncomment the following lines to switch to Oracle Java
-
-# RUN echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | tee /etc/apt/sources.list.d/webupd8team-java.list
-# RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys EEA14886  && \
-# RUN apt-get update
-# RUN echo debconf shared/accepted-oracle-license-v1-1 select true | debconf-set-selections
-# RUN DEBIAN_FRONTEND=noninteractive  apt-get install -y oracle-java8-installer oracle-java8-set-default
-
-
 RUN mkdir -p /spigot/plugins
 WORKDIR /build
-# DOWNLOAD AND BUILD SPIGOT
+# Download and build spigot
 ADD https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar /build/BuildTools.jar
 RUN cd /build && java -jar BuildTools.jar --rev $SPIGOT_VERSION
 RUN cp /build/Spigot/Spigot-Server/target/spigot-*.jar /spigot/spigot.jar
