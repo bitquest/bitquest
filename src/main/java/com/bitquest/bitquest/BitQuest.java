@@ -89,7 +89,7 @@ public class BitQuest extends JavaPlugin {
   // Connecting to REDIS
   // Links to the administration account via Environment Variables
   public static final String BITQUEST_ENV =
-      System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "";
+      System.getenv("BITQUEST_ENV") != null ? System.getenv("BITQUEST_ENV") : "development";
   public static final UUID ADMIN_UUID =
       System.getenv("ADMIN_UUID") != null ? UUID.fromString(System.getenv("ADMIN_UUID")) : null;
 
@@ -172,12 +172,11 @@ public class BitQuest extends JavaPlugin {
   public void onEnable() {
     log("startup", "BitQuest starting");
     redis = new Jedis(REDIS_HOST, REDIS_PORT);
-    node = new Node();
-    Node node = new Node();
-    node.host = BitQuest.NODE_HOST;
-    node.port = BitQuest.NODE_PORT;
-    node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
-    node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
+    this.node = new Node();
+    this.node.host = BitQuest.NODE_HOST;
+    this.node.port = BitQuest.NODE_PORT;
+    this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
+    this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
     try {
 
       if (ADMIN_UUID == null) {
@@ -868,19 +867,11 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
-  public void sendWalletInfo(final Player player, final User user) {
-    if (NODE_HOST != null) {
-      // TODO: Rewrite send wallet info
-    }
+  public void sendWalletInfo(final Player player) {
     try {
-      Double balance = user.wallet.balance(0);
-
-      player.sendMessage("Address: " + user.wallet.address());
-      player.sendMessage("Balance: " + balance);
-      player.sendMessage(
-          "URL: " + ChatColor.BLUE + ChatColor.UNDERLINE + ChatColor.BOLD + user.wallet.address());
-      player.sendMessage("-----------");
-
+      Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
+      player.sendMessage("Address: " + wallet.address());
+      player.sendMessage("Balance: " + wallet.balance(0));
     } catch (Exception e) {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED + "Error reading wallet. Please try again later.");

@@ -147,6 +147,8 @@ public class EntityEvents implements Listener {
   public void onPlayerLogin(PlayerLoginEvent event) {
     try {
       Player player = event.getPlayer();
+      // When Development mode is on (default) all users have admin access
+      player.setOp(BitQuest.BITQUEST_ENV.equals("development"));
       bitQuest.redis.set("name:" + player.getUniqueId().toString(), player.getName());
       bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
       if (bitQuest.redis.sismember("banlist", event.getPlayer().getUniqueId().toString())) {

@@ -18,8 +18,7 @@ public class WalletCommand extends CommandAction {
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
 
     try {
-      User user = new User(player.getUniqueId(), bitQuest);
-      bitQuest.sendWalletInfo(player, user);
+      bitQuest.sendWalletInfo(player);
       bitQuest.updateScoreboard(player);
     } catch (Exception e) {
       e.printStackTrace();

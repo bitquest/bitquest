@@ -18,6 +18,6 @@ services:
     image: redis
   dogecoind:
     image: explodi/dogecoind
-    command: ["-testnet","-rpcuser=user","-rpcpassword=hackme"]
+    command: ["-testnet","-rpcuser=user","-rpcpassword=hackme","--loglevel=error"]
     volumes:
       - "./data:/root/.dogecoin"

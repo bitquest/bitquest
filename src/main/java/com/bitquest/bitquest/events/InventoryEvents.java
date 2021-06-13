@@ -4,19 +4,24 @@ import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.Trade;
 import com.bitquest.bitquest.User;
 import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Statistic;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 /**
@@ -80,95 +85,6 @@ public class InventoryEvents implements Listener {
   }
 
   @EventHandler
-  void onInventoryClick(final InventoryClickEvent event) {
-    final Player player = (Player) event.getWhoClicked();
-    final Inventory inventory = event.getInventory();
-
-    // Merchant inventory
-    if (inventory.getType() == InventoryType.MERCHANT) {
-      if (event.getRawSlot() < event.getView().getTopInventory().getSize()) {
-        final User user;
-        try {
-          user = new User(player.getUniqueId(), bitQuest);
-        } catch (Exception e) {
-          e.printStackTrace();
-          player.sendMessage(
-              ChatColor.DARK_RED + "Problem loading your account. Please try again later.");
-          player.closeInventory();
-          event.setCancelled(true);
-          return;
-        }
-        // player buys
-        final ItemStack clicked = event.getCurrentItem();
-        if (clicked != null && clicked.getType() != Material.AIR) {
-          System.out.println("[purchase] " + player.getName() + " <- " + clicked.getType());
-          player.sendMessage(ChatColor.YELLOW + "Purchasing " + clicked.getType() + "...");
-          player.closeInventory();
-          event.setCancelled(true);
-          int sat = 0;
-          Trade trade = null;
-          for (int i = 0; i < trades.size(); i++) {
-            if (clicked.getType() == trades.get(i).itemStack.getType()) {
-              sat = trades.get(i).price;
-              trade = trades.get(i);
-            }
-          }
-          boolean hasOpenSlots = false;
-          for (ItemStack item : player.getInventory().getContents()) {
-            if (item == null
-                || (item.getType() == clicked.getType()
-                && item.getAmount() + clicked.getAmount() < item.getMaxStackSize())) {
-              hasOpenSlots = true;
-              break;
-            }
-          }
-          final boolean hasOpenSlotsFinal = hasOpenSlots;
-          final long satFinal = (sat * BitQuest.DENOMINATION_FACTOR);
-          try {
-            if (hasOpenSlotsFinal) {
-              if (user.wallet.payment(bitQuest.wallet.address(), (double) satFinal)) {
-                if (clicked.getType() == Material.ENCHANTED_BOOK) {
-                  bitQuest.books.remove(0);
-                }
-
-                ItemStack item = event.getCurrentItem();
-                ItemMeta meta = item.getItemMeta();
-                ArrayList<String> lore = new ArrayList<String>();
-                meta.setLore(null);
-                item.setItemMeta(meta);
-                player.getInventory().addItem(item);
-                player.sendMessage(
-                    ChatColor.GREEN
-                        + "You bought "
-                        + clicked.getType()
-                        + " for "
-                        + ChatColor.LIGHT_PURPLE
-                        + satFinal / 100
-                        + " (+ miner fees)");
-                bitQuest.updateScoreboard(player);
-              } else {
-                player.sendMessage(
-                    ChatColor.RED
-                        + "Transaction failed. Please try again in a few moments");
-              }
-            } else {
-              player.sendMessage(ChatColor.DARK_RED + "You don't have space in your inventory");
-            }
-
-          } catch (Exception e) {
-            e.printStackTrace();
-            player.sendMessage(
-                ChatColor.DARK_RED
-                    + "Problem reading your wallet balance. Please try again later.");
-            player.closeInventory();
-            event.setCancelled(true);
-          }
-        }
-      }
-    }
-  }
-
-  @EventHandler
   void onInteract(PlayerInteractEntityEvent event) {
     // VILLAGER
     if (event.getRightClicked().getType().equals(EntityType.VILLAGER)) {
@@ -176,37 +92,30 @@ public class InventoryEvents implements Listener {
       // compass
 
       // open menu
-
-      Inventory marketInventory = Bukkit.getServer().createInventory(null, InventoryType.MERCHANT, "Market");
+      Merchant merchant = Bukkit.createMerchant("Market");
+      // create list of merchant recipes:
+      List<MerchantRecipe> merchantRecipes = new ArrayList<MerchantRecipe>();      
       for (int i = 0; i < trades.size(); i++) {
-        int inventoryStock = bitQuest.MAX_STOCK;
-
-        if (inventoryStock > 0) {
-          ItemStack button = new ItemStack(trades.get(i).itemStack);
-          ItemMeta meta = button.getItemMeta();
-          ArrayList<String> lore = new ArrayList<String>();
-          int bitsPrice;
-          bitsPrice = (int) (trades.get(i).price
-              + (BitQuest.MINER_FEE / BitQuest.DENOMINATION_FACTOR));
-          lore.add("Price: " + bitsPrice);
-          meta.setLore(lore);
-          button.setItemMeta(meta);
-          marketInventory.setItem(i, button);
-        }
+        Trade trade = trades.get(i);
+        MerchantRecipe recipe = new MerchantRecipe(trade.itemStack, 10000);
+        recipe.addIngredient(new ItemStack(Material.EMERALD, Math.min(64,trade.price)));
+        merchantRecipes.add(recipe);
       }
-      if (bitQuest.books.size() > 0) {
-        ItemStack button = new ItemStack(bitQuest.books.get(0));
-        ItemMeta meta = button.getItemMeta();
-        ArrayList<String> lore = new ArrayList<String>();
-        int bitsPrice;
-        bitsPrice = 2;
+      merchant.setRecipes(merchantRecipes);
+      event.getPlayer().openMerchant(merchant, true);
+      // if (bitQuest.books.size() > 0) {
+      //   ItemStack button = new ItemStack(bitQuest.books.get(0));
+      //   ItemMeta meta = button.getItemMeta();
+      //   ArrayList<String> lore = new ArrayList<String>();
+      //   int bitsPrice;
+      //   bitsPrice = 2;
 
-        lore.add("Price: " + bitsPrice);
-        meta.setLore(lore);
-        button.setItemMeta(meta);
-        marketInventory.setItem(trades.size(), button);
-      }
-      event.getPlayer().openInventory(marketInventory);
+      //   lore.add("Price: " + bitsPrice);
+      //   meta.setLore(lore);
+      //   button.setItemMeta(meta);
+      //   marketInventory.setItem(trades.size(), button);
+      // }
+      // event.getPlayer().openInventory(marketInventory);
     }
   }
 
