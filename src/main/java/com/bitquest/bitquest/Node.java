@@ -31,7 +31,7 @@ public class Node {
     jsonObject.put("method", method);
     jsonObject.put("params", params);
     URL url = new URL("http://" + host + ":" + port);
-    System.out.println(url.toString());
+    BitQuest.debug("rpc",url.toString());
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setConnectTimeout(1000);
     String userPassword =

@@ -580,7 +580,13 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static final void log(String tag, String msg) {
-    System.out.println("[" + tag + "]" + msg);
+    System.out.println("[" + tag + "] " + msg);
+  }
+
+  public static final void debug(String tag, String msg) {
+    if (!BitQuest.BITQUEST_ENV.equals("production")) {
+      System.out.println("[" + tag + "] " + msg);
+    }
   }
 
   public int getLevel(int exp) {
