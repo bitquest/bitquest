@@ -18,7 +18,7 @@ jobs:
           distribution: 'adopt'
           java-version: '16'
       - name: Install checkstyle
-        run: apt-get install -y checkstyle
+        run: apt-get update && apt-get install -y checkstyle
       - name: Print Checkstyle Version
         run: checkstyle --version
       - name: Lint
