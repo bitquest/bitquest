@@ -24,7 +24,7 @@ public class Node {
       rpcCall
       Utility function for communicating with the node via RPC
   */
-  private JSONObject rpcCall(String method, JSONArray params) throws IOException, ParseException {
+  private JSONObject rpcCall(String method, JSONArray params) throws Exception {
     final JSONObject jsonObject = new JSONObject();
     jsonObject.put("jsonrpc", "1.0");
     jsonObject.put("id", "bitquest");
@@ -65,10 +65,15 @@ public class Node {
     System.out.println(responseJson.toString());
     JSONParser parser = new JSONParser();
     JSONObject response = (JSONObject) parser.parse(responseJson.toString());
+    JSONObject error = (JSONObject) response.get("error");
+    if (error != null) {
+      String errorMessage = (String) error.get("message");
+      throw(new Exception(errorMessage));
+    }
     return (JSONObject) response;
   }
 
-  private JSONObject rpcCall(String method) throws IOException, ParseException {
+  private JSONObject rpcCall(String method) throws Exception {
     return rpcCall(method, new JSONArray());
   }
 
@@ -78,7 +83,7 @@ public class Node {
       If the number is the same as the last block mined on the network, 
       it means the node is fully synced up.
   */
-  public JSONObject getBlockchainInfo() throws IOException, ParseException {
+  public JSONObject getBlockchainInfo() throws Exception {
     JSONObject response = rpcCall("getblockchaininfo");
     JSONObject blockchainInfo = (JSONObject) response.get("result");
     return blockchainInfo;
@@ -88,7 +93,7 @@ public class Node {
       accounts
       Returns a list of all the accounts in the node
   */
-  public JSONObject listAccounts() throws IOException, ParseException {
+  public JSONObject listAccounts() throws Exception {
     JSONObject response = rpcCall("listaccounts");
     return (JSONObject) response.get("result");
   }
@@ -97,7 +102,7 @@ public class Node {
       listWallets
       Returns a list of all the wallets stored in the node
   */
-  public JSONObject listWallets() throws IOException, ParseException {
+  public JSONObject listWallets() throws Exception {
     JSONObject response = rpcCall("listwallets");
     return (JSONObject) response.get("result");
   }
@@ -119,7 +124,7 @@ public class Node {
       Returns the balance of account
   */
   public Double getBalance(String accountName, Integer minimumConfirmations)
-      throws IOException, ParseException {
+      throws Exception {
     JSONArray params = new JSONArray();
     params.add(accountName);
     params.add(minimumConfirmations);
@@ -131,11 +136,24 @@ public class Node {
       getAccountAddress
       Returns the address of specified account
   */
-  public String getAccountAddress(String accountId) throws IOException, ParseException {
+  public String getAccountAddress(String accountId) throws Exception {
     JSONArray params = new JSONArray();
     params.add(accountId);
     JSONObject response = rpcCall("getaccountaddress", params);
-    System.out.println(response);
     return (String) response.get("result");
+  }
+
+  /*
+      sendFrom
+      Sends amount from account’s balance to address.
+  */
+  public boolean sendFrom(String fromAccount, String toAddress, Double amount) throws Exception {
+    JSONArray params = new JSONArray();
+    params.add(fromAccount);
+    params.add(toAddress);
+    params.add(amount);
+    JSONObject response = rpcCall("sendfrom", params);
+    // System.out.println(response);
+    return true;
   }
 }

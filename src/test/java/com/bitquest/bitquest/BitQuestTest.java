@@ -19,8 +19,7 @@ public class BitQuestTest {
 
   @Test
   public void testWallet()
-      throws SQLException, ParseException, java.text.ParseException, MnemonicLengthException,
-      IOException {
+      throws Exception {
     // generate new mnemonic code
     MnemonicCode mnemonicCode = new MnemonicCode();
     // Create some random entropy.
@@ -55,5 +54,9 @@ public class BitQuestTest {
     Wallet bob = new Wallet(node, "bob");
     System.out.println(bob.balance(0));
     System.out.println(bob.address());
+    Double amount = 100.0;
+    if (alice.balance(3) > amount) {
+      alice.send(bob.address(), amount);
+    }
   }
 }

@@ -13,15 +13,15 @@ public class Wallet {
     this.node = node;
   }
 
-  public Double balance(Integer minimumConfirmations) throws IOException, ParseException {
+  public Double balance(Integer minimumConfirmations) throws Exception {
     return this.node.getBalance(accountName, minimumConfirmations);
   }
 
-  public String address() throws IOException, ParseException {
+  public String address() throws Exception {
     return this.node.getAccountAddress(accountName);
   }
 
-  public Boolean payment(String toAddress, Double amount) {
-    return true;
+  public Boolean send(String toAddress, Double amount) throws Exception {
+    return this.node.sendFrom(accountName, toAddress, amount);
   }
 }
