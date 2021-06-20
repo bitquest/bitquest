@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container: node:lts-buster
+    container: maven:3.8.1-openjdk-16
     services:
       redis:
         image: redis
