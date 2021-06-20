@@ -43,7 +43,7 @@ public class SendCommand extends CommandAction {
                 if (balance >= amount) {
                   User userTip = new User(onlinePlayer.getUniqueId(), bitQuest);
                   // TODO: Pay to user address
-                  if (user.wallet.payment(userTip.wallet.address(), amount)) {
+                  if (user.wallet.send(userTip.wallet.address(), amount)) {
                     bitQuest.updateScoreboard(onlinePlayer);
                     bitQuest.updateScoreboard(player);
                     player.sendMessage(

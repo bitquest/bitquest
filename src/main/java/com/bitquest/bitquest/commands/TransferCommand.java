@@ -62,7 +62,7 @@ public class TransferCommand extends CommandAction {
                     + ChatColor.YELLOW
                     + "...");
 
-            if (fromWallet.payment(args[1], sendAmount) == true) {
+            if (fromWallet.send(args[1], sendAmount) == true) {
               player.sendMessage(
                   ChatColor.GREEN
                       + "Succesfully sent "

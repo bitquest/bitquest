@@ -112,7 +112,7 @@ public class Node {
       getAccount
       Returns the owner account of the specified address
   */
-  public JSONObject getAccount(String address) throws IOException, ParseException {
+  public JSONObject getAccount(String address) throws Exception {
     JSONArray params = new JSONArray();
     params.add(address);
     JSONObject response = rpcCall("getaccount", params);

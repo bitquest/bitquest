@@ -174,7 +174,7 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  public void onPlayerJoin(PlayerJoinEvent event) {
+  public void onPlayerJoin(PlayerJoinEvent event) throws Exception {
 
     final Player player = event.getPlayer();
     // On dev environment, admin gets op. In production, nobody gets op.
@@ -383,7 +383,7 @@ public class EntityEvents implements Listener {
 
   @EventHandler
   void onEntityDeath(EntityDeathEvent e)
-      throws IOException, ParseException, org.json.simple.parser.ParseException, SQLException {
+      throws Exception {
     final LivingEntity entity = e.getEntity();
 
     final int level = (int)entity.getMaxHealth() - 1;
@@ -412,7 +412,7 @@ public class EntityEvents implements Listener {
 
           final User user = new User(player.getUniqueId(),bitQuest);
 
-          if (bitQuest.wallet.payment(user.wallet.address(), money)) {
+          if (bitQuest.wallet.send(user.wallet.address(), money)) {
             System.out.println("[loot] " + player.getDisplayName() + ": " + money);
             bitQuest.sendDiscordMessage(
                 player.getDisplayName() + " killed " + damage.getEntity().getName() +

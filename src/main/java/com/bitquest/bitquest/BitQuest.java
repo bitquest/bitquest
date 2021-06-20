@@ -263,7 +263,7 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
-  public void updateLootPoolCache() {
+  public void updateLootPoolCache() throws Exception {
     System.out.println("[loot_cache]");
     bossAlreadySpawned = false;
     try {
@@ -399,7 +399,7 @@ public class BitQuest extends JavaPlugin {
       final User user = new User(player.getUniqueId(), this);
       if (user.wallet.balance(3) >= PET_PRICE) {
         try {
-          if (user.wallet.payment(wallet.address(), (double) PET_PRICE) == true) {
+          if (user.wallet.send(wallet.address(), (double) PET_PRICE) == true) {
             createPet(user, petName);
             spawnPet(player);
           }
@@ -703,7 +703,7 @@ public class BitQuest extends JavaPlugin {
             final BitQuest bitQuest = this;
             if (BitQuest.BLOCKCYPHER_CHAIN != null) {
 
-              if (user.wallet.payment(this.wallet.address(), LAND_PRICE)) {
+              if (user.wallet.send(this.wallet.address(), LAND_PRICE)) {
                 saveLandData(player, name, x, z);
               } else {
 
