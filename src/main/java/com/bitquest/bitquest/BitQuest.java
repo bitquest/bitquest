@@ -167,6 +167,7 @@ public class BitQuest extends JavaPlugin {
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
   public Jedis redis;
   public Node node;
+  public LandOwnership land;
 
   @Override
   public void onEnable() {
@@ -177,6 +178,7 @@ public class BitQuest extends JavaPlugin {
     this.node.port = BitQuest.NODE_PORT;
     this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
+    this.land = new LandOwnership(redis);
     try {
 
       if (ADMIN_UUID == null) {
