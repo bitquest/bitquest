@@ -137,7 +137,8 @@ public class BitQuest extends JavaPlugin {
   // Default price: 10,000 satoshis or 100 bits
   public static final Double LAND_PRICE = System.getenv("LAND_PRICE") != null
       ? Double.parseDouble(System.getenv("LAND_PRICE"))
-      : 10000;
+      : 10.0;
+      
   // Minimum transaction by default is 2000 bits
   public static final Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null
       ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
