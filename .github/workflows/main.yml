@@ -24,6 +24,9 @@ jobs:
       redis:
         # Docker Hub image
         image: redis
+        ports:
+          # Opens tcp port 6379 on the host and service container
+          - 6379:6379
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
