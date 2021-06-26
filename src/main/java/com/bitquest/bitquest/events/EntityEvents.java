@@ -243,8 +243,7 @@ public class EntityEvents implements Listener {
     try {
       player.sendMessage(
           "The loot pool is: "
-              + (int)
-              (bitQuest.wallet.balance(1) / bitQuest.DENOMINATION_FACTOR)
+              + bitQuest.wallet.balance(0).toString() 
               + " "
               + BitQuest.DENOMINATION_NAME);
     } catch (Exception e) {

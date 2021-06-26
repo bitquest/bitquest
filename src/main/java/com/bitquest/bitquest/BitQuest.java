@@ -109,7 +109,7 @@ public class BitQuest extends JavaPlugin {
       : 100L;
   public static final String DENOMINATION_NAME = System.getenv("DENOMINATION_NAME") != null
       ? System.getenv("DENOMINATION_NAME")
-      : "Bits";
+      : "DOGE";
   public static final String BLOCKCYPHER_CHAIN = System.getenv("BLOCKCYPHER_CHAIN") != null
       ? System.getenv("BLOCKCYPHER_CHAIN")
       : "btc/test3";

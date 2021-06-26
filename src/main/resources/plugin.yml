@@ -4,9 +4,6 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
-  ban:
-    description: "Adds player to the ban list"
-    usage: "/ban <player>"
   banlist:
     description: "Prints the list of banned players"
     usage: "/banlist"
@@ -88,4 +85,4 @@ commands:
   migrateclans:
     description: "Migrate clans to keep track of members"
     usage: "/migrateclans"
-api-version: 1.17
+api-version: 1.16
