@@ -53,6 +53,7 @@ jobs:
           BITQUEST_NODE_PORT: ${{ secrets.BITQUEST_NODE_PORT }}
           BITQUEST_NODE_RPC_PASSWORD: ${{ secrets.BITQUEST_NODE_RPC_PASSWORD }}
           BITQUEST_NODE_RPC_USER: ${{ secrets.BITQUEST_NODE_RPC_USER }}
+          BITQUEST_REDIS_HOST: localhost
         run: mvn test
       - name: Build Plugin
         run: make -B jar
