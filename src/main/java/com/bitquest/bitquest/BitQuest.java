@@ -21,6 +21,7 @@ import com.bitquest.bitquest.commands.ReportCommand;
 import com.bitquest.bitquest.commands.SendCommand;
 import com.bitquest.bitquest.commands.SpawnCommand;
 import com.bitquest.bitquest.commands.SpectateCommand;
+import com.bitquest.bitquest.commands.TradeCommand;
 import com.bitquest.bitquest.commands.TransferCommand;
 import com.bitquest.bitquest.commands.UnbanCommand;
 import com.bitquest.bitquest.commands.WalletCommand;
@@ -232,6 +233,7 @@ public class BitQuest extends JavaPlugin {
       commands.put("home", new HomeCommand(this));
       commands.put("clan", new ClanCommand(this));
       commands.put("transfer", new TransferCommand(this));
+      commands.put("trade", new TradeCommand(this));
       commands.put("report", new ReportCommand(this));
       commands.put("send", new SendCommand(this));
       commands.put("currency", new CurrencyCommand(this));

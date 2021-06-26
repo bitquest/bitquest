@@ -55,6 +55,9 @@ commands:
   transfer:
     description: "Sends your BitQuest wallet balance to an external address of your own"
     usage: "/transfer <amount> <bitcoin address, e-mail or username>"
+  trade:
+    description: "Trade crypto for emeralds"
+    usage: "/trade <amount>"
   unban:
     description: "Removes player from the ban list"
     usage: "/unban <player>"

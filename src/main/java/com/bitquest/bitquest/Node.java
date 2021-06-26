@@ -154,6 +154,8 @@ public class Node {
     params.add(amount);
     JSONObject response = rpcCall("sendfrom", params);
     // System.out.println(response);
-    return true;
+    String transactionId = (String) response.get("result");
+    BitQuest.log("tx",transactionId);
+    return transactionId != null;
   }
 }

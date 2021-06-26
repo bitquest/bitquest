@@ -14,7 +14,6 @@ import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.wallet.DeterministicSeed;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
-
 import redis.clients.jedis.Jedis;
 
 public class BitQuestTest {
@@ -57,13 +56,14 @@ public class BitQuestTest {
     Wallet bob = new Wallet(node, "bob");
     System.out.println(bob.balance(minimumConfirmations));
     System.out.println(bob.address());
-    Double amount = 100.0;
+    Double amount = 10.0;
     if (alice.balance(minimumConfirmations) > amount) {
       alice.send(bob.address(), amount);
     } else if (bob.balance(minimumConfirmations) > amount) {
       bob.send(alice.address(), amount);
     }
   }
+  
   @Test
   public void testLandOwnership() {
     Jedis redis = new Jedis(BitQuest.REDIS_HOST, BitQuest.REDIS_PORT);
