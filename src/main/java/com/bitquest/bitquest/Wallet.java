@@ -3,7 +3,6 @@ package com.bitquest.bitquest;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
-
 public class Wallet {
   public String accountName;
   public Node node;
@@ -19,6 +18,14 @@ public class Wallet {
 
   public String address() throws Exception {
     return this.node.getAccountAddress(accountName);
+  }
+
+  public String addressUrl() throws Exception {
+    if (node.chain().equals("test")) {
+      return "https://sochain.com/address/DOGETEST/" + this.address();
+    } else {
+      return "https://dogechain.info/address/" + this.address();
+    }
   }
 
   public Boolean send(String toAddress, Double amount) throws Exception {

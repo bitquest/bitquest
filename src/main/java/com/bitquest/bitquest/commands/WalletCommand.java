@@ -14,8 +14,7 @@ public class WalletCommand extends CommandAction {
     bitQuest = plugin;
   }
 
-  public boolean run(
-      CommandSender sender, Command cmd, String label, String[] args, Player player) {
+  public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
 
     try {
       bitQuest.sendWalletInfo(player);

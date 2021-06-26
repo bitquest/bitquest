@@ -90,6 +90,14 @@ public class Node {
   }
 
   /*
+      chain
+      Returns the chain this node is connected to
+  */
+  public String chain() throws Exception {
+    return (String) this.getBlockchainInfo().get("chain");
+  }
+
+  /*
       accounts
       Returns a list of all the accounts in the node
   */

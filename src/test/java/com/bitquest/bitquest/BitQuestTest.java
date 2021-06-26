@@ -48,14 +48,18 @@ public class BitQuestTest {
     node.port = BitQuest.NODE_PORT;
     node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
+    // Test Node
+    System.out.println(node.getBlockchainInfo());
     // Test wallet
     Wallet alice = new Wallet(node, "alice");
     int minimumConfirmations = 3;
     System.out.println(alice.balance(minimumConfirmations));
     System.out.println(alice.address());
+    System.out.println(alice.addressUrl());
     Wallet bob = new Wallet(node, "bob");
     System.out.println(bob.balance(minimumConfirmations));
     System.out.println(bob.address());
+    System.out.println(bob.addressUrl());
     Double amount = 10.0;
     if (alice.balance(minimumConfirmations) > amount) {
       alice.send(bob.address(), amount);
