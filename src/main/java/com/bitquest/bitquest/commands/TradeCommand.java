@@ -16,17 +16,28 @@ public class TradeCommand extends CommandAction {
     bitQuest = plugin;
   }
 
-  public boolean run(
-      CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
-    Wallet wallet = new Wallet(bitQuest.node,player.getUniqueId().toString());
+  public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
+    Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+    // Check that first argument is a number
+    for (char c : args[0].toCharArray()) {
+      if (!Character.isDigit(c)) {
+        return false;
+      }
+    }
+    final Double tradeAmount = Double.parseDouble(args[0]);
+    if (tradeAmount < 1) {
+      return false;
+    }
     try {
-      wallet.send(this.bitQuest.wallet.address(),10.0);
-      player.getInventory().addItem(new ItemStack(Material.EMERALD,10));
+      wallet.send(this.bitQuest.wallet.address(), tradeAmount);
+      player.getInventory().addItem(new ItemStack(Material.EMERALD, tradeAmount.intValue()));
+      player.sendMessage(ChatColor.GREEN + "You traded " + tradeAmount.toString() + " " + BitQuest.DENOMINATION_NAME
+          + " for emeralds.");
     } catch (Exception e) {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED + e.getMessage());
     }
     return true;
   }
-  
+
 }

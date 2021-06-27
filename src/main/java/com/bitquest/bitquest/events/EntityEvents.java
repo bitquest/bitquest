@@ -331,8 +331,9 @@ public class EntityEvents implements Listener {
     final LivingEntity entity = e.getEntity();
 
     final int level = (int) entity.getMaxHealth() - 1;
-    if (entity instanceof Player)
+    if (entity instanceof Player) {
       e.getDrops().clear();
+    }
     if (entity instanceof Monster && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
       Player player = null;
