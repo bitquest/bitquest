@@ -18,8 +18,7 @@ public class LandCommand extends CommandAction {
     this.bitQuest = plugin;
   }
 
-  public boolean run(
-      CommandSender sender, Command cmd, String label, String[] args, Player player) {
+  public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
     String tempchunk = "";
     if (player.getLocation().getWorld().getName().equals("world")) {
       tempchunk = "chunk";
@@ -31,17 +30,16 @@ public class LandCommand extends CommandAction {
     } else {
       Location location = player.getLocation();
       if (args[0].equalsIgnoreCase("price")) {
-        player.sendMessage("Land price is: " +
-            Math.round((bitQuest.LAND_PRICE + BitQuest.MINER_FEE) / bitQuest.DENOMINATION_FACTOR) +
-            " " + BitQuest.DENOMINATION_NAME + " (incl. miner fees)");
+        player.sendMessage(
+            "Land price is: " + Math.round((bitQuest.LAND_PRICE + BitQuest.MINER_FEE) / bitQuest.DENOMINATION_FACTOR)
+                + " " + BitQuest.DENOMINATION_NAME + " (incl. miner fees)");
       } else if (args[0].equalsIgnoreCase("rename")) {
         if (args.length == 2) {
           if (bitQuest.validName(args[1]) == false) {
             player.sendMessage(ChatColor.DARK_RED + "Invalid name.");
             return false;
           } else if (bitQuest.isOwner(location, player)) {
-            bitQuest.redis.set(
-                "chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "name",
+            bitQuest.redis.set("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "name",
                 args[1]);
             player.sendMessage(ChatColor.GREEN + "Land renamed to " + args[1]);
           } else {
@@ -57,11 +55,9 @@ public class LandCommand extends CommandAction {
             for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
               if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
                 if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
-                  player.sendMessage(
-                      "Changing the land ownership to " + onlinePlayer.getDisplayName() + "...");
-                  bitQuest.redis.set(
-                      "chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() +
-                          "owner", player.getUniqueId().toString());
+                  player.sendMessage("Changing the land ownership to " + onlinePlayer.getDisplayName() + "...");
+                  bitQuest.redis.set("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner",
+                      player.getUniqueId().toString());
                 }
               }
             }
@@ -79,10 +75,7 @@ public class LandCommand extends CommandAction {
         if (bitQuest.landIsClaimed(location)) {
           String landname = bitQuest.redis.get(tempchunk + "" + x + "," + z + "name");
           player.sendMessage(landname);
-          String permissionKey = "chunk"
-              + location.getChunk().getX()
-              + ","
-              + location.getChunk().getZ()
+          String permissionKey = "chunk" + location.getChunk().getX() + "," + location.getChunk().getZ()
               + "permissions";
           if (bitQuest.redis.exists(permissionKey)) {
             String permissionCode = bitQuest.redis.get(permissionKey);
@@ -93,18 +86,18 @@ public class LandCommand extends CommandAction {
             player.sendMessage("Permission: private");
           }
 
-
         } else {
           player.sendMessage("Land is not claimed");
         }
 
         return true;
       } else if (args[0].equalsIgnoreCase("claim")) {
+        // Claim land
         if (args.length > 1) {
           StringBuilder sb = new StringBuilder(args[1]);
-          //            for (int i = 3; i < args.length; i++){
-          //                sb.append(" " + args[i]);
-          //            }
+          // for (int i = 3; i < args.length; i++){
+          // sb.append(" " + args[i]);
+          // }
           String claimName = sb.toString().trim();
 
           if (!location.getWorld().getName().equals("world")) {
@@ -139,97 +132,41 @@ public class LandCommand extends CommandAction {
         int x = location.getChunk().getX();
         int z = location.getChunk().getZ();
 
-        if (bitQuest.landIsClaimed(location) &&
-            (bitQuest.isOwner(location, player) || bitQuest.isModerator(player))) {
+        if (bitQuest.landIsClaimed(location) && (bitQuest.isOwner(location, player) || bitQuest.isModerator(player))) {
           String landname = bitQuest.redis.get(tempchunk + "" + x + "," + z + "name");
 
           if (args[1].equalsIgnoreCase("public")) {
             bitQuest.redis.set(
-                tempchunk
-                    + ""
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "permissions",
-                "p");
+                tempchunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "p");
             player.sendMessage(
-                ChatColor.GREEN
-                    + "The land "
-                    + ChatColor.DARK_GREEN
-                    + landname
-                    + ChatColor.GREEN
-                    + " is now public");
+                ChatColor.GREEN + "The land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN + " is now public");
             return true;
           } else if (args[1].equalsIgnoreCase("clan")) {
             bitQuest.redis.set(
-                tempchunk
-                    + ""
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "permissions",
-                "c");
-            player.sendMessage(
-                ChatColor.GREEN
-                    + "The land "
-                    + ChatColor.DARK_GREEN
-                    + landname
-                    + ChatColor.GREEN
-                    + " is now clan-owned");
+                tempchunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "c");
+            player.sendMessage(ChatColor.GREEN + "The land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN
+                + " is now clan-owned");
             return true;
           } else if (args[1].equalsIgnoreCase("private")) {
-            bitQuest.redis.del(
-                tempchunk
-                    + ""
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "permissions");
+            bitQuest.redis
+                .del(tempchunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions");
             player.sendMessage(
-                ChatColor.GREEN
-                    + "The land "
-                    + ChatColor.DARK_GREEN
-                    + landname
-                    + ChatColor.GREEN
-                    + " is now private");
+                ChatColor.GREEN + "The land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN + " is now private");
             return true;
           } else if ((args[1].equalsIgnoreCase("pvp")) && (args.length == 2)) {
             bitQuest.redis.set(
-                tempchunk
-                    + ""
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "permissions",
-                "v");
-            player.sendMessage(
-                ChatColor.GREEN
-                    + "The land "
-                    + ChatColor.DARK_GREEN
-                    + landname
-                    + ChatColor.GREEN
-                    + " is now private PvP");
+                tempchunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "v");
+            player.sendMessage(ChatColor.GREEN + "The land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN
+                + " is now private PvP");
             return true;
           } else if ((args[1].equalsIgnoreCase("pvp")) && (args[2].equalsIgnoreCase("public"))) {
             bitQuest.redis.set(
-                tempchunk
-                    + ""
-                    + location.getChunk().getX()
-                    + ","
-                    + location.getChunk().getZ()
-                    + "permissions",
-                "pv");
-            player.sendMessage(
-                ChatColor.GREEN
-                    + "The land "
-                    + ChatColor.DARK_GREEN
-                    + landname
-                    + ChatColor.GREEN
-                    + " is now public PvP");
+                tempchunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "permissions", "pv");
+            player.sendMessage(ChatColor.GREEN + "The land " + ChatColor.DARK_GREEN + landname + ChatColor.GREEN
+                + " is now public PvP");
             return true;
           } else {
-            player.sendMessage(
-                ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");
+            player.sendMessage(ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");
             return true;
           }
 
@@ -237,10 +174,8 @@ public class LandCommand extends CommandAction {
           return false;
         }
       } else {
-        player.sendMessage(
-            ChatColor.RED
-                + "If you want buy claim a land, use /land claim landname."
-                + "For permissions, use /land permission [public,private,clan]");
+        player.sendMessage(ChatColor.RED + "If you want buy claim a land, use /land claim landname."
+            + "For permissions, use /land permission [public,private,clan]");
       }
     }
     return false;

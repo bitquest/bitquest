@@ -32,6 +32,7 @@ import com.bitquest.bitquest.events.InventoryEvents;
 import com.bitquest.bitquest.events.ServerEvents;
 import com.bitquest.bitquest.events.SignEvents;
 import com.google.gson.JsonObject;
+import io.sentry.Sentry;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -143,6 +144,8 @@ public class BitQuest extends JavaPlugin {
   public static final Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null
       ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
       : 2000L;
+
+  public static final String SENTRY_DSN = System.getenv("SENTRY_DSN");
 
   public static int rand(int min, int max) {
     return min + (int) (Math.random() * ((max - min) + 1));
@@ -648,42 +651,17 @@ public class BitQuest extends JavaPlugin {
       if (validName(name)) {
 
         if (redis.get(tempchunk + "" + x + "," + z + "owner") == null) {
+          player.sendMessage(ChatColor.YELLOW + "Claiming land...");
+          BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
+          final BitQuest bitQuest = this;
+          final Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
           try {
-
-            final User user = new User(player.getUniqueId(), this);
-            player.sendMessage(ChatColor.YELLOW + "Claiming land...");
-            BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-            final BitQuest bitQuest = this;
-            if (BitQuest.BLOCKCYPHER_CHAIN != null) {
-
-              if (user.wallet.send(this.wallet.address(), LAND_PRICE)) {
-                saveLandData(player, name, x, z);
-              } else {
-
-                player.sendMessage(ChatColor.RED + "Claim payment failed. Please try again later.");
-              }
-            } else {
-              int landxprice = 1;
-              if (player.getLocation().getWorld().getName().equals("world_nether")) {
-                landxprice = 4;
-              }
-              int landPriceInEmeralds = (int) ((LAND_PRICE * landxprice) / BitQuest.DENOMINATION_FACTOR);
-              if (user.countEmeralds(player.getInventory()) > landPriceInEmeralds) {
-                if (user.removeEmeralds(landPriceInEmeralds, player)) {
-                  saveLandData(player, name, x, z);
-                } else {
-                  player.sendMessage(ChatColor.RED + "There was an error.");
-                }
-
-              } else {
-                player.sendMessage(ChatColor.RED + "You have " + user.countEmeralds(player.getInventory())
-                    + ". To buy land you need " + landPriceInEmeralds);
-              }
-            }
+            wallet.send(this.wallet.address(), LAND_PRICE);
+            saveLandData(player, name, x, z);
           } catch (Exception e) {
             e.printStackTrace();
+            player.sendMessage(ChatColor.RED + e.getMessage());
           }
-
         } else if (redis.get(tempchunk + "" + x + "," + z + "name").equals(name)) {
           player.sendMessage(ChatColor.DARK_RED + "You already own this land!");
         } else {
