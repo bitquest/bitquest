@@ -331,7 +331,8 @@ public class EntityEvents implements Listener {
     final LivingEntity entity = e.getEntity();
 
     final int level = (int) entity.getMaxHealth() - 1;
-
+    if (entity instanceof Player)
+      e.getDrops().clear();
     if (entity instanceof Monster && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
       Player player = null;
@@ -351,6 +352,7 @@ public class EntityEvents implements Listener {
           if (bitQuest.wallet.send(wallet.address(), loot)) {
             BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
             player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
+            bitQuest.updateScoreboard(player);
           }
         }
 

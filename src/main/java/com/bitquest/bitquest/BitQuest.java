@@ -336,42 +336,20 @@ public class BitQuest extends JavaPlugin {
 
   public void updateScoreboard(final Player player) {
     try {
-      final User user = new User(player.getUniqueId(), this);
+      final Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
       ScoreboardManager scoreboardManager;
       Scoreboard walletScoreboard;
       Objective walletScoreboardObjective;
       scoreboardManager = Bukkit.getScoreboardManager();
       walletScoreboard = scoreboardManager.getNewScoreboard();
       walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
-
       walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-
       walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVER_NAME);
-
-      if (BitQuest.BLOCKCYPHER_CHAIN != null) {
-        Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); // Get a fake offline player
-        score.setScore((int) (user.wallet.balance(0) / DENOMINATION_FACTOR));
-
-        player.setScoreboard(walletScoreboard);
-
-      } else {
-        BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
-        scheduler.runTaskAsynchronously(this, new Runnable() {
-          @Override
-          public void run() {
-            try {
-              Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Ems:"); // Get a fake offline player
-
-              score.setScore(user.countEmeralds(player.getInventory()));
-              player.setScoreboard(walletScoreboard);
-            } catch (Exception e) {
-              System.out.println("problems in updatescoreboard");
-            }
-          }
-        });
-      } // end emerald here
+      Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); // Get a fake offline player
+      score.setScore((int) Math.round(wallet.balance(0)));
+      player.setScoreboard(walletScoreboard);
     } catch (Exception e) {
-      System.out.println("[scoreboard] rate limit");
+      e.printStackTrace();
     }
   }
 
@@ -462,25 +440,19 @@ public class BitQuest extends JavaPlugin {
   public void createScheduledTimers() {
     BukkitScheduler scheduler = Bukkit.getServer().getScheduler();
 
-    // scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-    // @Override
-    // public void run() {
-    // for (Player player : Bukkit.getServer().getOnlinePlayers()){
-    // User user= null;
-    // try {
-    // // user.createScoreBoard();
-    // updateScoreboard(player);
-    //
-    // } catch (ParseException e) {
-    // e.printStackTrace();
-    // } catch (org.json.simple.parser.ParseException e) {
-    // e.printStackTrace();
-    // } catch (IOException e) {
-    // // TODO: Handle rate limiting
-    // }
-    // }
-    // }
-    // }, 0, 120L);
+    scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
+      @Override
+      public void run() {
+        for (Player player : Bukkit.getServer().getOnlinePlayers()) {
+          User user = null;
+          try {
+            updateScoreboard(player);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      }
+    }, 0, 120L);
     scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
       @Override
       public void run() {
@@ -595,7 +567,7 @@ public class BitQuest extends JavaPlugin {
   public void setPlayerMaxHealth(Player player) {
     // base health=6
     // level health max=
-    int health = 8 + (player.getLevel() / 2);
+    int health = 1 + (player.getLevel() / 2);
     if (health > 40) {
       health = 40;
     }

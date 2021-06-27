@@ -24,28 +24,18 @@ public class TransferCommand extends CommandAction {
         }
       }
       final Double sendAmount = Double.parseDouble(args[0]);
-
       Wallet fromWallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
       try {
-        if (fromWallet != null) {
-
-          player.sendMessage(
-              ChatColor.YELLOW + "Sending " + ChatColor.LIGHT_PURPLE + args[0] + " " + BitQuest.DENOMINATION_NAME
-                  + ChatColor.YELLOW + " to " + ChatColor.BLUE + args[1] + ChatColor.YELLOW + "...");
-
-          if (fromWallet.send(args[1], sendAmount) == true) {
-            player.sendMessage(ChatColor.GREEN + "Succesfully sent " + ChatColor.LIGHT_PURPLE + args[0] + " "
-                + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + " to external address.");
-          } else {
-            player.sendMessage(ChatColor.DARK_RED + "Transaction failed. Please try again later.");
-          }
-          bitQuest.updateScoreboard(player);
-        }
+        fromWallet.send(args[1], sendAmount);
+        player.sendMessage(ChatColor.GREEN + "Succesfully sent " + ChatColor.LIGHT_PURPLE + args[0] + " "
+            + BitQuest.DENOMINATION_NAME + ChatColor.GREEN + " to external address.");
+        bitQuest.updateScoreboard(player);
+        return true;
       } catch (Exception e) {
         e.printStackTrace();
         player.sendMessage(ChatColor.RED + e.getMessage());
+        return false;
       }
-      return true;
     } else {
       return false;
     }
