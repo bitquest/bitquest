@@ -2,6 +2,7 @@ package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.User;
+import com.bitquest.bitquest.Wallet;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -76,52 +77,21 @@ public class EntityEvents implements Listener {
   StringBuilder rawwelcome = new StringBuilder();
   static String PROBLEM_MESSAGE = "Can't join right now. Come back later";
 
-  private static final List<Material> PROTECTED_BLOCKS =
-      Arrays.asList(
-          Material.CHEST,
-          Material.ACACIA_DOOR,
-          Material.BIRCH_DOOR,
-          Material.DARK_OAK_DOOR,
-          Material.JUNGLE_DOOR,
-          Material.SPRUCE_DOOR,
-          Material.LEGACY_WOOD_DOOR,
-          Material.LEGACY_WOODEN_DOOR,
-          Material.FURNACE,
-          Material.LEGACY_BURNING_FURNACE,
-          Material.ACACIA_FENCE_GATE,
-          Material.BIRCH_FENCE_GATE,
-          Material.DARK_OAK_FENCE_GATE,
-          Material.LEGACY_FENCE_GATE,
-          Material.JUNGLE_FENCE_GATE,
-          Material.SPRUCE_FENCE_GATE,
-          Material.DISPENSER,
-          Material.DROPPER,
-          Material.BREWING_STAND,
-          Material.BLACK_SHULKER_BOX,
-          Material.BLUE_SHULKER_BOX,
-          Material.BROWN_SHULKER_BOX,
-          Material.CYAN_SHULKER_BOX,
-          Material.GRAY_SHULKER_BOX,
-          Material.GREEN_SHULKER_BOX,
-          Material.LIGHT_BLUE_SHULKER_BOX,
-          Material.LIME_SHULKER_BOX,
-          Material.MAGENTA_SHULKER_BOX,
-          Material.ORANGE_SHULKER_BOX,
-          Material.PINK_SHULKER_BOX,
-          Material.PURPLE_SHULKER_BOX,
-          Material.RED_SHULKER_BOX,
-          Material.LEGACY_SILVER_SHULKER_BOX,
-          Material.WHITE_SHULKER_BOX,
-          Material.YELLOW_SHULKER_BOX);
+  private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR,
+      Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,
+      Material.LEGACY_WOOD_DOOR, Material.LEGACY_WOODEN_DOOR, Material.FURNACE, Material.LEGACY_BURNING_FURNACE,
+      Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.LEGACY_FENCE_GATE,
+      Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER,
+      Material.BREWING_STAND, Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX, Material.BROWN_SHULKER_BOX,
+      Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX, Material.LIGHT_BLUE_SHULKER_BOX,
+      Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX, Material.PINK_SHULKER_BOX,
+      Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.LEGACY_SILVER_SHULKER_BOX,
+      Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX);
 
-  private static final List<EntityType> PROTECTED_ENTITIES =
-      Arrays.asList(
-          EntityType.ARMOR_STAND,
-          EntityType.ITEM_FRAME,
-          EntityType.PAINTING,
-          EntityType.ENDER_CRYSTAL);
+  private static final List<EntityType> PROTECTED_ENTITIES = Arrays.asList(EntityType.ARMOR_STAND,
+      EntityType.ITEM_FRAME, EntityType.PAINTING, EntityType.ENDER_CRYSTAL);
 
-  // TODO: Implement PvP variables somewhere else 
+  // TODO: Implement PvP variables somewhere else
   // private int pvar = 0; // pvp area variable @bitcoinjake09
 
   public EntityEvents(BitQuest plugin) {
@@ -136,7 +106,8 @@ public class EntityEvents implements Listener {
       final Matcher matcher = pattern.matcher(line);
       matcher.find();
       String link = matcher.group(1);
-      // Right here we need to replace the link variable with a minecraft-compatible link
+      // Right here we need to replace the link variable with a minecraft-compatible
+      // link
       line = line.replaceAll("<link>" + link + "<link>", link);
 
       rawwelcome.append(line);
@@ -153,22 +124,19 @@ public class EntityEvents implements Listener {
       bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
       if (bitQuest.redis.sismember("banlist", event.getPlayer().getUniqueId().toString())) {
         System.out.println("kicking banned player " + event.getPlayer().getDisplayName());
-        event.disallow(
-            PlayerLoginEvent.Result.KICK_OTHER,
+        event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
             "You are temporarily banned. Please contact bitquest@bitquest.co");
       }
       if (bitQuest.redis.exists("rate_limit:" + event.getPlayer().getUniqueId()) == true) {
         Long ttl = bitQuest.redis.ttl("rate_limit:" + event.getPlayer().getUniqueId());
-        event.disallow(
-            PlayerLoginEvent.Result.KICK_OTHER, "Please try again in " + ttl + " seconds.");
+        event.disallow(PlayerLoginEvent.Result.KICK_OTHER, "Please try again in " + ttl + " seconds.");
       }
 
     } catch (Exception e) {
       e.printStackTrace();
       bitQuest.redis.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
       bitQuest.redis.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
-      event.disallow(
-          PlayerLoginEvent.Result.KICK_OTHER,
+      event.disallow(PlayerLoginEvent.Result.KICK_OTHER,
           "The server is in limited capacity at this moment. Please try again later.");
     }
   }
@@ -194,8 +162,7 @@ public class EntityEvents implements Listener {
     if (bitQuest.isModerator(player)) {
       try {
         player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-        String url = "https://live.blockcypher.com/btc-testnet/address/" +
-            bitQuest.wallet.address();
+        String url = "https://live.blockcypher.com/btc-testnet/address/" + bitQuest.wallet.address();
         if (BitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
           url = "https://live.blockcypher.com/btc/address/" + bitQuest.wallet.address();
         }
@@ -215,21 +182,12 @@ public class EntityEvents implements Listener {
     player.sendMessage(welcome);
     if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
       String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
-      player.setPlayerListName(
-          ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
+      player.setPlayerListName(ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
       if (bitQuest.isModerator(player)) {
         player.setPlayerListName(
-            ChatColor.RED
-                + "[MOD]"
-                + ChatColor.GOLD
-                + "["
-                + clan
-                + "] "
-                + ChatColor.WHITE
-                + player.getName());
+            ChatColor.RED + "[MOD]" + ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
       }
-    } else if ((!bitQuest.redis.exists("clan:" + player.getUniqueId().toString()))
-        && (bitQuest.isModerator(player))) {
+    } else if ((!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) && (bitQuest.isModerator(player))) {
       player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
     }
 
@@ -241,15 +199,11 @@ public class EntityEvents implements Listener {
       player.sendMessage(bitQuest.redis.get("bitquest:motd"));
     }
     try {
-      player.sendMessage(
-          "The loot pool is: "
-              + bitQuest.wallet.balance(0).toString() 
-              + " "
-              + BitQuest.DENOMINATION_NAME);
+      player
+          .sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + BitQuest.DENOMINATION_NAME);
     } catch (Exception e) {
       e.printStackTrace();
     }
-
 
     bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
     // spawn pet
@@ -281,15 +235,14 @@ public class EntityEvents implements Listener {
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     // TODO: Check if zone is PvP only when chunks change
-    // if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0)) {
-    //     event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
-    //     pvar++;
+    // if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0))
+    // {
+    // event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
+    // pvar++;
     // }
 
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-      event
-          .getPlayer()
-          .addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
+      event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
       if (event.getFrom().getWorld().getName().endsWith("_end") == false
           && event.getFrom().getWorld().getName().endsWith("_nether") == false) {
@@ -323,7 +276,6 @@ public class EntityEvents implements Listener {
         }
         event.getPlayer().setGameMode(GameMode.SURVIVAL);
 
-
         if (!name1.equals(name2)) {
 
           if (name2.equals("the wilderness")) {
@@ -356,14 +308,8 @@ public class EntityEvents implements Listener {
                 if (entry.getKey().equals(Enchantment.BINDING_CURSE)) {
                   inventory.setHelmet(null);
                   player.getWorld().dropItemNaturally(player.getLocation(), helmet);
-                  player.sendMessage(
-                      "You are finally free of the "
-                          + ChatColor.BOLD
-                          + ChatColor.GOLD
-                          + "Pumpkin "
-                          + ChatColor.GRAY
-                          + ChatColor.ITALIC
-                          + "curse");
+                  player.sendMessage("You are finally free of the " + ChatColor.BOLD + ChatColor.GOLD + "Pumpkin "
+                      + ChatColor.GRAY + ChatColor.ITALIC + "curse");
                 }
               }
             }
@@ -381,55 +327,33 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  void onEntityDeath(EntityDeathEvent e)
-      throws Exception {
+  void onEntityDeath(EntityDeathEvent e) throws Exception {
     final LivingEntity entity = e.getEntity();
 
-    final int level = (int)entity.getMaxHealth() - 1;
+    final int level = (int) entity.getMaxHealth() - 1;
 
-    if (entity instanceof Monster
-        && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-      final EntityDamageByEntityEvent damage =
-          (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
+    if (entity instanceof Monster && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+      final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
       Player player = null;
       if (damage.getDamager() instanceof Player) {
         player = (Player) damage.getDamager();
-      }
-      if (damage.getDamager() instanceof Arrow
-          && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
+      } else if (damage.getDamager() instanceof Arrow && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
         player = (Player) ((Arrow) damage.getDamager()).getShooter();
       }
       if (player != null) {
-
-        Double money = bitQuest.LAND_PRICE;
-
-        // Add EXP
+        // Award experience and loot to players
+        Double loot = 1.0;
         int exp = level * 4;
         bitQuest.redis.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
-        bitQuest.setTotalExperience(player);
-        if (damage.getEntity() instanceof Wither) {
-
-          final User user = new User(player.getUniqueId(),bitQuest);
-
-          if (bitQuest.wallet.send(user.wallet.address(), money)) {
-            System.out.println("[loot] " + player.getDisplayName() + ": " + money);
-            bitQuest.sendDiscordMessage(
-                player.getDisplayName() + " killed " + damage.getEntity().getName() +
-                    " !!! A reward was paid: " + money / bitQuest.DENOMINATION_FACTOR + " " +
-                    bitQuest.DENOMINATION_NAME);
-            bitQuest.announce(
-                ChatColor.GREEN
-                    + player.getDisplayName()
-                    + " got "
-                    + ChatColor.BOLD
-                    + money / bitQuest.DENOMINATION_FACTOR
-                    + ChatColor.GREEN
-                    + " "
-                    + bitQuest.DENOMINATION_NAME
-                    + " of loot!");
+        if (bitQuest.wallet.balance(3) > loot) {
+          bitQuest.setTotalExperience(player);
+          Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+          if (bitQuest.wallet.send(wallet.address(), loot)) {
+            BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
+            player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
           }
-
         }
+
       }
     } else {
       e.setDroppedExp(0);
@@ -437,16 +361,14 @@ public class EntityEvents implements Listener {
   }
 
   String spawnKey(Location location) {
-    return location.getWorld().getName()
-        + location.getChunk().getX()
-        + ","
-        + location.getChunk().getZ()
-        + "spawn";
+    return location.getWorld().getName() + location.getChunk().getX() + "," + location.getChunk().getZ() + "spawn";
   }
 
-  // TODO: Right now, entity spawns are cancelled, then replaced with random mob spawns. Perhaps it
+  // TODO: Right now, entity spawns are cancelled, then replaced with random mob
+  // spawns. Perhaps it
   // would be better to
-  //          find a way to instead set the EntityType of the event. Is there any way to do that?
+  // find a way to instead set the EntityType of the event. Is there any way to do
+  // that?
   // TODO: Magma Cubes don't get levels or custom names for some reason...
   @EventHandler
   void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
@@ -466,8 +388,7 @@ public class EntityEvents implements Listener {
       minlevel = 50;
       maxlevel = 100;
     }
-    int spawnDistance =
-        (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+    int spawnDistance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
 
     EntityType entityType = entity.getType();
     // max level is 128
@@ -493,14 +414,11 @@ public class EntityEvents implements Listener {
 
           entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
           entity.setCustomName(
-              String.format(
-                  "%s lvl %d",
-                  WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
+              String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
           if (entity instanceof Wither) {
             level = level + 10;
-            entity.setCustomName("Wither (Reward: "
-                + Math.round((bitQuest.LAND_PRICE) / bitQuest.DENOMINATION_FACTOR) + " "
-                + bitQuest.DENOMINATION_NAME + ")");
+            entity.setCustomName("Wither (Reward: " + Math.round((bitQuest.LAND_PRICE) / bitQuest.DENOMINATION_FACTOR)
+                + " " + bitQuest.DENOMINATION_NAME + ")");
           }
           entity.setMaxHealth(1 + level);
 
@@ -508,39 +426,29 @@ public class EntityEvents implements Listener {
 
           // add potion effects
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
           }
           if (bitQuest.rand(1, 100) < level) {
-            entity.addPotionEffect(
-                new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
+            entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
           }
-
 
           // give random equipment
-          if (entity instanceof Zombie
-              || entity instanceof PigZombie
-              || entity instanceof Skeleton) {
+          if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
             useRandomEquipment(entity, level);
           }
 
@@ -564,15 +472,9 @@ public class EntityEvents implements Listener {
           }
 
           if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
-            e.getLocation()
-                .getWorld()
-                .spawnEntity(
-                    new Location(
-                        e.getLocation().getWorld(),
-                        e.getLocation().getX(),
-                        80,
-                        e.getLocation().getZ()),
-                    EntityType.GHAST);
+            e.getLocation().getWorld().spawnEntity(
+                new Location(e.getLocation().getWorld(), e.getLocation().getX(), 80, e.getLocation().getZ()),
+                EntityType.GHAST);
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
           }
@@ -585,15 +487,8 @@ public class EntityEvents implements Listener {
       }
     } else if (entity instanceof Ghast) {
       entity.setMaxHealth(level * 4);
-      System.out.println(
-          "[spawn ghast] "
-              + entityType.name()
-              + " lvl "
-              + level
-              + " spawn distance: "
-              + spawnDistance
-              + " maxhealth: "
-              + entity.getMaxHealth());
+      System.out.println("[spawn ghast] " + entityType.name() + " lvl " + level + " spawn distance: " + spawnDistance
+          + " maxhealth: " + entity.getMaxHealth());
 
     } else {
       e.setCancelled(false);
@@ -608,8 +503,7 @@ public class EntityEvents implements Listener {
     if (event instanceof EntityDamageByEntityEvent) {
       EntityDamageByEntityEvent damageEvent = (EntityDamageByEntityEvent) event;
       Entity damager = damageEvent.getDamager();
-      if (damager instanceof Player
-          || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+      if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
         // player damage
         Player player;
 
@@ -629,13 +523,10 @@ public class EntityEvents implements Listener {
 
         // Player vs. Giant
         if (event.getEntity() instanceof Giant) {
-          Vector v =
-              damager.getLocation().toVector().subtract(event.getEntity().getLocation().toVector())
-                  .normalize();
+          Vector v = damager.getLocation().toVector().subtract(event.getEntity().getLocation().toVector()).normalize();
           event.getEntity().setVelocity(v);
 
-          event.getEntity().getLocation().getWorld()
-              .spawnEntity(event.getEntity().getLocation(), EntityType.ZOMBIE);
+          event.getEntity().getLocation().getWorld().spawnEntity(event.getEntity().getLocation(), EntityType.ZOMBIE);
           ((Giant) event.getEntity()).setTarget((Player) damager);
         }
         // Player vs. Animal in claimed location
@@ -878,8 +769,7 @@ public class EntityEvents implements Listener {
     }
 
     if (enchantment != null) {
-      meta.addEnchant(
-          enchantment, BitQuest.rand(enchantment.getStartLevel(), enchantment.getMaxLevel()), true);
+      meta.addEnchant(enchantment, BitQuest.rand(enchantment.getStartLevel(), enchantment.getMaxLevel()), true);
       item.setItemMeta(meta);
     }
   }

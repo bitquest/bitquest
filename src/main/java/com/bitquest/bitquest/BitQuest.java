@@ -138,7 +138,7 @@ public class BitQuest extends JavaPlugin {
   public static final Double LAND_PRICE = System.getenv("LAND_PRICE") != null
       ? Double.parseDouble(System.getenv("LAND_PRICE"))
       : 10.0;
-      
+
   // Minimum transaction by default is 2000 bits
   public static final Long MINIMUM_TRANSACTION = System.getenv("MINIMUM_TRANSACTION") != null
       ? Long.parseLong(System.getenv("MINIMUM_TRANSACTION"))
@@ -220,7 +220,7 @@ public class BitQuest extends JavaPlugin {
       }
 
       this.wallet = new Wallet(node, "loot");
-      System.out.println("[world wallet] address: " + wallet.address());
+      BitQuest.log("loot", wallet.address());
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
       commands = new HashMap<String, CommandAction>();
