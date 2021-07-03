@@ -55,6 +55,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -147,6 +148,10 @@ public class BitQuest extends JavaPlugin {
 
   public static int rand(int min, int max) {
     return min + (int) (Math.random() * ((max - min) + 1));
+  }
+
+  public static int d20() {
+    return rand(1,20);
   }
 
   public Wallet wallet = null;
@@ -352,6 +357,8 @@ public class BitQuest extends JavaPlugin {
       e.printStackTrace();
     }
   }
+
+
 
   public void createPet(User user, String petName) {
     redis.sadd("pet:names", petName);
