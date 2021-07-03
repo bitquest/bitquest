@@ -21,10 +21,10 @@ public class Wallet {
   }
 
   public String addressUrl() throws Exception {
-    if (node.chain().equals("test")) {
+    if (node.testnet()) {
       return "https://sochain.com/address/DOGETEST/" + this.address();
     } else {
-      return "https://dogechain.info/address/" + this.address();
+      return "https://chain.so/address/DOGE/" + this.address();
     }
   }
 
