@@ -1,7 +1,6 @@
 package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
-import com.bitquest.bitquest.User;
 import com.bitquest.bitquest.Wallet;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;

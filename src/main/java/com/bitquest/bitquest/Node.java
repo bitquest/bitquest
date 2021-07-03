@@ -1,18 +1,15 @@
 package com.bitquest.bitquest;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class Node {
   public String host;
@@ -77,24 +74,25 @@ public class Node {
     return rpcCall(method, new JSONArray());
   }
 
-  /*
-      blocks
-      Return the last block synced in the Node. 
-      If the number is the same as the last block mined on the network, 
-      it means the node is fully synced up.
-  */
   public JSONObject getBlockchainInfo() throws Exception {
     JSONObject response = rpcCall("getblockchaininfo");
+    JSONObject blockchainInfo = (JSONObject) response.get("result");
+    return blockchainInfo;
+  }
+  
+  
+  public JSONObject getInfo() throws Exception {
+    JSONObject response = rpcCall("getinfo");
     JSONObject blockchainInfo = (JSONObject) response.get("result");
     return blockchainInfo;
   }
 
   /*
       chain
-      Returns the chain this node is connected to
+      Returns the chain name this node is connected to
   */
   public String chain() throws Exception {
-    return (String) this.getBlockchainInfo().get("chain");
+    return this.testnet() ? "tDOGE" : "DOGE";
   }
 
   /*
@@ -114,7 +112,6 @@ public class Node {
     JSONObject response = rpcCall("listwallets");
     return (JSONObject) response.get("result");
   }
-
 
   /*
       getAccount
@@ -166,4 +163,9 @@ public class Node {
     BitQuest.log("tx",transactionId);
     return transactionId != null;
   }
+
+  public Boolean testnet() throws Exception {
+    return (Boolean) this.getInfo().get("testnet");
+  }
+
 }

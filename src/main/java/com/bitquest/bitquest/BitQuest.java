@@ -345,7 +345,7 @@ public class BitQuest extends JavaPlugin {
       walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
       walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
       walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVER_NAME);
-      Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + "Balance:"); // Get a fake offline player
+      Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + this.node.chain()); // Get a fake offline player
       score.setScore((int) Math.round(wallet.balance(0)));
       player.setScoreboard(walletScoreboard);
     } catch (Exception e) {
@@ -452,7 +452,7 @@ public class BitQuest extends JavaPlugin {
           }
         }
       }
-    }, 0, 120L);
+    }, 0, 1200L);
     scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
       @Override
       public void run() {
@@ -761,7 +761,7 @@ public class BitQuest extends JavaPlugin {
   public void sendWalletInfo(final Player player) {
     try {
       Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
-      player.sendMessage(ChatColor.BOLD+"Your Wallet");
+      player.sendMessage(ChatColor.BOLD + "Your Wallet");
       player.sendMessage("Balance: " + wallet.balance(0));
       player.sendMessage("Add " + BitQuest.DENOMINATION_NAME + ":");
       player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + wallet.addressUrl());

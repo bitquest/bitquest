@@ -1,7 +1,7 @@
 package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
-import com.bitquest.bitquest.User;
+import com.bitquest.bitquest.Wallet;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -17,77 +17,61 @@ public class SendCommand extends CommandAction {
 
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, final Player player) {
-    int maxSend = 10000; // to be multiplied by DENOMINATION_FACTOR
     if (args.length == 2) {
-      for (char c : args[0].toCharArray()) {
+      // args[1] == amount to send
+      for (char c : args[1].toCharArray()) {
         if (!Character.isDigit(c)) { 
           return false; 
         }
       }
-      if (args[0].length() > 8) {
-        // maximum send is 8 digits
+      final Double amount = Double.parseDouble(args[1]);
+      final Double minAmount = 1.0; // Minimum amount that can be sent
+      final Double maxAmount = 1000.0; // Minimum amount that can be sent
+      if (amount > maxAmount) {
         return false;
       }
-      final Double amount = Double.parseDouble(args[0]);
-
-      if (amount != 0 && amount <= maxSend) {
-
-        for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
-          if (onlinePlayer.getName().equalsIgnoreCase(args[1])) {
-            if (!args[1].equalsIgnoreCase(player.getDisplayName())) {
-              try {
-                final User user = new User(player.getUniqueId(), bitQuest);
-
-                Double balance = user.wallet.balance(0);
-
-                if (balance >= amount) {
-                  User userTip = new User(onlinePlayer.getUniqueId(), bitQuest);
-                  // TODO: Pay to user address
-                  if (user.wallet.send(userTip.wallet.address(), amount)) {
-                    bitQuest.updateScoreboard(onlinePlayer);
-                    bitQuest.updateScoreboard(player);
-                    player.sendMessage(
-                        ChatColor.GREEN
-                            + "You sent "
-                            + ChatColor.LIGHT_PURPLE
-                            + amount
-                            + " "
-                            + BitQuest.DENOMINATION_NAME
-                            + ChatColor.GREEN
-                            + " to user "
-                            + ChatColor.BLUE
-                            + onlinePlayer.getName());
-                    onlinePlayer.sendMessage(
-                        ChatColor.GREEN
-                            + "You got "
-                            + ChatColor.LIGHT_PURPLE
-                            + amount
-                            + " "
-                            + BitQuest.DENOMINATION_NAME
-                            + ChatColor.GREEN
-                            + " from user "
-                            + ChatColor.BLUE
-                            + player.getName());
-                  } else {
-                    player.sendMessage(ChatColor.RED + "Tip failed.");
-                  }
-                } else {
-                  player.sendMessage(ChatColor.DARK_RED + "Not enough balance");
-                }
-              } catch (Exception e) {
-                player.sendMessage(ChatColor.DARK_RED + "Error. Please try again later.");
-                System.out.println(e);
-              }
-            }
+      if (amount < minAmount) {
+        return false;
+      }
+      for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+        if (onlinePlayer.getName().equalsIgnoreCase(args[0]) && !args[0].equalsIgnoreCase(player.getDisplayName())) {
+          final Wallet senderWallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+          final Wallet receiverWallet = new Wallet(bitQuest.node, onlinePlayer.getUniqueId().toString());
+          try {
+            senderWallet.send(receiverWallet.address(), amount);
+            bitQuest.updateScoreboard(onlinePlayer);
+            bitQuest.updateScoreboard(player);
+            player.sendMessage(
+                ChatColor.GREEN
+                    + "You sent "
+                    + ChatColor.LIGHT_PURPLE
+                    + amount
+                    + " "
+                    + BitQuest.DENOMINATION_NAME
+                    + ChatColor.GREEN
+                    + " to user "
+                    + ChatColor.BLUE
+                    + onlinePlayer.getName());
+            onlinePlayer.sendMessage(
+                  ChatColor.GREEN
+                      + "You got "
+                      + ChatColor.LIGHT_PURPLE
+                      + amount
+                      + " "
+                      + BitQuest.DENOMINATION_NAME
+                      + ChatColor.GREEN
+                      + " from user "
+                      + ChatColor.BLUE
+                      + player.getName());
+            return true;
+          } catch (Exception e) {
+            player.sendMessage(ChatColor.RED + e.getMessage());
+            System.out.println(e);
+            return true;
           }
         }
-      } else {
-        player.sendMessage(
-            "Minimum tip is 1 " + BitQuest.DENOMINATION_NAME + ". Maximum is " + maxSend);
       }
-    } else {
-      return false;
-    }
-    return true;
+    } 
+    return false;
   }
 }
