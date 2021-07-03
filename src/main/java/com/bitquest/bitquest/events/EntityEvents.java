@@ -357,7 +357,8 @@ public class EntityEvents implements Listener {
           }
         }
         // Award random weapon
-        if (BitQuest.rand(1,5) == 1) e.getDrops().add(randomWeapon(level));
+        if (BitQuest.rand(1,1) == 1) e.getDrops().add(randomWeapon(level));
+        if (BitQuest.rand(1,1) == 1) e.getDrops().add(randomArmor(level));
       }
     } else {
       e.setDroppedExp(0);
@@ -694,12 +695,21 @@ public class EntityEvents implements Listener {
 
   public static boolean isArmour(ItemStack stack) {
     if (stack.getType() == Material.DIAMOND_LEGGINGS) return true;
-    if (stack.getType() == Material.IRON_HELMET) return true;
-    if (stack.getType() == Material.DIAMOND_HELMET) return true;
-    if (stack.getType() == Material.IRON_BOOTS) return true;
     if (stack.getType() == Material.DIAMOND_BOOTS) return true;
     if (stack.getType() == Material.DIAMOND_CHESTPLATE) return true;
+    if (stack.getType() == Material.DIAMOND_HELMET) return true;
+    if (stack.getType() == Material.IRON_HELMET) return true;
+    if (stack.getType() == Material.IRON_BOOTS) return true;
     if (stack.getType() == Material.IRON_CHESTPLATE) return true;
+    if (stack.getType() == Material.IRON_LEGGINGS) return true;
+    if (stack.getType() == Material.CHAINMAIL_HELMET) return true;
+    if (stack.getType() == Material.CHAINMAIL_BOOTS) return true;
+    if (stack.getType() == Material.CHAINMAIL_CHESTPLATE) return true;
+    if (stack.getType() == Material.CHAINMAIL_LEGGINGS) return true;
+    if (stack.getType() == Material.LEATHER_HELMET) return true;
+    if (stack.getType() == Material.LEATHER_BOOTS) return true;
+    if (stack.getType() == Material.LEATHER_CHESTPLATE) return true;
+    if (stack.getType() == Material.LEATHER_LEGGINGS) return true;    
     return false;
   }
 
@@ -758,9 +768,30 @@ public class EntityEvents implements Listener {
   public static ItemStack randomWeapon(final int level) {
     Material material = Material.WOODEN_SWORD;
     if (BitQuest.rand(1,5) == 1) material = Material.BOW;
-    if (BitQuest.rand(0, 200) < level) material = Material.GOLDEN_SWORD;
-    if (BitQuest.rand(0, 200) < level) material = Material.IRON_SWORD;
+    if (BitQuest.rand(0, 50) < level) material = Material.GOLDEN_SWORD;
+    if (BitQuest.rand(0, 100) < level) material = Material.IRON_SWORD;
     if (BitQuest.rand(0, 200) < level) material = Material.DIAMOND_SWORD;
+    ItemStack itemStack = new ItemStack(material,1);
+    randomEnchantItem(itemStack, level);
+    return itemStack;
+  }
+
+  // Random Armor
+
+  public static ItemStack randomArmor(final int level) {
+    Material material = Material.LEATHER_CHESTPLATE;
+    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_CHESTPLATE;
+    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_BOOTS;
+    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_HELMET;
+    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_LEGGINGS;
+    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_CHESTPLATE;
+    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_BOOTS;
+    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_HELMET;
+    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_LEGGINGS;
+    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_CHESTPLATE;
+    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_BOOTS;
+    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_HELMET;
+    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_LEGGINGS;
     ItemStack itemStack = new ItemStack(material,1);
     randomEnchantItem(itemStack, level);
     return itemStack;

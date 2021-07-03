@@ -15,16 +15,12 @@ public class MessageOfTheDayCommand extends CommandAction {
 
   public boolean run(
       CommandSender sender, Command cmd, String label, String[] args, Player player) {
-    if (args[0] == null || args[0].isEmpty()) {
-      player.sendMessage("Please write a message of the day.");
-      return false;
-    } else if (args[0].matches("^.*[^a-zA-Z0-9 _].*$")) {
-      player.sendMessage("Please use only aplhanumeric characters.");
-      return false;
-    } else {
-      bitQuest.redis.set("bitquest:motd", args[0]);
-      player.sendMessage(ChatColor.GREEN + "Message changed.");
-      return true;
+    String motd = "";
+    for (String arg : args) {
+      motd += arg + " ";
     }
+    bitQuest.redis.set("motd", motd);
+    player.sendMessage(ChatColor.GREEN + "Message changed.");
+    return true;
   }
 }
