@@ -14,7 +14,7 @@ config-version: 11
 settings:
   debug: false
   save-user-cache-on-stop-only: false
-  bungeecord: false
+  bungeecord: true
   late-bind: false
   sample-count: 12
   player-shuffle: 0
