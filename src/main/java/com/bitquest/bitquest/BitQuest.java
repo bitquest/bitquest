@@ -339,13 +339,13 @@ public class BitQuest extends JavaPlugin {
       Scoreboard walletScoreboard;
       Objective balanceObjective;
       // Double confirmedBalance = wallet.balance(3);
-      Double unconfirmedBalance = wallet.balance(0);
       scoreboardManager = Bukkit.getScoreboardManager();
       walletScoreboard = scoreboardManager.getNewScoreboard();
       balanceObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
       balanceObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
       balanceObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVER_NAME);
       Score score = balanceObjective.getScore(ChatColor.GREEN + this.node.chain()); // Get a fake offline player
+      Double unconfirmedBalance = wallet.balance(0);
       score.setScore((int) Math.round(unconfirmedBalance));
       player.setScoreboard(walletScoreboard);
     } catch (Exception e) {
@@ -765,7 +765,7 @@ public class BitQuest extends JavaPlugin {
       Double confirmedBalance = wallet.balance(3);
       player.sendMessage(ChatColor.BOLD + "Your Wallet");
       player.sendMessage("Balance: " + confirmedBalance);
-      if(unconfirmedBalance.equals(confirmedBalance)) {
+      if (unconfirmedBalance.equals(confirmedBalance)) {
         player.sendMessage("Unconfirmed Balance: " + unconfirmedBalance);
       }
       player.sendMessage("Add " + BitQuest.DENOMINATION_NAME + ":");
