@@ -32,7 +32,6 @@ import com.bitquest.bitquest.events.InventoryEvents;
 import com.bitquest.bitquest.events.ServerEvents;
 import com.bitquest.bitquest.events.SignEvents;
 import com.google.gson.JsonObject;
-import io.sentry.Sentry;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,7 +39,6 @@ import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -339,14 +337,16 @@ public class BitQuest extends JavaPlugin {
       final Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
       ScoreboardManager scoreboardManager;
       Scoreboard walletScoreboard;
-      Objective walletScoreboardObjective;
+      Objective balanceObjective;
+      // Double confirmedBalance = wallet.balance(3);
+      Double unconfirmedBalance = wallet.balance(0);
       scoreboardManager = Bukkit.getScoreboardManager();
       walletScoreboard = scoreboardManager.getNewScoreboard();
-      walletScoreboardObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
-      walletScoreboardObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
-      walletScoreboardObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVER_NAME);
-      Score score = walletScoreboardObjective.getScore(ChatColor.GREEN + this.node.chain()); // Get a fake offline player
-      score.setScore((int) Math.round(wallet.balance(0)));
+      balanceObjective = walletScoreboard.registerNewObjective("wallet", "dummy");
+      balanceObjective.setDisplaySlot(DisplaySlot.SIDEBAR);
+      balanceObjective.setDisplayName(ChatColor.GOLD + ChatColor.BOLD.toString() + BitQuest.SERVER_NAME);
+      Score score = balanceObjective.getScore(ChatColor.GREEN + this.node.chain()); // Get a fake offline player
+      score.setScore((int) Math.round(unconfirmedBalance));
       player.setScoreboard(walletScoreboard);
     } catch (Exception e) {
       e.printStackTrace();
@@ -761,8 +761,13 @@ public class BitQuest extends JavaPlugin {
   public void sendWalletInfo(final Player player) {
     try {
       Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
+      Double unconfirmedBalance = wallet.balance(0);
+      Double confirmedBalance = wallet.balance(3);
       player.sendMessage(ChatColor.BOLD + "Your Wallet");
-      player.sendMessage("Balance: " + wallet.balance(0));
+      player.sendMessage("Balance: " + confirmedBalance);
+      if(unconfirmedBalance.equals(confirmedBalance)) {
+        player.sendMessage("Unconfirmed Balance: " + unconfirmedBalance);
+      }
       player.sendMessage("Add " + BitQuest.DENOMINATION_NAME + ":");
       player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + wallet.addressUrl());
     } catch (Exception e) {
