@@ -461,7 +461,7 @@ public class BitQuest extends JavaPlugin {
         world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
 
       }
-    }, 0, 7200L);
+    }, 0, 30000L);
 
   }
 
@@ -761,10 +761,10 @@ public class BitQuest extends JavaPlugin {
   public void sendWalletInfo(final Player player) {
     try {
       Wallet wallet = new Wallet(this.node, player.getUniqueId().toString());
-      player.sendMessage("Address: " + wallet.address());
+      player.sendMessage(ChatColor.BOLD+"Your Wallet");
       player.sendMessage("Balance: " + wallet.balance(0));
+      player.sendMessage("Add " + BitQuest.DENOMINATION_NAME + ":");
       player.sendMessage(ChatColor.BLUE + "" + ChatColor.UNDERLINE + wallet.addressUrl());
-
     } catch (Exception e) {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED + "Error reading wallet. Please try again later.");

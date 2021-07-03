@@ -4,9 +4,6 @@ author: The BitQuest Dev Team
 main: com.bitquest.bitquest.BitQuest
 description: The BitQuest Open Source Project
 commands:
-  banlist:
-    description: "Prints the list of banned players"
-    usage: "/banlist"
   butcher:
     description: "kills all entities in the current chunk"
     usage: "/butcher"
