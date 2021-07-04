@@ -39,8 +39,13 @@ jobs:
           - 5432:5432
         env:
           POSTGRES_USER: bitquest
-          POSTGES_PASSWORD: development
+          POSTGRES_PASSWORD: development
           POSTGRES_DB: bitquest
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 20s
+          --health-timeout 10s
+          --health-retries 10
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
