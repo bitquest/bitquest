@@ -183,6 +183,7 @@ public class BitQuest extends JavaPlugin {
   public Jedis redis;
   public Node node;
   public Land land;
+  public Population players;
   public Connection conn;
 
 
@@ -205,6 +206,8 @@ public class BitQuest extends JavaPlugin {
       this.conn = DriverManager.getConnection(BitQuest.databaseUrl(), POSTGRES_USER, POSTGRES_PASSWORD);
       this.land = new Land(this.conn);
       this.land.runMigrations();
+      this.players = new Population(this.conn);
+      this.players.runMigrations();
       // registers listener classes
       getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
       getServer().getPluginManager().registerEvents(new BlockEvents(this), this);

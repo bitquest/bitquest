@@ -1,6 +1,8 @@
 package com.bitquest.bitquest.commands;
 
 import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.BitQuestPlayer;
+import java.sql.SQLException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -21,55 +23,16 @@ public class ClanCommand extends CommandAction {
       if (subCommand.equals("new")) {
         if (args.length > 1) {
           String clanName = args[1];
-          // check that desired clan name is alphanumeric
-          boolean hasNonAlpha = clanName.matches("^.*[^a-zA-Z0-9 ].*$");
-          if (!hasNonAlpha) {
-            // 16 characters max
-            if (clanName.length() <= 16) {
-              if (!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
-                if (!bitQuest.redis.sismember("clans", clanName)) {
-                  bitQuest.redis.sadd("clans", clanName);
-                  bitQuest.redis.set("clan:" + player.getUniqueId().toString(), clanName);
-                  bitQuest.redis.sadd(
-                      "clan:" + clanName + ":members", player.getUniqueId().toString());
-                  player.sendMessage(
-                      ChatColor.GREEN
-                          + "Congratulations! you are the founder of the "
-                          + clanName
-                          + " clan");
-                  player.setPlayerListName(
-                      ChatColor.GOLD + "[" + clanName + "] " + ChatColor.WHITE + player.getName());
-                  if (bitQuest.isModerator(player)) {
-                    player.setPlayerListName(
-                        ChatColor.RED
-                            + "[MOD]"
-                            + ChatColor.GOLD
-                            + "["
-                            + clanName
-                            + "] "
-                            + ChatColor.WHITE
-                            + player.getName());
-                  }
-                  return true;
-                } else {
-                  player.sendMessage(
-                      ChatColor.RED + "A clan with the name '" + clanName + "' already exists.");
-                  return true;
-                }
-              } else {
-                player.sendMessage(
-                    ChatColor.RED
-                        + "You already belong to the clan "
-                        + bitQuest.redis.get("clan:" + player.getUniqueId().toString()));
-                return true;
-              }
+          try {
+            if (bitQuest.players.createClan(player.getUniqueId().toString(), clanName)) {
+              player.sendMessage(ChatColor.GREEN + "You have founded the clan " + clanName);
             } else {
-              player.sendMessage(ChatColor.RED + "Error: clan name must have 16 characters max");
-              return true;
+              player.sendMessage(ChatColor.RED + "Cannot create clan.");
             }
-          } else {
-            player.sendMessage(
-                ChatColor.RED + "Your clan name must only contain letters and numbers");
+          } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            player.sendMessage(ChatColor.RED + e.getMessage());
+            e.printStackTrace();
             return true;
           }
 
@@ -81,73 +44,25 @@ public class ClanCommand extends CommandAction {
       if (subCommand.equals("invite")) {
         if (args.length > 1) {
           String invitedName = args[1];
-          if (invitedName.equals(player.getName())) {
-            player.sendMessage(ChatColor.RED + "You can not invite yourself");
-            return true;
-          }
-          // check that player is in a clan
-          if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
-            String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
-            // check if user is in the uuid database
-            if (bitQuest.redis.exists("uuid:" + invitedName)) {
-              // check if player already belongs to a clan
-              String uuid = bitQuest.redis.get("uuid:" + invitedName);
-              if (!bitQuest.redis.exists("clan:" + uuid)) {
-                // check if player is already invited to the clan
-                if (!bitQuest.redis.sismember("invitations:" + clan, uuid)) {
-                  bitQuest.redis.sadd("invitations:" + clan, uuid);
-                  player.sendMessage(
-                      ChatColor.GREEN
-                          + "You invited "
-                          + invitedName
-                          + " to the "
-                          + clan
-                          + " clan.");
-                  if (Bukkit.getPlayerExact(invitedName) != null) {
-                    Player invitedplayer = Bukkit.getPlayerExact(invitedName);
-                    invitedplayer.sendMessage(
-                        ChatColor.GREEN
-                            + player.getName()
-                            + " invited you to the "
-                            + clan
-                            + " clan");
-                    invitedplayer.sendMessage(
-                        ChatColor.GREEN + player.getName() + " to join, enter: /clan join " + clan);
-                  }
-                  return true;
+          for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
+            if (onlinePlayer.getName().equalsIgnoreCase(invitedName) && !invitedName.equalsIgnoreCase(player.getDisplayName())) {
+              try {
+                BitQuestPlayer bqPlayer = bitQuest.players.player(player.getUniqueId().toString());
+                BitQuestPlayer invitedPlayer = bitQuest.players.player(onlinePlayer.getUniqueId().toString());
+                if (bqPlayer.inviteToClan(invitedPlayer)) {
+                  player.sendMessage(ChatColor.GREEN + "Player " + onlinePlayer.getDisplayName() + " was invited to " + bqPlayer.clan);
                 } else {
-                  player.sendMessage(
-                      ChatColor.RED
-                          + "Player "
-                          + invitedName
-                          + " is already invited to the clan and must accept the invitation");
-                  return true;
+                  player.sendMessage(ChatColor.RED + "Cannot Invite Player");
                 }
-
-              } else {
-                if (bitQuest.redis.get("clan:" + uuid).equals(clan)) {
-                  player.sendMessage(
-                      ChatColor.RED
-                          + "Player "
-                          + invitedName
-                          + " already belongs to the clan "
-                          + clan);
-
-                } else {
-                  player.sendMessage(
-                      ChatColor.RED + "Player " + invitedName + " already belongs to a clan.");
-                }
+              } catch (Exception e) {
+                player.sendMessage(ChatColor.RED + e.getMessage());
+                e.printStackTrace();
                 return true;
               }
-            } else {
-              player.sendMessage(
-                  ChatColor.RED + "User " + invitedName + " does not play on this server");
-              return true;
             }
-          } else {
-            player.sendMessage(ChatColor.RED + "You don't belong to a clan");
-            return true;
           }
+          player.sendMessage(ChatColor.RED + "Can't find player " + invitedName);
+          return true;
         } else {
           player.sendMessage(ChatColor.RED + "Usage: /clan invite <player nickname>");
           return true;
