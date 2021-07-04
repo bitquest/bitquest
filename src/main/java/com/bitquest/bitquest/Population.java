@@ -125,7 +125,7 @@ public class Population {
     ps.executeUpdate();
     ps.close();
     // Create clan_invites table
-    sql = "CREATE TABLE IF NOT EXISTS clan_invites (uuid varchar(36) PRIMARY KEY, clan varchar(32));";
+    sql = "CREATE TABLE IF NOT EXISTS clan_invites (uuid varchar(36), clan varchar(32));";
     ps = this.conn.prepareStatement(sql);
     System.out.println(sql);
     ps.executeUpdate();
