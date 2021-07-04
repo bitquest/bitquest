@@ -21,14 +21,14 @@ public class Population {
     ResultSet rs = st.executeQuery(sql);
     BitQuestPlayer player = null;
     while (rs.next()) {
-      player = new BitQuestPlayer();
+      player = new BitQuestPlayer(conn);
       player.uuid = playerId;
       if (rs.getString(1) != null) player.clan = rs.getString(1);
     }
     rs.close();
     st.close();
     if (player == null) {
-      player = new BitQuestPlayer();
+      player = new BitQuestPlayer(conn);
       player.uuid = playerId;
       sql = "INSERT INTO players (uuid) VALUES ('" +
           playerId +
@@ -70,12 +70,22 @@ public class Population {
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
+    sql = "DELETE FROM clan_invites WHERE clan = '" +
+        clanName +
+        "'";
+    System.out.println(sql);
+    ps = this.conn.prepareStatement(sql);
+    ps.executeUpdate();
+    ps.close();
     return true;
   }
 
   public boolean joinClan(String playerId, String clanName) throws SQLException {
     if (!BitQuest.validName(clanName)) return false;
-    if (player(playerId).clan != null) return false;
+    if (!clanExists(clanName)) return false;
+    BitQuestPlayer player = player(playerId);
+    if (player.clan != null) return false;
+    if (!player.invitedToClan(clanName)) return false;
     String sql = "UPDATE players SET clan = '" +
         clanName +
         "' WHERE uuid = '" +
@@ -83,6 +93,13 @@ public class Population {
         "'";
     System.out.println(sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
+    ps.executeUpdate();
+    ps.close();
+    sql = "DELETE FROM clan_invites WHERE uuid = '" +
+        playerId +
+        "'";
+    System.out.println(sql);
+    ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
     return true;
@@ -101,8 +118,15 @@ public class Population {
   }  
 
   public void runMigrations() throws SQLException {
+    // Create players table
     String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32));";
     PreparedStatement ps = this.conn.prepareStatement(sql);
+    System.out.println(sql);
+    ps.executeUpdate();
+    ps.close();
+    // Create clan_invites table
+    sql = "CREATE TABLE IF NOT EXISTS clan_invites (uuid varchar(36) PRIMARY KEY, clan varchar(32));";
+    ps = this.conn.prepareStatement(sql);
     System.out.println(sql);
     ps.executeUpdate();
     ps.close();

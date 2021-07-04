@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -107,14 +108,32 @@ public class BitQuestTest {
     Connection conn = DriverManager.getConnection(BitQuest.databaseUrl(), BitQuest.POSTGRES_USER, BitQuest.POSTGRES_PASSWORD);
     Population players = new Population(conn);
     players.runMigrations();
-    BitQuestPlayer alice = players.player("63d9719e-571a-4963-ac11-2f1233393580");
+    String sql = "DELETE FROM players";
+    System.out.println(sql);
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.executeUpdate();
+    ps.close();
+    String aliceId = "63d9719e-571a-4963-ac11-2f1233393580";
+    BitQuestPlayer alice = players.player(aliceId);
+    BitQuestPlayer bob = players.player("35714b7c-fde7-4ebd-af32-7fd106c881a0");
     System.out.println(alice.clan);
+    assertFalse(alice.invitedToClan("FakeClan"));
+    String clanName = "Clan";
     if (alice.clan == null) {
+      assertFalse(alice.inviteToClan(bob));
       assertFalse(players.leaveClan(alice.uuid));
-      assertTrue(players.joinClan(alice.uuid, "Clan"));
-      assertFalse(players.joinClan(alice.uuid, "Clan"));
+      assertFalse(players.joinClan(alice.uuid, clanName));
+      assertTrue(players.createClan(alice.uuid, clanName));
+      assertFalse(players.createClan(alice.uuid, clanName));
+      alice = players.player(aliceId);
+      assertFalse(bob.invitedToClan(clanName));
+      assertFalse(players.joinClan(bob.uuid, clanName));
+      assertTrue(alice.inviteToClan(bob));
+      assertTrue(bob.invitedToClan(clanName));
+      assertTrue(players.joinClan(bob.uuid, clanName));
+      assertFalse(bob.invitedToClan(clanName));
     } else {
-      assertFalse(players.joinClan(alice.uuid, "Clan"));
+      assertFalse(players.joinClan(alice.uuid, clanName));
       assertTrue(players.leaveClan(alice.uuid));
     }
   }
