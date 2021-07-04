@@ -128,7 +128,7 @@ public class ClanCommand extends CommandAction {
           }
         }
         if (subCommand.equals("leave")) {
-          if(bqPlayer.leaveClan()) {
+          if (bqPlayer.leaveClan()) {
             player.sendMessage(ChatColor.RED + "You have left " + bqPlayer.clan);
           } else {
             player.sendMessage(ChatColor.RED + "Error");
