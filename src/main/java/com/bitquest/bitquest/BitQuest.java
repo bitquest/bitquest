@@ -697,23 +697,28 @@ public class BitQuest extends JavaPlugin {
     LandChunk chunk;
     try {
       chunk = this.land.chunk(location);
-    } catch (SQLException e) {
-      // TODO Auto-generated catch block
+      if (chunk != null) {
+        if (chunk.isOwner(player)) {
+          return true;
+        } else if (chunk.permission == ChunkPermission.PUBLIC) {
+          return true;
+        } else if (chunk.permission == ChunkPermission.CLAN) {
+          BitQuestPlayer owner = players.player(chunk.owner);
+          BitQuestPlayer bqPlayer = players.player(player.getUniqueId().toString());
+          if (owner != null && bqPlayer != null && owner.clan != null && bqPlayer.clan != null) {
+            return owner.clan.equals(bqPlayer.clan);
+          } else {
+            return false; 
+          }
+        } else {
+          return false;
+        }
+      } else {
+        return true;
+      }
+    } catch (Exception e) {
       e.printStackTrace();
       return false;
-    }
-    if (chunk != null) {
-      if (chunk.isOwner(player)) {
-        return true;
-      } else if (chunk.permission == ChunkPermission.PUBLIC) {
-        return true;
-      } else if (chunk.permission == ChunkPermission.CLAN) {
-        return false; // TODO: Re enable clan checks
-      } else {
-        return false;
-      }
-    } else {
-      return true;
     }
   }
 
