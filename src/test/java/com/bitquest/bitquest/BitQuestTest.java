@@ -106,12 +106,12 @@ public class BitQuestTest {
   public void testClans() throws Exception {
     Class.forName("org.postgresql.Driver");
     Connection conn = DriverManager.getConnection(BitQuest.databaseUrl(), BitQuest.POSTGRES_USER, BitQuest.POSTGRES_PASSWORD);
-    Population players = new Population(conn);
     String sql = "DROP TABLE IF EXISTS players";
     System.out.println(sql);
     PreparedStatement ps = conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
+    Population players = new Population(conn);
     players.runMigrations();
     String aliceId = "63d9719e-571a-4963-ac11-2f1233393580";
     BitQuestPlayer alice = players.player(aliceId);
