@@ -128,19 +128,10 @@ public class ClanCommand extends CommandAction {
           }
         }
         if (subCommand.equals("leave")) {
-          if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
-            String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
-            player.sendMessage(ChatColor.GREEN + "You are no longer part of the " + clan + " clan");
-            bitQuest.redis.del("clan:" + player.getUniqueId().toString());
-            bitQuest.redis.srem("clan:" + clan + ":members", player.getUniqueId().toString());
-
-            player.setPlayerListName(player.getName());
-
-            removeEmptyClan(clan);
-            return true;
+          if(bqPlayer.leaveClan()) {
+            player.sendMessage(ChatColor.RED + "You have left " + bqPlayer.clan);
           } else {
-            player.sendMessage(ChatColor.RED + "You don't belong to a clan.");
-            return true;
+            player.sendMessage(ChatColor.RED + "Error");
           }
         }
       } catch (SQLException e) {

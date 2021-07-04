@@ -32,6 +32,17 @@ public class BitQuestPlayer {
     return true;
   }
 
+  public boolean leaveClan() throws SQLException {
+    String sql = "UPDATE players SET clan = NULL WHERE uuid = '" +
+        uuid +
+        "'";
+    System.out.println(sql);
+    PreparedStatement ps = this.conn.prepareStatement(sql);
+    ps.executeUpdate();
+    ps.close();
+    return true;
+  }
+
   public boolean invitedToClan(String clanName) throws SQLException {
     String sql = "SELECT * FROM clan_invites WHERE uuid = '" +
         uuid + 
