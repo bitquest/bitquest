@@ -35,7 +35,8 @@ jobs:
           - 6379:6379
       postgres:
         image: postges
-        ports: 5432
+        ports: 
+          - 5432:5432
         env:
           POSTGRES_USER: bitquest
           POSTGES_PASSWORD: development
