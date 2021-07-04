@@ -247,7 +247,6 @@ public class EntityEvents implements Listener {
           LandChunk toChunk = bitQuest.land.chunk(event.getTo());
           String name1 = fromChunk != null ? fromChunk.name : "the wilderness";
           String name2 = toChunk != null ? toChunk.name : "the wilderness";
-          System.out.println(name1);
           if (!name1.equals(name2)) {
             if (name2.equals("the wilderness")) {
               event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
