@@ -19,7 +19,7 @@ public class BitQuestPlayer {
     if (clan == null) return false;
     if (invitedPlayer.clan != null) return false;
     if (invitedPlayer.uuid == null) return false;
-    if (invitedPlayer.invitedToClan(clan)) return false;
+    if (invitedPlayer.invitedToClan(clan)) return true;
     String sql = "INSERT INTO clan_invites (uuid, clan) VALUES ('" +
         invitedPlayer.uuid +
         "','" +

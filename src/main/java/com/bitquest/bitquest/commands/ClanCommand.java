@@ -43,6 +43,8 @@ public class ClanCommand extends CommandAction {
                 BitQuestPlayer invitedPlayer = bitQuest.players.player(onlinePlayer.getUniqueId().toString());
                 if (bqPlayer.inviteToClan(invitedPlayer)) {
                   player.sendMessage(ChatColor.GREEN + "Player " + onlinePlayer.getDisplayName() + " was invited to " + bqPlayer.clan);
+                  onlinePlayer.sendMessage(ChatColor.GREEN + "Player " + player.getDisplayName() + " has invited you to the clan " + bqPlayer.clan);
+                  onlinePlayer.sendMessage(ChatColor.GREEN + "To accept, write /clan join" + bqPlayer.clan);
                   return true;
                 } else {
                   player.sendMessage(ChatColor.RED + "Cannot Invite Player");
