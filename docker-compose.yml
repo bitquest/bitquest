@@ -14,8 +14,17 @@ services:
       - BITQUEST_NODE_HOST=dogecoind
       - BITQUEST_NODE_RPC_USER=user
       - BITQUEST_NODE_RPC_PASSWORD=hackme
+      - BITQUEST_POSTGRES_USER=bitquest
+      - BITQUEST_POSTGRES_PASSWORD=development
+      - BITQUEST_POSTGRES_HOST=postgres
   redis:
     image: redis
+  postgres:
+    image: postgres
+    environment: 
+      - POSTGRES_USER=bitquest
+      - POSTGRES_PASSWORD=development
+      - POSTGRES_DB=bitquest
   dogecoind:
     image: explodi/dogecoind
     command: ["-testnet","-rpcuser=user","-rpcpassword=hackme","--loglevel=error"]

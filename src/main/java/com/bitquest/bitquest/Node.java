@@ -12,10 +12,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class Node {
-  public String host;
-  public int port;
-  public String rpcUsername;
-  public String rpcPassword;
+  public String host = System.getenv("BITQUEST_NODE_HOST");
+  public int port = System.getenv("BITQUEST_NODE_PORT") != null ? Integer.parseInt(System.getenv("BITQUEST_NODE_PORT")) : 44555;
+  public String rpcUsername = System.getenv("BITQUEST_NODE_RPC_USER");
+  public String rpcPassword = System.getenv("BITQUEST_NODE_RPC_PASSWORD");
 
   /*
       rpcCall
@@ -28,7 +28,7 @@ public class Node {
     jsonObject.put("method", method);
     jsonObject.put("params", params);
     URL url = new URL("http://" + host + ":" + port);
-    BitQuest.debug("rpc",url.toString());
+    System.out.println(url);
     HttpURLConnection con = (HttpURLConnection) url.openConnection();
     con.setConnectTimeout(1000);
     String userPassword =

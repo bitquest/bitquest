@@ -1,6 +1,7 @@
 package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.LandChunk;
 import com.bitquest.bitquest.User;
 import com.bitquest.bitquest.Wallet;
 import java.io.IOException;
@@ -234,56 +235,29 @@ public class EntityEvents implements Listener {
   @EventHandler
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
-    // TODO: Check if zone is PvP only when chunks change
-    // if ((bitQuest.isPvP(event.getPlayer().getLocation()) == true) && (pvar == 0))
-    // {
-    // event.getPlayer().sendMessage(ChatColor.RED + "IN PVP ZONE");
-    // pvar++;
-    // }
 
     if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-      event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
+      // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
 
       if (event.getFrom().getWorld().getName().endsWith("_end") == false
           && event.getFrom().getWorld().getName().endsWith("_nether") == false) {
         // announce new area
-        String chunkname = "";
-        if (event.getPlayer().getWorld().getName().equals("world")) {
-          chunkname = "chunk";
-        } else if (event.getPlayer().getWorld().getName().equals("world_nether")) {
-          chunkname = "netherchunk";
-        }
-
-        int x1 = event.getFrom().getChunk().getX();
-        int z1 = event.getFrom().getChunk().getZ();
-
-        int x2 = event.getTo().getChunk().getX();
-        int z2 = event.getTo().getChunk().getZ();
-        String name1 = "the wilderness";
-        String name2 = "the wilderness";
-        String key1 = chunkname + "" + x1 + "," + z1 + "name";
-        String key2 = chunkname + "" + x2 + "," + z2 + "name";
-        if (bitQuest.landIsClaimed(event.getFrom())) {
-          if (bitQuest.landNameCache.containsKey(key1)) {
-            name1 = bitQuest.landNameCache.get(key1);
-          } else {
-            name1 = bitQuest.redis.get(key1) != null ? bitQuest.redis.get(key1) : "the wilderness";
-            bitQuest.landNameCache.put(key1, name1);
+        try {
+          LandChunk fromChunk = bitQuest.land.chunk(event.getFrom());
+          LandChunk toChunk = bitQuest.land.chunk(event.getFrom());
+          String name1 = fromChunk != null ? fromChunk.name : "the wilderness";
+          String name2 = toChunk != null ? toChunk.name : "the wilderness";
+          if (!name1.equals(name2)) {
+            if (name2.equals("the wilderness")) {
+              event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
+            } else {
+              event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + name2 + " ]");
+            }
           }
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-        if (bitQuest.landIsClaimed(event.getTo())) {
-          name2 = bitQuest.redis.get(key2) != null ? bitQuest.redis.get(key2) : "the wilderness";
-        }
-        event.getPlayer().setGameMode(GameMode.SURVIVAL);
 
-        if (!name1.equals(name2)) {
-
-          if (name2.equals("the wilderness")) {
-            event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
-          } else {
-            event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + name2 + " ]");
-          }
-        }
       } else {
         event.getPlayer().setGameMode(GameMode.ADVENTURE);
       }

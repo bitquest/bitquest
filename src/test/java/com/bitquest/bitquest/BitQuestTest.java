@@ -2,6 +2,7 @@ package com.bitquest.bitquest;
 
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -44,10 +45,6 @@ public class BitQuestTest {
     String xpub = masterKey.serializePubB58(network);
     System.out.println(xpub);
     Node node = new Node();
-    node.host = BitQuest.NODE_HOST;
-    node.port = BitQuest.NODE_PORT;
-    node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
-    node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
     // Test Node
     System.out.println(node.getBlockchainInfo());
     // Test wallet
@@ -69,8 +66,31 @@ public class BitQuestTest {
   }
   
   @Test
-  public void testLandOwnership() {
-    Jedis redis = new Jedis(BitQuest.REDIS_HOST, BitQuest.REDIS_PORT);
-    redis.flushAll();
+  public void testLandOwnership() throws Exception {
+    Land land = new Land();
+    land.runMigrations();
+    String uuid = "63d9719e-571a-4963-ac11-2f1233393580";
+    int x = 0;
+    int z = 0;
+    LandChunk chunk = land.chunk(x, z);
+    if (chunk == null) {
+      land.claim(x, z, uuid, "Land");
+    } else {
+      System.out.println(chunk.name);
+      System.out.println(chunk.permission);
+      System.out.println(chunk.owner);
+      if (chunk.permission == ChunkPermission.PRIVATE) {
+        land.changePermission(x, z, ChunkPermission.CLAN);
+      } else if (chunk.permission == ChunkPermission.CLAN) {
+        land.changePermission(x, z, ChunkPermission.PUBLIC);
+      } else {
+        land.changePermission(x, z, ChunkPermission.PRIVATE);
+      }
+      if (chunk.name.equals("Good Land")) {
+        land.rename(x, z, "Bad Land");
+      } else {
+        land.rename(x, z, "Good Land");
+      }
+    }
   }
 }

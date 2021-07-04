@@ -42,6 +42,7 @@ import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -79,6 +80,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import redis.clients.jedis.Jedis;
+
 
 // Color Table :
 // GREEN : Worked, YELLOW : Processing, LIGHT_PURPLE : Any money balance, BLUE : Player name,
@@ -175,7 +177,7 @@ public class BitQuest extends JavaPlugin {
   public static long PET_PRICE = 100 * DENOMINATION_FACTOR;
   public Jedis redis;
   public Node node;
-  public LandOwnership land;
+  public Land land;
 
   @Override
   public void onEnable() {
@@ -186,13 +188,13 @@ public class BitQuest extends JavaPlugin {
     this.node.port = BitQuest.NODE_PORT;
     this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
-    this.land = new LandOwnership(redis);
-    try {
+    this.land = new Land();
 
+    try {
       if (ADMIN_UUID == null) {
         log("warning", "ADMIN_UUID env variable is not set.");
       }
-
+      this.land.runMigrations();
       // registers listener classes
       getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
       getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -217,13 +219,10 @@ public class BitQuest extends JavaPlugin {
       log("startup", "Redis host is: " + REDIS_HOST);
       log("startup", "Redis port is: " + REDIS_PORT);
 
-      try {
-        JSONObject blockchainInfo = node.getBlockchainInfo();
-        Double verificationProgress = (Double) blockchainInfo.get("verificationprogress");
-        log("node", "verificartion progesss: " + verificationProgress);
-      } catch (Exception e) {
-        log("fatal", e.getMessage());
-      }
+      JSONObject blockchainInfo = node.getBlockchainInfo();
+      Double verificationProgress = (Double) blockchainInfo.get("verificationprogress");
+      log("node", "verificartion progesss: " + verificationProgress);
+
 
       this.wallet = new Wallet(node, "loot");
       BitQuest.log("loot", wallet.address());
@@ -529,13 +528,17 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static final void log(String tag, String msg) {
-    System.out.println("[" + tag + "] " + msg);
+    if (tag != null && msg != null) System.out.println("[" + tag + "] " + msg);
   }
 
   public static final void debug(String tag, String msg) {
-    if (!BitQuest.BITQUEST_ENV.equals("production")) {
+    if (!System.getenv("BITQUEST_ENV").equals("production")) {
       System.out.println("[" + tag + "] " + msg);
     }
+  }
+  
+  public static final boolean isAlphaNumeric(String string) {
+    return !string.matches("^.*[^a-zA-Z0-9 ].*$");
   }
 
   public int getLevel(int exp) {
@@ -603,7 +606,7 @@ public class BitQuest extends JavaPlugin {
     updateScoreboard(player);
   }
 
-  public boolean validName(final String name) {
+  public static boolean validName(final String name) {
     boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
     if (name.isEmpty() || name.length() > 28 || hasNonAlpha || name.equalsIgnoreCase("the wilderness")) {
       return false;
@@ -658,54 +661,30 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
-  public boolean isOwner(Location location, Player player) {
-    String chunk = "";
-    if (player.getWorld().getName().equals("world")) {
-      chunk = "chunk";
-    } else if (player.getWorld().getName().equals("world_nether")) {
-      chunk = "netherchunk";
-    }
-    String key = chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
-    if (redis.get(key).equals(player.getUniqueId().toString())) {
-      // player is the owner of the chunk
-      return true;
-    } else {
-      return false;
-    }
+  public boolean isOwner(Location location, Player player) throws SQLException {
+    if (!player.getWorld().getName().equals("world")) return false;
+    LandChunk land = this.land.chunk((int) location.getX(), (int) location.getZ());
+    return land != null && land.owner.equals(player.getUniqueId().toString());
   }
 
   public boolean canBuild(Location location, Player player) {
     // returns true if player has permission to build in location
-    // TODO: Find out how are we gonna deal with clans and locations, and how/if
-    // they are gonna
-    // share land resources
-    String chunk = "";
-    if (player.getWorld().getName().equals("world")) {
-      chunk = "chunk";
-    } else if (player.getWorld().getName().equals("world_nether")) {
-      chunk = "netherchunk";
-    } // end nether @bitcoinjake09
-    if (!(location.getWorld().getName().equals("world")) && !(location.getWorld().getName().equals("world_nether"))) {
-      // If theyre not in the overworld, they cant build
+    if (!player.getWorld().getName().equals("world")) return false;
+    LandChunk chunk;
+    try {
+      chunk = this.land.chunk((int) location.getX(), (int) location.getZ());
+    } catch (SQLException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
       return false;
-    } else if (landIsClaimed(location)) {
-      if (isOwner(location, player)) {
+    }
+    if (chunk != null) {
+      if (chunk.isOwner(player)) {
         return true;
-      } else if (landPermissionCode(location).equals("p")) {
+      } else if (chunk.permission == ChunkPermission.PUBLIC) {
         return true;
-      } else if (landPermissionCode(location).equals("pv")) {
-        return true; // public pvp @BitcoinJake09
-      } else if (landPermissionCode(location).equals("v")) {
-        return true; // pvp @BitcoinJake09
-      } else if (landPermissionCode(location).equals("c")) {
-        String ownerUuid = redis.get("chunk" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner");
-        String ownerClan = redis.get("clan:" + ownerUuid);
-        String playerClan = redis.get("clan:" + player.getUniqueId().toString());
-        if (ownerClan.equals(playerClan)) {
-          return true;
-        } else {
-          return false;
-        }
+      } else if (chunk.permission == ChunkPermission.CLAN) {
+        return false; // TODO: Re enable clan checks
       } else {
         return false;
       }

@@ -33,6 +33,18 @@ jobs:
         ports:
           # Opens tcp port 6379 on the host and service container
           - 6379:6379
+      postgres:
+        image: postges
+        ports: 5432
+        env:
+          POSTGRES_USER: bitquest
+          POSTGES_PASSWORD: development
+          POSTGRES_DB: bitquest
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
@@ -54,6 +66,9 @@ jobs:
           BITQUEST_NODE_RPC_PASSWORD: ${{ secrets.BITQUEST_NODE_RPC_PASSWORD }}
           BITQUEST_NODE_RPC_USER: ${{ secrets.BITQUEST_NODE_RPC_USER }}
           BITQUEST_REDIS_HOST: localhost
+          BITQUEST_POSTGRES_HOST: localhost
+          BITQUEST_POSTGRES_USER: bitquest
+          BITQUEST_POSTGRES_PASSWORD: development
         run: mvn test
       - name: Build Plugin
         run: make -B jar
