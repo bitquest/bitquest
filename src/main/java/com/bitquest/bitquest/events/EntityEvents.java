@@ -244,7 +244,7 @@ public class EntityEvents implements Listener {
         // announce new area
         try {
           LandChunk fromChunk = bitQuest.land.chunk(event.getFrom());
-          LandChunk toChunk = bitQuest.land.chunk(event.getFrom());
+          LandChunk toChunk = bitQuest.land.chunk(event.getTo());
           String name1 = fromChunk != null ? fromChunk.name : "the wilderness";
           String name2 = toChunk != null ? toChunk.name : "the wilderness";
           System.out.println(name1);

@@ -93,7 +93,7 @@ public class LandCommand extends CommandAction {
             return true;
           }
           try {
-            bitQuest.land.claim(location.getChunk().getX(), location.getChunk().getZ(), player.getUniqueId().toString(), claimName);
+            bitQuest.land.claim(x, z, player.getUniqueId().toString(), claimName);
             player.sendMessage(ChatColor.GREEN + "Congratulations! You are now the owner of " + claimName);
             return true;
           } catch (Exception e) {
