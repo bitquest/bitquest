@@ -19,11 +19,12 @@ public class LandCommand extends CommandAction {
   }
 
   public boolean run(CommandSender sender, Command cmd, String label, String[] args, Player player) {
-    if (player.getLocation().getWorld().getName().equals("world")) return false;
+    if (player.getLocation().getWorld().getName().equals("world_the_end")) return false;
     if (player.getLocation().getWorld().getName().equals("world_nether")) return false;
     if (args.length == 0) return false;
     Location location = player.getLocation();
     String subCommand = args[0];
+    System.out.println(subCommand);
     int x = (int) location.getX();
     int z = (int) location.getZ();
     LandChunk chunk;
@@ -52,7 +53,7 @@ public class LandCommand extends CommandAction {
       } else {
         return false;
       }
-    } else if (args[0].equalsIgnoreCase("transfer")) {
+    } else if (subCommand.equalsIgnoreCase("transfer")) {
       if (args.length == 2) {
         if (chunk.isOwner(player)) {
           for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -72,9 +73,9 @@ public class LandCommand extends CommandAction {
       } else {
         return false;
       }
-    } else if (args[0].equalsIgnoreCase("info")) {
+    } else if (subCommand.equalsIgnoreCase("info")) {
       return true;
-    } else if (args[0].equalsIgnoreCase("claim")) {
+    } else if (subCommand.equalsIgnoreCase("claim")) {
       // Claim land
       if (args.length > 1) {
         if (chunk == null) {
