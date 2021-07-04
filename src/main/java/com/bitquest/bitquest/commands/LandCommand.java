@@ -39,6 +39,7 @@ public class LandCommand extends CommandAction {
     if (subCommand.equalsIgnoreCase("rename")) {
       if (chunk == null) {
         player.sendMessage(ChatColor.RED + "This land is not claimed yet.");
+        return true;
       }
       if (args.length == 2) {
         String name = args[1];
