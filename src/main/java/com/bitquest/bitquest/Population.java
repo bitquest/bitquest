@@ -14,7 +14,7 @@ public class Population {
   }
 
   public BitQuestPlayer player(String playerId) throws SQLException {
-    String sql = "SELECT clan FROM players WHERE uuid='" +
+    String sql = "SELECT clan, experience FROM players WHERE uuid='" +
         playerId +
         "'";
     Statement st = this.conn.createStatement();
@@ -24,15 +24,16 @@ public class Population {
       player = new BitQuestPlayer(conn);
       player.uuid = playerId;
       if (rs.getString(1) != null) player.clan = rs.getString(1);
+      player.experience = rs.getInt(2);
     }
     rs.close();
     st.close();
     if (player == null) {
       player = new BitQuestPlayer(conn);
       player.uuid = playerId;
-      sql = "INSERT INTO players (uuid) VALUES ('" +
+      sql = "INSERT INTO players (uuid, experience) VALUES ('" +
           playerId +
-          "')";
+          "',0)";
       System.out.println(sql);
       PreparedStatement ps = this.conn.prepareStatement(sql);
       ps.executeUpdate();
@@ -119,7 +120,7 @@ public class Population {
 
   public void runMigrations() throws SQLException {
     // Create players table
-    String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32));";
+    String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32), experience int NOT NULL);";
     PreparedStatement ps = this.conn.prepareStatement(sql);
     System.out.println(sql);
     ps.executeUpdate();

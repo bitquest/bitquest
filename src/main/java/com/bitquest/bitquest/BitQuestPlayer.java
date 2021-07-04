@@ -9,6 +9,7 @@ import java.sql.Statement;
 public class BitQuestPlayer {
   public String clan;
   public String uuid;
+  public int experience;
   private Connection conn;
 
   public BitQuestPlayer(Connection conn) {

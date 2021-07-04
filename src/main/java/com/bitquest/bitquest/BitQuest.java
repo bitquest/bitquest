@@ -57,6 +57,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
+import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -220,6 +221,9 @@ public class BitQuest extends JavaPlugin {
       System.out.println("[startup] sending command gamerule keepInventory on");
 
       Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "gamerule keepInventory on");
+      Bukkit.getWorld("world").setDifficulty(Difficulty.HARD);
+      Bukkit.getWorld("world_the_end").setDifficulty(Difficulty.HARD);
+      Bukkit.getWorld("world_nether").setDifficulty(Difficulty.HARD);
 
       // loads config file. If it doesn't exist, creates it.
       getDataFolder().mkdir();
