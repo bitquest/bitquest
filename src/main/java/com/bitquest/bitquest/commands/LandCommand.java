@@ -25,8 +25,8 @@ public class LandCommand extends CommandAction {
     Location location = player.getLocation();
     String subCommand = args[0];
     System.out.println(subCommand);
-    int x = (int) location.getX();
-    int z = (int) location.getZ();
+    int x = location.getChunk().getX();
+    int z = location.getChunk().getZ();
     LandChunk chunk;
     try {
       chunk = bitQuest.land.chunk(x, z);
@@ -37,6 +37,9 @@ public class LandCommand extends CommandAction {
     }
     
     if (subCommand.equalsIgnoreCase("rename")) {
+      if (chunk == null) {
+        player.sendMessage(ChatColor.RED + "This land is not claimed yet.");
+      }
       if (args.length == 2) {
         String name = args[1];
         if (chunk.isOwner(player)) {
