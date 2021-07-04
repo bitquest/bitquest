@@ -663,7 +663,7 @@ public class BitQuest extends JavaPlugin {
 
   public boolean isOwner(Location location, Player player) throws SQLException {
     if (!player.getWorld().getName().equals("world")) return false;
-    LandChunk land = this.land.chunk((int) location.getX(), (int) location.getZ());
+    LandChunk land = this.land.chunk(location);
     return land != null && land.owner.equals(player.getUniqueId().toString());
   }
 
@@ -672,7 +672,7 @@ public class BitQuest extends JavaPlugin {
     if (!player.getWorld().getName().equals("world")) return false;
     LandChunk chunk;
     try {
-      chunk = this.land.chunk((int) location.getX(), (int) location.getZ());
+      chunk = this.land.chunk(location);
     } catch (SQLException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();

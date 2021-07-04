@@ -72,7 +72,7 @@ public class Land {
   }
 
   public LandChunk chunk(Location location) throws SQLException {
-    return this.chunk((int) location.getX(), (int) location.getZ());
+    return this.chunk((int) location.getChunk().getX(), (int) location.getChunk().getZ());
   }
 
   public LandChunk chunk(int x, int z) throws SQLException {
