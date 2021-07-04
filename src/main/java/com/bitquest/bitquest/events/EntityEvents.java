@@ -332,8 +332,8 @@ public class EntityEvents implements Listener {
           }
         }
         // Award random weapon
-        if (BitQuest.rand(1,1) == 1) e.getDrops().add(randomWeapon(level));
-        if (BitQuest.rand(1,1) == 1) e.getDrops().add(randomArmor(level));
+        if (BitQuest.rand(1,10) == 1) e.getDrops().add(randomWeapon(level));
+        if (BitQuest.rand(1,10) == 1) e.getDrops().add(randomArmor(level));
       }
     } else {
       e.setDroppedExp(0);
