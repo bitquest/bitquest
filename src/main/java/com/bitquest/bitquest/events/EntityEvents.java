@@ -354,7 +354,18 @@ public class EntityEvents implements Listener {
   void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
     // e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);
 
-    Chunk chunk = e.getLocation().getChunk();
+    try {
+      LandChunk chunk = bitQuest.land.chunk(e.getLocation());
+      if (chunk != null) {
+        e.setCancelled(true);
+        return;
+      }
+    } catch (SQLException e2) {
+      e2.printStackTrace();
+      e.setCancelled(true);
+      return;
+    }
+
 
     LivingEntity entity = e.getEntity();
     int maxlevel = 10;
