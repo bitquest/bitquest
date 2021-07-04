@@ -99,15 +99,17 @@ public class Land {
   }
 
   public boolean claim(int x, int z, String owner, String name) throws Exception {
-    if (!BitQuest.isAlphaNumeric(name)) throw new Exception("Invalid name");
+    if (!BitQuest.validName(name)) throw new Exception("Invalid name");
     LandChunk chunk = this.chunk(x, z);
     if (chunk != null) throw new Exception("Land already claimed");
-    String sql = "INSERT INTO chunks (x, z, owner, permission) VALUES (" + 
+    String sql = "INSERT INTO chunks (x, z, owner, name, permission) VALUES (" + 
         String.valueOf(x) + 
         "," +
         String.valueOf(z) +
         ",'" +
         owner +
+        "','" +
+        name +
         "',0)";
     System.out.println(sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
