@@ -42,6 +42,8 @@ import java.net.CookieManager;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -125,6 +127,9 @@ public class BitQuest extends JavaPlugin {
       : 10000;
 
   public static final int MAX_STOCK = 100;
+  public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
+  public static final String POSTGRES_PASSWORD = System.getenv("BITQUEST_POSTGRES_PASSWORD");
+
 
   // REDIS: Look for Environment variables on hostname and port, otherwise
   // defaults to
@@ -178,6 +183,8 @@ public class BitQuest extends JavaPlugin {
   public Jedis redis;
   public Node node;
   public Land land;
+  public Connection conn;
+
 
   @Override
   public void onEnable() {
@@ -188,12 +195,15 @@ public class BitQuest extends JavaPlugin {
     this.node.port = BitQuest.NODE_PORT;
     this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
-    this.land = new Land();
-
+    
     try {
       if (ADMIN_UUID == null) {
         log("warning", "ADMIN_UUID env variable is not set.");
       }
+      Class.forName("org.postgresql.Driver");
+      BitQuest.log("db","connecting to " + BitQuest.databaseUrl());
+      this.conn = DriverManager.getConnection(BitQuest.databaseUrl(), POSTGRES_USER, POSTGRES_PASSWORD);
+      this.land = new Land(this.conn);
       this.land.runMigrations();
       // registers listener classes
       getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
@@ -286,11 +296,22 @@ public class BitQuest extends JavaPlugin {
       e.printStackTrace();
       redis.del("loot_cache");
       System.out.println("[loot_cache] FAIL");
-
     }
-
   }
 
+  public static String databaseUrl() {
+    String postgresDb = System.getenv("BITQUEST_POSTGRES_DB") != null ? System.getenv("BITQUEST_POSTGRES_DB") : "bitquest";
+    String postgresHost = System.getenv("BITQUEST_POSTGRES_HOST") != null ? System.getenv("BITQUEST_POSTGRES_HOST") : "postgres";
+    String postgresPort = System.getenv("BITQUEST_POSTGRES_PORT") != null ? System.getenv("BITQUEST_POSTGRES_PORT") : "5432";
+    String postgresUrl = "jdbc:postgresql://" + 
+        postgresHost +
+        ":" + 
+        postgresPort + 
+        "/" + 
+        postgresDb;
+    return postgresUrl;
+  }
+  
   static Double witherReward() {
     return (LAND_PRICE);
   }
@@ -608,7 +629,7 @@ public class BitQuest extends JavaPlugin {
 
   public static boolean validName(final String name) {
     boolean hasNonAlpha = name.matches("^.*[^a-zA-Z0-9 _].*$");
-    if (name.isEmpty() || name.length() > 28 || hasNonAlpha || name.equalsIgnoreCase("the wilderness")) {
+    if (name.isEmpty() || name.length() > 32 || hasNonAlpha || name.equalsIgnoreCase("the wilderness")) {
       return false;
     } else {
       return true;

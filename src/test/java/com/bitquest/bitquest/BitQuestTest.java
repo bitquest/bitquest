@@ -1,7 +1,12 @@
 package com.bitquest.bitquest;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.security.SecureRandom;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -67,7 +72,9 @@ public class BitQuestTest {
   
   @Test
   public void testLandOwnership() throws Exception {
-    Land land = new Land();
+    Class.forName("org.postgresql.Driver");
+    Connection conn = DriverManager.getConnection(BitQuest.databaseUrl(), BitQuest.POSTGRES_USER, BitQuest.POSTGRES_PASSWORD);
+    Land land = new Land(conn);
     land.runMigrations();
     String uuid = "63d9719e-571a-4963-ac11-2f1233393580";
     int x = 0;
@@ -91,6 +98,24 @@ public class BitQuestTest {
       } else {
         land.rename(x, z, "Good Land");
       }
+    }
+  }
+
+  @Test
+  public void testClans() throws Exception {
+    Class.forName("org.postgresql.Driver");
+    Connection conn = DriverManager.getConnection(BitQuest.databaseUrl(), BitQuest.POSTGRES_USER, BitQuest.POSTGRES_PASSWORD);
+    Population players = new Population(conn);
+    players.runMigrations();
+    BitQuestPlayer alice = players.player("63d9719e-571a-4963-ac11-2f1233393580");
+    System.out.println(alice.clan);
+    if (alice.clan == null) {
+      assertFalse(players.leaveClan(alice.uuid));
+      assertTrue(players.joinClan(alice.uuid, "Clan"));
+      assertFalse(players.joinClan(alice.uuid, "Clan"));
+    } else {
+      assertFalse(players.joinClan(alice.uuid, "Clan"));
+      assertTrue(players.leaveClan(alice.uuid));
     }
   }
 }

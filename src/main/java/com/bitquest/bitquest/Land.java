@@ -1,7 +1,6 @@
 package com.bitquest.bitquest;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,25 +10,8 @@ import org.bukkit.Location;
 public class Land {
   public Connection conn;
 
-  public Land() {
-    String postgresDb = System.getenv("BITQUEST_POSTGRES_DB") != null ? System.getenv("BITQUEST_POSTGRES_DB") : "bitquest";
-    String postgresHost = System.getenv("BITQUEST_POSTGRES_HOST") != null ? System.getenv("BITQUEST_POSTGRES_HOST") : "postgres";
-    String postgresUser = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
-    String postgresPassword = System.getenv("BITQUEST_POSTGRES_PASSWORD");
-    String postgresPort = System.getenv("BITQUEST_POSTGRES_PORT") != null ? System.getenv("BITQUEST_POSTGRES_PORT") : "5432";
-    try {
-      Class.forName("org.postgresql.Driver");
-      String postgresUrl = "jdbc:postgresql://" + 
-          postgresHost +
-          ":" + 
-          postgresPort + 
-          "/" + 
-          postgresDb;
-      BitQuest.log("db","connecting to " + postgresUrl);
-      this.conn = DriverManager.getConnection(postgresUrl, postgresUser, postgresPassword);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
+  public Land(Connection conn) {
+    this.conn = conn;
   }
 
   public void runMigrations() throws SQLException {
