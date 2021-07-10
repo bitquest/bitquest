@@ -3,6 +3,7 @@ package com.bitquest.bitquest.commands;
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.ChunkPermission;
 import com.bitquest.bitquest.LandChunk;
+import com.bitquest.bitquest.Wallet;
 import java.sql.SQLException;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -94,6 +95,8 @@ public class LandCommand extends CommandAction {
             return true;
           }
           try {
+            Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+            wallet.send(bitQuest.wallet.address(), BitQuest.LAND_PRICE);
             bitQuest.land.claim(x, z, player.getUniqueId().toString(), claimName);
             player.sendMessage(ChatColor.GREEN + "Congratulations! You are now the owner of " + claimName);
             return true;
