@@ -61,4 +61,29 @@ public class BitQuestPlayer {
     st.close();
     return exists;
   }
+
+  public boolean addExperience(int points) throws SQLException {
+    String sql = "UPDATE players SET experience = experience + 1 WHERE uuid = '" +
+        uuid +
+        "'";
+    System.out.println(sql);
+    PreparedStatement ps = this.conn.prepareStatement(sql);
+    ps.executeUpdate();
+    ps.close();
+    return true;
+  }
+
+  public int experience() throws SQLException {
+    String sql = "SELECT experience FROM players WHERE uuid = '" +
+        uuid +
+        "'";
+    Statement st = this.conn.createStatement();
+    ResultSet rs = st.executeQuery(sql);
+    System.out.println(sql);
+    rs.next();
+    int experience = rs.getInt(1);
+    rs.close();
+    st.close();
+    return experience;
+  }
 }

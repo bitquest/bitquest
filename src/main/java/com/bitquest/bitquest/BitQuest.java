@@ -570,11 +570,13 @@ public class BitQuest extends JavaPlugin {
   }
 
   public int getLevel(int exp) {
-    return (int) Math.floor(Math.sqrt(exp / (float) 256));
+    int level = (int) Math.floor(Math.sqrt(exp / (float) 64));
+    if(level > 100) return 100;
+    return level;
   }
 
   public int getExpForLevel(int level) {
-    return (int) Math.pow(level, 2) * 256;
+    return (int) Math.pow(level, 2) * 64;
   }
 
   public float getExpProgress(int exp) {
@@ -585,21 +587,26 @@ public class BitQuest extends JavaPlugin {
       prevlevel = getExpForLevel(level);
     }
     float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+    System.out.println("prog: " + progress + "level:" + level + "nextlevel:" + getExpForLevel(level +1));
     return progress;
   }
 
   public void setTotalExperience(Player player) {
-    int rawxp = 0;
-    if (redis.exists("experience.raw." + player.getUniqueId().toString())) {
-      rawxp = Integer.parseInt(redis.get("experience.raw." + player.getUniqueId().toString()));
-    }
     // lower factor, experience is easier to get. you can increase to get the
     // opposite effect
-    int level = getLevel(rawxp);
-    float progress = getExpProgress(rawxp);
-    player.setLevel(level);
-    player.setExp(progress);
-    setPlayerMaxHealth(player);
+    try {
+      int experience = players.player(player.getUniqueId().toString()).experience();
+      int level = getLevel(experience);
+      System.out.println(experience);
+      System.out.println(level);
+      float progress = getExpProgress(experience);
+      player.setLevel(level);
+      player.setExp(progress);
+      setPlayerMaxHealth(player);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
   }
 
   public void setPlayerMaxHealth(Player player) {

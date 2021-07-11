@@ -131,6 +131,14 @@ public class LandCommand extends CommandAction {
         player.sendMessage(ChatColor.DARK_RED + "Only the owner of this location can change its permissions.");
         return false;
       }
+    } else if(subCommand.equalsIgnoreCase("price")) {
+      try {
+        player.sendMessage(ChatColor.GREEN + "The land price is: " + BitQuest.LAND_PRICE + " " + bitQuest.node.chain());
+      } catch (Exception e) {
+        player.sendMessage(ChatColor.RED + "An error ocurred when calculating the land price");
+        e.printStackTrace();
+      }
+      return true;
     }
     return false;
   }

@@ -1,6 +1,7 @@
 package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
+import com.bitquest.bitquest.BitQuestPlayer;
 import com.bitquest.bitquest.LandChunk;
 import com.bitquest.bitquest.User;
 import com.bitquest.bitquest.Wallet;
@@ -20,6 +21,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Animals;
@@ -301,15 +304,15 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  void onEntityDeath(EntityDeathEvent e) throws Exception {
-    final LivingEntity entity = e.getEntity();
+  void onEntityDeath(EntityDeathEvent event) throws Exception {
+    final LivingEntity entity = event.getEntity();
 
     final int level = (int) entity.getMaxHealth() - 1;
     if (entity instanceof Player) {
-      e.getDrops().clear();
+      event.getDrops().clear();
     }
-    if (entity instanceof Monster && e.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-      final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) e.getEntity().getLastDamageCause();
+    if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+      final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
       Player player = null;
       if (damage.getDamager() instanceof Player) {
         player = (Player) damage.getDamager();
@@ -320,9 +323,13 @@ public class EntityEvents implements Listener {
         // Award experience and loot to players
         Double loot = 1.0;
         int exp = level * 4;
-        bitQuest.redis.incrBy("experience.raw." + player.getUniqueId().toString(), exp);
-        if (bitQuest.wallet.balance(3) > loot) {
+        try {
+          bitQuest.players.player(player.getUniqueId().toString()).addExperience(level);
           bitQuest.setTotalExperience(player);
+        } catch (Exception e) {
+          e.printStackTrace();
+        }
+        if (bitQuest.wallet.balance(3) > loot) {
           Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
           if (bitQuest.wallet.send(wallet.address(), loot)) {
             BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
@@ -331,11 +338,11 @@ public class EntityEvents implements Listener {
           }
         }
         // Award random weapon
-        if (BitQuest.rand(1,10) == 1) e.getDrops().add(randomWeapon(level));
-        if (BitQuest.rand(1,10) == 1) e.getDrops().add(randomArmor(level));
+        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
+        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
       }
     } else {
-      e.setDroppedExp(0);
+      event.setDroppedExp(0);
     }
   }
 
@@ -388,32 +395,30 @@ public class EntityEvents implements Listener {
       entity.setMaxHealth(2858519);
       entity.setCustomName("Giant Terry");
     } else if (entity instanceof Monster) {
-      bitQuest.createBossFight(e.getEntity().getLocation());
+      // bitQuest.createBossFight(e.getEntity().getLocation());
 
       // Disable mob spawners. Keep mob farmers away
       if (e.getSpawnReason() == SpawnReason.SPAWNER || spawnDistance < 64) {
         e.setCancelled(true);
       } else {
+        e.setCancelled(false);
+
+        if (level < 1) {
+          level = 1;
+        }
         try {
-
-          e.setCancelled(false);
-
-          if (level < 1) {
-            level = 1;
-          }
-
           entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
           entity.setCustomName(
               String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
           if (entity instanceof Wither) {
             level = level + 10;
-            entity.setCustomName("Wither (Reward: " + Math.round((bitQuest.LAND_PRICE) / bitQuest.DENOMINATION_FACTOR)
-                + " " + bitQuest.DENOMINATION_NAME + ")");
           }
-          entity.setMaxHealth(1 + level);
-
-          entity.setHealth(1 + level);
-
+          // entity.setMaxHealth(1 + level);
+          AttributeInstance attribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+          attribute.setBaseValue(level);
+          entity.setHealth(level);
+          System.out.println(entity.getCustomName());
+          System.out.println(entity.getHealth());
           // add potion effects
           if (bitQuest.rand(1, 100) < level) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
@@ -537,6 +542,10 @@ public class EntityEvents implements Listener {
           } else {
             event.setCancelled(true);
           }
+        }
+        if(event.getEntity() instanceof LivingEntity) {
+          LivingEntity damaged = (LivingEntity)event.getEntity();
+          System.out.println(damager.getName() + " -> " + event.getDamage() + " " + damaged.getHealth() + "/" + damaged.getMaxHealth());
         }
       } else {
         if (damageEvent.getCause() == EntityDamageEvent.DamageCause.PROJECTILE) {
