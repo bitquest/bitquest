@@ -48,3 +48,6 @@ ops.json
 permissions.yml
 usercache.json
 docs/_site
+
+# jekyll
+docs/.jekyll-cache
