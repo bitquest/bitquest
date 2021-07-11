@@ -543,7 +543,7 @@ public class EntityEvents implements Listener {
             event.setCancelled(true);
           }
         }
-        if(event.getEntity() instanceof LivingEntity) {
+        if (event.getEntity() instanceof LivingEntity) {
           LivingEntity damaged = (LivingEntity)event.getEntity();
           System.out.println(damager.getName() + " -> " + event.getDamage() + " " + damaged.getHealth() + "/" + damaged.getMaxHealth());
         }

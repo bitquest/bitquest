@@ -571,7 +571,7 @@ public class BitQuest extends JavaPlugin {
 
   public int getLevel(int exp) {
     int level = (int) Math.floor(Math.sqrt(exp / (float) 64));
-    if(level > 100) return 100;
+    if (level > 100) return 100;
     return level;
   }
 
@@ -587,7 +587,6 @@ public class BitQuest extends JavaPlugin {
       prevlevel = getExpForLevel(level);
     }
     float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
-    System.out.println("prog: " + progress + "level:" + level + "nextlevel:" + getExpForLevel(level +1));
     return progress;
   }
 
