@@ -20,7 +20,7 @@ public class BitQuestPlayer {
         "'";
     Statement st = this.conn.createStatement();
     ResultSet rs = st.executeQuery(sql);
-    if(rs.next() == false) {
+    if (rs.next() == false) {
       sql = "INSERT INTO players (uuid, experience) VALUES ('" +
           this.uuid +
           "',0)";
@@ -111,7 +111,7 @@ public class BitQuestPlayer {
     return found;
   }
 
-  public final static void runMigrations(Connection conn) throws SQLException {
+  public static final void runMigrations(Connection conn) throws SQLException {
     // Create players table
     String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32), experience int NOT NULL);";
     PreparedStatement ps = conn.prepareStatement(sql);

@@ -17,7 +17,7 @@ public class TradeCommand extends CommandAction {
   }
 
   public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
-    if(player.getInventory().firstEmpty() == -1) {
+    if (player.getInventory().firstEmpty() == -1) {
       player.sendMessage(ChatColor.RED + "Inventory is full");
       return false;
     }

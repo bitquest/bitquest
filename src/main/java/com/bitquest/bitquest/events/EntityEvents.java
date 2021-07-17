@@ -165,15 +165,8 @@ public class EntityEvents implements Listener {
     welcome = welcome.replace("<name>", player.getName());
     player.sendMessage(welcome);
     final BitQuestPlayer bqPlayer = bitQuest.player(player);
-    if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
-      String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
-      player.setPlayerListName(ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
-      if (bitQuest.isModerator(player)) {
-        player.setPlayerListName(
-            ChatColor.RED + "[MOD]" + ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
-      }
-    } else if ((!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) && (bitQuest.isModerator(player))) {
-      player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
+    if (bqPlayer.clan != null) {
+      player.setPlayerListName(ChatColor.GOLD + "[" + bqPlayer.clan + "] " + ChatColor.WHITE + player.getName());
     }
     bitQuest.setTotalExperience(player);
     player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
