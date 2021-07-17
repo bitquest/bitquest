@@ -111,30 +111,30 @@ public class BitQuestTest {
     PreparedStatement ps = conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
-    Population players = new Population(conn);
-    players.runMigrations();
+    BitQuestPlayer.runMigrations(conn);
     String aliceId = "63d9719e-571a-4963-ac11-2f1233393580";
-    BitQuestPlayer alice = players.player(aliceId);
-    BitQuestPlayer bob = players.player("35714b7c-fde7-4ebd-af32-7fd106c881a0");
-    System.out.println(alice.clan);
+    BitQuestPlayer alice = new BitQuestPlayer(conn, aliceId);
+    BitQuestPlayer bob = new BitQuestPlayer(conn, "35714b7c-fde7-4ebd-af32-7fd106c881a0");
+    System.out.println("Alice clan: " + alice.clan);
     assertFalse(alice.invitedToClan("FakeClan"));
     String clanName = "Clan";
     if (alice.clan == null) {
       assertFalse(alice.inviteToClan(bob));
-      assertFalse(players.leaveClan(alice.uuid));
-      assertFalse(players.joinClan(alice.uuid, clanName));
-      assertTrue(players.createClan(alice.uuid, clanName));
-      assertFalse(players.createClan(alice.uuid, clanName));
-      alice = players.player(aliceId);
+      assertFalse(alice.leaveClan());
+      assertFalse(alice.joinClan(clanName));
+      assertTrue(alice.createClan(clanName));
+      assertFalse(alice.createClan(clanName));
+      alice = new BitQuestPlayer(conn, aliceId);
+      System.out.println("Alice clan: " + alice.clan);
       assertFalse(bob.invitedToClan(clanName));
-      assertFalse(players.joinClan(bob.uuid, clanName));
+      assertFalse(bob.joinClan(clanName));
       assertTrue(alice.inviteToClan(bob));
       assertTrue(bob.invitedToClan(clanName));
-      assertTrue(players.joinClan(bob.uuid, clanName));
+      assertTrue(bob.joinClan(clanName));
       assertFalse(bob.invitedToClan(clanName));
     } else {
-      assertFalse(players.joinClan(alice.uuid, clanName));
-      assertTrue(players.leaveClan(alice.uuid));
+      assertFalse(alice.joinClan(clanName));
+      assertTrue(alice.leaveClan());
     }
   }
 }

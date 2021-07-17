@@ -21,11 +21,11 @@ public class ClanCommand extends CommandAction {
     if (args.length > 0) {
       String subCommand = args[0];
       try {
-        BitQuestPlayer bqPlayer = bitQuest.players.player(player.getUniqueId().toString());
+        BitQuestPlayer bqPlayer = bitQuest.player(player);
         if (subCommand.equals("new")) {
           if (args.length > 1) {
             String clanName = args[1];     
-            if (bitQuest.players.createClan(player.getUniqueId().toString(), clanName)) {
+            if (bitQuest.player(player).createClan(clanName)) {
               player.sendMessage(ChatColor.GREEN + "You have founded the clan " + clanName);
             } else {
               player.sendMessage(ChatColor.RED + "Cannot create clan.");
@@ -40,7 +40,7 @@ public class ClanCommand extends CommandAction {
             String invitedName = args[1];
             for (final Player onlinePlayer : Bukkit.getOnlinePlayers()) {
               if (onlinePlayer.getName().equalsIgnoreCase(invitedName) && !invitedName.equalsIgnoreCase(player.getDisplayName())) {
-                BitQuestPlayer invitedPlayer = bitQuest.players.player(onlinePlayer.getUniqueId().toString());
+                BitQuestPlayer invitedPlayer = bitQuest.player(onlinePlayer);
                 if (bqPlayer.inviteToClan(invitedPlayer)) {
                   player.sendMessage(ChatColor.GREEN + "Player " + onlinePlayer.getDisplayName() + " was invited to " + bqPlayer.clan);
                   onlinePlayer.sendMessage(ChatColor.GREEN + "Player " + player.getDisplayName() + " has invited you to the clan " + bqPlayer.clan);
@@ -64,7 +64,7 @@ public class ClanCommand extends CommandAction {
           if (args.length > 1) {
             String clanName = args[1];
             try {
-              if (bitQuest.players.joinClan(player.getUniqueId().toString(), clanName)) {
+              if (bitQuest.player(player).joinClan(clanName)) {
                 player.sendMessage(ChatColor.GREEN + "You have joined the clan " + clanName);
               } else {
                 player.sendMessage(ChatColor.RED + "You cannot join that clan.");

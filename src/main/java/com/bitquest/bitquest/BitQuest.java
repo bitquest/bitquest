@@ -184,7 +184,6 @@ public class BitQuest extends JavaPlugin {
   public Jedis redis;
   public Node node;
   public Land land;
-  public Population players;
   public Connection conn;
 
 
@@ -207,8 +206,7 @@ public class BitQuest extends JavaPlugin {
       this.conn = DriverManager.getConnection(BitQuest.databaseUrl(), POSTGRES_USER, POSTGRES_PASSWORD);
       this.land = new Land(this.conn);
       this.land.runMigrations();
-      this.players = new Population(this.conn);
-      this.players.runMigrations();
+      BitQuestPlayer.runMigrations(this.conn);
       // registers listener classes
       getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
       getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
@@ -590,11 +588,15 @@ public class BitQuest extends JavaPlugin {
     return progress;
   }
 
+  public BitQuestPlayer player(Player player) throws SQLException {
+    return new BitQuestPlayer(this.conn, player.getUniqueId().toString());
+  }
+
   public void setTotalExperience(Player player) {
     // lower factor, experience is easier to get. you can increase to get the
     // opposite effect
     try {
-      int experience = players.player(player.getUniqueId().toString()).experience();
+      int experience = player(player).experience;
       int level = getLevel(experience);
       System.out.println(experience);
       System.out.println(level);
@@ -713,8 +715,8 @@ public class BitQuest extends JavaPlugin {
         } else if (chunk.permission == ChunkPermission.PUBLIC) {
           return true;
         } else if (chunk.permission == ChunkPermission.CLAN) {
-          BitQuestPlayer owner = players.player(chunk.owner);
-          BitQuestPlayer bqPlayer = players.player(player.getUniqueId().toString());
+          BitQuestPlayer owner = new BitQuestPlayer(this.conn, chunk.owner);
+          BitQuestPlayer bqPlayer = player(player);
           if (owner != null && bqPlayer != null && owner.clan != null && bqPlayer.clan != null) {
             return owner.clan.equals(bqPlayer.clan);
           } else {
