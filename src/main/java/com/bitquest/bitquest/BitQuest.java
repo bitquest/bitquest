@@ -558,7 +558,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static final void debug(String tag, String msg) {
-    if (!System.getenv("BITQUEST_ENV").equals("production")) {
+    if (!BITQUEST_ENV.equals("production")) {
       System.out.println("[" + tag + "] " + msg);
     }
   }

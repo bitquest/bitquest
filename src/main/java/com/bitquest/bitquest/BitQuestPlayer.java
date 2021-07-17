@@ -24,7 +24,7 @@ public class BitQuestPlayer {
       sql = "INSERT INTO players (uuid, experience) VALUES ('" +
           this.uuid +
           "',0)";
-      System.out.println(sql);
+      BitQuest.debug("sql",sql);
       PreparedStatement ps = this.conn.prepareStatement(sql);
       ps.executeUpdate();
       ps.close();
@@ -45,14 +45,14 @@ public class BitQuestPlayer {
         "' WHERE uuid = '" +
         uuid +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
     sql = "DELETE FROM clan_invites WHERE clan = '" +
         clanName +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
@@ -69,14 +69,14 @@ public class BitQuestPlayer {
         "' WHERE uuid = '" +
         uuid +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
     sql = "DELETE FROM clan_invites WHERE uuid = '" +
         uuid +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
@@ -88,7 +88,7 @@ public class BitQuestPlayer {
     String sql = "UPDATE players SET clan = NULL WHERE uuid = '" +
         uuid +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
@@ -99,7 +99,7 @@ public class BitQuestPlayer {
     String sql = "SELECT * FROM players WHERE clan='" +
         clanName +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     Statement st = this.conn.createStatement();
     ResultSet rs = st.executeQuery(sql);
     boolean found = false;
@@ -115,13 +115,13 @@ public class BitQuestPlayer {
     // Create players table
     String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32), experience int NOT NULL);";
     PreparedStatement ps = conn.prepareStatement(sql);
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     ps.executeUpdate();
     ps.close();
     // Create clan_invites table
     sql = "CREATE TABLE IF NOT EXISTS clan_invites (uuid varchar(36), clan varchar(32));";
     ps = conn.prepareStatement(sql);
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     ps.executeUpdate();
     ps.close();
   }
@@ -136,7 +136,7 @@ public class BitQuestPlayer {
         "','" +
         clan +
         "')";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
@@ -152,7 +152,7 @@ public class BitQuestPlayer {
     boolean exists = false;
     Statement st = this.conn.createStatement();
     ResultSet rs = st.executeQuery(sql);
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     while (rs.next()) {
       exists = true;
     }
@@ -165,7 +165,7 @@ public class BitQuestPlayer {
     String sql = "UPDATE players SET experience = experience + 1 WHERE uuid = '" +
         uuid +
         "'";
-    System.out.println(sql);
+    BitQuest.debug("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();
@@ -178,7 +178,7 @@ public class BitQuestPlayer {
   //       "'";
   //   Statement st = this.conn.createStatement();
   //   ResultSet rs = st.executeQuery(sql);
-  //   System.out.println(sql);
+  //   BitQuest.debug("sql",sql);
   //   rs.next();
   //   int experience = rs.getInt(1);
   //   rs.close();
