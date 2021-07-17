@@ -147,10 +147,11 @@ public class EntityEvents implements Listener {
 
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) throws Exception {
-
     final Player player = event.getPlayer();
     // On dev environment, admin gets op. In production, nobody gets op.
-
+    if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
+      player.setOp(true);
+    }
     player.setGameMode(GameMode.SURVIVAL);
     bitQuest.setTotalExperience(player);
     final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
@@ -160,30 +161,10 @@ public class EntityEvents implements Listener {
     bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
     bitQuest.redis.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
     bitQuest.redis.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
-    if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
-      player.setOp(true);
-    }
-    if (bitQuest.isModerator(player)) {
-      try {
-        player.sendMessage(ChatColor.GREEN + "You are a moderator on this server.");
-        String url = "https://live.blockcypher.com/btc-testnet/address/" + bitQuest.wallet.address();
-        if (BitQuest.BLOCKCYPHER_CHAIN == "btc/main") {
-          url = "https://live.blockcypher.com/btc/address/" + bitQuest.wallet.address();
-        }
-        if (BitQuest.BLOCKCYPHER_CHAIN == "doge/main") {
-          url = "https://live.blockcypher.com/doge/address/" + bitQuest.wallet.address();
-        }
-        player.sendMessage(ChatColor.DARK_BLUE + "" + ChatColor.UNDERLINE + url);
-      } catch (IOException e) {
-        e.printStackTrace();
-      } catch (org.json.simple.parser.ParseException e) {
-        e.printStackTrace();
-      }
-    }
-
     String welcome = rawwelcome.toString();
     welcome = welcome.replace("<name>", player.getName());
     player.sendMessage(welcome);
+    final BitQuestPlayer bqPlayer = bitQuest.player(player);
     if (bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) {
       String clan = bitQuest.redis.get("clan:" + player.getUniqueId().toString());
       player.setPlayerListName(ChatColor.GOLD + "[" + clan + "] " + ChatColor.WHITE + player.getName());
@@ -194,27 +175,13 @@ public class EntityEvents implements Listener {
     } else if ((!bitQuest.redis.exists("clan:" + player.getUniqueId().toString())) && (bitQuest.isModerator(player))) {
       player.setPlayerListName(ChatColor.RED + "[MOD]" + ChatColor.WHITE + player.getName());
     }
-
-    // Prints the user balance
     bitQuest.setTotalExperience(player);
-
     player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
     if (bitQuest.redis.exists("bitquest:motd") == true) {
       player.sendMessage(bitQuest.redis.get("bitquest:motd"));
     }
-    try {
-      player
-          .sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + BitQuest.DENOMINATION_NAME);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
+    player.sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + bitQuest.node.chain());
     bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
-    // spawn pet
-    if (bitQuest.redis.exists("pet:" + player.getUniqueId().toString())) {
-      bitQuest.spawnPet(player);
-    }
-
     bitQuest.updateScoreboard(player);
   }
 

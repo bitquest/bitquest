@@ -17,6 +17,10 @@ public class TradeCommand extends CommandAction {
   }
 
   public boolean run(CommandSender sender, Command cmd, String label, final String[] args, final Player player) {
+    if(player.getInventory().firstEmpty() == -1) {
+      player.sendMessage(ChatColor.RED + "Inventory is full");
+      return false;
+    }
     Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
     // Check that first argument is a number
     for (char c : args[0].toCharArray()) {
