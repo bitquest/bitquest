@@ -248,7 +248,7 @@ public class EntityEvents implements Listener {
       String lootTimerKey = "loot:timer";
       if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
         // Award experience and loot to players
-        Double loot = 1.0;
+        Double loot =  Double.valueOf(BitQuest.rand(1,level));
         int exp = level * 4;
         try {
           bitQuest.player(player).addExperience(level);
