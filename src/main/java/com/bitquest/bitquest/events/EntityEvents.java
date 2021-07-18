@@ -220,7 +220,7 @@ public class EntityEvents implements Listener {
         } catch (Exception e) {
           e.printStackTrace();
         }
-
+        event.getPlayer().setGameMode(GameMode.CREATIVE);
       } else {
         event.getPlayer().setGameMode(GameMode.ADVENTURE);
       }
