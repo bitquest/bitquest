@@ -8,6 +8,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerExpChangeEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
@@ -29,6 +30,10 @@ public class PlayerEvents implements Listener {
     BitQuest.setGameMode(event.getPlayer(), event.getRespawnLocation());
   }
 
+  @EventHandler
+  public void onExperienceChange(PlayerExpChangeEvent event) {
+    bitQuest.setTotalExperience(event.getPlayer());
+  }
 
   @EventHandler
   public void onPlayerJoin(PlayerJoinEvent event) throws Exception {

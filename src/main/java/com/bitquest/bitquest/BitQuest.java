@@ -620,8 +620,8 @@ public class BitQuest extends JavaPlugin {
       setPlayerMaxHealth(player);
     } catch (Exception e) {
       e.printStackTrace();
+      player.kickPlayer("An error ocurred :(");
     }
-
   }
 
   public void setPlayerMaxHealth(Player player) {

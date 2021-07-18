@@ -148,20 +148,14 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  public void onExperienceChange(PlayerExpChangeEvent event)
-      throws ParseException, org.json.simple.parser.ParseException, IOException {
-    event.setAmount(0);
-  }
-
-  @EventHandler
-  public void onEnchantItemEvent(EnchantItemEvent event)
-      throws ParseException, org.json.simple.parser.ParseException, IOException {
+  public void onEnchantItemEvent(EnchantItemEvent event) {
     // Simply setting the cost to zero does not work. there are probably
     // checks downstream for this. Instead cancel out the cost.
     // None of this actually changes the bitquest xp anyway, so just make
     // things look correct for the user. This only works for the enchantment table,
     // not the anvil.
-    event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.whichButton() + 1);
+    // event.getEnchanter().setLevel(event.getEnchanter().getLevel() + event.whichButton() + 1);
+    bitQuest.setTotalExperience(event.getEnchanter());
   }
 
   @EventHandler
