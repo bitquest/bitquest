@@ -59,9 +59,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -303,6 +305,16 @@ public class BitQuest extends JavaPlugin {
       e.printStackTrace();
       redis.del("loot_cache");
       System.out.println("[loot_cache] FAIL");
+    }
+  }
+
+  public static final void setGameMode(Player player, Location location) {
+    if (location.getWorld().getEnvironment() == Environment.NORMAL) {
+      player.setGameMode(GameMode.SURVIVAL);
+      BitQuest.log("setGameMode", player.getCustomName() + " survival");
+    } else {
+      player.setGameMode(GameMode.ADVENTURE);
+      BitQuest.log("setGameMode", player.getCustomName() + " adventure");
     }
   }
 

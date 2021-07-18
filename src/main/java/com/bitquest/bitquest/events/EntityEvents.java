@@ -148,48 +148,6 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  public void onPlayerJoin(PlayerJoinEvent event) throws Exception {
-    final Player player = event.getPlayer();
-    // On dev environment, admin gets op. In production, nobody gets op.
-    if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
-      player.setOp(true);
-    }
-    bitQuest.setTotalExperience(player);
-    final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
-    System.out.println("User " + player.getName() + "logged in with IP " + ip);
-    bitQuest.redis.set("ip" + player.getUniqueId().toString(), ip);
-    bitQuest.redis.set("displayname:" + player.getUniqueId().toString(), player.getDisplayName());
-    bitQuest.redis.set("uuid:" + player.getName().toString(), player.getUniqueId().toString());
-    bitQuest.redis.set("rate_limit:" + event.getPlayer().getUniqueId(), "1");
-    bitQuest.redis.expire("rate_limit:" + event.getPlayer().getUniqueId(), 60);
-    String welcome = rawwelcome.toString();
-    welcome = welcome.replace("<name>", player.getName());
-    player.sendMessage(welcome);
-    final BitQuestPlayer bqPlayer = bitQuest.player(player);
-    if (bqPlayer.clan != null) {
-      player.setPlayerListName(ChatColor.GOLD + "[" + bqPlayer.clan + "] " + ChatColor.WHITE + player.getName());
-    }
-    bitQuest.setTotalExperience(player);
-    player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
-    if (bitQuest.redis.exists("bitquest:motd") == true) {
-      player.sendMessage(bitQuest.redis.get("bitquest:motd"));
-    }
-    player.sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + bitQuest.node.chain());
-    bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
-    bitQuest.updateScoreboard(player);
-  }
-
-  public void setGameMode(Player player) {
-    if (player.getLocation().getWorld().getEnvironment() == Environment.NORMAL) {
-      player.setGameMode(GameMode.SURVIVAL);
-      BitQuest.log("setGameMode", player.getCustomName() + " survival");
-    } else {
-      player.setGameMode(GameMode.ADVENTURE);
-      BitQuest.log("setGameMode", player.getCustomName() + " adventure");
-    }
-  }
-
-  @EventHandler
   public void onExperienceChange(PlayerExpChangeEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
     event.setAmount(0);
@@ -823,12 +781,6 @@ public class EntityEvents implements Listener {
     }
   }
 
-  @EventHandler(priority = EventPriority.NORMAL)
-  public void onPlayerRespawn(final PlayerRespawnEvent event) {
-    if (bitQuest.redis.exists("pet:" + event.getPlayer().getUniqueId())) {
-      bitQuest.spawnPet(event.getPlayer());
-    }
-  }
 
   @EventHandler
   void onPlayerBucketEmpty(PlayerBucketEmptyEvent event) {
