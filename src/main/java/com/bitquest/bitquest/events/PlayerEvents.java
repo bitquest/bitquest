@@ -33,6 +33,7 @@ public class PlayerEvents implements Listener {
   @EventHandler
   public void onExperienceChange(PlayerExpChangeEvent event) {
     bitQuest.setTotalExperience(event.getPlayer());
+    event.setAmount(0);
   }
 
   @EventHandler

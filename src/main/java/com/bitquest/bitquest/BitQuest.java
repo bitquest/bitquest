@@ -621,8 +621,6 @@ public class BitQuest extends JavaPlugin {
     try {
       int experience = player(player).experience;
       int level = getLevel(experience);
-      System.out.println(experience);
-      System.out.println(level);
       float progress = getExpProgress(experience);
       player.setLevel(level);
       player.setExp(progress);
