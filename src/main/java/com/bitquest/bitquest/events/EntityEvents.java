@@ -409,7 +409,6 @@ public class EntityEvents implements Listener {
                 new Location(e.getLocation().getWorld(), e.getLocation().getX(), 80, e.getLocation().getZ()),
                 EntityType.GHAST);
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
-            e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.VILLAGER);
           }
 
         } catch (Exception e1) {

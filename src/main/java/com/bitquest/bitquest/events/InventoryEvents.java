@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.event.inventory.TradeSelectEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -82,6 +83,13 @@ public class InventoryEvents implements Listener {
     trades.add(new Trade(new ItemStack(Material.LEGACY_DRAGONS_BREATH, 64), 20));
     trades.add(new Trade(new ItemStack(Material.LEGACY_EMPTY_MAP, 64), 10));
     trades.add(new Trade(new ItemStack(Material.PUMPKIN, 64), 10));
+  }
+
+  @EventHandler
+  void inventoryCloseEvent(InventoryCloseEvent event) {
+    if (event.getPlayer() instanceof Player) {
+      bitQuest.setTotalExperience((Player) event.getPlayer());
+    }
   }
 
   @EventHandler

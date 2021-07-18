@@ -199,7 +199,42 @@ public class BitQuest extends JavaPlugin {
     this.node.port = BitQuest.NODE_PORT;
     this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
-    
+    // register commands
+    commands = new HashMap<String, CommandAction>();
+    commands.put("wallet", new WalletCommand(this));
+    commands.put("land", new LandCommand(this));
+    commands.put("home", new HomeCommand(this));
+    commands.put("clan", new ClanCommand(this));
+    commands.put("transfer", new TransferCommand(this));
+    commands.put("trade", new TradeCommand(this));
+    commands.put("report", new ReportCommand(this));
+    commands.put("send", new SendCommand(this));
+    commands.put("currency", new CurrencyCommand(this));
+    commands.put("donate", new DonateCommand(this));
+    commands.put("profession", new ProfessionCommand(this));
+    commands.put("spawn", new SpawnCommand(this));
+    commands.put("pet", new PetCommand(this));
+    modCommands = new HashMap<String, CommandAction>();
+    modCommands.put("butcher", new ButcherCommand());
+    modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
+    modCommands.put("crashTest", new CrashtestCommand(this));
+    modCommands.put("mod", new ModCommand(this));
+    modCommands.put("ban", new BanCommand(this));
+    modCommands.put("unban", new UnbanCommand(this));
+    modCommands.put("banlist", new BanlistCommand(this));
+    modCommands.put("spectate", new SpectateCommand(this));
+    modCommands.put("emergencystop", new EmergencystopCommand());
+    modCommands.put("fixabandonland", new FixAbandonLand(this));
+    modCommands.put("motd", new MessageOfTheDayCommand(this));
+    // registers listener classes
+    getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
+    getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
+    getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
+    getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+    getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
+    getServer().getPluginManager().registerEvents(new SignEvents(this), this);
+    getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+
     try {
       if (ADMIN_UUID == null) {
         log("warning", "ADMIN_UUID env variable is not set.");
@@ -210,14 +245,6 @@ public class BitQuest extends JavaPlugin {
       this.land = new Land(this.conn);
       this.land.runMigrations();
       BitQuestPlayer.runMigrations(this.conn);
-      // registers listener classes
-      getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
-      getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
-      getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
-      getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
-      getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
-      getServer().getPluginManager().registerEvents(new SignEvents(this), this);
-      getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
 
       // player does not lose inventory on death
       System.out.println("[startup] sending command gamerule keepInventory on");
@@ -247,37 +274,7 @@ public class BitQuest extends JavaPlugin {
       BitQuest.log("loot", wallet.address());
       // creates scheduled timers (update balances, etc)
       createScheduledTimers();
-      commands = new HashMap<String, CommandAction>();
-      commands.put("wallet", new WalletCommand(this));
-      commands.put("land", new LandCommand(this));
-      commands.put("home", new HomeCommand(this));
-      commands.put("clan", new ClanCommand(this));
-      commands.put("transfer", new TransferCommand(this));
-      commands.put("trade", new TradeCommand(this));
-      commands.put("report", new ReportCommand(this));
-      commands.put("send", new SendCommand(this));
-      commands.put("currency", new CurrencyCommand(this));
-      commands.put("donate", new DonateCommand(this));
-      commands.put("profession", new ProfessionCommand(this));
-      commands.put("spawn", new SpawnCommand(this));
-      commands.put("pet", new PetCommand(this));
-      modCommands = new HashMap<String, CommandAction>();
-      modCommands.put("butcher", new ButcherCommand());
-      modCommands.put("killAllVillagers", new KillAllVillagersCommand(this));
-      modCommands.put("crashTest", new CrashtestCommand(this));
-      modCommands.put("mod", new ModCommand(this));
-      modCommands.put("ban", new BanCommand(this));
-      modCommands.put("unban", new UnbanCommand(this));
-      modCommands.put("banlist", new BanlistCommand(this));
-      modCommands.put("spectate", new SpectateCommand(this));
-      modCommands.put("emergencystop", new EmergencystopCommand());
-      modCommands.put("fixabandonland", new FixAbandonLand(this));
-      modCommands.put("motd", new MessageOfTheDayCommand(this));
-      // TODO: Re enable loot pool cache
-      // updateLootPoolCache();
-      redis.set("loot:rate:limit", "1");
-      redis.expire("loot:rate:limit", 10);
-      killAllVillagers();
+
       System.out.println("[startup] finished");
 
     } catch (Exception e) {
@@ -498,16 +495,30 @@ public class BitQuest extends JavaPlugin {
           }
         }
       }
-    }, 0, 1200L);
+    }, 0, 12000L); // 10 minutes
     scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
       @Override
       public void run() {
-        // A villager is born
+        int villagerCount = 0;
         World world = Bukkit.getWorld("world");
-        world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
-
+        List<Entity> entities = world.getEntities();
+        for (Entity entity : entities) {
+          if (entity instanceof Villager) {
+            if (entity.getLocation().distance(world.getSpawnLocation()) < 10000) {
+              villagerCount += 1;
+            } else {
+              entity.remove();
+            }
+          }
+        }
+        if (villagerCount < 8) {
+          BitQuest.debug("villager spawned", "count: " + villagerCount);
+          world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
+        }
+        killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
+        killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
       }
-    }, 0, 30000L);
+    }, 0, 12000L); // 10 minutes
 
   }
 
