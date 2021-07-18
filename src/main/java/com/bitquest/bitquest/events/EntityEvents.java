@@ -21,6 +21,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.block.Block;
@@ -152,7 +153,6 @@ public class EntityEvents implements Listener {
     if (BitQuest.BITQUEST_ENV.equals("development") == true && BitQuest.ADMIN_UUID == null) {
       player.setOp(true);
     }
-    player.setGameMode(GameMode.SURVIVAL);
     bitQuest.setTotalExperience(player);
     final String ip = player.getAddress().toString().split("/")[1].split(":")[0];
     System.out.println("User " + player.getName() + "logged in with IP " + ip);
@@ -176,6 +176,16 @@ public class EntityEvents implements Listener {
     player.sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + bitQuest.node.chain());
     bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
     bitQuest.updateScoreboard(player);
+  }
+
+  public void setGameMode(Player player) {
+    if(player.getLocation().getWorld().getEnvironment() == Environment.NORMAL) {
+      player.setGameMode(GameMode.SURVIVAL);
+      BitQuest.log("setGameMode", player.getCustomName() + " survival");
+    } else {
+      player.setGameMode(GameMode.ADVENTURE);
+      BitQuest.log("setGameMode", player.getCustomName() + " adventure");
+    }
   }
 
   @EventHandler
@@ -220,9 +230,6 @@ public class EntityEvents implements Listener {
         } catch (Exception e) {
           e.printStackTrace();
         }
-        event.getPlayer().setGameMode(GameMode.CREATIVE);
-      } else {
-        event.getPlayer().setGameMode(GameMode.ADVENTURE);
       }
     }
   }

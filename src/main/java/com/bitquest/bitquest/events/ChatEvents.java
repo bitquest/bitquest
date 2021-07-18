@@ -3,6 +3,8 @@ package com.bitquest.bitquest.events;
 import com.bitquest.bitquest.BitQuest;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -20,7 +22,6 @@ public class ChatEvents implements Listener {
 
   @EventHandler
   public void onChat(AsyncPlayerChatEvent event) {
-
     String message = event.getMessage();
     Player sender = event.getPlayer();
     if (message.endsWith("!")) {
@@ -50,33 +51,14 @@ public class ChatEvents implements Listener {
               + ChatColor.WHITE
               + message;
       event.setCancelled(true);
-      Set<Player> recipients = new HashSet<Player>();
-      recipients.add(sender);
-      for (Entity entity : sender.getNearbyEntities(100, 100, 100)) {
-
-        if (entity instanceof Player) {
-          recipients.add((Player) entity);
+      for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+        System.out.println(player.getLocation().distance(sender.getLocation()));
+        if(
+            player.getLocation().getWorld().getName().equals(sender.getLocation().getWorld().getName()) &&
+            player.getLocation().distance(sender.getLocation()) < 10000000
+            ) {
+          player.sendMessage(message);
         }
-      }
-
-      if (recipients.size() <= 1) {
-        sender.sendMessage(
-            ChatColor.BLUE
-                + ChatColor.BOLD.toString()
-                + "Local> "
-                + ChatColor.RED
-                + "Nobody is within earshot! Try shouting.");
-        sender.sendMessage(
-            ChatColor.BLUE
-                + ChatColor.BOLD.toString()
-                + "Local> "
-                + ChatColor.RED
-                + "Shout by placing a ! before messages.");
-      } else {
-        for (Player recipient : recipients) {
-          recipient.sendMessage(message);
-        }
-        System.out.println(ChatColor.stripColor(event.getFormat()));
       }
     }
   }

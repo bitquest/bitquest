@@ -29,6 +29,7 @@ import com.bitquest.bitquest.events.BlockEvents;
 import com.bitquest.bitquest.events.ChatEvents;
 import com.bitquest.bitquest.events.EntityEvents;
 import com.bitquest.bitquest.events.InventoryEvents;
+import com.bitquest.bitquest.events.PlayerEvents;
 import com.bitquest.bitquest.events.ServerEvents;
 import com.bitquest.bitquest.events.SignEvents;
 import com.google.gson.JsonObject;
@@ -212,6 +213,7 @@ public class BitQuest extends JavaPlugin {
       getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
       getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
       getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+      getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
       getServer().getPluginManager().registerEvents(new SignEvents(this), this);
       getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
 
