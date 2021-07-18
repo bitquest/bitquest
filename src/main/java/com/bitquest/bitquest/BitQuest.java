@@ -511,14 +511,12 @@ public class BitQuest extends JavaPlugin {
             }
           }
         }
-        if (villagerCount < 8) {
-          BitQuest.debug("villager spawned", "count: " + villagerCount);
+        if (villagerCount < 20) {
+          BitQuest.log("villager spawned", "count: " + villagerCount);
           world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
         }
-        killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
-        killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
       }
-    }, 0, 12000L); // 10 minutes
+    }, 0, 1200L); // 1 minute
 
   }
 
