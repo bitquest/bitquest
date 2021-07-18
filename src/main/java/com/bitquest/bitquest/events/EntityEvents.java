@@ -21,6 +21,7 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -286,7 +287,8 @@ public class EntityEvents implements Listener {
       } else if (damage.getDamager() instanceof Arrow && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
         player = (Player) ((Arrow) damage.getDamager()).getShooter();
       }
-      if (player != null) {
+      String lootTimerKey = "loot:timer";
+      if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
         // Award experience and loot to players
         Double loot = 1.0;
         int exp = level * 4;
@@ -307,6 +309,8 @@ public class EntityEvents implements Listener {
         // Award random weapon
         if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
         if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
+        bitQuest.redis.set(lootTimerKey, "1");
+        bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
       }
     } else {
       event.setDroppedExp(0);
@@ -325,38 +329,55 @@ public class EntityEvents implements Listener {
   // TODO: Magma Cubes don't get levels or custom names for some reason...
   @EventHandler
   void onEntitySpawn(org.bukkit.event.entity.CreatureSpawnEvent e) {
-    // e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.GHAST);
-
-    try {
-      LandChunk chunk = bitQuest.land.chunk(e.getLocation());
-      if (chunk != null) {
-        e.setCancelled(true);
-        return;
-      }
-    } catch (SQLException e2) {
-      e2.printStackTrace();
-      e.setCancelled(true);
-      return;
-    }
-
-
+    Location location = e.getLocation();
+    World world = location.getWorld();
     LivingEntity entity = e.getEntity();
-    int maxlevel = 10;
-    int minlevel = 1;
+    int minLevel = 1;
+    int maxLevel = 10;
     int difficulty = 10;
-
-    if (e.getLocation().getWorld().getName().equals("world_nether")) {
-      minlevel = 10;
-      maxlevel = 50;
-    } else if (e.getLocation().getWorld().getName().equals("world_end")) {
-      minlevel = 50;
-      maxlevel = 100;
-    }
     int spawnDistance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
+    if (e.getLocation().getWorld().getEnvironment() == Environment.NETHER) {
+      minLevel = 10;
+      maxLevel = 50;
+    } else if (e.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
+      minLevel = 50;
+      maxLevel = 100;
+    } else {
+      String cacheKey = "land:claimed:" + world.getName() + ":" + location.getChunk().getX() + ":" + location.getChunk().getZ();
+      String landClaimedCache = bitQuest.redis.get(cacheKey);
+      if (landClaimedCache != null) {
+        BitQuest.debug("onEntitySpawn", cacheKey + "hit " + landClaimedCache);
+        if (landClaimedCache.equalsIgnoreCase("1")) {
+          // Land is claimed
+          e.setCancelled(true);
+          return;
+        }
+      } else {
+        BitQuest.debug("onEntitySpawn", cacheKey + " miss");
+        try {
+          LandChunk chunk = bitQuest.land.chunk(e.getLocation());
+          if (chunk != null) {
+            // Land is claimed
+            bitQuest.redis.set(cacheKey, "1");
+            bitQuest.redis.expire(cacheKey, 3600); // 1 hour
+            e.setCancelled(true);
+            return;
+          } else {
+            bitQuest.redis.set(cacheKey, "0");
+            bitQuest.redis.expire(cacheKey, 300); // 5 minutes
+          }
+        } catch (SQLException e2) {
+          e2.printStackTrace();
+          e.setCancelled(true);
+          return;
+        }
+      }
+
+    }
 
     EntityType entityType = entity.getType();
     // max level is 128
-    int level = Math.min(maxlevel, BitQuest.rand(minlevel, minlevel + (spawnDistance / 1000)));
+    int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 1000)));
 
     if (entity instanceof Giant) {
       entity.setMaxHealth(2858519);
@@ -384,8 +405,6 @@ public class EntityEvents implements Listener {
           AttributeInstance attribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
           attribute.setBaseValue(level);
           entity.setHealth(level);
-          System.out.println(entity.getCustomName());
-          System.out.println(entity.getHealth());
           // add potion effects
           if (bitQuest.rand(1, 100) < level) {
             entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
@@ -433,7 +452,7 @@ public class EntityEvents implements Listener {
             randomEnchantItem(bow, level);
           }
 
-          if (bitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
+          if (BitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
             e.getLocation().getWorld().spawnEntity(
                 new Location(e.getLocation().getWorld(), e.getLocation().getX(), 80, e.getLocation().getZ()),
                 EntityType.GHAST);
@@ -444,7 +463,7 @@ public class EntityEvents implements Listener {
         } catch (Exception e1) {
           System.out.println("Event failed. Shutting down...");
           e1.printStackTrace();
-          Bukkit.shutdown();
+          e.setCancelled(true);
         }
       }
     } else if (entity instanceof Ghast) {
