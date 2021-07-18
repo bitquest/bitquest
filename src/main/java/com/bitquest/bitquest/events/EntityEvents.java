@@ -179,7 +179,7 @@ public class EntityEvents implements Listener {
   }
 
   public void setGameMode(Player player) {
-    if(player.getLocation().getWorld().getEnvironment() == Environment.NORMAL) {
+    if (player.getLocation().getWorld().getEnvironment() == Environment.NORMAL) {
       player.setGameMode(GameMode.SURVIVAL);
       BitQuest.log("setGameMode", player.getCustomName() + " survival");
     } else {

@@ -3,7 +3,6 @@ package com.bitquest.bitquest.events;
 import com.bitquest.bitquest.BitQuest;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Entity;
@@ -51,12 +50,12 @@ public class ChatEvents implements Listener {
               + ChatColor.WHITE
               + message;
       event.setCancelled(true);
-      for(Player player : Bukkit.getServer().getOnlinePlayers()) {
+      for (Player player : Bukkit.getServer().getOnlinePlayers()) {
         System.out.println(player.getLocation().distance(sender.getLocation()));
-        if(
+        if (
             player.getLocation().getWorld().getName().equals(sender.getLocation().getWorld().getName()) &&
             player.getLocation().distance(sender.getLocation()) < 10000000
-            ) {
+        ) {
           player.sendMessage(message);
         }
       }

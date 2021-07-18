@@ -1,7 +1,6 @@
 package com.bitquest.bitquest.events;
 
 import com.bitquest.bitquest.BitQuest;
-
 import org.bukkit.GameMode;
 import org.bukkit.World.Environment;
 import org.bukkit.event.EventHandler;
