@@ -245,7 +245,9 @@ public class EntityEvents implements Listener {
         Double loot =  Double.valueOf(BitQuest.rand(1,level));
         int exp = level * 4;
         try {
-          bitQuest.player(player).addExperience(level);
+          if (player.getLevel() < BitQuest.MAX_LEVEL) {
+            bitQuest.player(player).addExperience(level);
+          }
           bitQuest.setTotalExperience(player);
         } catch (Exception e) {
           e.printStackTrace();

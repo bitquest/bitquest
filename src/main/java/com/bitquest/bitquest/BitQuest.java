@@ -131,6 +131,7 @@ public class BitQuest extends JavaPlugin {
       : 10000;
 
   public static final int MAX_STOCK = 100;
+  public static final int MAX_LEVEL = 20;
   public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
   public static final String POSTGRES_PASSWORD = System.getenv("BITQUEST_POSTGRES_PASSWORD");
 
@@ -454,14 +455,20 @@ public class BitQuest extends JavaPlugin {
     player.setMetadata("pet", new FixedMetadataValue(this, catName));
   }
 
+  public static final Location spawnLocation() {
+    return Bukkit.getWorld("world").getSpawnLocation().clone().add(
+        5 - BitQuest.rand(0,10), 
+        2, 
+        5 - BitQuest.rand(0,10));
+  }
+
   public void teleportToSpawn(Player player) {
     BitQuest bitQuest = this;
     // TODO: open the tps inventory
     player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
     player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-    World world = Bukkit.getWorld("world");
 
-    final Location spawn = world.getSpawnLocation();
+    final Location spawn = spawnLocation();
 
     Chunk c = spawn.getChunk();
     if (!c.isLoaded()) {
@@ -513,7 +520,7 @@ public class BitQuest extends JavaPlugin {
         }
         if (villagerCount < 20) {
           BitQuest.log("villager spawned", "count: " + villagerCount);
-          world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
+          world.spawnEntity(BitQuest.spawnLocation(), EntityType.VILLAGER);
         }
       }
     }, 0, 1200L); // 1 minute
@@ -592,7 +599,7 @@ public class BitQuest extends JavaPlugin {
 
   public int getLevel(int exp) {
     int level = (int) Math.floor(Math.sqrt(exp / (float) 64));
-    if (level > 100) return 100;
+    if (level > BitQuest.MAX_LEVEL) return BitQuest.MAX_LEVEL;
     return level;
   }
 
@@ -621,9 +628,13 @@ public class BitQuest extends JavaPlugin {
     try {
       int experience = player(player).experience;
       int level = getLevel(experience);
-      float progress = getExpProgress(experience);
       player.setLevel(level);
-      player.setExp(progress);
+      if (level < BitQuest.MAX_LEVEL) {
+        float progress = getExpProgress(experience);
+        player.setExp(progress);
+      } else {
+        player.setExp(0);
+      }
       setPlayerMaxHealth(player);
     } catch (Exception e) {
       e.printStackTrace();
