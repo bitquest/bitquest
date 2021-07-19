@@ -21,7 +21,7 @@ public class PlayerEvents implements Listener {
   }
 
   @EventHandler
-  public void onServerListPing(PlayerPortalEvent event) {
+  public void onPlayerPortal(PlayerPortalEvent event) {
     BitQuest.setGameMode(event.getPlayer(), event.getTo());
   }
 

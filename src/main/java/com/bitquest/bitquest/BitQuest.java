@@ -457,9 +457,9 @@ public class BitQuest extends JavaPlugin {
 
   public static final Location spawnLocation() {
     return Bukkit.getWorld("world").getSpawnLocation().clone().add(
-        5 - BitQuest.rand(0,10), 
+        2 - BitQuest.rand(0,4), 
         2, 
-        5 - BitQuest.rand(0,10));
+        2 - BitQuest.rand(0,4));
   }
 
   public void teleportToSpawn(Player player) {
@@ -474,6 +474,7 @@ public class BitQuest extends JavaPlugin {
     if (!c.isLoaded()) {
       c.load();
     }
+    bitQuest.spawnVillager();
     bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
 
       public void run() {
@@ -503,28 +504,25 @@ public class BitQuest extends JavaPlugin {
         }
       }
     }, 0, 12000L); // 10 minutes
-    scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-      @Override
-      public void run() {
-        int villagerCount = 0;
-        World world = Bukkit.getWorld("world");
-        List<Entity> entities = world.getEntities();
-        for (Entity entity : entities) {
-          if (entity instanceof Villager) {
-            if (entity.getLocation().distance(world.getSpawnLocation()) < 10000) {
-              villagerCount += 1;
-            } else {
-              entity.remove();
-            }
-          }
-        }
-        if (villagerCount < 20) {
-          BitQuest.log("villager spawned", "count: " + villagerCount);
-          world.spawnEntity(BitQuest.spawnLocation(), EntityType.VILLAGER);
+  }
+
+  public void spawnVillager() {
+    int villagerCount = 0;
+    World world = Bukkit.getWorld("world");
+    List<Entity> entities = world.getEntities();
+    for (Entity entity : entities) {
+      if (entity instanceof Villager) {
+        if (entity.getLocation().distance(world.getSpawnLocation()) < 10000) {
+          villagerCount += 1;
+        } else {
+          entity.remove();
         }
       }
-    }, 0, 1200L); // 1 minute
-
+    }
+    BitQuest.log("villagers", "count" + villagerCount);
+    if (villagerCount < 20) {
+      world.spawnEntity(BitQuest.spawnLocation(), EntityType.VILLAGER);
+    }
   }
 
   public void run_season_events() {
