@@ -162,7 +162,9 @@ public class BitQuestPlayer {
   }
 
   public boolean addExperience(int points) throws SQLException {
-    String sql = "UPDATE players SET experience = experience + 1 WHERE uuid = '" +
+    if(points < 1) return false;
+    if(points < BitQuest.maxLevel()) return false;
+    String sql = "UPDATE players SET experience = experience + " + points + " WHERE uuid = '" +
         uuid +
         "'";
     BitQuest.debug("sql",sql);

@@ -151,9 +151,37 @@ public class BitQuest extends JavaPlugin {
       265000,
       305000,
       355000,
+      410000,
+      470000,
+      530000,
+      600000,
+      670000,
+      750000,
+      830000,
+      920000,
+      1010000,
+      1110000,
+      1210000,
+      1320000,
+      1430000,
+      1550000,
+      1670000,
+      1800000,
+      1930000,
+      2070000,
+      2210000,
+      2360000,
+      2510000,
+      2670000,
+      2830000,
+      3000000,
+      3170000,
+      3350000,
+      3530000,
+      3720000,
+      3910000
   };
   public static final int MAX_STOCK = 100;
-  public static final int MAX_LEVEL = 20;
   public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
   public static final String POSTGRES_PASSWORD = System.getenv("BITQUEST_POSTGRES_PASSWORD");
 
@@ -630,9 +658,13 @@ public class BitQuest extends JavaPlugin {
     return EXPERIENCE_TABLE[level - 1];
   }
 
+  public static int maxLevel() {
+    return EXPERIENCE_TABLE.length + 1;
+  }
+
   public float getExpProgress(int exp) {
     int level = getLevel(exp);
-    if (level < MAX_LEVEL) {
+    if (level < BitQuest.maxLevel()) {
       int nextlevel = getExpForLevel(level + 1);
       int prevlevel = 0;
       if (level > 0) {
@@ -655,7 +687,7 @@ public class BitQuest extends JavaPlugin {
       int experience = player(player).experience;
       int level = getLevel(experience);
       player.setLevel(level);
-      if (level < BitQuest.MAX_LEVEL) {
+      if (level < BitQuest.maxLevel()) {
         float progress = getExpProgress(experience);
         player.setExp(progress);
       } else {
