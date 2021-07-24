@@ -37,6 +37,7 @@ public class TradeCommand extends CommandAction {
       player.getInventory().addItem(new ItemStack(Material.EMERALD, tradeAmount.intValue()));
       player.sendMessage(ChatColor.GREEN + "You traded " + tradeAmount.toString() + " " + BitQuest.DENOMINATION_NAME
           + " for emeralds.");
+      bitQuest.updateScoreboard(player);
     } catch (Exception e) {
       e.printStackTrace();
       player.sendMessage(ChatColor.RED + e.getMessage());

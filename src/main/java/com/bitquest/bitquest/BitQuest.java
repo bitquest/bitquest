@@ -911,7 +911,7 @@ public class BitQuest extends JavaPlugin {
       Double confirmedBalance = wallet.balance(3);
       player.sendMessage(ChatColor.BOLD + "Your Wallet");
       player.sendMessage("Balance: " + confirmedBalance);
-      if (unconfirmedBalance.equals(confirmedBalance)) {
+      if (!unconfirmedBalance.equals(confirmedBalance)) {
         player.sendMessage("Unconfirmed Balance: " + unconfirmedBalance);
       }
       player.sendMessage("Add " + BitQuest.DENOMINATION_NAME + ":");
