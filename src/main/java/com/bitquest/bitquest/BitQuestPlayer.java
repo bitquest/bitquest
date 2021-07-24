@@ -168,7 +168,7 @@ public class BitQuestPlayer {
     String sql = "UPDATE players SET experience = experience + " + points + " WHERE uuid = '" +
         uuid +
         "'";
-    BitQuest.debug("sql",sql);
+    BitQuest.log("sql",sql);
     PreparedStatement ps = this.conn.prepareStatement(sql);
     ps.executeUpdate();
     ps.close();

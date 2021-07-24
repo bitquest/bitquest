@@ -56,7 +56,6 @@ public class PlayerEvents implements Listener {
     if (bqPlayer.clan != null) {
       player.setPlayerListName(ChatColor.GOLD + "[" + bqPlayer.clan + "] " + ChatColor.WHITE + player.getName());
     }
-    bitQuest.setTotalExperience(player);
     player.sendMessage(ChatColor.YELLOW + "     Welcome to " + bitQuest.SERVER_NAME + "! ");
     if (bitQuest.redis.exists("bitquest:motd") == true) {
       player.sendMessage(bitQuest.redis.get("bitquest:motd"));

@@ -224,8 +224,9 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  void onEntityDeath(EntityDeathEvent event) throws Exception {
+  void onEntityDeath(EntityDeathEvent event) {
     final LivingEntity entity = event.getEntity();
+    event.setDroppedExp(0);
     if (entity instanceof Player) {
       event.getDrops().clear();
     }
