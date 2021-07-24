@@ -733,7 +733,7 @@ public class BitQuest extends JavaPlugin {
 
   public boolean landIsClaimed(Location location) throws SQLException {
     World world = location.getWorld();
-    String cacheKey = "land:claimed:" + world.getName() + ":" + location.getChunk().getX() + ":" + location.getChunk().getZ();
+    String cacheKey = Land.landIsClaimedCacheKey(location, world);
     String landClaimedCache = redis.get(cacheKey);
     if (landClaimedCache != null) {
       return landClaimedCache.equals("1");
