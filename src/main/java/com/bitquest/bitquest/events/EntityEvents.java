@@ -226,54 +226,58 @@ public class EntityEvents implements Listener {
   @EventHandler
   void onEntityDeath(EntityDeathEvent event) throws Exception {
     final LivingEntity entity = event.getEntity();
-    event.setDroppedExp(0);
-    final int level = (int) entity.getMaxHealth() - 1;
-    if (entity instanceof Player) {
-      event.getDrops().clear();
-    }
     if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+      int level = (int) entity.getMaxHealth() - 1;
+      if (level < 1) level = 1;
+      if (level > BitQuest.maxLevel()) level = BitQuest.maxLevel();
       final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
       Player player = null;
       if (damage.getDamager() instanceof Player) {
         player = (Player) damage.getDamager();
-      } else if (damage.getDamager() instanceof Arrow && ((Arrow) damage.getDamager()).getShooter() instanceof Player) {
-        player = (Player) ((Arrow) damage.getDamager()).getShooter();
-      }
-      String lootTimerKey = "loot:timer";
-      // Add experience to player
-      try {
-        if (player.getLevel() < BitQuest.maxLevel()) {
-          bitQuest.player(player).addExperience(level);
+      } else if (damage.getDamager() instanceof Arrow) {
+        Arrow arrow = (Arrow) damage.getDamager();
+        if (arrow.getShooter() instanceof Player) {
+          player = (Player) arrow.getShooter();
+          BitQuest.debug("arrow",player.getName());
         }
-        bitQuest.setTotalExperience(player);
-      } catch (Exception e) {
-        e.printStackTrace();
       }
-      // Award random weapon
-      if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
-      if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
-
-      // Award loot if random timer is expired
-      if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
+      if (player != null) {
+        // Award experience
         try {
-          Double loot =  Double.valueOf(BitQuest.rand(1,level));         
-          if (bitQuest.wallet.balance(3) > loot) {
-            Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
-            if (bitQuest.wallet.send(wallet.address(), loot)) {
-              bitQuest.redis.set(lootTimerKey, "1");
-              bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
-              BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
-              player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
-              bitQuest.updateScoreboard(player);
-            }
+          if (player.getLevel() < BitQuest.maxLevel()) {
+            bitQuest.player(player).addExperience(level);
           }
-
+          bitQuest.setTotalExperience(player);
         } catch (Exception e) {
           e.printStackTrace();
         }
-       
-      }
-    } 
+
+        // Award random weapon
+        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
+        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
+
+        // Award loot if random timer is expired
+        String lootTimerKey = "loot:timer";
+        if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
+          try {
+            bitQuest.redis.set(lootTimerKey, "1");
+            bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
+            Double loot =  Double.valueOf(BitQuest.rand(1,level));         
+            if (bitQuest.wallet.balance(3) > loot) {
+              Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+              if (bitQuest.wallet.send(wallet.address(), loot)) {
+   
+                BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
+                player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
+                bitQuest.updateScoreboard(player);
+              }
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        }
+      } 
+    }
   }
 
   String spawnKey(Location location) {
@@ -307,7 +311,7 @@ public class EntityEvents implements Listener {
 
     EntityType entityType = entity.getType();
     // max level is 128
-    int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 1000)));
+    int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 100)));
 
     if (entity instanceof Giant) {
       entity.setMaxHealth(2858519);
@@ -420,13 +424,11 @@ public class EntityEvents implements Listener {
       Entity damager = damageEvent.getDamager();
       if (damager instanceof Arrow) {
         Arrow arrow = (Arrow) damager;
-        BitQuest.debug("arrow", arrow.getShooter().getClass().toString());
-        if (arrow.getShooter() instanceof Player) {
-          Player shooter = (Player) arrow.getShooter();
-          BitQuest.debug("arrow shooter", shooter.getName());
+        if (arrow.getShooter() instanceof Entity) {
+          damager = (Entity) arrow.getShooter();
         }
       }
-      if (damager instanceof Player || (damager instanceof Arrow && ((Arrow) damager).getShooter() instanceof Player)) {
+      if (damager instanceof Player) {
         // player damage
         Player player;
 

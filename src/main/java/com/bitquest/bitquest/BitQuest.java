@@ -181,7 +181,8 @@ public class BitQuest extends JavaPlugin {
       3350000,
       3530000,
       3720000,
-      3910000
+      3910000,
+      4110000
   };
   public static final int MAX_STOCK = 100;
   public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
@@ -661,7 +662,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static int maxLevel() {
-    return EXPERIENCE_TABLE.length + 1;
+    return EXPERIENCE_TABLE.length;
   }
 
   public float getExpProgress(int exp) {
@@ -715,7 +716,6 @@ public class BitQuest extends JavaPlugin {
     // player.getLevel(), true));
     AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
     attribute.setBaseValue(health);
-    player.setHealth(health);
     player.setMaxHealth(health);
   }
 
