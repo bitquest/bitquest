@@ -226,7 +226,7 @@ public class EntityEvents implements Listener {
   @EventHandler
   void onEntityDeath(EntityDeathEvent event) throws Exception {
     final LivingEntity entity = event.getEntity();
-
+    event.setDroppedExp(0);
     final int level = (int) entity.getMaxHealth() - 1;
     if (entity instanceof Player) {
       event.getDrops().clear();
@@ -240,35 +240,40 @@ public class EntityEvents implements Listener {
         player = (Player) ((Arrow) damage.getDamager()).getShooter();
       }
       String lootTimerKey = "loot:timer";
+      // Add experience to player
+      try {
+        if (player.getLevel() < BitQuest.maxLevel()) {
+          bitQuest.player(player).addExperience(level);
+        }
+        bitQuest.setTotalExperience(player);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+      // Award random weapon
+      if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
+      if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
+
+      // Award loot if random timer is expired
       if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
-        // Award experience and loot to players
-        Double loot =  Double.valueOf(BitQuest.rand(1,level));
-        int exp = level * 4;
         try {
-          if (player.getLevel() < BitQuest.maxLevel()) {
-            bitQuest.player(player).addExperience(level);
+          Double loot =  Double.valueOf(BitQuest.rand(1,level));         
+          if (bitQuest.wallet.balance(3) > loot) {
+            Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+            if (bitQuest.wallet.send(wallet.address(), loot)) {
+              bitQuest.redis.set(lootTimerKey, "1");
+              bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
+              BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
+              player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
+              bitQuest.updateScoreboard(player);
+            }
           }
-          bitQuest.setTotalExperience(player);
+
         } catch (Exception e) {
           e.printStackTrace();
         }
-        if (bitQuest.wallet.balance(3) > loot) {
-          Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
-          if (bitQuest.wallet.send(wallet.address(), loot)) {
-            BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
-            player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
-            bitQuest.updateScoreboard(player);
-          }
-        }
-        // Award random weapon
-        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
-        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
-        bitQuest.redis.set(lootTimerKey, "1");
-        bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
+       
       }
-    } else {
-      event.setDroppedExp(0);
-    }
+    } 
   }
 
   String spawnKey(Location location) {

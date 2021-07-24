@@ -63,6 +63,8 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
@@ -703,13 +705,17 @@ public class BitQuest extends JavaPlugin {
   public void setPlayerMaxHealth(Player player) {
     // base health=6
     // level health max=
-    int health = 1 + (player.getLevel() / 2);
+    int health = player.getLevel();
+    if (health < 1) health = 1;
     if (health > 40) {
       health = 40;
     }
     // player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,
     // Integer.MAX_VALUE,
     // player.getLevel(), true));
+    AttributeInstance attribute = player.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+    attribute.setBaseValue(health);
+    player.setHealth(health);
     player.setMaxHealth(health);
   }
 
