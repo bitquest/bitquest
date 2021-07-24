@@ -245,7 +245,9 @@ public class EntityEvents implements Listener {
         Double loot =  Double.valueOf(BitQuest.rand(1,level));
         int exp = level * 4;
         try {
-          bitQuest.player(player).addExperience(level);
+          if (player.getLevel() < BitQuest.MAX_LEVEL) {
+            bitQuest.player(player).addExperience(level);
+          }
           bitQuest.setTotalExperience(player);
         } catch (Exception e) {
           e.printStackTrace();
@@ -286,14 +288,13 @@ public class EntityEvents implements Listener {
     LivingEntity entity = e.getEntity();
     int minLevel = 1;
     int maxLevel = 10;
-    int difficulty = 10;
     int spawnDistance = (int) e.getLocation().getWorld().getSpawnLocation().distance(e.getLocation());
-    if (e.getLocation().getWorld().getEnvironment() == Environment.NETHER) {
+    if (location.getWorld().getEnvironment() == Environment.NETHER) {
+      minLevel = 5;
+      maxLevel = 15;
+    } else if (location.getWorld().getEnvironment() == Environment.THE_END) {
       minLevel = 10;
-      maxLevel = 50;
-    } else if (e.getLocation().getWorld().getEnvironment() == Environment.THE_END) {
-      minLevel = 50;
-      maxLevel = 100;
+      maxLevel = 20;
     } else {
       String cacheKey = "land:claimed:" + world.getName() + ":" + location.getChunk().getX() + ":" + location.getChunk().getZ();
       String landClaimedCache = bitQuest.redis.get(cacheKey);
@@ -410,7 +411,7 @@ public class EntityEvents implements Listener {
                 EntityType.GHAST);
             e.getLocation().getWorld().spawnEntity(e.getLocation(), EntityType.WITCH);
           }
-
+          BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
         } catch (Exception e1) {
           System.out.println("Event failed. Shutting down...");
           e1.printStackTrace();

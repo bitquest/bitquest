@@ -21,7 +21,7 @@ public class PlayerEvents implements Listener {
   }
 
   @EventHandler
-  public void onServerListPing(PlayerPortalEvent event) {
+  public void onPlayerPortal(PlayerPortalEvent event) {
     BitQuest.setGameMode(event.getPlayer(), event.getTo());
   }
 
@@ -33,6 +33,7 @@ public class PlayerEvents implements Listener {
   @EventHandler
   public void onExperienceChange(PlayerExpChangeEvent event) {
     bitQuest.setTotalExperience(event.getPlayer());
+    event.setAmount(0);
   }
 
   @EventHandler

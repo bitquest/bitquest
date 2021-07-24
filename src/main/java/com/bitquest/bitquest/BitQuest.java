@@ -130,6 +130,7 @@ public class BitQuest extends JavaPlugin {
       : 10000;
 
   public static final int MAX_STOCK = 100;
+  public static final int MAX_LEVEL = 20;
   public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
   public static final String POSTGRES_PASSWORD = System.getenv("BITQUEST_POSTGRES_PASSWORD");
 
@@ -452,19 +453,26 @@ public class BitQuest extends JavaPlugin {
     player.setMetadata("pet", new FixedMetadataValue(this, catName));
   }
 
+  public static final Location spawnLocation() {
+    return Bukkit.getWorld("world").getSpawnLocation().clone().add(
+        2 - BitQuest.rand(0,4), 
+        2, 
+        2 - BitQuest.rand(0,4));
+  }
+
   public void teleportToSpawn(Player player) {
     BitQuest bitQuest = this;
     // TODO: open the tps inventory
     player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
     player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
-    World world = Bukkit.getWorld("world");
 
-    final Location spawn = world.getSpawnLocation();
+    final Location spawn = spawnLocation();
 
     Chunk c = spawn.getChunk();
     if (!c.isLoaded()) {
       c.load();
     }
+    bitQuest.spawnVillager();
     bitQuest.getServer().getScheduler().scheduleSyncDelayedTask(bitQuest, new Runnable() {
 
       public void run() {
@@ -494,30 +502,25 @@ public class BitQuest extends JavaPlugin {
         }
       }
     }, 0, 12000L); // 10 minutes
-    scheduler.scheduleSyncRepeatingTask(this, new Runnable() {
-      @Override
-      public void run() {
-        int villagerCount = 0;
-        World world = Bukkit.getWorld("world");
-        List<Entity> entities = world.getEntities();
-        for (Entity entity : entities) {
-          if (entity instanceof Villager) {
-            if (entity.getLocation().distance(world.getSpawnLocation()) < 10000) {
-              villagerCount += 1;
-            } else {
-              entity.remove();
-            }
-          }
-        }
-        if (villagerCount < 8) {
-          BitQuest.debug("villager spawned", "count: " + villagerCount);
-          world.spawnEntity(world.getSpawnLocation(), EntityType.VILLAGER);
-        }
-        killAllVillagersInWorld(Bukkit.getWorld("world_the_end"));
-        killAllVillagersInWorld(Bukkit.getWorld("world_nether"));
-      }
-    }, 0, 12000L); // 10 minutes
+  }
 
+  public void spawnVillager() {
+    int villagerCount = 0;
+    World world = Bukkit.getWorld("world");
+    List<Entity> entities = world.getEntities();
+    for (Entity entity : entities) {
+      if (entity instanceof Villager) {
+        if (entity.getLocation().distance(world.getSpawnLocation()) < 10000) {
+          villagerCount += 1;
+        } else {
+          entity.remove();
+        }
+      }
+    }
+    BitQuest.log("villagers", "count" + villagerCount);
+    if (villagerCount < 20) {
+      world.spawnEntity(BitQuest.spawnLocation(), EntityType.VILLAGER);
+    }
   }
 
   public void run_season_events() {
@@ -592,7 +595,7 @@ public class BitQuest extends JavaPlugin {
 
   public int getLevel(int exp) {
     int level = (int) Math.floor(Math.sqrt(exp / (float) 64));
-    if (level > 100) return 100;
+    if (level > BitQuest.MAX_LEVEL) return BitQuest.MAX_LEVEL;
     return level;
   }
 
@@ -621,11 +624,13 @@ public class BitQuest extends JavaPlugin {
     try {
       int experience = player(player).experience;
       int level = getLevel(experience);
-      System.out.println(experience);
-      System.out.println(level);
-      float progress = getExpProgress(experience);
       player.setLevel(level);
-      player.setExp(progress);
+      if (level < BitQuest.MAX_LEVEL) {
+        float progress = getExpProgress(experience);
+        player.setExp(progress);
+      } else {
+        player.setExp(0);
+      }
       setPlayerMaxHealth(player);
     } catch (Exception e) {
       e.printStackTrace();
