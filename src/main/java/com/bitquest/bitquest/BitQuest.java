@@ -807,7 +807,7 @@ public class BitQuest extends JavaPlugin {
       return landClaimedCache.equals("1");
     } else {
       LandChunk chunk = land.chunk(location);
-      BitQuest.debug("onEntitySpawn", cacheKey + " miss");
+      BitQuest.debug("landIsClaimed", cacheKey + " miss");
       if (chunk != null) {
         // Land is claimed
         redis.set(cacheKey, "1");
