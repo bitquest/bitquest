@@ -731,6 +731,29 @@ public class BitQuest extends JavaPlugin {
     return land != null && land.owner.equals(player.getUniqueId().toString());
   }
 
+  public boolean landIsClaimed(Location location) throws SQLException {
+    World world = location.getWorld();
+    String cacheKey = "land:claimed:" + world.getName() + ":" + location.getChunk().getX() + ":" + location.getChunk().getZ();
+    String landClaimedCache = redis.get(cacheKey);
+    if (landClaimedCache != null) {
+      return landClaimedCache.equals("1");
+    } else {
+      LandChunk chunk = land.chunk(location);
+      BitQuest.debug("onEntitySpawn", cacheKey + " miss");
+      if (chunk != null) {
+        // Land is claimed
+        redis.set(cacheKey, "1");
+        redis.expire(cacheKey, 3600); // 1 hour
+        return true;
+      } else {
+        redis.set(cacheKey, "0");
+        redis.expire(cacheKey, 3600); // 1 hour
+        return false;
+      }
+    }
+
+  }
+
   public boolean canBuild(Location location, Player player) {
     // returns true if player has permission to build in location
     if (!player.getWorld().getName().equals("world")) return false;
@@ -831,23 +854,6 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
-  ;
-
-  public boolean landIsClaimed(Location location) {
-    String chunk = "";
-    if (location.getWorld().getName().equals("world")) {
-      chunk = "chunk";
-    } else if (location.getWorld().getName().equals("world_nether")) {
-      chunk = "netherchunk";
-    }
-    String key = chunk + "" + location.getChunk().getX() + "," + location.getChunk().getZ() + "owner";
-
-    if (redis.exists(key) == true) {
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   @Override
   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
