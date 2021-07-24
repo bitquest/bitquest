@@ -233,8 +233,7 @@ public class EntityEvents implements Listener {
     }
     if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       if (entity.hasMetadata("level")) {
-        System.out.println(entity.getMetadata("level").get(0).asInt());
-        int level = (int) entity.getMaxHealth() - 1;
+        int level = entity.getMetadata("level").get(0).asInt();
         if (level < 1) level = 1;
         if (level > BitQuest.maxLevel()) level = BitQuest.maxLevel();
         final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
