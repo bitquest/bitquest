@@ -130,6 +130,29 @@ public class BitQuest extends JavaPlugin {
   public static final Long MINER_FEE = System.getenv("MINER_FEE") != null ? Long.parseLong(System.getenv("MINER_FEE"))
       : 10000;
 
+
+  public static final int[] EXPERIENCE_TABLE = new int[] {
+      0,
+      300,
+      900,
+      2700,
+      6500,
+      14000,
+      23000,
+      34000,
+      48000,
+      64000,
+      85000,
+      100000,
+      120000,
+      140000,
+      165000,
+      195000,
+      225000,
+      265000,
+      305000,
+      355000,
+  };
   public static final int MAX_STOCK = 100;
   public static final int MAX_LEVEL = 20;
   public static final String POSTGRES_USER = System.getenv("BITQUEST_POSTGRES_USER") != null ? System.getenv("BITQUEST_POSTGRES_USER") : "postgres";
@@ -595,25 +618,32 @@ public class BitQuest extends JavaPlugin {
     return !string.matches("^.*[^a-zA-Z0-9 ].*$");
   }
 
-  public int getLevel(int exp) {
-    int level = (int) Math.floor(Math.sqrt(exp / (float) 64));
-    if (level > BitQuest.MAX_LEVEL) return BitQuest.MAX_LEVEL;
+  public int getLevel(int experience) {
+    int level = 0;
+    for (int levelExperience : BitQuest.EXPERIENCE_TABLE) {
+      level = + 1;
+      if (levelExperience > experience) return level;
+    }
     return level;
   }
 
   public int getExpForLevel(int level) {
-    return (int) Math.pow(level, 2) * 64;
+    if (level > EXPERIENCE_TABLE.length) return EXPERIENCE_TABLE[EXPERIENCE_TABLE.length - 1];
+    return EXPERIENCE_TABLE[level - 1];
   }
 
   public float getExpProgress(int exp) {
     int level = getLevel(exp);
-    int nextlevel = getExpForLevel(level + 1);
-    int prevlevel = 0;
-    if (level > 0) {
-      prevlevel = getExpForLevel(level);
-    }
-    float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
-    return progress;
+    if (level < MAX_LEVEL) {
+      int nextlevel = getExpForLevel(level + 1);
+      int prevlevel = 0;
+      if (level > 0) {
+        prevlevel = getExpForLevel(level);
+      }
+      float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+      return progress;
+    } 
+    return 0;
   }
 
   public BitQuestPlayer player(Player player) throws SQLException {
