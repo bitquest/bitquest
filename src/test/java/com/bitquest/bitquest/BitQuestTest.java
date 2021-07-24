@@ -27,12 +27,12 @@ public class BitQuestTest {
 
   @Test
   public void levelsTest() {
-    assertTrue(BitQuest.getLevel(0)==1);
-    assertTrue(BitQuest.getLevel(299)==1);
-    assertTrue(BitQuest.getLevel(300)==2);
-    assertTrue(BitQuest.getLevel(301)==2);
+    assertTrue(BitQuest.getLevel(0) == 1);
+    assertTrue(BitQuest.getLevel(299) == 1);
+    assertTrue(BitQuest.getLevel(300) == 2);
+    assertTrue(BitQuest.getLevel(301) == 2);
     System.out.println(BitQuest.maxLevel());
-    assertTrue(BitQuest.maxLevel()==50);
+    assertTrue(BitQuest.maxLevel() == 50);
   }
 
   @Test

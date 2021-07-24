@@ -667,7 +667,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static int maxLevel() {
-    return EXPERIENCE_TABLE.length+1;
+    return EXPERIENCE_TABLE.length + 1;
   }
 
   public float getExpProgress(int experience) {
