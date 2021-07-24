@@ -669,10 +669,9 @@ public class BitQuest extends JavaPlugin {
     int level = getLevel(exp);
     if (level < BitQuest.maxLevel()) {
       int nextlevel = getExpForLevel(level + 1);
-      int prevlevel = 0;
-      if (level > 0) {
-        prevlevel = getExpForLevel(level);
-      }
+      BitQuest.log("nextLevel", "level " + level + 1 + ": " + nextlevel);
+      int prevlevel = getExpForLevel(level);
+      BitQuest.log("prevlevel", "level " + level + ": " + prevlevel);
       float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
       return progress;
     } 
@@ -688,7 +687,9 @@ public class BitQuest extends JavaPlugin {
     // opposite effect
     try {
       int experience = player(player).experience;
+      BitQuest.log("experience", player.getName() + " " + experience);
       int level = getLevel(experience);
+      BitQuest.log("level", player.getName() + " " + level);
       player.setLevel(level);
       if (level < BitQuest.maxLevel()) {
         float progress = getExpProgress(experience);

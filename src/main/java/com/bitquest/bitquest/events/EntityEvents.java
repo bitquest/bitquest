@@ -232,56 +232,59 @@ public class EntityEvents implements Listener {
       event.getDrops().clear();
     }
     if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
-      int level = (int) entity.getMaxHealth() - 1;
-      if (level < 1) level = 1;
-      if (level > BitQuest.maxLevel()) level = BitQuest.maxLevel();
-      final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
-      Player player = null;
-      if (damage.getDamager() instanceof Player) {
-        player = (Player) damage.getDamager();
-      } else if (damage.getDamager() instanceof Arrow) {
-        Arrow arrow = (Arrow) damage.getDamager();
-        if (arrow.getShooter() instanceof Player) {
-          player = (Player) arrow.getShooter();
-          BitQuest.debug("arrow",player.getName());
-        }
-      }
-      if (player != null) {
-        // Award experience
-        try {
-          if (player.getLevel() < BitQuest.maxLevel()) {
-            bitQuest.player(player).addExperience(level);
+      if (entity.hasMetadata("level")) {
+        System.out.println(entity.getMetadata("level").toString());
+        int level = (int) entity.getMaxHealth() - 1;
+        if (level < 1) level = 1;
+        if (level > BitQuest.maxLevel()) level = BitQuest.maxLevel();
+        final EntityDamageByEntityEvent damage = (EntityDamageByEntityEvent) event.getEntity().getLastDamageCause();
+        Player player = null;
+        if (damage.getDamager() instanceof Player) {
+          player = (Player) damage.getDamager();
+        } else if (damage.getDamager() instanceof Arrow) {
+          Arrow arrow = (Arrow) damage.getDamager();
+          if (arrow.getShooter() instanceof Player) {
+            player = (Player) arrow.getShooter();
+            BitQuest.debug("arrow",player.getName());
           }
-          bitQuest.setTotalExperience(player);
-        } catch (Exception e) {
-          e.printStackTrace();
         }
-
-        // Award random weapon
-        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
-        if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
-
-        // Award loot if random timer is expired
-        String lootTimerKey = "loot:timer";
-        if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
+        if (player != null) {
+          // Award experience
           try {
-            bitQuest.redis.set(lootTimerKey, "1");
-            bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
-            Double loot =  Double.valueOf(BitQuest.rand(1,level));         
-            if (bitQuest.wallet.balance(3) > loot) {
-              Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
-              if (bitQuest.wallet.send(wallet.address(), loot)) {
-   
-                BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
-                player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
-                bitQuest.updateScoreboard(player);
-              }
+            if (player.getLevel() < BitQuest.maxLevel()) {
+              bitQuest.player(player).addExperience(level);
             }
+            bitQuest.setTotalExperience(player);
           } catch (Exception e) {
             e.printStackTrace();
           }
-        }
-      } 
+
+          // Award random weapon
+          if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
+          if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
+
+          // Award loot if random timer is expired
+          String lootTimerKey = "loot:timer";
+          if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
+            try {
+              bitQuest.redis.set(lootTimerKey, "1");
+              bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
+              Double loot =  Double.valueOf(BitQuest.rand(1,level));         
+              if (bitQuest.wallet.balance(3) > loot) {
+                Wallet wallet = new Wallet(bitQuest.node, player.getUniqueId().toString());
+                if (bitQuest.wallet.send(wallet.address(), loot)) {
+    
+                  BitQuest.log("loot", loot.toString() + " --> " + player.getDisplayName());
+                  player.sendMessage(ChatColor.GREEN + " you looted " + loot.toString() + " " + BitQuest.DENOMINATION_NAME);
+                  bitQuest.updateScoreboard(player);
+                }
+              }
+            } catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
+        } 
+      }
     }
   }
 
@@ -409,6 +412,8 @@ public class EntityEvents implements Listener {
               EntityType.GHAST);
           location.getWorld().spawnEntity(location, EntityType.WITCH);
         }
+        entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
+        BitQuest.log("level", entity.getMetadata("level").toString());
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
   
       }
@@ -658,9 +663,9 @@ public class EntityEvents implements Listener {
   public static ItemStack randomWeapon(final int level) {
     Material material = Material.WOODEN_SWORD;
     if (BitQuest.rand(1,5) == 1) material = Material.BOW;
-    if (BitQuest.rand(0, 50) < level) material = Material.GOLDEN_SWORD;
-    if (BitQuest.rand(0, 100) < level) material = Material.IRON_SWORD;
-    if (BitQuest.rand(0, 200) < level) material = Material.DIAMOND_SWORD;
+    if (BitQuest.rand(0, level) > 5) material = Material.IRON_SWORD;
+    if (BitQuest.rand(0, level) > 10) material = Material.DIAMOND_SWORD;
+    if (BitQuest.rand(0, level) > 15) material = Material.DIAMOND_SWORD;
     ItemStack itemStack = new ItemStack(material,1);
     randomEnchantItem(itemStack, level);
     return itemStack;
@@ -669,19 +674,26 @@ public class EntityEvents implements Listener {
   // Random Armor
 
   public static ItemStack randomArmor(final int level) {
-    Material material = Material.LEATHER_CHESTPLATE;
-    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_CHESTPLATE;
-    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_BOOTS;
-    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_HELMET;
-    if (BitQuest.rand(1,5) == 1) material = Material.LEATHER_LEGGINGS;
-    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_CHESTPLATE;
-    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_BOOTS;
-    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_HELMET;
-    if (BitQuest.rand(0, 50) < level) material = Material.CHAINMAIL_LEGGINGS;
-    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_CHESTPLATE;
-    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_BOOTS;
-    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_HELMET;
-    if (BitQuest.rand(0, 100) < level) material = Material.DIAMOND_LEGGINGS;
+    Material material = Material.LEATHER_BOOTS;
+    if (BitQuest.rand(0, 4) == 1) material = Material.LEATHER_HELMET;
+    if (BitQuest.rand(0, 4) == 1) material = Material.LEATHER_LEGGINGS;
+    if (BitQuest.rand(0, 4) == 1) material = Material.NETHERITE_CHESTPLATE;
+    if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_CHESTPLATE;
+    if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_BOOTS;
+    if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_HELMET;
+    if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_LEGGINGS;
+    if (BitQuest.rand(0, level) > 5) material = Material.IRON_CHESTPLATE;
+    if (BitQuest.rand(0, level) > 5) material = Material.IRON_BOOTS;
+    if (BitQuest.rand(0, level) > 5) material = Material.IRON_HELMET;
+    if (BitQuest.rand(0, level) > 5) material = Material.IRON_LEGGINGS;
+    if (BitQuest.rand(0, level) > 10) material = Material.DIAMOND_CHESTPLATE;
+    if (BitQuest.rand(0, level) > 10) material = Material.DIAMOND_BOOTS;
+    if (BitQuest.rand(0, level) > 10) material = Material.DIAMOND_HELMET;
+    if (BitQuest.rand(0, level) > 10) material = Material.DIAMOND_LEGGINGS;
+    if (BitQuest.rand(0, level) > 15) material = Material.NETHERITE_BOOTS;
+    if (BitQuest.rand(0, level) > 15) material = Material.NETHERITE_HELMET;
+    if (BitQuest.rand(0, level) > 15) material = Material.NETHERITE_LEGGINGS;
+    if (BitQuest.rand(0, level) > 15) material = Material.NETHERITE_CHESTPLATE;
     ItemStack itemStack = new ItemStack(material,1);
     randomEnchantItem(itemStack, level);
     return itemStack;
