@@ -152,7 +152,7 @@ public class BitQuestPlayer {
     boolean exists = false;
     Statement st = this.conn.createStatement();
     ResultSet rs = st.executeQuery(sql);
-    BitQuest.debug("sql",sql);
+    BitQuest.log("sql",sql);
     while (rs.next()) {
       exists = true;
     }
