@@ -233,7 +233,7 @@ public class EntityEvents implements Listener {
     }
     if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       if (entity.hasMetadata("level")) {
-        System.out.println(entity.getMetadata("level").toString());
+        System.out.println(entity.getMetadata("level").get(0).asInt());
         int level = (int) entity.getMaxHealth() - 1;
         if (level < 1) level = 1;
         if (level > BitQuest.maxLevel()) level = BitQuest.maxLevel();
@@ -413,7 +413,7 @@ public class EntityEvents implements Listener {
           location.getWorld().spawnEntity(location, EntityType.WITCH);
         }
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
-        BitQuest.log("level", entity.getMetadata("level").toString());
+        System.out.println(entity.getMetadata("level").get(0).asInt());
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
   
       }

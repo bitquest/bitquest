@@ -281,12 +281,16 @@ public class BitQuest extends JavaPlugin {
     modCommands.put("fixabandonland", new FixAbandonLand(this));
     modCommands.put("motd", new MessageOfTheDayCommand(this));
     // registers listener classes
-    getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
-    getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
-    getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
-    getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
-    getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
-    getServer().getPluginManager().registerEvents(new ServerEvents(this), this);
+    try {
+      getServer().getPluginManager().registerEvents(new ChatEvents(this), this);
+      getServer().getPluginManager().registerEvents(new BlockEvents(this), this);
+      getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
+      getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
+      getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
+    } catch(Exception e) {
+      e.printStackTrace();
+      Bukkit.shutdown();
+    }
 
     try {
       if (ADMIN_UUID == null) {
@@ -657,6 +661,7 @@ public class BitQuest extends JavaPlugin {
   }
 
   public int getExpForLevel(int level) {
+    if (level == 1) return 0;
     if (level > EXPERIENCE_TABLE.length) return EXPERIENCE_TABLE[EXPERIENCE_TABLE.length - 1];
     return EXPERIENCE_TABLE[level - 1];
   }
@@ -665,14 +670,14 @@ public class BitQuest extends JavaPlugin {
     return EXPERIENCE_TABLE.length;
   }
 
-  public float getExpProgress(int exp) {
-    int level = getLevel(exp);
+  public float getExpProgress(int experience) {
+    int level = getLevel(experience);
     if (level < BitQuest.maxLevel()) {
-      int nextlevel = getExpForLevel(level + 1);
-      BitQuest.log("nextLevel", "level " + level + 1 + ": " + nextlevel);
-      int prevlevel = getExpForLevel(level);
-      BitQuest.log("prevlevel", "level " + level + ": " + prevlevel);
-      float progress = ((exp - prevlevel) / (float) (nextlevel - prevlevel));
+      int experienceForNextLevel = getExpForLevel(level + 1);
+      BitQuest.log("experienceForNextLevel", "level " + level + 1 + ": " + experienceForNextLevel);
+      int experienceFromPrevLevel = getExpForLevel(level);
+      BitQuest.log("experienceFromPrevLevel", "level " + level + ": " + experienceFromPrevLevel);
+      float progress = ((float) (experience - experienceFromPrevLevel) / (float) (experienceForNextLevel - experienceFromPrevLevel));
       return progress;
     } 
     return 0;
