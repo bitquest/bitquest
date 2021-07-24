@@ -651,14 +651,10 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static final int getLevel(int experience) {
-    System.out.println("getLevel "+experience);
     if (experience == 0) return 1;
     int level = 0;
     for (int levelExperience : BitQuest.EXPERIENCE_TABLE) {
       level += 1;
-      System.out.println("level " + level + " exp: " + levelExperience);
-      System.out.println("experience " + experience);
-      
       if (levelExperience > experience) return level;
     }
     return level;
