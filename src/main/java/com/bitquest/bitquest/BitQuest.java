@@ -287,7 +287,7 @@ public class BitQuest extends JavaPlugin {
       getServer().getPluginManager().registerEvents(new EntityEvents(this), this);
       getServer().getPluginManager().registerEvents(new InventoryEvents(this), this);
       getServer().getPluginManager().registerEvents(new PlayerEvents(this), this);
-    } catch(Exception e) {
+    } catch (Exception e) {
       e.printStackTrace();
       Bukkit.shutdown();
     }
