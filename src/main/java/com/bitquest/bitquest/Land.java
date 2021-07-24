@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import org.bukkit.Location;
+import org.bukkit.World;
 
 public class Land {
   public Connection conn;
@@ -20,6 +21,10 @@ public class Land {
     System.out.println(sql);
     ps.executeUpdate();
     ps.close();
+  }
+
+  public static String landIsClaimedCacheKey(Location location, World world) {
+    return  "land:claimed:" + world.getName() + ":" + location.getChunk().getX() + ":" + location.getChunk().getZ();
   }
 
   public boolean rename(int x, int z, String name) throws SQLException {

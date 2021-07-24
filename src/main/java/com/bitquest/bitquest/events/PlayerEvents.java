@@ -64,5 +64,6 @@ public class PlayerEvents implements Listener {
     player.sendMessage("The loot pool is: " + bitQuest.wallet.balance(0).toString() + " " + bitQuest.node.chain());
     bitQuest.redis.zincrby("player:login", 1, player.getUniqueId().toString());
     bitQuest.updateScoreboard(player);
+    bitQuest.spawnVillager();
   }
 }
