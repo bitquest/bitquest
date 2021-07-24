@@ -650,10 +650,15 @@ public class BitQuest extends JavaPlugin {
     return !string.matches("^.*[^a-zA-Z0-9 ].*$");
   }
 
-  public int getLevel(int experience) {
+  public static final int getLevel(int experience) {
+    System.out.println("getLevel "+experience);
+    if (experience == 0) return 1;
     int level = 0;
     for (int levelExperience : BitQuest.EXPERIENCE_TABLE) {
-      level = + 1;
+      level += 1;
+      System.out.println("level " + level + " exp: " + levelExperience);
+      System.out.println("experience " + experience);
+      
       if (levelExperience > experience) return level;
     }
     return level;
@@ -666,11 +671,11 @@ public class BitQuest extends JavaPlugin {
   }
 
   public static int maxLevel() {
-    return EXPERIENCE_TABLE.length;
+    return EXPERIENCE_TABLE.length+1;
   }
 
   public float getExpProgress(int experience) {
-    int level = getLevel(experience);
+    int level = BitQuest.getLevel(experience);
     if (level < BitQuest.maxLevel()) {
       int experienceForNextLevel = getExpForLevel(level + 1);
       BitQuest.log("experienceForNextLevel", "level " + level + 1 + ": " + experienceForNextLevel);
