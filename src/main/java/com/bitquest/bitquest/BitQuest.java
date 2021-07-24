@@ -133,7 +133,6 @@ public class BitQuest extends JavaPlugin {
 
 
   public static final int[] EXPERIENCE_TABLE = new int[] {
-      0,
       300,
       900,
       2700,
