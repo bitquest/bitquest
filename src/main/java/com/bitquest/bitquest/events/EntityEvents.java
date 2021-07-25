@@ -320,7 +320,7 @@ public class EntityEvents implements Listener {
 
     EntityType entityType = entity.getType();
     // max level is 128
-    int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 100)));
+    int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 200)));
 
     if (entity instanceof Giant) {
       entity.setMaxHealth(2858519);
