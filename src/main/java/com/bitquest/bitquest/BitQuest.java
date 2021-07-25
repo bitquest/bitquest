@@ -693,7 +693,13 @@ public class BitQuest extends JavaPlugin {
     // lower factor, experience is easier to get. you can increase to get the
     // opposite effect
     try {
-      int experience = player(player).experience;
+      int experience;
+      String cachedExperience = redis.get(BitQuestPlayer.cachedExperienceKey(player));
+      if (cachedExperience == null) {
+        experience = player(player).experience;
+      } else {
+        experience = Integer.valueOf(cachedExperience);
+      }
       BitQuest.log("experience", player.getName() + " " + experience);
       int level = getLevel(experience);
       BitQuest.log("level", player.getName() + " " + level);

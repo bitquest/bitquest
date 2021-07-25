@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import org.bukkit.entity.Player;
 
 public class BitQuestPlayer {
   public String clan;
@@ -24,7 +25,7 @@ public class BitQuestPlayer {
       sql = "INSERT INTO players (uuid, experience) VALUES ('" +
           this.uuid +
           "',0)";
-      BitQuest.debug("sql",sql);
+      BitQuest.log("sql",sql);
       PreparedStatement ps = this.conn.prepareStatement(sql);
       ps.executeUpdate();
       ps.close();
@@ -34,6 +35,10 @@ public class BitQuestPlayer {
     }
     rs.close();
     st.close();
+  }
+
+  public static String cachedExperienceKey(Player player) {
+    return "experience:" + player.getUniqueId().toString();
   }
 
   public boolean createClan(String clanName) throws SQLException {

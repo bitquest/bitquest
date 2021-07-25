@@ -163,27 +163,25 @@ public class EntityEvents implements Listener {
   public void onPlayerMove(PlayerMoveEvent event)
       throws ParseException, org.json.simple.parser.ParseException, IOException {
 
-    if (event.getFrom().getChunk() != event.getTo().getChunk()) {
-      // event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 0, false));
-
-      if (event.getFrom().getWorld().getName().endsWith("_end") == false
-          && event.getFrom().getWorld().getName().endsWith("_nether") == false) {
-        // announce new area
-        try {
-          LandChunk fromChunk = bitQuest.land.chunk(event.getFrom());
-          LandChunk toChunk = bitQuest.land.chunk(event.getTo());
-          String name1 = fromChunk != null ? fromChunk.name : "the wilderness";
-          String name2 = toChunk != null ? toChunk.name : "the wilderness";
-          if (!name1.equals(name2)) {
-            if (name2.equals("the wilderness")) {
-              event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + name2 + " ]");
-            } else {
-              event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + name2 + " ]");
-            }
+    if (
+          event.getTo().getWorld().getEnvironment() == Environment.NORMAL && 
+          event.getFrom().getChunk() != event.getTo().getChunk()) {
+      try {
+        boolean fromChunkIsClaimed = bitQuest.landIsClaimed(event.getFrom());
+        String fromChunkName = "the wilderness";
+        if (fromChunkIsClaimed) fromChunkName = bitQuest.land.chunk(event.getFrom()).name;
+        boolean toChunkIsClaimed = bitQuest.landIsClaimed(event.getTo());
+        String toChunkName = fromChunkName;
+        if (toChunkIsClaimed) toChunkName = bitQuest.land.chunk(event.getTo()).name;
+        if (!fromChunkName.equals(toChunkName)) {
+          if (toChunkName.equals("the wilderness")) {
+            event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + toChunkName + " ]");
+          } else {
+            event.getPlayer().sendMessage(ChatColor.YELLOW + "[ " + toChunkName + " ]");
           }
-        } catch (Exception e) {
-          e.printStackTrace();
         }
+      } catch (Exception e) {
+        e.printStackTrace();
       }
     }
   }
@@ -252,6 +250,7 @@ public class EntityEvents implements Listener {
           try {
             if (player.getLevel() < BitQuest.maxLevel()) {
               bitQuest.player(player).addExperience(level * 10);
+              bitQuest.redis.del(BitQuestPlayer.cachedExperienceKey(player));
             }
             bitQuest.setTotalExperience(player);
           } catch (Exception e) {
@@ -412,9 +411,7 @@ public class EntityEvents implements Listener {
           location.getWorld().spawnEntity(location, EntityType.WITCH);
         }
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
-        System.out.println(entity.getMetadata("level").get(0).asInt());
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
-  
       }
     } else if (entity instanceof Ghast) {
       entity.setMaxHealth(level * 4);
