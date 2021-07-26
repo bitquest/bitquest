@@ -676,7 +676,7 @@ public class EntityEvents implements Listener {
     Material material = Material.LEATHER_BOOTS;
     if (BitQuest.rand(0, 4) == 1) material = Material.LEATHER_HELMET;
     if (BitQuest.rand(0, 4) == 1) material = Material.LEATHER_LEGGINGS;
-    if (BitQuest.rand(0, 4) == 1) material = Material.NETHERITE_CHESTPLATE;
+    if (BitQuest.rand(0, 4) == 1) material = Material.LEATHER_CHESTPLATE;
     if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_CHESTPLATE;
     if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_BOOTS;
     if (BitQuest.rand(0, level) > 2) material = Material.CHAINMAIL_HELMET;
