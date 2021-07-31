@@ -519,7 +519,6 @@ public class BitQuest extends JavaPlugin {
 
   public void teleportToSpawn(Player player) {
     BitQuest bitQuest = this;
-    // TODO: open the tps inventory
     player.sendMessage(ChatColor.GREEN + "Teleporting to spawn...");
     player.setMetadata("teleporting", new FixedMetadataValue(bitQuest, true));
 
@@ -534,10 +533,7 @@ public class BitQuest extends JavaPlugin {
 
       public void run() {
         player.teleport(spawn);
-        if (redis.exists("pet:" + player.getUniqueId()) == true) {
-          spawnPet(player);
-        }
-
+        player.setGameMode(GameMode.SURVIVAL);
         player.removeMetadata("teleporting", bitQuest);
       }
     }, 60L);
