@@ -261,8 +261,8 @@ public class EntityEvents implements Listener {
           }
 
           // Award random weapon
-          if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomWeapon(level));
-          if (BitQuest.rand(1,10) == 1) event.getDrops().add(randomArmor(level));
+          if (BitQuest.rand(1,20) == 1) event.getDrops().add(randomWeapon(level));
+          if (BitQuest.rand(1,20) == 1) event.getDrops().add(randomArmor(level));
 
           // Award loot if random timer is expired
           String lootTimerKey = "loot:timer";
