@@ -86,14 +86,14 @@ public class EntityEvents implements Listener {
 
   private static final List<Material> PROTECTED_BLOCKS = Arrays.asList(Material.CHEST, Material.ACACIA_DOOR,
       Material.BIRCH_DOOR, Material.DARK_OAK_DOOR, Material.JUNGLE_DOOR, Material.SPRUCE_DOOR,
-      Material.LEGACY_WOOD_DOOR, Material.LEGACY_WOODEN_DOOR, Material.FURNACE, Material.LEGACY_BURNING_FURNACE,
-      Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.LEGACY_FENCE_GATE,
+      Material.ACACIA_DOOR, Material.BIRCH_DOOR, Material.FURNACE, Material.BLAST_FURNACE,
+      Material.ACACIA_FENCE_GATE, Material.BIRCH_FENCE_GATE, Material.DARK_OAK_FENCE_GATE, Material.ACACIA_FENCE_GATE,
       Material.JUNGLE_FENCE_GATE, Material.SPRUCE_FENCE_GATE, Material.DISPENSER, Material.DROPPER,
       Material.BREWING_STAND, Material.BLACK_SHULKER_BOX, Material.BLUE_SHULKER_BOX, Material.BROWN_SHULKER_BOX,
       Material.CYAN_SHULKER_BOX, Material.GRAY_SHULKER_BOX, Material.GREEN_SHULKER_BOX, Material.LIGHT_BLUE_SHULKER_BOX,
       Material.LIME_SHULKER_BOX, Material.MAGENTA_SHULKER_BOX, Material.ORANGE_SHULKER_BOX, Material.PINK_SHULKER_BOX,
       Material.PURPLE_SHULKER_BOX, Material.RED_SHULKER_BOX, Material.LEGACY_SILVER_SHULKER_BOX,
-      Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX,Material.HOPPER);
+      Material.WHITE_SHULKER_BOX, Material.YELLOW_SHULKER_BOX, Material.HOPPER);
 
   private static final List<EntityType> PROTECTED_ENTITIES = Arrays.asList(EntityType.ARMOR_STAND,
       EntityType.ITEM_FRAME, EntityType.PAINTING, EntityType.ENDER_CRYSTAL);
@@ -727,7 +727,7 @@ public class EntityEvents implements Listener {
 
     Block b = event.getClickedBlock();
     Player p = event.getPlayer();
-    if (b != null && PROTECTED_BLOCKS.contains(b.getType())) {
+    if (b != null) {
       // If player doesn't have permission, disallow the player to interact with it.
       if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
         event.setCancelled(true);
