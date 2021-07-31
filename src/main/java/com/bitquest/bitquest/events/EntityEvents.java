@@ -409,10 +409,15 @@ public class EntityEvents implements Listener {
 
         // spawn extra mobs
         EntityType extraMobType = null;
-        if (BitQuest.rand(1,10) < 3) {
+        if (BitQuest.rand(1,10) == 1) {
           if (world.getEnvironment() == Environment.NORMAL) extraMobType = EntityType.WITCH;
-          if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.WITHER_SKELETON;
+          if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.BLAZE;
           if (world.getEnvironment() == Environment.THE_END) extraMobType = EntityType.PHANTOM;
+          if (BitQuest.rand(1,10) == 1) {
+            if (world.getEnvironment() == Environment.NORMAL) extraMobType = EntityType.ENDERMITE;
+            if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.PIGLIN_BRUTE;
+            if (world.getEnvironment() == Environment.THE_END) extraMobType = EntityType.RAVAGER;
+          }
         }
         if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
