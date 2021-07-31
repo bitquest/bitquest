@@ -3,10 +3,8 @@ package com.bitquest.bitquest.events;
 import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.BitQuestPlayer;
 import com.bitquest.bitquest.LandChunk;
-import com.bitquest.bitquest.User;
 import com.bitquest.bitquest.Wallet;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,7 +36,9 @@ import org.bukkit.entity.Ghast;
 import org.bukkit.entity.Giant;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
+import org.bukkit.entity.Phantom;
 import org.bukkit.entity.PigZombie;
+import org.bukkit.entity.PiglinBrute;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
@@ -322,10 +322,21 @@ public class EntityEvents implements Listener {
     // max level is 128
     int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 200)));
 
-    if (entity instanceof Giant) {
-      entity.setMaxHealth(2858519);
-      entity.setCustomName("Giant Terry");
-    } else if (entity instanceof Monster) {
+    // Do not spawn some mobs on overworld
+    if (world.getEnvironment() == Environment.NORMAL) {
+      if (entity instanceof Phantom) event.setCancelled(true);
+      if (entity instanceof Wither) event.setCancelled(true);
+    }
+    // Disable mob spawners
+    if (event.getSpawnReason() == SpawnReason.SPAWNER) {
+      event.setCancelled(true);
+    } 
+    boolean isEnemy = false;
+    if (entity instanceof Ghast) isEnemy = true;
+    if (entity instanceof Giant) isEnemy = true;
+    if (entity instanceof Monster) isEnemy = true;
+
+    if (isEnemy && !event.isCancelled()) {
       // Do not spawn monsters on claimed land
       if (world.getEnvironment() == Environment.NORMAL) {
         try {
@@ -339,22 +350,13 @@ public class EntityEvents implements Listener {
         }
       
       }
-
-      // Disable mob spawners
-      if (event.getSpawnReason() == SpawnReason.SPAWNER || spawnDistance < 64) {
-        event.setCancelled(true);
-      } 
       if (event.isCancelled() == false) {
-
         if (level < 1) {
           level = 1;
         }
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, level));
         entity.setCustomName(
             String.format("%s lvl %d", WordUtils.capitalizeFully(entityType.name().replace("_", " ")), level));
-        if (entity instanceof Wither) {
-          level = level + 10;
-        }
         // entity.setMaxHealth(1 + level);
         AttributeInstance attribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         attribute.setBaseValue(level);
@@ -396,10 +398,8 @@ public class EntityEvents implements Listener {
         if (entity instanceof PigZombie) {
           PigZombie pigZombie = (PigZombie) entity;
           pigZombie.setAngry(true);
-          pigZombie.setAngry(true);
         }
 
-        // some skeletons are black
         if (entity instanceof Skeleton) {
           Skeleton skeleton = (Skeleton) entity;
           ItemStack bow = new ItemStack(Material.BOW);
@@ -407,21 +407,19 @@ public class EntityEvents implements Listener {
           skeleton.getEquipment().setItemInMainHand(bow);
         }
 
-        if (BitQuest.rand(1, 100) == 20 && bitQuest.spookyMode == true) {
-          world.spawnEntity(
-              new Location(world, location.getX(), 80, location.getZ()),
-              EntityType.GHAST);
-          location.getWorld().spawnEntity(location, EntityType.WITCH);
+        // spawn extra mobs
+        EntityType extraMobType = null;
+        if (BitQuest.rand(1,10) < 3) {
+          if (world.getEnvironment() == Environment.NORMAL) extraMobType = EntityType.WITCH;
+          if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.WITHER_SKELETON;
+          if (world.getEnvironment() == Environment.THE_END) extraMobType = EntityType.PHANTOM;
         }
+        if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
       }
-    } else if (entity instanceof Ghast) {
-      entity.setMaxHealth(level * 4);
-      System.out.println("[spawn ghast] " + entityType.name() + " lvl " + level + " spawn distance: " + spawnDistance
-          + " maxhealth: " + entity.getMaxHealth());
-
     }
+    
   }
 
   @EventHandler

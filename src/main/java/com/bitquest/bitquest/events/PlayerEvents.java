@@ -22,7 +22,16 @@ public class PlayerEvents implements Listener {
 
   @EventHandler
   public void onPlayerPortal(PlayerPortalEvent event) {
-    BitQuest.setGameMode(event.getPlayer(), event.getTo());
+    Player player = event.getPlayer();
+    if (player.getLevel() < 20 && event.getTo().getWorld().getEnvironment() == Environment.THE_END) {
+      player.sendMessage(ChatColor.RED + "Yoy must be level 30 to cross this portal.");
+      event.setCancelled(true);
+    } else if (player.getLevel() < 10 && event.getTo().getWorld().getEnvironment() == Environment.NETHER) {
+      player.sendMessage(ChatColor.RED + "Yoy must be level 10 to cross this portal.");
+      event.setCancelled(true);
+    } else {
+      BitQuest.setGameMode(player, event.getTo());
+    }
   }
 
   @EventHandler
