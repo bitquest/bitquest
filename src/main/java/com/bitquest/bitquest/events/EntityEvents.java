@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -361,28 +362,18 @@ public class EntityEvents implements Listener {
         AttributeInstance attribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         attribute.setBaseValue(level);
         entity.setHealth(level);
+
         // add potion effects
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.ABSORPTION, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.JUMP, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION, Integer.MAX_VALUE, 2), true);
-        }
-        if (bitQuest.rand(1, 100) < level) {
-          entity.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, Integer.MAX_VALUE, 2), true);
-        }
+        ArrayList<PotionEffect> effects = new ArrayList<PotionEffect>() ;
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.ABSORPTION, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.JUMP, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.LEVITATION, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.REGENERATION, 999999, level, false));
+        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.SPEED, 999999, level, false));
+        entity.addPotionEffects(effects);
 
         // give random equipment
         if (entity instanceof Zombie || entity instanceof PigZombie || entity instanceof Skeleton) {
