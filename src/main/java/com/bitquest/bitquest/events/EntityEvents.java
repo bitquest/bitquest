@@ -45,6 +45,7 @@ import org.bukkit.entity.Projectile;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.entity.Villager;
 import org.bukkit.entity.Wither;
+import org.bukkit.entity.Zoglin;
 import org.bukkit.entity.Zombie;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -322,6 +323,7 @@ public class EntityEvents implements Listener {
 
     // Do not spawn some mobs on overworld
     if (world.getEnvironment() == Environment.NORMAL) {
+      if (entity instanceof Zoglin) event.setCancelled(true);
       if (entity instanceof Phantom) event.setCancelled(true);
       if (entity instanceof Wither) event.setCancelled(true);
     }
