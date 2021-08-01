@@ -168,12 +168,8 @@ public class EntityEvents implements Listener {
           event.getTo().getWorld().getEnvironment() == Environment.NORMAL && 
           event.getFrom().getChunk() != event.getTo().getChunk()) {
       try {
-        boolean fromChunkIsClaimed = bitQuest.landIsClaimed(event.getFrom());
-        String fromChunkName = "the wilderness";
-        if (fromChunkIsClaimed) fromChunkName = bitQuest.land.chunk(event.getFrom()).name;
-        boolean toChunkIsClaimed = bitQuest.landIsClaimed(event.getTo());
-        String toChunkName = fromChunkName;
-        if (toChunkIsClaimed) toChunkName = bitQuest.land.chunk(event.getTo()).name;
+        String fromChunkName = bitQuest.landIsClaimed(event.getFrom()) ? bitQuest.land.chunk(event.getFrom()).name : "the wilderness";
+        String toChunkName = bitQuest.landIsClaimed(event.getTo()) ? bitQuest.land.chunk(event.getTo()).name : "the wilderness";
         if (!fromChunkName.equals(toChunkName)) {
           if (toChunkName.equals("the wilderness")) {
             event.getPlayer().sendMessage(ChatColor.GRAY + "[ " + toChunkName + " ]");

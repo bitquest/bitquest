@@ -109,6 +109,7 @@ public class LandCommand extends CommandAction {
             bitQuest.redis.del(cacheKey);
             bitQuest.land.claim(x, z, player.getUniqueId().toString(), claimName);
             player.sendMessage(ChatColor.GREEN + "Congratulations! You are now the owner of " + claimName);
+            bitQuest.updateScoreboard(player);
             return true;
           } catch (Exception e) {
             e.printStackTrace();
