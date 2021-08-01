@@ -1,5 +1,5 @@
-FROM maven:3.8.1-openjdk-16
-ARG SPIGOT_VERSION=1.17.1
+FROM maven:3.8.1-openjdk-15
+ARG SPIGOT_VERSION=1.16.5
 ENV DEBIAN_FRONTEND noninteractive
 RUN mkdir -p /spigot/plugins
 WORKDIR /build

@@ -23,17 +23,17 @@ settings:
   deprecated-verbose: default
   shutdown-message: Server closed
 spawn-limits:
-  monsters: 100
-  animals: 20
-  water-animals: 6
-  ambient: 8
+  monsters: 50
+  animals: 8
+  water-animals: 7
+  ambient: 1
 chunk-gc:
-  period-in-ticks: 300
+  period-in-ticks: 400
   load-threshold: 300
 ticks-per:
   animal-spawns: 200
   monster-spawns: 25
-  autosave: 30000
+  autosave: 6000
 aliases: now-in-commands.yml
 database:
   username: bukkit

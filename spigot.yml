@@ -13,8 +13,8 @@
 config-version: 11
 settings:
   debug: false
-  save-user-cache-on-stop-only: false
-  bungeecord: false
+  save-user-cache-on-stop-only: true
+  bungeecord: true
   late-bind: false
   sample-count: 12
   player-shuffle: 0
@@ -65,10 +65,10 @@ world-settings:
   default:
     verbose: true
     entity-activation-range:
-      animals: 8
-      monsters: 12
-      misc: 4
-      tick-inactive-villagers: true
+      animals: 16
+      monsters: 24
+      misc: 8
+      tick-inactive-villagers: false
     entity-tracking-range:
       players: 32
       animals: 32
@@ -96,8 +96,8 @@ world-settings:
       other-multiplier: 0.0
     max-tnt-per-tick: 10
     max-tick-time:
-      tile: 8
-      entity: 16
+      tile: 1000
+      entity: 1000
     squid-spawn-range:
       min: 45.0
     mob-spawn-range: 6
@@ -115,8 +115,8 @@ world-settings:
     item-despawn-rate: 1200
     merge-radius:
       item: 4
-      exp: 10
-    arrow-despawn-rate: 1200
+      exp: 6
+    arrow-despawn-rate: 300
     enable-zombie-pigmen-portal-spawns: true
     wither-spawn-sound-radius: 0
     view-distance: 8
