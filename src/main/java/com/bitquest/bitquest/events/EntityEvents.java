@@ -365,14 +365,13 @@ public class EntityEvents implements Listener {
 
         // add potion effects
         ArrayList<PotionEffect> effects = new ArrayList<PotionEffect>();
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.ABSORPTION, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.JUMP, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.LEVITATION, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.REGENERATION, 999999, level, false));
-        if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.SPEED, 999999, level, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.ABSORPTION, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.INCREASE_DAMAGE, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.JUMP, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.REGENERATION, 999999, level, false, false));
+        if (BitQuest.rand(1, 100) < level) effects.add(new PotionEffect(PotionEffectType.SPEED, 999999, level, false, false));
         entity.addPotionEffects(effects);
 
         // give random equipment
@@ -401,14 +400,19 @@ public class EntityEvents implements Listener {
         // spawn extra mobs
         EntityType extraMobType = null;
         if (BitQuest.rand(1,10) == 1) {
-          if (world.getEnvironment() == Environment.NORMAL) extraMobType = EntityType.WITCH;
-          if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.BLAZE;
-          if (world.getEnvironment() == Environment.THE_END) extraMobType = EntityType.PHANTOM;
-          if (BitQuest.rand(1,10) == 1) {
-            if (world.getEnvironment() == Environment.NORMAL) extraMobType = EntityType.ENDERMITE;
-            if (world.getEnvironment() == Environment.NETHER) extraMobType = EntityType.PIGLIN_BRUTE;
-            if (world.getEnvironment() == Environment.THE_END) extraMobType = EntityType.RAVAGER;
-          }
+          // Overworld
+          if (entity.getType() == EntityType.SKELETON) extraMobType = EntityType.WITCH;
+          if (entity.getType() == EntityType.ZOMBIE) extraMobType = EntityType.SILVERFISH;
+          if (entity.getType() == EntityType.SPIDER) extraMobType = EntityType.ZOGLIN;
+          // Nether
+          if (entity.getType() == EntityType.PIGLIN) extraMobType = EntityType.BLAZE;
+          if (entity.getType() == EntityType.MAGMA_CUBE) extraMobType = EntityType.GHAST;
+          if (entity.getType() == EntityType.SKELETON) extraMobType = EntityType.WITHER_SKELETON;
+          if (entity.getType() == EntityType.BLAZE) extraMobType = EntityType.WITHER;
+          if (entity.getType() == EntityType.WITHER_SKELETON) extraMobType = EntityType.HOGLIN;
+          // The End
+          if (entity.getType() == EntityType.SHULKER) extraMobType = EntityType.PIGLIN_BRUTE;
+          if (entity.getType() == EntityType.ENDERMAN) extraMobType = EntityType.RAVAGER;
         }
         if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
