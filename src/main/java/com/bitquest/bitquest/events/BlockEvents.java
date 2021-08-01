@@ -5,6 +5,7 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
+import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.event.EventHandler;
@@ -71,22 +72,19 @@ public class BlockEvents implements Listener {
 
   @EventHandler
   void onBlockBreak(BlockBreakEvent event) {
-    // If block is bedrock, cancel the event
     Block b = event.getBlock();
     Material m = b.getType();
-    if (event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_the_end")
-        || event.getBlock().getLocation().getWorld().getName().equalsIgnoreCase("world_nether")) {
-      if (bitQuest.isModerator(event.getPlayer())) {
-        event.setCancelled(false);
-      } else {
-        event.setCancelled(true);
-      }
-    } else if (m.equals(Material.BEDROCK) || m.equals(Material.LEGACY_COMMAND) ||
-        m.equals(Material.LEGACY_COMMAND_CHAIN)
-        || m.equals(Material.LEGACY_COMMAND_REPEATING)) {
+      // If block is bedrock, cancel the event
+    if(m.equals(Material.BEDROCK)) {
       event.setCancelled(true);
-      // If player is in a no-build zone, cancel the event
-    } else if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+      return;
+    }
+    Environment environment = event.getBlock().getLocation().getWorld().getEnvironment();
+    if (environment == Environment.NETHER || environment == Environment.THE_END) {
+      event.setCancelled(true);
+      return;
+    }
+    if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
       event.setCancelled(true);
     } else {
       event.setCancelled(false);

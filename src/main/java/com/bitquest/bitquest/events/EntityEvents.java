@@ -249,6 +249,7 @@ public class EntityEvents implements Listener {
         if (player != null) {
           // Award experience
           BitQuest.log("kill", player.getName() + " killed " + entity.getName());
+          event.setDroppedExp(level);
 
           try {
             if (player.getLevel() < BitQuest.maxLevel()) {
