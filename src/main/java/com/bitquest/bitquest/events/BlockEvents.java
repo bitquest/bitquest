@@ -74,8 +74,8 @@ public class BlockEvents implements Listener {
   void onBlockBreak(BlockBreakEvent event) {
     Block b = event.getBlock();
     Material m = b.getType();
-      // If block is bedrock, cancel the event
-    if(m.equals(Material.BEDROCK)) {
+    // If block is bedrock, cancel the event
+    if (m.equals(Material.BEDROCK)) {
       event.setCancelled(true);
       return;
     }

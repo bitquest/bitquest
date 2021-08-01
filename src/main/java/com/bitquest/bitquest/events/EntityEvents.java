@@ -722,18 +722,28 @@ public class EntityEvents implements Listener {
   }
 
   @EventHandler
-  public void onPlayerInteract(PlayerInteractEvent event)
-      throws ParseException, org.json.simple.parser.ParseException, IOException {
-
+  public void onPlayerInteract(PlayerInteractEvent event) {
     Block b = event.getClickedBlock();
     Player p = event.getPlayer();
-    if (b != null) {
+    List<Material> allowedBlocks = Arrays.asList(
+        Material.CRAFTING_TABLE
+    );
+    if (allowedBlocks.contains(b.getType())) {
+      // Some blocks are allowed to use on land claimed by other players
+      event.setCancelled(false);
+    } else {
       // If player doesn't have permission, disallow the player to interact with it.
-      if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+      try {
+        if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+          event.setCancelled(true);
+          p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
         event.setCancelled(true);
-        p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
       }
     }
+
   }
 
   @EventHandler

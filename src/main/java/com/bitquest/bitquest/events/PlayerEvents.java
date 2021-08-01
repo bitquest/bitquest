@@ -41,6 +41,7 @@ public class PlayerEvents implements Listener {
 
   @EventHandler
   public void onExperienceChange(PlayerExpChangeEvent event) {
+    BitQuest.debug("onExperienceChange", event.getPlayer().getName() + ":" + event.getAmount());
     bitQuest.setTotalExperience(event.getPlayer());
     event.setAmount(0);
   }
