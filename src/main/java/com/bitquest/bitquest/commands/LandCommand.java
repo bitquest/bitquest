@@ -25,8 +25,6 @@ public class LandCommand extends CommandAction {
     if (player.getLocation().getWorld().getName().equals("world_nether")) return false;
     if (args.length == 0) return false;
     Location location = player.getLocation();
-    String subCommand = args[0];
-    System.out.println(subCommand);
     int x = location.getChunk().getX();
     int z = location.getChunk().getZ();
     LandChunk chunk;
@@ -37,7 +35,16 @@ public class LandCommand extends CommandAction {
       e.printStackTrace();
       return true;
     }
-    
+    String subCommand = args[0];
+    if (subCommand == null) {
+      // land info
+      if (chunk != null) {
+        player.sendMessage(ChatColor.GREEN + "Land name: " + chunk.name);
+      } else {
+        player.sendMessage(ChatColor.GREEN + "This land is not claimed yet.");
+      }
+      return true;
+    }
     if (subCommand.equalsIgnoreCase("rename")) {
       if (chunk == null) {
         player.sendMessage(ChatColor.RED + "This land is not claimed yet.");

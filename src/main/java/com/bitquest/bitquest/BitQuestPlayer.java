@@ -120,13 +120,19 @@ public class BitQuestPlayer {
     // Create players table
     String sql = "CREATE TABLE IF NOT EXISTS players (uuid varchar(36) PRIMARY KEY, clan varchar(32), experience int NOT NULL);";
     PreparedStatement ps = conn.prepareStatement(sql);
-    BitQuest.debug("sql",sql);
+    BitQuest.debug("sql", sql);
     ps.executeUpdate();
     ps.close();
     // Create clan_invites table
     sql = "CREATE TABLE IF NOT EXISTS clan_invites (uuid varchar(36), clan varchar(32));";
     ps = conn.prepareStatement(sql);
-    BitQuest.debug("sql",sql);
+    BitQuest.debug("sql", sql);
+    ps.executeUpdate();
+    ps.close();
+    // Add name column to players to store nicknames
+    sql = "ALTER TABLE players ADD COLUMN IF NOT EXISTS column_name varchar(32)";
+    ps = conn.prepareStatement(sql);
+    BitQuest.debug("sql", sql);
     ps.executeUpdate();
     ps.close();
   }

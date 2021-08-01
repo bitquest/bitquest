@@ -364,7 +364,7 @@ public class EntityEvents implements Listener {
         entity.setHealth(level);
 
         // add potion effects
-        ArrayList<PotionEffect> effects = new ArrayList<PotionEffect>() ;
+        ArrayList<PotionEffect> effects = new ArrayList<PotionEffect>();
         if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.ABSORPTION, 999999, level, false));
         if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE, 999999, level, false));
         if (BitQuest.rand(1, 2) == 1) effects.add(new PotionEffect(PotionEffectType.FIRE_RESISTANCE, 999999, level, false));
