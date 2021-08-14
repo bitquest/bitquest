@@ -32,6 +32,7 @@ import com.bitquest.bitquest.events.InventoryEvents;
 import com.bitquest.bitquest.events.PlayerEvents;
 import com.bitquest.bitquest.events.ServerEvents;
 import com.google.gson.JsonObject;
+import io.sentry.Sentry;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -252,6 +253,16 @@ public class BitQuest extends JavaPlugin {
     this.node.port = BitQuest.NODE_PORT;
     this.node.rpcUsername = BitQuest.NODE_RPC_USERNAME;
     this.node.rpcPassword = BitQuest.NODE_RPC_PASSWORD;
+    if (SENTRY_DSN != null) {
+      Sentry.init(options -> {
+        options.setDsn(SENTRY_DSN);
+        // Set traces_sample_rate to 1.0 to capture 100% of transactions for performance monitoring.
+        // We recommend adjusting this value in production.
+        options.setTracesSampleRate(1.0);
+        // When first trying Sentry it's good to see what the SDK is doing:
+        options.setDebug(true);
+      });
+    }
     // register commands
     commands = new HashMap<String, CommandAction>();
     commands.put("wallet", new WalletCommand(this));

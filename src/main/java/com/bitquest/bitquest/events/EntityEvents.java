@@ -276,7 +276,7 @@ public class EntityEvents implements Listener {
           String lootTimerKey = "timer:loot:" + player.getUniqueId().toString();
           if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
             try {
-              Double loot =  Double.valueOf(BitQuest.rand(1,level)) * 10;         
+              Double loot =  Double.valueOf(BitQuest.rand(1,level*10));         
               if (BitQuest.rand(1,5) == 1 && bitQuest.wallet.balance(3) > loot) {
                 bitQuest.redis.set(lootTimerKey, "1");
                 bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
