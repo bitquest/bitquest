@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang.WordUtils;
@@ -317,7 +318,7 @@ public class EntityEvents implements Listener {
     int spawnDistance = (int) world.getSpawnLocation().distance(location);
     if (world.getEnvironment() == Environment.NETHER) {
       minLevel = 10;
-      maxLevel = 30;
+      maxLevel = 20;
     } else if (world.getEnvironment() == Environment.THE_END) {
       minLevel = 20;
       maxLevel = 50;
@@ -330,16 +331,26 @@ public class EntityEvents implements Listener {
     // max level is 128
     int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 200)));
 
+    // only allow one wither per world
+    if (entityType == EntityType.WITHER) {
+      if (event.getLocation().getWorld().getEnvironment() != Environment.NORMAL) event.setCancelled(true);
+      for (Entity e : event.getLocation().getWorld().getEntities()) {
+        if (e.getType() == EntityType.WITHER) event.setCancelled(true);
+      }
+    }
+
     // Do not spawn some mobs on overworld
     if (world.getEnvironment() == Environment.NORMAL) {
       if (entity instanceof Zoglin) event.setCancelled(true);
       if (entity instanceof Phantom) event.setCancelled(true);
       if (entity instanceof Wither) event.setCancelled(true);
     }
+
     // Disable mob spawners
     if (event.getSpawnReason() == SpawnReason.SPAWNER) {
       event.setCancelled(true);
-    } 
+    }
+
     boolean isEnemy = false;
     if (entity instanceof Ghast) isEnemy = true;
     if (entity instanceof Giant) isEnemy = true;
@@ -408,20 +419,33 @@ public class EntityEvents implements Listener {
 
         // spawn extra mobs
         EntityType extraMobType = null;
-        if (BitQuest.rand(1,5) == 1) {
-          // Overworld
-          if (entity.getType() == EntityType.SKELETON) extraMobType = EntityType.WITCH;
-          if (entity.getType() == EntityType.ZOMBIE) extraMobType = EntityType.SILVERFISH;
-          if (entity.getType() == EntityType.SPIDER) extraMobType = EntityType.ZOGLIN;
-          // Nether
-          if (entity.getType() == EntityType.PIGLIN) extraMobType = EntityType.BLAZE;
-          if (entity.getType() == EntityType.MAGMA_CUBE) extraMobType = EntityType.GHAST;
-          if (entity.getType() == EntityType.SKELETON) extraMobType = EntityType.WITHER_SKELETON;
-          if (entity.getType() == EntityType.BLAZE) extraMobType = EntityType.WITHER;
-          if (entity.getType() == EntityType.WITHER_SKELETON) extraMobType = EntityType.HOGLIN;
-          // The End
-          if (entity.getType() == EntityType.SHULKER) extraMobType = EntityType.PIGLIN_BRUTE;
-          if (entity.getType() == EntityType.ENDERMAN) extraMobType = EntityType.RAVAGER;
+        List<EntityType> overworldMobs = Arrays.asList(
+            EntityType.WITCH,
+            EntityType.SILVERFISH,
+            EntityType.WITHER
+        );
+        List<EntityType> netherMobs = Arrays.asList(
+            EntityType.ZOGLIN,
+            EntityType.GHAST,
+            EntityType.WITHER_SKELETON,
+            EntityType.HOGLIN
+        );
+        List<EntityType> endMobs = Arrays.asList(
+            EntityType.GHAST,
+            EntityType.WITHER_SKELETON,
+            EntityType.HOGLIN,
+            EntityType.ZOGLIN,
+            EntityType.PIGLIN_BRUTE,
+            EntityType.RAVAGER
+        );
+        
+        
+        if (BitQuest.rand(1,20) == 1) {
+          Random rand = new Random();
+          if (location.getWorld().getEnvironment() == Environment.NORMAL) extraMobType = overworldMobs.get(rand.nextInt(overworldMobs.size()));
+          if (location.getWorld().getEnvironment() == Environment.NETHER) extraMobType = netherMobs.get(rand.nextInt(netherMobs.size()));
+          if (location.getWorld().getEnvironment() == Environment.THE_END) extraMobType = endMobs.get(rand.nextInt(endMobs.size()));
+
         }
         if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
