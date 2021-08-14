@@ -4,6 +4,7 @@ import com.bitquest.bitquest.BitQuest;
 import com.bitquest.bitquest.BitQuestPlayer;
 import com.bitquest.bitquest.LandChunk;
 import com.bitquest.bitquest.Wallet;
+import io.sentry.Sentry;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -276,7 +277,7 @@ public class EntityEvents implements Listener {
           String lootTimerKey = "timer:loot:" + player.getUniqueId().toString();
           if (player != null && bitQuest.redis.exists(lootTimerKey) == false) {
             try {
-              Double loot =  Double.valueOf(BitQuest.rand(1,level*10));         
+              Double loot =  Double.valueOf(BitQuest.rand(1,level * 10));         
               if (BitQuest.rand(1,5) == 1 && bitQuest.wallet.balance(3) > loot) {
                 bitQuest.redis.set(lootTimerKey, "1");
                 bitQuest.redis.expire(lootTimerKey, BitQuest.rand(60,600));
@@ -732,22 +733,24 @@ public class EntityEvents implements Listener {
     List<Material> allowedBlocks = Arrays.asList(
         Material.CRAFTING_TABLE
     );
-    if (allowedBlocks.contains(b.getType())) {
-      // Some blocks are allowed to use on land claimed by other players
-      event.setCancelled(false);
-    } else {
-      // If player doesn't have permission, disallow the player to interact with it.
-      try {
-        if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+    if (b != null) {
+      if (allowedBlocks.contains(b.getType())) {
+        // Some blocks are allowed to use on land claimed by other players
+        event.setCancelled(false);
+      } else {
+        // If player doesn't have permission, disallow the player to interact with it.
+        try {
+          if (!bitQuest.canBuild(b.getLocation(), event.getPlayer())) {
+            event.setCancelled(true);
+            p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
+          }
+        } catch (Exception e) {
+          e.printStackTrace();
+          Sentry.captureException(e);
           event.setCancelled(true);
-          p.sendMessage(ChatColor.DARK_RED + "You don't have permission to do that!");
         }
-      } catch (Exception e) {
-        e.printStackTrace();
-        event.setCancelled(true);
       }
     }
-
   }
 
   @EventHandler
