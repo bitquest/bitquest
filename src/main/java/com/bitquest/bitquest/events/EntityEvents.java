@@ -253,6 +253,8 @@ public class EntityEvents implements Listener {
           try {
             if (player.getLevel() < BitQuest.maxLevel()) {
               int experience = level * 10;
+              if (player.getLocation().getWorld().getEnvironment() == Environment.NETHER) experience = experience * 2;
+              if (player.getLocation().getWorld().getEnvironment() == Environment.THE_END) experience = experience * 4;
               bitQuest.player(player).addExperience(experience);
               bitQuest.redis.del(BitQuestPlayer.cachedExperienceKey(player));
             }
