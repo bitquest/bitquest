@@ -453,16 +453,20 @@ public class EntityEvents implements Listener {
           if (location.getWorld().getEnvironment() == Environment.THE_END) extraMobType = endMobs.get(rand.nextInt(endMobs.size()));
         }
 
-        // spawn wither in overworld
-        if (BitQuest.rand(1,100) == 1 && world.getEnvironment().equals(Environment.NORMAL)) {
-          world.spawnEntity(location.clone().add(
-              200 - BitQuest.rand(0,400),
-              50,
-              200 - BitQuest.rand(0,400)), 
-              EntityType.WITHER);
+        // spawn extra mobs
+        try {
+          if (BitQuest.rand(1,100) == 1 && world.getEnvironment().equals(Environment.NORMAL)) {
+            world.spawnEntity(location.clone().add(
+                200 - BitQuest.rand(0,400),
+                50,
+                200 - BitQuest.rand(0,400)), 
+                EntityType.WITHER);
+          }
+          if (extraMobType != null) world.spawnEntity(location,extraMobType);
+        } catch (Exception e) {
+          e.printStackTrace();
+          Sentry.captureException(e);
         }
-      
-        if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
       }
