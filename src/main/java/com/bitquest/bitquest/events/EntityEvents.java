@@ -228,8 +228,7 @@ public class EntityEvents implements Listener {
     event.setDroppedExp(0);
     if (entity instanceof Player) {
       event.getDrops().clear();
-    }
-    if (entity instanceof Monster && event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
+    } else if (event.getEntity().getLastDamageCause() instanceof EntityDamageByEntityEvent) {
       if (entity.hasMetadata("level")) {
         int level = entity.getMetadata("level").get(0).asInt();
         if (level < 1) level = 1;
@@ -251,6 +250,10 @@ public class EntityEvents implements Listener {
           event.setDroppedExp(level);
 
           try {
+            String killersKey = "killers:" + entity.getUniqueId();
+            for (String uuidString : bitQuest.redis.smembers(killersKey)) {
+              BitQuest.log("killer", entity.getCustomName() + " " + uuidString);
+            }
             if (player.getLevel() < BitQuest.maxLevel()) {
               int experience = level * 10;
               if (player.getLocation().getWorld().getEnvironment() == Environment.NETHER) experience = experience * 2;
@@ -260,6 +263,7 @@ public class EntityEvents implements Listener {
             }
             bitQuest.setTotalExperience(player);
           } catch (Exception e) {
+            Sentry.captureException(e);
             e.printStackTrace();
           }
 
@@ -516,8 +520,17 @@ public class EntityEvents implements Listener {
             event.setCancelled(true);
           }
         }
+      
         if (event.getEntity() instanceof LivingEntity) {
           LivingEntity damaged = (LivingEntity)event.getEntity();
+          try {
+            String killersKey = "killers:" + damaged.getUniqueId();
+            bitQuest.redis.sadd(killersKey, damager.getUniqueId().toString());
+            bitQuest.redis.expire(killersKey, 60);
+          } catch (Exception e) {
+            e.printStackTrace();
+            Sentry.captureException(e);
+          }
           System.out.println(damager.getName() + " -> " + event.getDamage() + " " + damaged.getHealth() + "/" + damaged.getMaxHealth());
         }
       } else {
