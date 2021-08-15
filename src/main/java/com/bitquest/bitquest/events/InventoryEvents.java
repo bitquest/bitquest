@@ -41,7 +41,7 @@ public class InventoryEvents implements Listener {
     trades = new ArrayList<>();
     // Food
     trades.add(new Trade(new ItemStack(Material.APPLE, 64), 1));
-    trades.add(new Trade(new ItemStack(Material.COOKED_BEEF, 64), 10));
+    trades.add(new Trade(new ItemStack(Material.COOKED_BEEF, 64), 2));
     trades.add(new Trade(new ItemStack(Material.CAKE, 1), 1));
 
     // Basic weapons
