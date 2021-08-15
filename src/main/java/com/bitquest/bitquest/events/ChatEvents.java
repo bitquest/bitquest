@@ -51,7 +51,6 @@ public class ChatEvents implements Listener {
               + message;
       event.setCancelled(true);
       for (Player player : Bukkit.getServer().getOnlinePlayers()) {
-        System.out.println(player.getLocation().distance(sender.getLocation()));
         if (
             player.getLocation().getWorld().getName().equals(sender.getLocation().getWorld().getName()) &&
             player.getLocation().distance(sender.getLocation()) < 10000000
