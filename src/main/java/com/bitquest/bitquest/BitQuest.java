@@ -351,6 +351,13 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
+  public boolean bossSpawned() {
+    for (Entity e : Bukkit.getWorld("world").getEntities()) {
+      if (e.getType() == EntityType.WITHER) return true;
+    }
+    return false;
+  }
+
   public void updateLootPoolCache() throws Exception {
     System.out.println("[loot_cache]");
     bossAlreadySpawned = false;
@@ -461,7 +468,7 @@ public class BitQuest extends JavaPlugin {
     }
   }
 
-
+  
 
   public void createPet(User user, String petName) {
     redis.sadd("pet:names", petName);

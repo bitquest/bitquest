@@ -337,6 +337,11 @@ public class EntityEvents implements Listener {
     // max level is 128
     int level = Math.min(maxLevel, BitQuest.rand(minLevel, minLevel + (spawnDistance / 200)));
 
+    // Disable mob spawners
+    if (event.getSpawnReason() == SpawnReason.SPAWNER) {
+      event.setCancelled(true);
+    }
+
     // only allow one wither per world
     if (entityType == EntityType.WITHER) {
       if (event.getLocation().getWorld().getEnvironment() != Environment.NORMAL) event.setCancelled(true);
@@ -345,22 +350,14 @@ public class EntityEvents implements Listener {
       }
     }
 
-    // Do not spawn some mobs on overworld
-    if (world.getEnvironment() == Environment.NORMAL) {
-      if (entity instanceof Zoglin) event.setCancelled(true);
-      if (entity instanceof Phantom) event.setCancelled(true);
-      if (entity instanceof Wither) event.setCancelled(true);
-    }
-
-    // Disable mob spawners
-    if (event.getSpawnReason() == SpawnReason.SPAWNER) {
-      event.setCancelled(true);
-    }
-
     boolean isEnemy = false;
     if (entity instanceof Ghast) isEnemy = true;
     if (entity instanceof Giant) isEnemy = true;
     if (entity instanceof Monster) isEnemy = true;
+    if (entity instanceof Wither) {
+      isEnemy = true;
+      level = 10;
+    }
 
     if (isEnemy && !event.isCancelled()) {
       // Do not spawn monsters on claimed land
@@ -386,7 +383,10 @@ public class EntityEvents implements Listener {
         // entity.setMaxHealth(1 + level);
         AttributeInstance attribute = entity.getAttribute(Attribute.GENERIC_MAX_HEALTH);
         attribute.setBaseValue(level);
-        entity.setHealth(level);
+        int baseHealth = 0;
+        if (entityType.equals(EntityType.WITHER)) baseHealth = 50;
+        int health = level + baseHealth;
+        entity.setHealth(health);
 
         // add potion effects
         ArrayList<PotionEffect> effects = new ArrayList<PotionEffect>();
@@ -427,13 +427,14 @@ public class EntityEvents implements Listener {
         EntityType extraMobType = null;
         List<EntityType> overworldMobs = Arrays.asList(
             EntityType.WITCH,
-            EntityType.SILVERFISH,
-            EntityType.WITHER
+            EntityType.SILVERFISH
         );
         List<EntityType> netherMobs = Arrays.asList(
             EntityType.ZOGLIN,
             EntityType.GHAST,
             EntityType.WITHER_SKELETON,
+            EntityType.ENDERMITE,
+            EntityType.EVOKER,
             EntityType.HOGLIN
         );
         List<EntityType> endMobs = Arrays.asList(
@@ -444,21 +445,28 @@ public class EntityEvents implements Listener {
             EntityType.PIGLIN_BRUTE,
             EntityType.RAVAGER
         );
-        
-        
+
         if (BitQuest.rand(1,20) == 1) {
           Random rand = new Random();
           if (location.getWorld().getEnvironment() == Environment.NORMAL) extraMobType = overworldMobs.get(rand.nextInt(overworldMobs.size()));
           if (location.getWorld().getEnvironment() == Environment.NETHER) extraMobType = netherMobs.get(rand.nextInt(netherMobs.size()));
           if (location.getWorld().getEnvironment() == Environment.THE_END) extraMobType = endMobs.get(rand.nextInt(endMobs.size()));
-
         }
+
+        // spawn wither in overworld
+        if (BitQuest.rand(1,100) == 1 && world.getEnvironment().equals(Environment.NORMAL)) {
+          world.spawnEntity(location.clone().add(
+              200 - BitQuest.rand(0,400),
+              50,
+              200 - BitQuest.rand(0,400)), 
+              EntityType.WITHER);
+        }
+      
         if (extraMobType != null) world.spawnEntity(location,extraMobType);
         entity.setMetadata("level", new FixedMetadataValue(bitQuest, Integer.toString(level)));
         BitQuest.log("spawn", location.getWorld().getName() + " " + entity.getCustomName());
       }
     }
-    
   }
 
   @EventHandler
