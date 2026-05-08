@@ -66,7 +66,7 @@
         <dependency>
             <groupId>org.bitcoinj</groupId>
             <artifactId>bitcoinj-core</artifactId>
-            <version>0.15.10</version>
+            <version>0.17.1</version>
         </dependency>
         <dependency>
             <groupId>io.sentry</groupId>
